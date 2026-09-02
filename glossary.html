@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · 약어 사전</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+</style>
+<style>
+/* ── 약어 사전 전용 ──────────────────────────────────────────────
+   강의 노트의 .jargon 은 "강의 → 용어" 방향이다. 읽다가 마주친 말을 푼다.
+   이 페이지는 반대 방향이다. 용어를 이미 알고 있고 뜻을 찾으러 온다.
+   그래서 알파벳순이고, 설명은 짧고, 자세한 건 노트로 링크한다.
+   설명을 양쪽에 복제하지 않는다. 복제하면 반드시 갈라진다. */
+.wrap.gloss{grid-template-columns:minmax(0,1fr);max-width:900px}
+.tools{position:sticky;top:0;z-index:20;background:var(--paper);padding:14px 0 12px;border-bottom:1px solid var(--rule);margin-bottom:8px}
+.tools input{width:100%;font-family:var(--sans);font-size:15px;padding:11px 14px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--card);color:var(--ink)}
+.tools input:focus{outline:2px solid var(--blue);outline-offset:1px}
+.tools .count{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:9px;letter-spacing:.05em}
+.alpha{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.alpha a{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:5px;background:var(--chip);
+  color:var(--ink2);text-decoration:none;border-bottom:none}
+.alpha a:hover{background:rgba(var(--blue-rgb),.12);color:var(--blue)}
+.gletter{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink3);
+  margin:38px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--rule);scroll-margin-top:96px}
+.gterm{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:15px 18px;margin-bottom:9px}
+.gterm .t{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.gterm .f{font-size:13px;color:var(--ink3);margin-top:2px}
+.gterm .d{font-size:14.5px;color:var(--ink2);line-height:1.65;margin-top:9px}
+.gterm .d strong{color:var(--ink)}
+.gterm .src{margin-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em}
+.gterm .src a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.35)}
+.gterm .src a:hover{background:rgba(var(--blue-rgb),.09)}
+.gterm.hide{display:none}
+.gletter.hide{display:none}
+.noresult{padding:40px 0;text-align:center;color:var(--ink3);font-size:14.5px}
+</style>
+</head>
+<body>
+<div class="wrap gloss">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Jeff (Jun) Zhang</div>
+  <h1 class="title" lang="ko">약어 사전</h1>
+  <h1 class="title" lang="en">Glossary</h1>
+  <p class="subtitle" lang="ko">논문을 펴놓고 "이게 뭐였지" 할 때 오는 곳. 알파벳순이고, 자세한 설명은 해당 강의 노트로 보낸다. ML 쪽 용어와 하드웨어 쪽 용어를 섞어 두었다. 이 수업의 요점이 그 둘이 한 문장 안에 나온다는 것이기 때문이다.</p>
+  <p class="subtitle" lang="en">The page you open with a paper in front of you asking "what was that again". Alphabetical, with the detail left to the lecture notes. ML terms and hardware terms are mixed together on purpose, because the point of this course is that they show up in the same sentence.</p>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<main>
+<div class="tools">
+  <input type="search" id="q" autocomplete="off" spellcheck="false">
+  <div class="count" id="cnt"></div>
+  <nav class="alpha" id="alpha"></nav>
+</div>
+
+<div id="list">
+
+<h2 class="gletter" id="gA">A</h2>
+
+<div class="gterm">
+  <div class="t">APR</div>
+  <div class="f">Automatic Place and Route</div>
+  <div class="d" lang="ko">합성이 만든 netlist의 게이트를 칩 위 어디에 놓고 어떻게 배선할지 도구가 정하는 단계. 이 수업 Project에서는 Cadence Innovus를 쓴다. <strong>합성 직후의 면적·지연 숫자는 배선을 모르는 추정치</strong>이므로, 논문에 넣는 값은 post-APR이어야 한다.</div>
+  <div class="d" lang="en">The stage where the tool decides where each gate from the netlist sits on the die and how the wires run. This course suggests Cadence Innovus. <strong>Area and delay straight out of synthesis are estimates made without wires</strong>, so numbers in a paper should be post-APR.</div>
+  <div class="src"><a href="L01-introduction.html#s6">Lecture 1 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ASPLOS</div>
+  <div class="f">Architectural Support for Programming Languages and Operating Systems</div>
+  <div class="d" lang="ko">하드웨어와 소프트웨어의 <strong>경계</strong>를 다루는 최상위 학회. 이 수업의 compilation과 systems 주제가 가장 가까이 있는 곳이다.</div>
+  <div class="d" lang="en">A top venue for work on <strong>the boundary</strong> between hardware and software, and the closest home for this course's compilation and systems topics.</div>
+  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<h2 class="gletter" id="gB">B</h2>
+
+<div class="gterm">
+  <div class="t">bfloat</div>
+  <div class="f">brain floating point (bfloat16)</div>
+  <div class="d" lang="ko">부호 1 + 지수 8 + 가수 7 비트의 16비트 부동소수점. <strong>FP32와 지수 폭이 같아서 표현 범위가 같고, 정밀도만 잃는다.</strong> 그래서 FP32 코드를 거의 그대로 옮길 수 있다. TPU v2가 학습에 쓴 형식이다.</div>
+  <div class="d" lang="en">A 16-bit float laid out as 1 sign + 8 exponent + 7 mantissa bits. <strong>It keeps FP32's exponent width, so the dynamic range is the same and only precision is lost</strong>, which is why FP32 code ports across almost unchanged. This is the format TPU v2 trains in.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gC">C</h2>
+
+<div class="gterm">
+  <div class="t">CGRA</div>
+  <div class="f">Coarse-Grained Reconfigurable Array</div>
+  <div class="d" lang="ko">재구성 가능한 배열인데 단위가 <strong>1비트 LUT가 아니라 연산기(ALU)</strong>인 구조. ASIC의 효율과 FPGA의 유연성 사이를 노린다. SambaNova의 RDU가 이 계열에 가깝다.</div>
+  <div class="d" lang="en">A reconfigurable array whose unit is <strong>an ALU rather than a one-bit LUT</strong>, aiming between ASIC efficiency and FPGA flexibility. SambaNova's RDU is close to this family.</div>
+  <div class="src"><a href="L01-introduction.html#s2">Lecture 1 · 02</a></div>
+</div>
+
+<h2 class="gletter" id="gD">D</h2>
+
+<div class="gterm">
+  <div class="t">Dennard scaling</div>
+  <div class="d" lang="ko">트랜지스터가 작아져도 <strong>단위 면적당 전력이 일정하게 유지된다</strong>는 관측. 2000년대 중후반에 끝났다. <strong>Moore의 법칙과 다른 이야기다.</strong> Moore는 개수, Dennard는 전력이다. 도메인 특화 하드웨어는 Moore가 아니라 <strong>Dennard가 끝난 것에 대한 대답</strong>이다.</div>
+  <div class="d" lang="en">The observation that <strong>power per unit area stays constant</strong> as transistors shrink. It ended in the mid to late 2000s. <strong>Not the same claim as Moore's law</strong>: Moore is about count, Dennard about power. Domain-specific hardware is a reply to the end of <strong>Dennard</strong>, not of Moore.</div>
+  <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DSA</div>
+  <div class="f">Domain-Specific Accelerator / Architecture</div>
+  <div class="d" lang="ko">슬라이드의 정의로는 <em>"customized hardware designed for a domain of applications"</em>. <strong>하나의 앱이 아니라 한 부류의 연산</strong>을 잘하는 회로다. Neural Engine은 특정 모델이 아니라 convolution과 matmul을 잘한다.</div>
+  <div class="d" lang="en">In the slide's words, <em>"customized hardware designed for a domain of applications"</em>. A circuit good at <strong>a class of computation, not one application</strong>: a Neural Engine is not good at a particular model, it is good at convolution and matmul.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gF">F</h2>
+
+<div class="gterm">
+  <div class="t">FLOP</div>
+  <div class="f">FLoating-point OPeration</div>
+  <div class="d" lang="ko">부동소수점 연산 <strong>한 번</strong>. 세는 단위다. "이 모델을 학습시키는 데 총 몇 번"처럼 <strong>워크로드</strong>를 말할 때 쓴다. <strong>MAC 한 번은 FLOP 두 번</strong>(곱하기 + 더하기)이므로, MAC으로 적힌 논문과 비교하려면 2배를 맞춘다.</div>
+  <div class="d" lang="en">One floating-point operation: a count, used to describe <strong>a workload</strong>, as in how many it took to train a model. <strong>One MAC is two FLOPs</strong> (a multiply and an add), so comparing against a paper that counts MACs needs a factor of two.</div>
+  <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FLOP/s</div>
+  <div class="d" lang="ko">초당 FLOP. <strong>속도</strong>이고 <strong>기계</strong>를 말할 때 쓴다. V100의 15.7 TFLOP/s가 이것이다. FLOP과 헷갈리면 논지가 뒤집힌다.</div>
+  <div class="d" lang="en">FLOP per second: a <strong>rate</strong>, used to describe <strong>a machine</strong>, as in the V100's 15.7 TFLOP/s. Confusing it with FLOP inverts the argument.</div>
+  <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<h2 class="gletter" id="gH">H</h2>
+
+<div class="gterm">
+  <div class="t">HPCA</div>
+  <div class="f">International Symposium on High-Performance Computer Architecture</div>
+  <div class="d" lang="ko">아키텍처 최상위 학회 중 하나. 슬라이드 17쪽이 HPCA 2023에 <strong>Neural Networks and Accelerators 세션이 셋</strong> 있었다는 것을 보여준다.</div>
+  <div class="d" lang="en">One of the top architecture venues. Slide 17 shows that HPCA 2023 had <strong>three separate Neural Networks and Accelerators sessions</strong>.</div>
+  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<h2 class="gletter" id="gI">I</h2>
+
+<div class="gterm">
+  <div class="t">ISCA</div>
+  <div class="f">International Symposium on Computer Architecture</div>
+  <div class="d" lang="ko">이 분야에서 가장 오래되고 권위 있는 학회. <strong>Paper Reading 리뷰 폼의 종합 판정이 "ISCA에 붙을 만한가"를 기준으로 한다.</strong> 그래서 이 과제는 독후감이 아니라 학회 심사위원 흉내다.</div>
+  <div class="d" lang="en">The oldest and most prestigious venue in the field. <strong>The overall-merit field of the paper review form asks whether a paper is ISCA-worthy</strong>, which is what makes the assignment program-committee work rather than a book report.</div>
+  <div class="src"><a href="L01-introduction.html#s4">Lecture 1 · 04</a></div>
+</div>
+
+<h2 class="gletter" id="gM">M</h2>
+
+<div class="gterm">
+  <div class="t">MAC</div>
+  <div class="f">Multiply-Accumulate</div>
+  <div class="d" lang="ko">곱해서 누적하는 연산 한 번, 그리고 그 연산을 하는 회로. DNN 연산의 기본 단위다. Tesla FSD 칩이 <strong>96×96 MAC</strong>을 갖고 있다는 식으로 배열 크기를 세는 데 쓴다. <strong>MAC 1회 = FLOP 2회.</strong></div>
+  <div class="d" lang="en">One multiply-and-accumulate operation, and the circuit that performs it. The basic unit of DNN arithmetic, also used to size arrays, as in the Tesla FSD chip's <strong>96×96 MACs</strong>. <strong>One MAC is two FLOPs.</strong></div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MICRO</div>
+  <div class="f">International Symposium on Microarchitecture</div>
+  <div class="d" lang="ko">ISCA와 쌍벽을 이루는 아키텍처 학회. 이름대로 마이크로아키텍처 쪽에 더 가깝다.</div>
+  <div class="d" lang="en">Architecture's other flagship venue alongside ISCA, leaning, as the name says, more microarchitectural.</div>
+  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MLSys</div>
+  <div class="f">Conference on Machine Learning and Systems</div>
+  <div class="d" lang="ko">ML과 시스템의 교집합을 다루려고 <strong>새로 생긴</strong> 학회. 슬라이드 17쪽이 AICAS, TinyML과 함께 "새 학회"의 예로 든다.</div>
+  <div class="d" lang="en">A <strong>newer</strong> venue created for the intersection of ML and systems. Slide 17 lists it with AICAS and TinyML as examples of the new conferences.</div>
+  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Moore's law</div>
+  <div class="d" lang="ko">같은 면적에 들어가는 트랜지스터 <strong>개수</strong>가 약 2년마다 두 배가 된다는 관측. 슬라이드 33쪽이 <strong>14 nm에 5년 머물렀다</strong>는 것으로 정체를 보여준다. <a href="#gD">Dennard scaling</a>과 다른 이야기다.</div>
+  <div class="d" lang="en">The observation that the <strong>number</strong> of transistors per unit area doubles about every two years. Slide 33 shows the stall by way of <strong>five years spent at 14 nm</strong>. A different claim from <a href="#gD">Dennard scaling</a>.</div>
+  <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+</div>
+
+<h2 class="gletter" id="gN">N</h2>
+
+<div class="gterm">
+  <div class="t">NNA</div>
+  <div class="f">Neural Network Accelerator</div>
+  <div class="d" lang="ko">Tesla FSD 칩의 다이 사진에서 신경망 전용 블록에 붙은 이름. 회사마다 부르는 이름이 다르다: Apple은 <strong>Neural Engine</strong>, Google은 <strong>TPU</strong>, NVIDIA는 <strong>Tensor Core</strong>(GPU 안의 유닛). 같은 일을 하는 것이 아니라 <strong>비슷한 자리에 있는 것</strong>이므로 스펙을 직접 비교하면 안 된다.</div>
+  <div class="d" lang="en">The label on the neural-network block in the Tesla FSD die shot. Every company names it differently: Apple's <strong>Neural Engine</strong>, Google's <strong>TPU</strong>, NVIDIA's <strong>Tensor Core</strong> (a unit inside the GPU). These are not the same thing so much as <strong>things in a similar position</strong>, so their specs should not be compared head to head.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gP">P</h2>
+
+<div class="gterm">
+  <div class="t">PDK</div>
+  <div class="f">Process Design Kit</div>
+  <div class="d" lang="ko">특정 공정에서 설계할 때 EDA 도구가 읽는 자료 묶음. 표준 셀 라이브러리, 타이밍 모델, 설계 규칙, 기생 모델. 이 수업은 <strong>ASU와 ARM의 7nm 교육용 PDK</strong>를 권한다. <strong>교육용 PDK의 숫자는 실제 파운드리 7nm와 같지 않다.</strong> 논문에 쓸 때 반드시 밝힌다.</div>
+  <div class="d" lang="en">The bundle an EDA tool reads to design in a given process: standard cell library, timing models, design rules, parasitics. This course suggests the <strong>ASU/ARM 7nm educational PDK</strong>. <strong>An educational PDK's numbers are not a real foundry 7nm</strong>, and a paper has to say so.</div>
+  <div class="src"><a href="L01-introduction.html#s6">Lecture 1 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">PE</div>
+  <div class="f">Processing Element</div>
+  <div class="d" lang="ko">가속기 배열의 한 칸. 보통 <a href="#gM">MAC</a> 하나와 작은 레지스터를 갖는다. "PE 배열이 96×96"처럼 가속기의 규모를 말하는 단위다.</div>
+  <div class="d" lang="en">One cell of an accelerator array, usually a <a href="#gM">MAC</a> plus a little local storage. The unit in which accelerator size gets quoted, as in a 96×96 PE array.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gS">S</h2>
+
+<div class="gterm">
+  <div class="t">systolic array</div>
+  <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. <strong>이 수업에서 내부를 제대로 파는 것은 뒤쪽 강의다.</strong> L01에서는 이름만 나온다.</div>
+  <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. <strong>The internals get opened up in a later lecture</strong>; lecture 1 only names it.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gT">T</h2>
+
+<div class="gterm">
+  <div class="t">Tensor Core</div>
+  <div class="d" lang="ko">NVIDIA GPU 안에 들어 있는 행렬 곱셈 전용 유닛. <span class="m">D = A·B + C</span> 형태만 하고, 입력은 낮은 정밀도로 받아 FP32로 누산한다. V100의 <strong>15.7 TFLOP/s(FP32)와 125 Tensor TFLOP/s의 8배 차이</strong>가 이 유닛에서 나온다. <strong>범용 칩 안에 전용 가속기가 들어 있는 예다.</strong></div>
+  <div class="d" lang="en">A matrix-multiply unit inside NVIDIA GPUs. It only does <span class="m">D = A·B + C</span>, taking reduced-precision inputs and accumulating in FP32. The <strong>eightfold gap between the V100's 15.7 FP32 TFLOP/s and its 125 Tensor TFLOP/s</strong> comes from this unit. <strong>An example of a dedicated accelerator living inside a general-purpose chip.</strong></div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TOPS</div>
+  <div class="f">Tera Operations Per Second</div>
+  <div class="d" lang="ko">초당 1조 회 연산. 보통 <strong>INT8 정수</strong> 기준의 이론 최대 처리량이고 edge 추론 칩의 스펙에 쓰인다. Coral Edge TPU가 4 TOPS다. <strong>TFLOP/s와 나란히 놓으면 안 된다.</strong> 정수와 부동소수점이고 정밀도도 다르다.</div>
+  <div class="d" lang="en">A trillion operations per second, usually the theoretical peak counted in <strong>INT8 integer</strong> ops, quoted on edge inference parts. The Coral Edge TPU is 4 TOPS. <strong>Never set it beside TFLOP/s</strong>: different arithmetic, different precision.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TOPS/W</div>
+  <div class="d" lang="ko">TOPS를 소비 전력으로 나눈 값. <strong>edge 칩에서는 절대 성능보다 이 값이 더 중요하다.</strong> Coral Edge TPU가 2 TOPS/W다.</div>
+  <div class="d" lang="en">TOPS divided by power draw. <strong>On edge parts this matters more than absolute performance.</strong> The Coral Edge TPU is 2 TOPS/W.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TPU</div>
+  <div class="f">Tensor Processing Unit</div>
+  <div class="d" lang="ko">Google의 ML 가속기. <a href="#gS">systolic array</a> 기반이다. V1은 추론 전용, V2는 <a href="#gB">bfloat</a>으로 학습까지, V3는 V2의 2배. <strong>Edge TPU</strong>는 별개 제품으로 Coral 보드에 들어가고 4 TOPS / 2 TOPS/W다.</div>
+  <div class="d" lang="en">Google's ML accelerator, built on a <a href="#gS">systolic array</a>. V1 is inference only, V2 trains using <a href="#gB">bfloat</a>, V3 is twice V2. The <strong>Edge TPU</strong> is a separate product on the Coral board at 4 TOPS and 2 TOPS/W.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gW">W</h2>
+
+<div class="gterm">
+  <div class="t">WSE</div>
+  <div class="f">Wafer Scale Engine</div>
+  <div class="d" lang="ko">Cerebras의 칩. 46,225 mm²(한 변 215 mm), 1.2조 트랜지스터, 40만 코어, <strong>온칩 메모리 18 GB</strong>. 300 mm 웨이퍼에서 잘라낼 수 있는 최대치에 붙어 있다. 설계 전략이 <strong>모델을 통째로 칩 안에 올려 off-chip 접근을 없애는 것</strong>이다.</div>
+  <div class="d" lang="en">Cerebras's chip: 46,225 mm² (215 mm on a side), 1.2 trillion transistors, 400,000 cores and <strong>18 GB of on-chip memory</strong>. It sits right against what a single 300 mm wafer can yield. Its strategy is <strong>to hold the entire model on chip and delete off-chip traffic</strong>.</div>
+  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+</div>
+<div id="none" style="display:none"></div>
+</main>
+
+<footer>
+  <span lang="ko">EEE / CEN 598 Hardware and Systems for Machine Learning · 약어 사전<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  이 사전의 뜻풀이는 수강생이 강의 슬라이드와 지정 교재를 근거로 정리한 개인 학습 자료이며, 공식 강의 자료가 아닙니다.</span><span lang="en">EEE / CEN 598 Hardware and Systems for Machine Learning · glossary<br>
+  Course: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  These definitions were written by a student from the lecture slides and the assigned texts. They are not official course material.</span>
+</footer>
+
+</div>
+
+<script>
+// 검색과 알파벳 점프. 목록이 길어지면 스크롤로는 못 찾는다.
+// 브라우저 저장소는 쓰지 않는다. 상태는 전부 JS 변수와 DOM 에만 둔다.
+(function () {
+  var q = document.getElementById('q');
+  var cnt = document.getElementById('cnt');
+  var none = document.getElementById('none');
+  var alpha = document.getElementById('alpha');
+  var terms = [].slice.call(document.querySelectorAll('.gterm'));
+  var letters = [].slice.call(document.querySelectorAll('.gletter'));
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  letters.forEach(function (h) {
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    alpha.appendChild(a);
+  });
+
+  function apply() {
+    var s = q.value.trim().toLowerCase();
+    var shown = 0;
+    terms.forEach(function (t) {
+      var hit = !s || t.textContent.toLowerCase().indexOf(s) !== -1;
+      t.classList.toggle('hide', !hit);
+      if (hit) shown++;
+    });
+    letters.forEach(function (h) {
+      var any = false, n = h.nextElementSibling;
+      while (n && !n.classList.contains('gletter')) {
+        if (n.classList.contains('gterm') && !n.classList.contains('hide')) { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      h.classList.toggle('hide', !any);
+    });
+    none.style.display = shown ? 'none' : 'block';
+    none.textContent = L('검색 결과가 없다.', 'Nothing matched.');
+    cnt.textContent = s
+      ? L(shown + ' / ' + terms.length + ' 항목', shown + ' of ' + terms.length + ' entries')
+      : L('전체 ' + terms.length + ' 항목', terms.length + ' entries');
+  }
+
+  function paintPlaceholder() {
+    q.placeholder = L('용어 검색 (예: TOPS, MAC, PDK)', 'Search a term, for example TOPS, MAC, PDK');
+    q.setAttribute('aria-label', L('용어 검색', 'Search terms'));
+  }
+
+  q.addEventListener('input', apply);
+  window.addEventListener('langchange', function () { paintPlaceholder(); apply(); });
+  paintPlaceholder();
+  apply();
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

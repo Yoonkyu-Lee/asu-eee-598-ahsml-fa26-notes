@@ -1,0 +1,28 @@
+node_modules/
+shots/
+package-lock.json
+.DS_Store
+Thumbs.db
+
+# 조립 중간 산출물 (스타일 블록 공유용). 커밋하지 않는다.
+.build-*.html
+
+# PDF 는 기본적으로 전부 막고 강의 슬라이드만 되살린다.
+# Drive 미러에서 아무 PDF 나 루트로 복사해도 딸려 들어가지 않게 하는 방어다.
+*.pdf
+!slides/*.pdf
+
+# PPTX 원본은 올리지 않는다. 발표자 노트가 딸려 들어간다.
+*.pptx
+
+# Paper Reading 자료 방어선. 애초에 저장소로 복사하지 않지만,
+# 실수로 들어와도 커밋되지 않게 막는다.
+# 논문 PDF 는 위의 *.pdf 규칙이 이미 막는다.
+papers/
+reviews/
+*Review Form*
+*Sample review*
+*review*.txt
+
+# 개인 작업 지시 파일. 공개 저장소에 올리지 않는다.
+WHAT TO DO.md

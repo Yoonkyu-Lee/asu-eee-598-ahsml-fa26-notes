@@ -1,0 +1,14 @@
+{
+  "name": "asu-eee-598-ahsml-fa26-notes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ASU EEE/CEN 598 Hardware and Systems for Machine Learning - personal study notes",
+  "scripts": {
+    "verify": "node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "^6.2.108",
+    "playwright": "^1.62.1"
+  }
+}
