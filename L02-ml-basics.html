@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · Lecture 2-3 — Machine Learning Basics</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Jeff (Jun) Zhang</div>
+  <h1 class="title">Lecture 2-3<br>Machine Learning Basics</h1>
+  <p class="subtitle" lang="ko">ML 알고리즘은 전부 같은 레시피의 변형이다. 데이터셋, cost function, 모델, 최적화. 이 네 칸이 각각 하드웨어에서 무엇을 요구하는지가 이 노트의 관심사다.</p>
+  <p class="subtitle" lang="en">Every ML algorithm is a variation on one recipe: a dataset, a cost function, a model and an optimization method. What each of those four slots demands from hardware is what these notes are after.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">슬라이드 21쪽</span>
+    <span class="chip">Lecture 2와 3을 한 덱이 덮는다</span>
+    <span class="chip hot">여기서부터 수식이 나온다</span>
+    <span class="chip dim">대부분 ECE 479에서 본 내용이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">21 slides</span>
+    <span class="chip">one deck covering lectures 2 and 3</span>
+    <span class="chip hot">the equations start here</span>
+    <span class="chip dim">most of this appeared in ECE 479</span>
+  </div>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <div class="mod">Lecture 2-3</div>
+    <div class="name">Machine Learning Basics</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 강의가 하는 일</span><span lang="en">What this lecture does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">겹이 넷으로 늘었다</span><span lang="en">The rings became four</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">무엇을 사람이 정하고 무엇을 배우나</span><span lang="en">What you fix, what it learns</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">데이터가 커졌다</span><span lang="en">The data got big</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">모델도 커졌다</span><span lang="en">The models got big too</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">ML의 정의: E, T, P</span><span lang="en">Defining ML: E, T, P</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">하나의 레시피</span><span lang="en">One recipe</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">Dataset과 일반화</span><span lang="en">Datasets and generalization</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">Cost function</span><span lang="en">Cost function</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">Dropout</span><span lang="en">Dropout</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">Optimization</span><span lang="en">Optimization</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">정리 &amp; 다음 강의</span><span lang="en">Recap &amp; next lecture</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head" data-slide="1"><span class="sec-num">00</span><h2 lang="ko">이 강의가 하는 일</h2><h2 lang="en">What this lecture does</h2></div>
+  <p class="sec-sub" lang="ko">한 덱이 <strong>Lecture 2와 3 두 강의</strong>를 덮는다. 표지에 <code>Lecture 2, 3</code>이라고 적혀 있고 날짜는 8/25/2026이다. footer는 <code>2023 Fall</code>인데, L01보다도 오래된 덱이라는 뜻이다.</p>
+  <p class="sec-sub" lang="en">One deck covers <strong>both lecture 2 and lecture 3</strong>. The title page reads <code>Lecture 2, 3</code> and is dated 8/25/2026. The footer says <code>2023 Fall</code>, which makes this deck older than lecture 1's.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">한 줄로</span><span class="tag" lang="en">In one line</span>
+    <p lang="ko">거의 모든 ML 알고리즘은 <strong>데이터셋 + cost function + 모델 + 최적화 방법</strong>이라는 하나의 레시피에 값을 채워 넣은 것이다 (s12). 이 강의는 그 네 칸을 하나씩 채우며 지나간다.</p>
+    <p lang="en">Nearly every ML algorithm is one recipe with its four slots filled in: <strong>a dataset, a cost function, a model and an optimization method</strong> (slide 12). The lecture walks those four slots in order.</p>
+  </div>
+
+  <h4 lang="ko">이미 아는 것과 새로 나오는 것</h4>
+  <h4 lang="en">What you already know, and what is new</h4>
+  <p lang="ko"><strong>이 강의는 거의 전부 ECE 479에서 본 내용이다.</strong> 그래서 이 노트는 개념을 다시 가르치지 않는다. 대신 <strong>같은 개념을 하드웨어 쪽에서 다시 본다.</strong> 이 수업이 ML 수업이 아니라 하드웨어 수업이기 때문이다. 각 절에 <strong>하드웨어로 넘어가면</strong>이라는 문단이 하나씩 붙어 있고, 그게 이 노트가 새로 더하는 부분이다.</p>
+  <p lang="en"><strong>Almost all of this appeared in ECE 479</strong>, so these notes do not re-teach the concepts. They look at the same concepts <strong>from the hardware side</strong>, because this is a hardware course, not an ML course. Every section carries a paragraph headed <strong>what this costs in hardware</strong>, and that is the part the notes are adding.</p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">슬라이드</th><th lang="ko">상태</th><th lang="ko">이 노트가 더하는 것</th>
+      <th lang="en">Slide</th><th lang="en">Status</th><th lang="en">What the note adds</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">AI ⊃ ML ⊃ NN ⊃ DL (2쪽)</td><td lang="ko">안다</td><td lang="ko">L01은 겹이 <strong>셋</strong>이었다. 왜 다른지</td>
+          <td lang="en">AI ⊃ ML ⊃ NN ⊃ DL (p2)</td><td lang="en">known</td><td lang="en">Lecture 1 had <strong>three</strong> rings. Why they differ</td></tr>
+      <tr><td lang="ko">데이터셋과 모델 크기 (5-8쪽)</td><td lang="ko">안다</td><td lang="ko"><strong>바이트로 환산</strong>하면 어디에 안 들어가나</td>
+          <td lang="en">Dataset and model sizes (p5-8)</td><td lang="en">known</td><td lang="en"><strong>Converted to bytes</strong>: what does not fit where</td></tr>
+      <tr><td lang="ko">E / T / P 정의 (9-11쪽)</td><td lang="ko">안다</td><td lang="ko">세 글자가 각각 하드웨어의 무엇인가</td>
+          <td lang="en">E / T / P (p9-11)</td><td lang="en">known</td><td lang="en">What each letter maps to in hardware</td></tr>
+      <tr><td lang="ko">MSE, regularization (16-17쪽)</td><td lang="ko">안다</td><td lang="ko"><strong>L1만 sparsity를 만든다.</strong> 그게 pruning으로 이어진다</td>
+          <td lang="en">MSE, regularization (p16-17)</td><td lang="en">known</td><td lang="en"><strong>Only L1 creates sparsity</strong>, and that is the road to pruning</td></tr>
+      <tr><td lang="ko">Dropout (18쪽)</td><td lang="ko">안다</td><td lang="ko">학습에만 있다. <strong>학습용 칩과 추론용 칩이 갈리는 이유</strong></td>
+          <td lang="en">Dropout (p18)</td><td lang="en">known</td><td lang="en">Training only, and <strong>a reason training and inference chips diverge</strong></td></tr>
+      <tr><td lang="ko">SGD, momentum (19-20쪽)</td><td lang="ko">안다</td><td lang="ko"><strong>momentum이 메모리를 두 배로 만든다.</strong> Adam은 세 배</td>
+          <td lang="en">SGD, momentum (p19-20)</td><td lang="en">known</td><td lang="en"><strong>Momentum doubles the memory</strong>, Adam triples it</td></tr>
+      <tr><td lang="ko">수식 표기</td><td lang="ko"><strong>새것</strong></td><td lang="ko">슬라이드의 첨자가 PDF 추출에서 깨진다. 기호 뜯어보기로 복원</td>
+          <td lang="en">The notation itself</td><td lang="en"><strong>new</strong></td><td lang="en">Subscripts break in PDF extraction; the notation blocks restore them</td></tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">먼저 짚고 갈 것</span><span class="tag" lang="en">Before we start</span>
+    <h4 lang="ko">이 덱은 수식이 PDF 텍스트 추출에서 깨진다</h4>
+    <h4 lang="en">The equations in this deck break under PDF text extraction</h4>
+    <p lang="ko">13, 16, 17쪽의 수식은 PowerPoint 수식 개체라, 텍스트로 뽑으면 첨자와 위첨자가 통째로 사라진다. 예를 들어 13쪽의 모델 식은 <code>= 0 + 1</code>처럼 나온다. <strong>실제로는 <span class="m"><i>h</i> = <i>w</i><sub>0</sub> + <i>w</i><sub>1</sub> · <i>x</i></span>다.</strong></p>
+    <p lang="en">The equations on pages 13, 16 and 17 are PowerPoint equation objects, so pulling them out as text drops every subscript and superscript. Page 13's model comes out as <code>= 0 + 1</code>, when it actually reads <span class="m"><i>h</i> = <i>w</i><sub>0</sub> + <i>w</i><sub>1</sub> · <i>x</i></span>.</p>
+    <p lang="ko"><strong>그래서 이 덱은 반드시 렌더해서 눈으로 읽어야 한다.</strong> 이 노트의 수식은 전부 렌더한 이미지에서 옮긴 것이다.</p>
+    <p lang="en"><strong>So this deck has to be rendered and read by eye.</strong> Every equation in these notes was transcribed from the rendered pages.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head" data-slide="2"><span class="sec-num">01</span><h2 lang="ko">겹이 넷으로 늘었다</h2><h2 lang="en">The rings became four</h2></div>
+  <p class="sec-sub" lang="ko">한 장짜리 동심원 그림인데, <strong>L01의 같은 그림과 겹 수가 다르다.</strong> 그냥 넘기면 안 되는 차이다.</p>
+  <p class="sec-sub" lang="en">A single slide of nested ellipses, and <strong>it has a different number of rings than the same figure in lecture 1.</strong> Not a difference to skim past.</p>
+
+  <p lang="ko">타원 네 개가 겹쳐 있다. 바깥부터 <strong>Artificial Intelligence</strong>(연분홍), <strong>Machine Learning</strong>(연파랑), <strong>Neural Networks</strong>(연노랑), <strong>Deep Learning</strong>(연초록). L01 20-22쪽에는 <strong>Neural Networks 겹이 없었다.</strong></p>
+  <p lang="en">Four nested ellipses: from the outside, <strong>Artificial Intelligence</strong> in pale pink, <strong>Machine Learning</strong> in pale blue, <strong>Neural Networks</strong> in pale yellow and <strong>Deep Learning</strong> in pale green. Pages 20 to 22 of lecture 1 <strong>had no neural networks ring.</strong></p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="Lecture 1의 세 겹 그림과 Lecture 2-3의 네 겹 그림을 나란히 비교한 도해">
+      <text class="svglab" x="20" y="24" style="font-size:10.5px" fill="var(--ink3)">Lecture 1 · p20-22</text>
+      <rect x="20" y="34" width="300" height="180" rx="10" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="170" y="56" text-anchor="middle" style="font-size:12px" fill="var(--blue)">Artificial Intelligence</text>
+      <rect x="50" y="68" width="240" height="132" rx="10" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="170" y="90" text-anchor="middle" style="font-size:12px" fill="var(--blue)">Machine Learning</text>
+      <rect x="82" y="102" width="176" height="84" rx="10" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="170" y="150" text-anchor="middle" style="font-size:12px" fill="var(--blue)">Deep Learning</text>
+
+      <text class="svglab" x="380" y="24" style="font-size:10.5px" fill="var(--ink3)">Lecture 2-3 · p2</text>
+      <rect x="380" y="34" width="300" height="180" rx="10" fill="rgba(var(--violet-rgb),.07)" stroke="var(--violet)"/>
+      <text class="svgtxt" x="530" y="52" text-anchor="middle" style="font-size:11.5px" fill="var(--violet)">Artificial Intelligence</text>
+      <rect x="404" y="60" width="252" height="146" rx="10" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)"/>
+      <text class="svgtxt" x="530" y="78" text-anchor="middle" style="font-size:11.5px" fill="var(--violet)">Machine Learning</text>
+      <rect x="428" y="86" width="204" height="112" rx="10" fill="rgba(var(--violet-rgb),.19)" stroke="var(--violet)"/>
+      <text class="svgtxt" x="530" y="104" text-anchor="middle" style="font-size:11.5px" fill="var(--violet)">Neural Networks</text>
+      <rect x="452" y="112" width="156" height="72" rx="10" fill="rgba(var(--violet-rgb),.28)" stroke="var(--violet)"/>
+      <text class="svgtxt" x="530" y="152" text-anchor="middle" style="font-size:11.5px" fill="var(--violet)">Deep Learning</text>
+
+      <text class="svglab" lang="ko" x="350" y="238" text-anchor="middle" style="font-size:10.5px" fill="var(--ink2)">한 겹이 더 있다. 같은 그림이 아니다</text>
+      <text class="svglab" lang="en" x="350" y="238" text-anchor="middle" style="font-size:10.5px" fill="var(--ink2)">one extra ring: not the same figure</text>
+    </svg>
+    <figcaption lang="ko">두 강의의 동심원을 나란히 놓은 것. 원본은 타원이지만 겹 수를 비교하는 게 목적이라 사각형으로 다시 그렸다. 이 비교 도해는 슬라이드에 없다.</figcaption>
+    <figcaption lang="en">The two versions side by side. The originals are ellipses; these are redrawn as rectangles because the point is to compare the number of rings. The comparison itself is not on any slide.</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>어느 쪽이 맞는가.</strong> 둘 다 맞다. Neural Networks는 ML의 <strong>한 가지 모델 계열</strong>이고, Deep Learning은 그 신경망이 <strong>여러 층으로 깊어진 경우</strong>다. 그러니 넷으로 나누는 게 더 정확하다. L01 20-22쪽은 <em>Eyeriss tutorial</em>에서 가져온 그림이라 그쪽 판본을 따른 것이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Which is right?</strong> Both. Neural networks are <strong>one family of models</strong> within ML, and deep learning is the case where those networks <strong>go many layers deep</strong>, so four rings is the more precise picture. Pages 20 to 22 of lecture 1 came from the <em>Eyeriss tutorial</em> and simply follow that source's version.
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 이 겹 구분이 <strong>칩이 무엇을 가속하는지</strong>를 정한다. 이 수업에서 다루는 가속기는 거의 전부 <strong>가장 안쪽 두 겹</strong>(Neural Networks와 Deep Learning)만 빠르게 만든다. 바깥 두 겹에 속하는 것, 예를 들어 결정 트리나 탐색 알고리즘은 그 칩에서 아무 이득이 없다. <strong>"AI 가속기"라고 광고하지만 실제로는 행렬 곱셈 가속기</strong>인 이유가 이것이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The ring you are in decides <strong>what a chip actually accelerates</strong>. Nearly every accelerator in this course speeds up only the <strong>inner two rings</strong>, neural networks and deep learning. Anything living in the outer two, a decision tree or a search algorithm, gets nothing from that silicon. That is why something sold as an <strong>"AI accelerator" is in practice a matrix-multiply accelerator</strong>.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head" data-slide="3-4"><span class="sec-num">02</span><h2 lang="ko">무엇을 사람이 정하고 무엇을 배우나</h2><h2 lang="en">What you fix, and what it learns</h2></div>
+  <p class="sec-sub" lang="ko">두 장이 이어진다. 하나는 세 방식의 비교 도해, 하나는 그 안쪽을 열어 본 그림이다. 둘 다 Goodfellow 책에서 왔다.</p>
+  <p class="sec-sub" lang="en">Two slides in sequence: a comparison of three approaches, and then a look inside one of them. Both come from the Goodfellow book.</p>
+
+  <h3 data-slide="3"><span lang="ko">세 기둥, 그리고 칠해진 칸의 뜻</span><span lang="en">Three columns, and what the shaded boxes mean</span></h3>
+  <p lang="ko">세로 기둥이 셋이고 각각 아래에서 위로 <code>Input</code>부터 <code>Output</code>까지 화살표로 이어진다. <strong>어떤 칸은 흰색이고 어떤 칸은 청록색으로 칠해져 있다.</strong> 그리고 청록 칸 안의 글자 중 일부만 회색 굵은 글씨다. 이 두 가지 표시가 이 그림의 전부다.</p>
+  <p lang="en">Three vertical columns, each running bottom to top from <code>Input</code> to <code>Output</code> along arrows. <strong>Some boxes are white and some are filled teal</strong>, and inside the teal boxes only part of the text is set in bold grey. Those two markings are the whole content of the figure.</p>
+  <ul lang="ko">
+    <li><strong>왼쪽 · Rule-based system</strong> — Input → <code>Hand-designed program</code> → Output. 칸이 <strong>전부 흰색</strong>이다. 사람이 다 짠다.</li>
+    <li><strong>가운데 · Classic machine learning</strong> — Input → <code>Hand-designed <strong>features</strong></code> → <code>Mapping from <strong>features</strong></code> → Output. <strong>두 칸이 청록색</strong>이다. feature는 사람이 설계하고, feature에서 출력으로 가는 매핑만 배운다.</li>
+    <li><strong>오른쪽 · Deep learning</strong> — Input → <code>Simple <strong>features</strong></code> → <code>Layers of abstract <strong>features</strong></code> → <code>Mapping from <strong>features</strong></code> → Output. <strong>세 칸이 청록색</strong>이다. feature 자체를 배운다.</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Left, rule-based system</strong> — Input → <code>Hand-designed program</code> → Output. <strong>Every box is white</strong>: a person writes all of it.</li>
+    <li><strong>Centre, classic machine learning</strong> — Input → <code>Hand-designed <strong>features</strong></code> → <code>Mapping from <strong>features</strong></code> → Output, with <strong>two boxes filled teal</strong>. A person designs the features; only the mapping from features to output is learned.</li>
+    <li><strong>Right, deep learning</strong> — Input → <code>Simple <strong>features</strong></code> → <code>Layers of abstract <strong>features</strong></code> → <code>Mapping from <strong>features</strong></code> → Output, with <strong>three boxes filled teal</strong>. The features themselves are learned.</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="규칙 기반, 고전 머신러닝, 딥러닝 세 방식에서 사람이 정하는 부분과 데이터로 배우는 부분의 비율">
+      <rect x="30" y="200" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="115" y="222" text-anchor="middle" style="font-size:11.5px">Input</text>
+      <rect x="30" y="150" width="170" height="42" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="115" y="176" text-anchor="middle" style="font-size:11.5px">hand-designed program</text>
+      <rect x="30" y="100" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="115" y="122" text-anchor="middle" style="font-size:11.5px">Output</text>
+      <text class="svgtxt" x="115" y="262" text-anchor="middle" style="font-size:12px;font-weight:600">rule-based</text>
+      <text class="svgnum" x="115" y="282" text-anchor="middle" style="font-size:12px" fill="var(--ink3)">0 learned</text>
+
+      <rect x="265" y="200" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="350" y="222" text-anchor="middle" style="font-size:11.5px">Input</text>
+      <rect x="265" y="150" width="170" height="42" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="350" y="176" text-anchor="middle" style="font-size:11.5px">hand-designed features</text>
+      <rect x="265" y="100" width="170" height="42" rx="5" fill="rgba(var(--blue-rgb),.20)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="350" y="126" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">mapping from features</text>
+      <rect x="265" y="58" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="350" y="80" text-anchor="middle" style="font-size:11.5px">Output</text>
+      <text class="svgtxt" x="350" y="262" text-anchor="middle" style="font-size:12px;font-weight:600">classic ML</text>
+      <text class="svgnum" x="350" y="282" text-anchor="middle" style="font-size:12px" fill="var(--blue)">1 learned</text>
+
+      <rect x="500" y="200" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="585" y="222" text-anchor="middle" style="font-size:11.5px">Input</text>
+      <rect x="500" y="158" width="170" height="34" rx="5" fill="rgba(var(--blue-rgb),.20)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="585" y="180" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">simple features</text>
+      <rect x="500" y="108" width="170" height="42" rx="5" fill="rgba(var(--blue-rgb),.20)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="585" y="134" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">layers of abstract features</text>
+      <rect x="500" y="58" width="170" height="42" rx="5" fill="rgba(var(--blue-rgb),.20)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="585" y="84" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">mapping from features</text>
+      <rect x="500" y="16" width="170" height="34" rx="5" fill="none" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="585" y="38" text-anchor="middle" style="font-size:11.5px">Output</text>
+      <text class="svgtxt" x="585" y="262" text-anchor="middle" style="font-size:12px;font-weight:600">deep learning</text>
+      <text class="svgnum" x="585" y="282" text-anchor="middle" style="font-size:12px" fill="var(--blue)">3 learned</text>
+
+      <text class="svglab" lang="ko" x="30" y="20" style="font-size:10.5px" fill="var(--blue)">파란 칸 = 데이터에서 배우는 부분</text>
+      <text class="svglab" lang="en" x="30" y="20" style="font-size:10.5px" fill="var(--blue)">blue box = learned from data</text>
+      <text class="svglab" lang="ko" x="30" y="36" style="font-size:10.5px" fill="var(--ink3)">흰 칸 = 사람이 정하는 부분</text>
+      <text class="svglab" lang="en" x="30" y="36" style="font-size:10.5px" fill="var(--ink3)">white box = fixed by a person</text>
+    </svg>
+    <figcaption lang="ko">3쪽의 세 기둥을 다시 그린 것. 원본의 청록 칠을 이 저장소의 <span class="cAlg">모델·알고리즘 색</span>으로 바꿨고, 아래에 "몇 칸을 배우는가"를 숫자로 더했다. 원본에는 그 숫자가 없다.</figcaption>
+    <figcaption lang="en">The three columns of page 3, redrawn. The original teal fill is swapped for this site's <span class="cAlg">model and algorithm colour</span>, and the count of learned boxes at the bottom is an addition; it is not on the slide.</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 파란 칸이 늘어난다는 것은 <strong>계산해야 할 파라미터가 늘어난다는 뜻</strong>이다. 왼쪽 기둥은 학습이라는 개념 자체가 없어서 <span class="cHw">연산기</span>도 <span class="cMem">메모리</span>도 거의 안 쓴다. 오른쪽 기둥은 세 칸의 가중치를 전부 메모리에 들고 있어야 하고, 학습할 때는 그 가중치마다 gradient까지 들고 있어야 한다. <strong>"feature를 사람이 안 짜도 된다"의 대가가 메모리와 연산이다.</strong> 이 수업은 그 대가를 깎는 방법을 배우는 곳이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> More blue boxes means <strong>more parameters to compute</strong>. The left column has no notion of learning at all, so it barely touches the <span class="cHw">datapath</span> or <span class="cMem">memory</span>. The right column has to hold the weights of three boxes in memory, and during training a gradient for every one of those weights as well. <strong>The price of not hand-writing features is memory and arithmetic</strong>, and this course is about cutting that price down.
+  </div>
+
+  <h3 data-slide="4"><span lang="ko">층이 깊어지면 무엇이 보이나</span><span lang="en">What the layers see as they go deeper</span></h3>
+  <p lang="ko">Goodfellow 책의 그림을 그대로 실었다. 왼쪽에 사람 사진이 하나 있고, 화살표가 그 사진을 오른쪽 네트워크의 맨 아래로 보낸다. 네트워크는 원 노드가 층마다 셋씩 쌓인 구조이고, 각 층마다 오른쪽에 이름표가 붙어 있다.</p>
+  <p lang="en">The figure is lifted straight from the Goodfellow book. A photograph of a person sits on the left, with an arrow feeding it into the bottom of the network on the right. The network is stacks of three circular nodes per layer, each layer labelled on the right.</p>
+  <ul lang="ko">
+    <li><strong>맨 아래 · Visible layer (input pixels)</strong> — 노드 안이 단색 사각형이다. 그냥 픽셀 값이다</li>
+    <li><strong>1st hidden layer (edges)</strong> — 노드 안에 <strong>가로줄, 세로줄, 대각선 무늬</strong>가 보인다. 방향이 있는 경계를 잡아낸 것이다</li>
+    <li><strong>2nd hidden layer (corners and contours)</strong> — 무늬가 <strong>동그란 형태와 꺾인 형태</strong>로 바뀐다</li>
+    <li><strong>3rd hidden layer (object parts)</strong> — 이제 <strong>얼굴 부위처럼 보이는 형태</strong>가 나타난다</li>
+    <li><strong>맨 위 · Output (object identity)</strong> — 노드가 <code>CAR</code>, <code>PERSON</code>, <code>ANIMAL</code>이라는 글자로 바뀐다</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Bottom, visible layer (input pixels)</strong> — the nodes hold flat blocks of colour: raw pixel values</li>
+    <li><strong>1st hidden layer (edges)</strong> — the nodes show <strong>horizontal, vertical and diagonal stripes</strong>: oriented boundaries</li>
+    <li><strong>2nd hidden layer (corners and contours)</strong> — the patterns turn into <strong>rounded and bent shapes</strong></li>
+    <li><strong>3rd hidden layer (object parts)</strong> — now <strong>shapes that look like parts of a face</strong> appear</li>
+    <li><strong>Top, output (object identity)</strong> — the nodes become the words <code>CAR</code>, <code>PERSON</code>, <code>ANIMAL</code></li>
+  </ul>
+  <p lang="ko">층 사이의 화살표가 <strong>모든 노드에서 모든 노드로</strong> 그려져 있다. 완전 연결이라는 뜻이다.</p>
+  <p lang="en">The arrows between layers run <strong>from every node to every node</strong>, which is to say the layers are fully connected.</p>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 이 그림이 말하는 <strong>"층마다 표현이 추상화된다"</strong>는 이야기에는 숫자로 된 뒷면이 있다. 입력 쪽 층은 <strong>공간 크기가 크고 채널이 적고</strong>, 출력 쪽 층은 <strong>공간 크기가 작고 채널이 많다.</strong> 그래서 앞쪽 층은 <span class="cMem">activation</span>이 크고 뒤쪽 층은 <span class="cAlg">weight</span>가 크다. <strong>같은 네트워크 안에서도 어느 층이냐에 따라 병목이 반대편에 있다.</strong> 이 사실이 뒤에서 dataflow와 tiling을 배울 때 계속 나온다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The story this figure tells, <strong>representations getting more abstract layer by layer</strong>, has a numeric flip side. Layers near the input are <strong>spatially large with few channels</strong>; layers near the output are <strong>spatially small with many channels</strong>. So early layers are dominated by <span class="cMem">activations</span> and late layers by <span class="cAlg">weights</span>. <strong>Within one network the bottleneck sits on opposite sides depending on the layer</strong>, and that fact keeps returning once dataflow and tiling show up.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head" data-slide="5-7"><span class="sec-num">03</span><h2 lang="ko">데이터가 커졌다</h2><h2 lang="en">The data got big</h2></div>
+  <p class="sec-sub" lang="ko">세 장이 데이터셋 이야기다. 하나는 100년치 추세, 둘은 실제 데이터셋 소개.</p>
+  <p class="sec-sub" lang="en">Three slides on datasets: one century-long trend, then two actual datasets.</p>
+
+  <h3 data-slide="5"><span lang="ko">100년치 데이터셋 크기</span><span lang="en">A century of dataset sizes</span></h3>
+  <p lang="ko">글머리 두 줄이 먼저 있다. 데이터셋 크기가 시간에 따라 <strong>눈에 띄게 커졌고</strong>, "Big Data"의 시대가 <strong>머신러닝을 더 쉽게 만들었다</strong>.</p>
+  <p lang="en">Two bullets first: dataset sizes have <strong>expanded remarkably over time</strong>, and the age of "big data" has <strong>made machine learning easier</strong>.</p>
+  <p lang="ko">아래 그래프는 Goodfellow 책에서 왔다. 세로축이 <em>Dataset size (number examples)</em>로 <strong>로그 스케일</strong> <span class="m">10<sup>0</sup></span>부터 <span class="m">10<sup>9</sup></span>까지, 가로축이 1900년부터 2015년 이후까지. 점은 파란 원이고 <strong>분홍 상자에 담긴 이름표</strong>가 화살표로 각 점을 가리킨다.</p>
+  <p lang="en">The chart below comes from the Goodfellow book. The y axis is <em>dataset size (number of examples)</em> on a <strong>log scale</strong> from <span class="m">10<sup>0</sup></span> to <span class="m">10<sup>9</sup></span>; the x axis runs from 1900 to past 2015. Points are blue dots, and <strong>labels in pink boxes</strong> point at them with arrows.</p>
+  <p lang="ko">왼쪽 아래부터 오른쪽 위로 이렇게 배치되어 있다. <strong>Iris</strong>(1930년대, 약 <span class="m">10<sup>2</sup></span>), <strong>Criminals</strong>(1900년, 약 <span class="m">10<sup>3</sup></span>), <strong>T vs. G vs. F</strong>(1960년대, 한 자리 수), <strong>Rotated T vs. C</strong>(1985년, 한 자리 수), <strong>MNIST</strong>와 <strong>CIFAR-10</strong>(약 <span class="m">10<sup>4</sup></span>), <strong>ImageNet</strong>(약 <span class="m">10<sup>5</sup></span>), <strong>ILSVRC 2014</strong>, <strong>Public SVHN</strong>(약 <span class="m">10<sup>6</sup></span>), <strong>ImageNet10k</strong>(약 <span class="m">10<sup>7</sup></span>), <strong>WMT</strong>와 <strong>Sports-1M</strong>, 그리고 <strong>Canadian Hansard</strong>(약 <span class="m">10<sup>8</sup></span>).</p>
+  <p lang="en">From lower left to upper right: <strong>Iris</strong> (1930s, around <span class="m">10<sup>2</sup></span>), <strong>Criminals</strong> (1900, around <span class="m">10<sup>3</sup></span>), <strong>T vs. G vs. F</strong> (1960s, single digits), <strong>Rotated T vs. C</strong> (1985, single digits), <strong>MNIST</strong> and <strong>CIFAR-10</strong> (around <span class="m">10<sup>4</sup></span>), <strong>ImageNet</strong> (around <span class="m">10<sup>5</sup></span>), <strong>ILSVRC 2014</strong>, <strong>Public SVHN</strong> (around <span class="m">10<sup>6</sup></span>), <strong>ImageNet10k</strong> (around <span class="m">10<sup>7</sup></span>), <strong>WMT</strong> and <strong>Sports-1M</strong>, and <strong>Canadian Hansard</strong> (around <span class="m">10<sup>8</sup></span>).</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">가로축 눈금이 균등하지 않다</h4>
+    <h4 lang="en">The x axis is not evenly spaced</h4>
+    <p lang="ko">눈금이 <strong>1900, 1950, 1985, 2000, 2015</strong>다. 앞은 50년 간격인데 뒤로 갈수록 <strong>35년, 15년, 15년</strong>으로 좁아진다. 최근 구간이 가로로 늘어나 보이므로 <strong>기울기를 눈으로 읽으면 안 된다.</strong></p>
+    <p lang="en">The ticks are <strong>1900, 1950, 1985, 2000, 2015</strong>: a 50-year gap at first, then <strong>35, 15 and 15</strong>. Recent decades are stretched horizontally, so <strong>reading the slope by eye will mislead you</strong>.</p>
+    <p lang="ko">이건 L01 28쪽의 이중 축 문제와 같은 종류다. <strong>축을 먼저 읽고 곡선을 나중에 읽는다.</strong> 논문 그림을 볼 때 매번 해야 하는 일이다.</p>
+    <p lang="en">This is the same species of problem as the dual axis on page 28 of lecture 1. <strong>Read the axes first and the curve second</strong>, every time you look at a figure in a paper.</p>
+  </div>
+
+  <h3 data-slide="6"><span lang="ko">CIFAR-10</span><span lang="en">CIFAR-10</span></h3>
+  <p lang="ko">왼쪽에 숫자, 오른쪽에 <strong>클래스별 샘플 이미지 격자</strong>가 있다. 세로로 클래스 이름 열 개가 적혀 있고 (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck), 각 행에 그 클래스의 32×32 이미지 열 장이 늘어서 있다. 출처는 <em>Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton</em>이다.</p>
+  <p lang="en">Numbers on the left, a <strong>grid of sample images by class</strong> on the right: ten class names down the side (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck) with ten 32×32 examples along each row. Credited to <em>Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton</em>.</p>
+  <ul lang="ko">
+    <li><strong>60,000장의 32×32 이미지</strong> (학습 50,000 / 테스트 10,000)</li>
+    <li><strong>10개 클래스</strong>, 클래스당 6,000장</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>60,000 images at 32×32</strong> (50,000 training, 10,000 test)</li>
+    <li><strong>10 classes</strong>, 6,000 images each</li>
+  </ul>
+
+  <h3 data-slide="7"><span lang="ko">ImageNet</span><span lang="en">ImageNet</span></h3>
+  <p lang="ko">가운데 위에 ImageNet 로고가 있고, 아래에 <strong>bounding box가 그려진 사진 세 장</strong>이 있다. 각 사진 옆 검은 띠에 검출된 클래스가 색깔 글씨로 적혀 있다. 첫 사진은 <span lang="ko">거실에서 아이와 개</span>로 <code>person</code>(초록), <code>dog</code>(빨강), <code>chair</code>(노랑). 둘째는 물가의 새로 <code>bird</code>(노랑), <code>frog</code>(빨강). 셋째는 작업 중인 사람으로 <code>person</code>, <code>hammer</code>, <code>flower pot</code>, <code>power drill</code>. <strong>박스 색과 글자 색이 짝을 이룬다.</strong></p>
+  <p lang="en">The ImageNet logo sits at the top, with <strong>three photographs carrying bounding boxes</strong> below. Beside each photo a black strip lists the detected classes in matching colours. The first shows a child and a dog in a living room: <code>person</code> in green, <code>dog</code> in red, <code>chair</code> in yellow. The second is a bird at the water's edge: <code>bird</code> in yellow, <code>frog</code> in red. The third shows someone working: <code>person</code>, <code>hammer</code>, <code>flower pot</code>, <code>power drill</code>. <strong>The box colour pairs with the label colour.</strong></p>
+  <ul lang="ko">
+    <li><strong>Image Classification Task</strong> · 학습 이미지 1.2M · 1,000개 물체 범주</li>
+    <li><strong>Object Detection Task</strong> · 학습 이미지 456k · 200개 물체 범주</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Image classification task</strong> · 1.2M training images · 1,000 object categories</li>
+    <li><strong>Object detection task</strong> · 456k training images · 200 object categories</li>
+  </ul>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 데이터셋을 바이트로 바꾸면</div>
+    <div class="cap" lang="en">Sense of scale · datasets converted to bytes</div>
+    <table>
+      <tr><td class="what"><span lang="ko">CIFAR-10 전체</span><span lang="en">all of CIFAR-10</span></td>
+          <td class="num">~184 MB</td>
+          <td><span lang="ko">60,000 × 32 × 32 × 3바이트. <strong>노트북 메모리에 통째로 들어간다</strong></span><span lang="en">60,000 × 32 × 32 × 3 bytes. <strong>It fits in a laptop's memory whole</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">ImageNet 학습셋 (224×224로 자른 뒤)</span><span lang="en">ImageNet train, cropped to 224×224</span></td>
+          <td class="num">~180 GB</td>
+          <td><span lang="ko">1.2M × 224 × 224 × 3바이트. <strong>CIFAR-10의 약 1,000배</strong></span><span lang="en">1.2M × 224 × 224 × 3 bytes, about <strong>1,000× CIFAR-10</strong></span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: A100 GPU 메모리</span><span lang="en">reference: A100 GPU memory</span></td>
+          <td class="num">40-80 GB</td>
+          <td><span lang="ko">ImageNet은 <strong>안 들어간다.</strong> 매 epoch마다 디스크에서 읽어 와야 한다</span><span lang="en">ImageNet <strong>does not fit</strong>: it has to be streamed from disk every epoch</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: Coral Edge TPU 온칩</span><span lang="en">reference: Coral Edge TPU on chip</span></td>
+          <td class="num">8 MiB</td>
+          <td><span lang="ko">CIFAR-10 <strong>한 장</strong>은 3 KB라 들어가지만, 데이터셋은 근처도 못 간다</span><span lang="en">a <strong>single</strong> CIFAR-10 image is 3 KB and fits; the dataset is nowhere close</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">전부 이 노트가 슬라이드의 장수와 해상도로 계산한 어림수다. 실제 파일은 압축되어 있고 원본 ImageNet 이미지는 크기가 제각각이라 더 크다. <strong>요점은 자릿수다.</strong> 5쪽 그래프의 세로축이 로그인 이유가 여기 있고, 학습 시스템이 <span class="cMem">데이터 파이프라인</span>을 따로 신경 써야 하는 이유도 여기 있다.</div>
+    <div class="foot" lang="en">These are rough figures the note computed from the counts and resolutions on the slides. Real files are compressed, and raw ImageNet images vary in size and run larger. <strong>The order of magnitude is the point.</strong> It is why the y axis on page 5 is logarithmic, and why a training system has to think about its <span class="cMem">data pipeline</span> as a separate problem.</div>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 데이터셋이 메모리에 들어가느냐 아니냐가 <strong>학습 시스템의 모양을 바꾼다.</strong> CIFAR-10은 한 번 올려두고 계속 쓰면 되지만, ImageNet은 <strong>매 epoch마다 180 GB를 디스크에서 읽어 GPU로 옮겨야</strong> 한다. 그래서 실제 학습에서는 GPU가 놀고 데이터 로더가 병목이 되는 일이 흔하다. <strong>"연산보다 데이터 이동이 비싸다"는 이 수업의 명제가 칩 안이 아니라 시스템 전체 수준에서도 그대로 성립한다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> Whether the dataset fits in memory <strong>changes the shape of the training system</strong>. CIFAR-10 you load once and keep; ImageNet means <strong>reading 180 GB off disk and moving it to the GPU every epoch</strong>. In practice it is common for the GPU to sit idle while the data loader is the bottleneck. <strong>The course's thesis that moving data costs more than computing on it holds at the system level too, not only inside the chip.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head" data-slide="8"><span class="sec-num">04</span><h2 lang="ko">모델도 커졌다</h2><h2 lang="en">The models got big too</h2></div>
+  <p class="sec-sub" lang="ko">한 장에 그래프가 둘이고, 둘 다 <strong>동물과 비교</strong>한다. 그리고 이 강의에서 하드웨어가 처음 명시적으로 언급되는 장이다.</p>
+  <p class="sec-sub" lang="en">One slide, two charts, both <strong>measured against animals</strong>. It is also the first slide in this lecture where hardware gets named explicitly.</p>
+
+  <p lang="ko">왼쪽 글머리부터.</p>
+  <p lang="en">The bullets on the left first.</p>
+  <ul lang="ko">
+    <li><strong>모델 크기</strong>는 두 가지로 잰다: <strong>뉴런당 연결 수</strong>, 그리고 <strong>뉴런 수</strong></li>
+    <li>커진 것은 <strong>대체로 더 빠른 하드웨어(CPU와 GPU)를 쓸 수 있게 된 덕분</strong>이다</li>
+    <li>계속될 것으로 본다</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Model size</strong> is measured two ways: <strong>connections per neuron</strong> and <strong>number of neurons</strong></li>
+    <li>The growth is <strong>largely due to the availability of faster hardware, CPUs and GPUs</strong></li>
+    <li>It is expected to continue</li>
+  </ul>
+
+  <p lang="ko"><strong>위 그래프</strong>는 세로축이 <em>Connections per neuron</em>로 <span class="m">10<sup>1</sup></span>부터 <span class="m">10<sup>4</sup></span>까지 로그, 가로축이 1950부터 2015까지다. 파란 점마다 <strong>분홍 상자에 번호</strong>가 붙어 있고 (1번부터 10번까지), 오른쪽에 <strong>노란 상자</strong>가 수평선의 높이를 표시한다. 위에서부터 <strong>Human</strong>(<span class="m">10<sup>4</sup></span> 근처), <strong>Cat</strong>, <strong>Mouse</strong>(<span class="m">10<sup>3</sup></span> 근처), <strong>Fruit fly</strong>(<span class="m">10<sup>2</sup></span> 근처).</p>
+  <p lang="en"><strong>The upper chart</strong> has <em>connections per neuron</em> on a log y axis from <span class="m">10<sup>1</sup></span> to <span class="m">10<sup>4</sup></span> and years 1950 to 2015 across the bottom. Each blue dot carries a <strong>numbered pink box</strong>, 1 through 10, and <strong>yellow boxes</strong> on the right mark horizontal reference lines: <strong>Human</strong> near <span class="m">10<sup>4</sup></span>, then <strong>Cat</strong>, <strong>Mouse</strong> near <span class="m">10<sup>3</sup></span>, and <strong>Fruit fly</strong> near <span class="m">10<sup>2</sup></span>.</p>
+  <p lang="ko"><strong>아래 그래프</strong>는 세로축이 <em>Number of neurons (logarithmic scale)</em>로 <span class="m">10<sup>−2</sup></span>부터 <span class="m">10<sup>11</sup></span>까지, 가로축이 1950부터 <strong>2056</strong>까지다. 번호는 1번부터 20번까지 있고, 오른쪽 노란 상자는 <strong>Human</strong>(<span class="m">10<sup>11</sup></span>), <strong>Octopus</strong>, <strong>Frog</strong>, <strong>Bee</strong>, <strong>Ant</strong>, <strong>Leech</strong>, <strong>Roundworm</strong>, <strong>Sponge</strong> 순으로 내려온다. 점들을 관통하는 <strong>파란 직선</strong>이 오른쪽 위로 뻗어 2056년에 <span class="m">10<sup>11</sup></span>, 즉 Human 선에 닿는다.</p>
+  <p lang="en"><strong>The lower chart</strong> has <em>number of neurons (logarithmic scale)</em> from <span class="m">10<sup>−2</sup></span> to <span class="m">10<sup>11</sup></span> against years from 1950 to <strong>2056</strong>. The numbered labels run 1 through 20, and the yellow reference boxes descend from <strong>Human</strong> at <span class="m">10<sup>11</sup></span> through <strong>Octopus</strong>, <strong>Frog</strong>, <strong>Bee</strong>, <strong>Ant</strong>, <strong>Leech</strong>, <strong>Roundworm</strong> to <strong>Sponge</strong>. A <strong>blue straight line</strong> runs through the cloud up to the right and meets the Human line at <span class="m">10<sup>11</sup></span> in 2056.</p>
+  <p lang="ko">오른쪽 가운데에 <strong>진한 남색 상자</strong>로 <code>AlexNet</code>이라고 적혀 있고, 거기서 <strong>빨간 화살표 두 개</strong>가 각각 위 그래프와 아래 그래프의 한 점을 가리킨다. 위 그래프에서는 <span class="m">10<sup>2</sup></span> 근처, 즉 <strong>Fruit fly 선 바로 위</strong>. 아래 그래프에서는 <span class="m">10<sup>6</sup></span>과 <span class="m">10<sup>7</sup></span> 사이다.</p>
+  <p lang="en">A <strong>dark navy box</strong> in the middle right reads <code>AlexNet</code>, with <strong>two red arrows</strong> pointing from it to one dot in each chart: in the upper chart near <span class="m">10<sup>2</sup></span>, <strong>just above the fruit fly line</strong>, and in the lower chart between <span class="m">10<sup>6</sup></span> and <span class="m">10<sup>7</sup></span>.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · AlexNet은 어느 동물쯤인가</div>
+    <div class="cap" lang="en">Sense of scale · which animal is AlexNet</div>
+    <table>
+      <tr><td class="what"><span lang="ko">AlexNet · 뉴런당 연결</span><span lang="en">AlexNet · connections per neuron</span></td>
+          <td class="num">~10<sup>2</sup></td>
+          <td><span lang="ko">Fruit fly 선 바로 위. 사람(<span class="m">10<sup>4</sup></span>)의 <strong>1/100</strong></span><span lang="en">just above the fruit fly line, <strong>1/100</strong> of a human's <span class="m">10<sup>4</sup></span></span></td></tr>
+      <tr><td class="what"><span lang="ko">AlexNet · 뉴런 수</span><span lang="en">AlexNet · number of neurons</span></td>
+          <td class="num">~10<sup>6-7</sup></td>
+          <td><span lang="ko">Bee와 Frog 사이. 사람(<span class="m">10<sup>11</sup></span>)의 <strong>1/10,000</strong> 남짓</span><span lang="en">between bee and frog, roughly <strong>1/10,000</strong> of a human's <span class="m">10<sup>11</sup></span></span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: AlexNet 파라미터 수</span><span lang="en">reference: AlexNet parameter count</span></td>
+          <td class="num">~60M</td>
+          <td><span lang="ko">FP32면 <strong>240 MB</strong>. 2012년 GPU 메모리로는 한 장에 안 들어갔다</span><span lang="en"><strong>240 MB</strong> in FP32, which did not fit on one 2012 GPU</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">마지막 줄은 슬라이드에 없고 AlexNet 논문에서 온 숫자다. <strong>그 논문이 GPU 두 장에 네트워크를 쪼개 올린 이유가 정확히 이것이다.</strong> 이번 주 Paper Reading의 2번 논문이므로 읽을 때 확인하면 좋다.</div>
+    <div class="foot" lang="en">The last row is not on the slide; it comes from the AlexNet paper. <strong>It is exactly why that paper split the network across two GPUs</strong>, and it is paper 2 of this week's reading, so it is worth checking as you read.</div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">2056년까지 그은 직선은 외삽이다</h4>
+    <h4 lang="en">The line drawn out to 2056 is an extrapolation</h4>
+    <p lang="ko">아래 그래프의 파란 직선은 <strong>측정값이 아니다.</strong> 로그 축 위에서 직선이라는 것은 지수 성장을 가정했다는 뜻이고, 그 가정을 <strong>30년 넘게 밀어서</strong> Human 선에 닿는 지점을 2056년으로 찍은 것이다. L01 34쪽이 보여준 대로 <strong>그 지수 성장을 떠받치던 공정이 이미 멈췄다.</strong></p>
+    <p lang="en">The blue line in the lower chart <strong>is not data</strong>. A straight line on a log axis assumes exponential growth, and that assumption is <strong>pushed out more than thirty years</strong> to place the crossing with the human line at 2056. As page 34 of lecture 1 showed, <strong>the process scaling that carried that exponential has already stalled.</strong></p>
+    <h4 lang="ko">그리고 뉴런 수는 능력이 아니다</h4>
+    <h4 lang="en">And neuron count is not capability</h4>
+    <p lang="ko">이 그래프는 <strong>크기</strong>만 비교한다. 뉴런 수가 사람과 같아지는 것과 사람처럼 하는 것은 다른 이야기다. <strong>그래프가 재는 것이 무엇인지 축 이름을 다시 읽는다.</strong> <em>Number of neurons</em>라고만 적혀 있다.</p>
+    <p lang="en">The chart compares <strong>size only</strong>. Matching a human's neuron count is not the same claim as matching what a human does. <strong>Re-read the axis label to see what is being measured</strong>: it says <em>number of neurons</em> and nothing more.</p>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 이 슬라이드의 두 축이 하드웨어에서는 서로 다른 자원에 대응한다. <strong>뉴런 수</strong>는 대체로 <span class="cMem">activation을 저장할 메모리</span>를 정하고, <strong>뉴런당 연결 수</strong>는 <span class="cAlg">weight의 개수</span>, 곧 <span class="cHw">곱셈 횟수</span>를 정한다. 그래서 "모델이 커졌다"는 말이 <strong>어느 쪽으로 커졌느냐에 따라 병목이 달라진다.</strong> 그리고 강사가 굳이 <em>"faster hardware 덕분"</em>이라고 적어 놓은 것은, 이 수업이 왜 ML 수업 안에서 하드웨어를 이야기하는지의 근거다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The slide's two axes map onto different resources. <strong>Neuron count</strong> mostly sets the <span class="cMem">memory needed to hold activations</span>; <strong>connections per neuron</strong> sets the <span class="cAlg">number of weights</span> and therefore the <span class="cHw">number of multiplies</span>. So "the model got bigger" points at a different bottleneck <strong>depending on which way it grew</strong>. And the bullet crediting <em>faster hardware</em> is the reason a machine learning lecture in this course keeps circling back to silicon.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head" data-slide="9-11"><span class="sec-num">05</span><h2 lang="ko">ML의 정의: E, T, P</h2><h2 lang="en">Defining ML: E, T, P</h2></div>
+  <p class="sec-sub" lang="ko">정의 한 장, 예제 두 장. 세 글자가 나머지 강의 전체의 뼈대가 된다.</p>
+  <p class="sec-sub" lang="en">One slide of definition, two of examples. Three letters that frame the rest of the lecture.</p>
+
+  <h3 data-slide="9"><span lang="ko">Mitchell의 정의</span><span lang="en">Mitchell's definition</span></h3>
+  <p lang="ko">첫 줄은 명시적으로 프로그래밍하지 않고도 기계가 <em>explicitly</em> 학습할 수 있는 능력이라는 것이고, 그 아래 연노랑 상자에 인용이 들어 있다.</p>
+  <p lang="en">The opening line is about machines learning without being <em>explicitly</em> programmed, and a pale yellow box below carries the quotation.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">슬라이드의 인용</span><span class="tag" lang="en">Quoted on the slide</span>
+    <p><em>"A computer program is said to learn from experience <span class="m"><i>E</i></span> with respect to some class of tasks <span class="m"><i>T</i></span> and performance measure <span class="m"><i>P</i></span> if its performance at tasks in <span class="m"><i>T</i></span>, as measured by <span class="m"><i>P</i></span>, improves with experience <span class="m"><i>E</i></span>."</em></p>
+    <p class="sec-sub">--- Mitchell, T. (1997). <em>Machine Learning</em>. McGraw Hill. p. 2.</p>
+  </div>
+
+  <p lang="ko">그 아래 질문 두 묶음이 이어진다. <strong>왜 사람의 지식과 경험, 전문성을 그냥 쓰지 않는가?</strong> 사람이 자기 전문성을 항상 설명할 수 있는가? 기계가 사람을 <em>outperform</em> 할 수 있는가? 그리고 마지막 줄: <strong>어떤 종류의 경험(E), 작업(T), 성능 측도(P)가 있는가?</strong></p>
+  <p lang="en">Two clusters of questions follow. <strong>Why not just use human knowledge, experience or expertise?</strong> Are humans always able to explain their expertise? Can machines <em>outperform</em> humans? And the closing line: <strong>what kinds of experiences (E), tasks (T) and performance measures (P) are there?</strong></p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · E, T, P</span><span lang="en">Unpacking the notation · E, T, P</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>E</i></td><td><span lang="ko"><strong>Experience.</strong> 실제로는 <strong>데이터셋</strong>이다. 스칼라가 아니라 예제의 모음이고, 각 예제는 보통 벡터나 텐서다</span><span lang="en"><strong>Experience</strong>, which in practice means <strong>the dataset</strong>. Not a scalar but a collection of examples, each usually a vector or a tensor</span></td></tr>
+        <tr><td class="m"><i>T</i></td><td><span lang="ko"><strong>Task.</strong> 무엇을 하는가. 분류, 회귀, 군집화. 슬라이드 12쪽이 이걸 <strong>모델 + 최적화 방법</strong>으로 다시 쪼갠다</span><span lang="en"><strong>Task</strong>: what is being done, whether classification, regression or clustering. Slide 12 splits this further into <strong>a model plus an optimization method</strong></span></td></tr>
+        <tr><td class="m"><i>P</i></td><td><span lang="ko"><strong>Performance measure.</strong> 잘하고 있는지를 재는 <strong>하나의 숫자</strong>. 정확도, 또는 cost function 값. 스칼라다</span><span lang="en"><strong>Performance measure</strong>: <strong>a single number</strong> saying how well it is doing, such as accuracy or the value of a cost function. A scalar</span></td></tr>
+      </table>
+      <p lang="ko"><strong>핵심은 <span class="m"><i>P</i></span>가 스칼라라는 것이다.</strong> 아무리 큰 데이터셋과 모델을 써도 학습이 최적화하는 대상은 <strong>숫자 하나</strong>다. 그 숫자를 만들려면 모든 예제의 오차를 <strong>더해서 하나로 줄여야</strong> 하고, 그 축약이 병렬화에서 문제가 된다. 8절에서 다시 나온다.</p>
+      <p lang="en"><strong>The thing to hold onto is that <span class="m"><i>P</i></span> is a scalar.</strong> However large the dataset and the model, what training optimizes is <strong>one number</strong>. Producing it means <strong>summing the error over every example down to a single value</strong>, and that reduction is where parallelism gets awkward. Section 08 comes back to it.</p>
+    </div>
+  </details>
+
+  <h3 data-slide="10-11"><span lang="ko">같은 틀에 두 예제를 끼워 넣기</span><span lang="en">Two examples in the same frame</span></h3>
+  <p lang="ko">10쪽과 11쪽이 <strong>완전히 같은 레이아웃</strong>이다. 왼쪽에 데이터 사진, 오른쪽에 <code>Task (T)</code> / <code>Experience (E)</code> / <code>Performance (P)</code>, 가운데에 연노랑 상자로 <span class="m"><i>f</i> : <i>x</i> → <i>y</i></span>, 그리고 맨 아래에 하늘색 굵은 글씨로 <strong>"Supervised Learning (Classification)"</strong>. 두 장이 나란히 놓인 이유는 <strong>완전히 다른 문제가 같은 틀에 들어간다</strong>는 것을 보이기 위해서다.</p>
+  <p lang="en">Pages 10 and 11 use <strong>exactly the same layout</strong>: data image on the left, <code>Task (T)</code>, <code>Experience (E)</code> and <code>Performance (P)</code> on the right, a pale yellow box in the middle holding <span class="m"><i>f</i> : <i>x</i> → <i>y</i></span>, and along the bottom in bold sky blue, <strong>"Supervised Learning (Classification)"</strong>. The two slides sit together to show that <strong>two completely different problems fit the same frame</strong>.</p>
+
+  <table>
+    <thead><tr>
+      <th></th><th lang="ko">MNIST (10쪽)</th><th lang="ko">Spam (11쪽)</th>
+      <th lang="en">MNIST (p10)</th><th lang="en">Spam (p11)</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="m"><i>T</i></td>
+          <td lang="ko"><span class="m"><i>x</i> ∈ [0,255]<sup>28×28</sup></span>, <span class="m"><i>y</i> ∈ [0,9]</span>인 <span class="m"><i>f</i></span>를 찾기</td>
+          <td lang="ko"><span class="m"><i>x</i></span>는 가능한 모든 이메일, <span class="m"><i>y</i> ∈ {spam, non_spam}</span></td>
+          <td lang="en">find <span class="m"><i>f</i></span> with <span class="m"><i>x</i> ∈ [0,255]<sup>28×28</sup></span> and <span class="m"><i>y</i> ∈ [0,9]</span></td>
+          <td lang="en"><span class="m"><i>x</i></span> is all possible emails, <span class="m"><i>y</i> ∈ {spam, non_spam}</span></td></tr>
+      <tr><td class="m"><i>E</i></td>
+          <td lang="ko">올바르게 라벨이 붙은 이미지들의 training dataset</td>
+          <td lang="ko">spam / non_spam으로 표시된 이메일들의 training dataset</td>
+          <td lang="en">a training dataset of correctly labelled images</td>
+          <td lang="en">a training dataset of emails marked spam or non_spam</td></tr>
+      <tr><td class="m"><i>P</i></td>
+          <td lang="ko">test dataset에서의 accuracy</td>
+          <td lang="ko">spam 검출 accuracy</td>
+          <td lang="en">accuracy on a test dataset</td>
+          <td lang="en">spam detection accuracy</td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">10쪽의 왼쪽 사진은 <strong>MNIST 손글씨 숫자 격자</strong>다. 검은 배경에 흰 숫자가 7행 10열로 늘어서 있고, 그중 한 칸(<code>8</code>)이 <strong>빨간 사각형</strong>으로 표시되어 있으며 빨간 화살표가 오른쪽의 <code>8</code>이라는 글자로 이어진다. 아래에 출처 URL이 작게 적혀 있다.</p>
+  <p lang="en">The image on page 10 is a <strong>grid of MNIST handwritten digits</strong>, white on black, seven rows by ten columns, with one cell (an <code>8</code>) boxed in <strong>red</strong> and a red arrow leading to the character <code>8</code> beside it. A source URL is printed small underneath.</p>
+  <p lang="ko">11쪽의 왼쪽은 <strong>메일 클라이언트 스크린샷</strong>이다. Viagra 광고 메일이 열려 있고 상단에 "Mail thinks this message is Junk Mail" 배너가 보인다. 그 아래로 <strong>빨간 아래 화살표</strong>가 <code>SPAM</code>이라는 글자를 가리킨다.</p>
+  <p lang="en">Page 11's left side is a <strong>screenshot of a mail client</strong> showing a Viagra advertisement with a "Mail thinks this message is Junk Mail" banner across the top, and a <strong>red downward arrow</strong> beneath it pointing to the word <code>SPAM</code>.</p>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 두 예제가 같은 <span class="m"><i>f</i> : <i>x</i> → <i>y</i></span>이지만 <strong><span class="m"><i>x</i></span>의 모양이 완전히 다르다.</strong> MNIST는 <span class="m">28×28</span>의 고정 크기 격자이고, 이메일은 길이가 제각각인 문자열이다. 그래서 <strong>같은 가속기가 두 문제를 똑같이 잘 처리하지 못한다.</strong> 고정 크기 텐서는 systolic array에 잘 맞고, 가변 길이 시퀀스는 padding과 batching 전략이 따로 필요하다. <strong>"AI 가속기"의 성능 숫자가 어떤 워크로드에서 나온 것인지 물어야 하는 이유</strong>가 여기 있고, 이건 Paper Reading에서 평가 항목을 볼 때 그대로 쓰는 질문이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The two examples share the same <span class="m"><i>f</i> : <i>x</i> → <i>y</i></span>, but <strong>the shape of <span class="m"><i>x</i></span> is completely different</strong>: a fixed <span class="m">28×28</span> grid versus strings of varying length. So <strong>one accelerator will not handle both equally well</strong>. Fixed-size tensors suit a systolic array; variable-length sequences need their own padding and batching strategy. This is why <strong>you have to ask which workload an "AI accelerator" number came from</strong>, and it is the same question you bring to the evaluation section of a paper.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head" data-slide="12-13"><span class="sec-num">06</span><h2 lang="ko">하나의 레시피</h2><h2 lang="en">One recipe</h2></div>
+  <p class="sec-sub" lang="ko">이 강의에서 가장 중요한 두 장이다. 12쪽이 레시피를 주고 13쪽이 그 레시피로 실제 알고리즘 하나를 완성한다.</p>
+  <p class="sec-sub" lang="en">The two most important slides in the lecture: page 12 gives the recipe, page 13 fills it in to produce a complete algorithm.</p>
+
+  <h3 data-slide="12"><span lang="ko">거의 모든 ML 알고리즘의 네 칸</span><span lang="en">The four slots of nearly every ML algorithm</span></h3>
+  <div class="def">
+    <span class="tag" lang="ko">슬라이드가 적은 그대로</span><span class="tag" lang="en">Straight from the slide</span>
+    <p lang="ko">거의 모든 ML 알고리즘은 단순한 레시피의 <strong>특정한 사례</strong>로 기술할 수 있다.</p>
+    <p lang="en">Nearly all ML algorithms can be described as <strong>particular instances</strong> of a simple recipe.</p>
+    <ul lang="ko">
+      <li>데이터셋 → Experience (<span class="m"><i>E</i></span>)</li>
+      <li>cost (loss) function → Performance Measure (<span class="m"><i>P</i></span>)</li>
+      <li>모델 + 최적화 방법 → Task (<span class="m"><i>T</i></span>)</li>
+    </ul>
+    <ul lang="en">
+      <li>a dataset → experience (<span class="m"><i>E</i></span>)</li>
+      <li>a cost (loss) function → performance measure (<span class="m"><i>P</i></span>)</li>
+      <li>a model plus an optimization method → task (<span class="m"><i>T</i></span>)</li>
+    </ul>
+    <p lang="ko">그리고 이 레시피를 쓰는 이유가 따로 적혀 있다. 알고리즘을 <strong>각자 다른 근거를 가진 긴 목록</strong>으로 외우는 대신, <strong>비슷한 이유로 동작하는 관련 작업들의 분류 체계</strong>로 보기 위해서다.</p>
+    <p lang="en">The slide also states why the recipe is worth having: so that algorithms can be seen as <strong>a taxonomy of methods for related tasks that work for similar reasons</strong>, rather than memorised as <strong>a long list each with its own separate justification</strong>.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 280" role="img" aria-label="E, T, P 레시피의 네 칸이 각각 어떤 하드웨어 자원을 요구하는지 대응시킨 도해">
+      <defs>
+        <marker id="q2ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <text class="svglab" x="20" y="22" style="font-size:10.5px" fill="var(--ink3)">recipe slot</text>
+      <text class="svglab" x="400" y="22" style="font-size:10.5px" fill="var(--ink3)">what it demands from hardware</text>
+
+      <rect x="20" y="34" width="230" height="48" rx="6" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)"/>
+      <text class="svgtxt" x="36" y="54" style="font-size:12.5px;font-weight:600" fill="var(--brown)">dataset · E</text>
+      <text class="svglab" x="36" y="70" style="font-size:9.5px">examples, labels</text>
+      <rect x="400" y="34" width="280" height="48" rx="6" fill="rgba(var(--brown-rgb),.07)" stroke="var(--brown)" stroke-dasharray="4 3"/>
+      <text class="svgtxt" x="416" y="54" style="font-size:11.5px" fill="var(--brown)">storage and bandwidth</text>
+      <text class="svglab" x="416" y="70" style="font-size:9.5px">180 GB per epoch for ImageNet</text>
+      <path d="M254,58 L396,58" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#q2ar)"/>
+
+      <rect x="20" y="98" width="230" height="48" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)"/>
+      <text class="svgtxt" x="36" y="118" style="font-size:12.5px;font-weight:600" fill="var(--blue)">model · part of T</text>
+      <text class="svglab" x="36" y="134" style="font-size:9.5px">weights, activations</text>
+      <rect x="400" y="98" width="280" height="48" rx="6" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-dasharray="4 3"/>
+      <text class="svgtxt" x="416" y="118" style="font-size:11.5px" fill="var(--blue)">on-chip capacity</text>
+      <text class="svglab" x="416" y="134" style="font-size:9.5px">does it fit, or does it stream</text>
+      <path d="M254,122 L396,122" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#q2ar)"/>
+
+      <rect x="20" y="162" width="230" height="48" rx="6" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)"/>
+      <text class="svgtxt" x="36" y="182" style="font-size:12.5px;font-weight:600" fill="var(--violet)">optimization · part of T</text>
+      <text class="svglab" x="36" y="198" style="font-size:9.5px">gradients, update rule</text>
+      <rect x="400" y="162" width="280" height="48" rx="6" fill="rgba(var(--violet-rgb),.07)" stroke="var(--violet)" stroke-dasharray="4 3"/>
+      <text class="svgtxt" x="416" y="182" style="font-size:11.5px" fill="var(--violet)">MAC throughput, extra state</text>
+      <text class="svglab" x="416" y="198" style="font-size:9.5px">momentum and Adam add buffers</text>
+      <path d="M254,186 L396,186" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#q2ar)"/>
+
+      <rect x="20" y="226" width="230" height="48" rx="6" fill="rgba(var(--amber-rgb),.13)" stroke="var(--amber)"/>
+      <text class="svgtxt" x="36" y="246" style="font-size:12.5px;font-weight:600" fill="var(--amber)">cost function · P</text>
+      <text class="svglab" x="36" y="262" style="font-size:9.5px">one scalar</text>
+      <rect x="400" y="226" width="280" height="48" rx="6" fill="rgba(var(--amber-rgb),.07)" stroke="var(--amber)" stroke-dasharray="4 3"/>
+      <text class="svgtxt" x="416" y="246" style="font-size:11.5px" fill="var(--amber)">a reduction across everything</text>
+      <text class="svglab" x="416" y="262" style="font-size:9.5px">cheap to compute, awkward to split</text>
+      <path d="M254,250 L396,250" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#q2ar)"/>
+    </svg>
+    <figcaption lang="ko">12쪽의 세 줄을 네 칸으로 펴고, 오른쪽에 하드웨어 대응을 붙인 것. 왼쪽 열은 슬라이드의 내용이고 <strong>오른쪽 열은 슬라이드에 없다.</strong> 이 노트가 이 강의를 하드웨어 수업으로 되읽는 방식이다.</figcaption>
+    <figcaption lang="en">The three lines of page 12 opened out into four slots, with a hardware column attached. The left column is the slide's; <strong>the right column is not.</strong> It is how this note reads the lecture back as a hardware lecture.</figcaption>
+  </figure>
+
+  <h3 data-slide="13"><span lang="ko">레시피를 채워 본 예: 선형 회귀</span><span lang="en">The recipe filled in: linear regression</span></h3>
+  <p lang="ko">위쪽에 자료가 둘 있다. 왼쪽은 <strong>산점도</strong>로, 제목이 <em>Housing Prices (Portland, OR)</em>다. 가로축이 <em>Size (feet²)</em>로 0에서 3000, 세로축이 <em>Price (in 1000s of dollars)</em>로 0에서 500. 빨간 × 표시가 40개 남짓 흩어져 있는데 <strong>대체로 우상향</strong>한다. 오른쪽은 그 데이터의 <strong>표 일부</strong>다. <code>2104 → 460</code>, <code>1416 → 232</code>, <code>1534 → 315</code>, <code>852 → 178</code>, 그리고 <code>...</code>.</p>
+  <p lang="en">Two pieces of material along the top. On the left a <strong>scatter plot</strong> titled <em>Housing Prices (Portland, OR)</em>, with <em>size (feet²)</em> from 0 to 3000 across and <em>price (in 1000s of dollars)</em> from 0 to 500 up the side; about forty red crosses scattered across it, <strong>trending upward</strong>. On the right, <strong>part of the same data as a table</strong>: <code>2104 → 460</code>, <code>1416 → 232</code>, <code>1534 → 315</code>, <code>852 → 178</code>, then <code>...</code>.</p>
+  <p lang="ko">아래에 레시피의 네 칸이 채워져 있다.</p>
+  <p lang="en">The four slots are filled in below.</p>
+
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">Dataset · E</span>
+      <p lang="ko"><span class="m">(<i>x</i>, <i>y</i>)</span>이고 <span class="m"><i>x</i></span>는 크기, <span class="m"><i>y</i></span>는 가격. <span class="m"><i>m</i></span>개의 학습 예제.</p>
+      <p lang="en"><span class="m">(<i>x</i>, <i>y</i>)</span> where <span class="m"><i>x</i></span> is size and <span class="m"><i>y</i></span> is price, with <span class="m"><i>m</i></span> training examples.</p>
+    </div>
+    <div class="def">
+      <span class="tag">Model · T</span>
+      <div class="eq"><span class="m"><i>h</i> = <i>w</i><sub>0</sub> + <i>w</i><sub>1</sub> · <i>x</i></span></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">Cost function · P</span>
+      <p lang="ko">Mean Squared error</p>
+      <p lang="en">Mean squared error</p>
+      <div class="eq"><span class="m"><i>MSE</i> = <sup>1</sup>⁄<sub><i>m</i></sub> Σ (<i>h</i>(<i>x<sub>i</sub></i>) − <i>y<sub>i</sub></i>)<sup>2</sup></span></div>
+    </div>
+    <div class="def">
+      <span class="tag">Optimization · T</span>
+      <ul lang="ko">
+        <li>gradient가 0인 지점을 직접 푼다</li>
+        <li>gradient descent</li>
+      </ul>
+      <ul lang="en">
+        <li>solve for where the gradient is 0</li>
+        <li>gradient descent</li>
+      </ul>
+    </div>
+  </div>
+  <p lang="ko">오른쪽 아래에 출처가 <em>Machine Learning, Andrew Ng</em>이라고 적혀 있다.</p>
+  <p lang="en">The credit in the lower right reads <em>Machine Learning, Andrew Ng</em>.</p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · 선형 회귀</span><span lang="en">Unpacking the notation · linear regression</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>m</i></td><td><span lang="ko">학습 예제의 개수. 스칼라. 이 데이터셋에서는 산점도의 × 개수</span><span lang="en">the number of training examples, a scalar; here, the number of crosses on the scatter plot</span></td></tr>
+        <tr><td class="m"><i>x<sub>i</sub></i></td><td><span lang="ko"><span class="m"><i>i</i></span>번째 예제의 입력. 여기서는 <strong>스칼라 하나</strong>(집 크기)지만, 일반적으로는 벡터다</span><span lang="en">the input of example <span class="m"><i>i</i></span>. Here <strong>a single scalar</strong>, the house size, though in general a vector</span></td></tr>
+        <tr><td class="m"><i>h</i>(<i>x<sub>i</sub></i>)</td><td><span lang="ko">모델이 낸 <strong>예측값</strong>. hypothesis의 h다. 16쪽에서는 같은 것을 <span class="m"><i>ŷ<sub>i</sub></i></span>로 쓴다</span><span lang="en">the model's <strong>prediction</strong>, h for hypothesis. Page 16 writes the same quantity as <span class="m"><i>ŷ<sub>i</sub></i></span></span></td></tr>
+        <tr><td class="m"><i>w</i><sub>0</sub>, <i>w</i><sub>1</sub></td><td><span lang="ko">학습되는 <strong>파라미터 두 개.</strong> 절편과 기울기. <strong>이 모델의 전체 크기가 2다</strong></span><span lang="en">the <strong>two learned parameters</strong>, intercept and slope. <strong>The entire model has size 2</strong></span></td></tr>
+        <tr><td class="m">Σ</td><td><span lang="ko">모든 예제에 대해 더한다. <strong><span class="m"><i>m</i></span>개를 하나로 줄이는 축약</strong>이고, 이게 <span class="m"><i>P</i></span>가 스칼라인 이유다</span><span lang="en">sum over every example: <strong>a reduction of <span class="m"><i>m</i></span> values to one</strong>, which is why <span class="m"><i>P</i></span> is a scalar</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">슬라이드가 최적화 방법을 <strong>둘</strong> 적었다. gradient가 0인 곳을 직접 푸는 것과 gradient descent다. 선형 회귀는 닫힌 형태의 해가 존재하는데, <strong>왜 딥러닝에서는 그 방법을 안 쓸까?</strong> 하드웨어 쪽 이유를 대 보자.</p>
+    <p lang="en">The slide lists <strong>two</strong> optimization methods: solving directly for a zero gradient, and gradient descent. Linear regression has a closed-form solution, so <strong>why is that route never used in deep learning?</strong> Give the hardware reason.</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <p lang="ko"><strong>닫힌 형태의 해는 행렬을 역행렬로 뒤집어야 한다.</strong> 파라미터가 <span class="m"><i>n</i></span>개면 <span class="m"><i>n</i>×<i>n</i></span> 행렬의 역행렬이 필요하고, 그 비용이 대략 <span class="m"><i>n</i><sup>3</sup></span>이다. 파라미터가 둘인 이 예제에서는 아무 문제가 없다.</p>
+      <p lang="en"><strong>The closed form requires inverting a matrix.</strong> With <span class="m"><i>n</i></span> parameters you need the inverse of an <span class="m"><i>n</i>×<i>n</i></span> matrix, which costs roughly <span class="m"><i>n</i><sup>3</sup></span>. With two parameters, as here, that is nothing.</p>
+      <p lang="ko">그런데 AlexNet은 파라미터가 <strong>6천만 개</strong>다. <span class="m"><i>n</i><sup>3</sup></span>은 <span class="m">2 × 10<sup>23</sup></span>이 되고, 역행렬을 담을 <span class="m"><i>n</i>×<i>n</i></span> 행렬만 해도 FP32로 <strong><span class="m">1.4 × 10<sup>7</sup></span> TB</strong>다. 존재할 수 없는 크기다.</p>
+      <p lang="en">AlexNet has <strong>sixty million</strong> parameters. Then <span class="m"><i>n</i><sup>3</sup></span> is <span class="m">2 × 10<sup>23</sup></span>, and merely storing the <span class="m"><i>n</i>×<i>n</i></span> matrix in FP32 takes <strong><span class="m">1.4 × 10<sup>7</sup></span> TB</strong>. It cannot exist.</p>
+      <p lang="ko"><strong>gradient descent는 한 스텝이 <span class="m"><i>n</i></span>에 비례한다.</strong> 정확한 답을 한 번에 얻는 대신 근사값을 여러 번 갱신하는 쪽을 택한 것이고, <strong>그 선택의 이유가 수학이 아니라 메모리와 연산량이다.</strong> 그래서 딥러닝 하드웨어는 역행렬을 잘하는 기계가 아니라 <span class="cHw">곱셈 누적을 아주 많이 하는 기계</span>로 만들어진다. 이 수업에서 배울 가속기가 전부 그 모양인 이유다.</p>
+      <p lang="en"><strong>Gradient descent costs a step proportional to <span class="m"><i>n</i></span>.</strong> Trading one exact answer for many approximate updates is a choice made <strong>on memory and arithmetic grounds, not mathematical ones</strong>. Which is why deep learning hardware is not built to invert matrices but to <span class="cHw">do an enormous number of multiply-accumulates</span>, and why every accelerator in this course has that shape.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head" data-slide="14-15"><span class="sec-num">07</span><h2 lang="ko">Dataset과 일반화</h2><h2 lang="en">Datasets and generalization</h2></div>
+  <p class="sec-sub" lang="ko">레시피의 첫 칸을 자세히 본다. 데이터의 종류가 알고리즘의 종류를 정하고, 데이터를 나누는 방식이 평가 방식을 정한다.</p>
+  <p class="sec-sub" lang="en">A closer look at the first slot. The kind of data decides the kind of algorithm, and how the data is split decides how it gets evaluated.</p>
+
+  <h3 data-slide="14"><span lang="ko">지도 · 비지도 · 강화</span><span lang="en">Supervised, unsupervised, reinforcement</span></h3>
+  <p lang="ko">ML 작업은 보통 <strong>시스템이 예제 하나를 어떻게 처리해야 하는지</strong>로 기술되고, 데이터셋은 <strong>많은 예제의 모음</strong>이다. 알고리즘은 <strong>어떤 종류의 데이터셋을 다루느냐</strong>에 따라 크게 나뉜다.</p>
+  <p lang="en">ML tasks are usually described in terms of <strong>how the system should process one example</strong>, and a dataset is <strong>a collection of many examples</strong>. Algorithms divide broadly by <strong>what kind of dataset they process</strong>.</p>
+  <ul lang="ko">
+    <li><strong>Supervised</strong> · 데이터셋의 각 예제에 <strong>라벨 또는 타깃이 붙어 있다.</strong> 예: 분류, 회귀</li>
+    <li><strong>Unsupervised</strong> · <strong>라벨이 없는</strong> 데이터셋. 예: 군집화</li>
+    <li><strong>Reinforcement</strong> · <strong>고정된 데이터셋이 아니라</strong> 환경과 상호작용한다</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Supervised</strong> · each example carries <strong>a label or target</strong>. Classification, regression</li>
+    <li><strong>Unsupervised</strong> · a dataset <strong>without labels</strong>. Clustering</li>
+    <li><strong>Reinforcement</strong> · <strong>not a fixed dataset</strong> at all; it interacts with an environment</li>
+  </ul>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 세 번째 줄이 나머지 둘과 성격이 다르다. supervised와 unsupervised는 <strong>데이터가 먼저 다 있고</strong> 그걸 읽어 오면 되지만, reinforcement는 <strong>환경을 돌려서 데이터를 만들어 가며</strong> 학습한다. 즉 학습 루프 안에 <strong>시뮬레이터가 들어온다.</strong> 그러면 병목이 <span class="cHw">행렬 곱셈</span>이 아니라 시뮬레이션 쪽으로 옮겨갈 수 있고, 가속기 설계의 전제가 무너진다. <strong>L01 41쪽의 가속기 목록이 거의 전부 추론과 지도학습을 겨냥한 이유</strong>가 이것이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The third line is not like the other two. Supervised and unsupervised learning read from <strong>data that already exists</strong>; reinforcement learning <strong>generates its data by running an environment</strong>, which puts <strong>a simulator inside the training loop</strong>. The bottleneck can then move off <span class="cHw">matrix multiply</span> and onto simulation, and the assumption the accelerator was designed around collapses. It is <strong>why nearly every accelerator on page 41 of lecture 1 targets inference and supervised training</strong>.
+  </div>
+
+  <h3 data-slide="15"><span lang="ko">Generalization과 capacity 곡선</span><span lang="en">Generalization and the capacity curve</span></h3>
+  <p lang="ko">오른쪽 위에 <strong>그래프</strong>가 하나 있다. 가로축이 <em>Capacity</em>, 세로축이 <em>Error</em>다. 선이 둘이고 범례가 붙어 있다. <strong>파란 점선</strong>이 Training error, <strong>초록 실선</strong>이 Generalization error다.</p>
+  <p lang="en">A <strong>chart</strong> sits at the upper right, <em>capacity</em> across and <em>error</em> up. Two labelled series: a <strong>blue dashed line</strong> for training error and a <strong>green solid line</strong> for generalization error.</p>
+  <p lang="ko"><strong>파란 점선은 계속 내려간다.</strong> 왼쪽 끝에서 급격히 떨어지고 그 뒤로는 완만하게 계속 감소한다. <strong>초록 실선은 U자를 그린다.</strong> 처음에는 같이 내려가다가 어느 지점에서 최저를 찍고 다시 올라간다. 그 최저점에 <strong>빨간 세로선</strong>이 그어져 있고 가로축에 <em>Optimal Capacity</em>라고 적혀 있다. 빨간 선의 <strong>왼쪽이 <code>Underfitting zone</code>, 오른쪽이 <code>Overfitting zone</code></strong>이다. 오른쪽 끝에 두 선 사이를 <strong>양방향 화살표</strong>가 잇고 <em>Generalization gap</em>이라고 적혀 있다.</p>
+  <p lang="en"><strong>The blue dashed line falls throughout</strong>: steeply at the left, then gently but always downward. <strong>The green solid line makes a U</strong>: it descends alongside the blue one, reaches a minimum, then climbs again. A <strong>red vertical line</strong> marks that minimum, labelled <em>optimal capacity</em> on the x axis, with <code>Underfitting zone</code> to its <strong>left</strong> and <code>Overfitting zone</code> to its <strong>right</strong>. At the far right a <strong>double-headed arrow</strong> spans the gap between the two curves, labelled <em>generalization gap</em>.</p>
+  <p lang="ko">아래 글머리는 이렇다. <strong>Generalization</strong>은 학습에 쓰지 않은 <strong>새 입력</strong>에서도 잘하는 것이고, 데이터셋을 <strong>training set</strong>과 <strong>test set</strong>으로 나눈다. <strong>Overfitting</strong>은 그 둘 사이 오차의 <strong>격차가 큰</strong> 상태다.</p>
+  <p lang="en">The bullets below: <strong>generalization</strong> is performing well on <strong>new, previously unseen inputs</strong>; the dataset is partitioned into a <strong>training set</strong> and a <strong>test set</strong>; and <strong>overfitting</strong> is a <strong>large gap</strong> between the two errors.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · capacity</span><span lang="en">Unpacking the jargon · capacity</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">모델이 <strong>표현할 수 있는 함수의 범위가 얼마나 넓은가.</strong> 그래프의 가로축이다</span><span lang="en">how wide a <strong>range of functions the model can represent</strong>. It is the x axis of the chart</span></td></tr>
+        <tr><td><span lang="ko">무엇으로 늘리나</span><span lang="en">How you increase it</span></td><td><span lang="ko">파라미터를 늘리거나, 층을 깊게 하거나, 다항식 차수를 올리거나</span><span lang="en">more parameters, more layers, a higher-degree polynomial</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">모델 구조를 정할 때. 학습 중에 바뀌는 값이 아니다</span><span lang="en">when the architecture is chosen; it does not change during training</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>메모리 용량(capacity)과 다른 말이다.</strong> 이 수업에서는 두 뜻이 같은 페이지에 나올 수 있다. on-chip capacity는 바이트이고, model capacity는 표현력이다. <strong>다만 둘이 연결되어 있다.</strong> capacity를 늘리려고 파라미터를 늘리면 메모리 용량이 그만큼 필요해진다</span><span lang="en"><strong>Not the same word as memory capacity</strong>, and in this course both senses can appear on one page. On-chip capacity is bytes; model capacity is expressive power. <strong>They are linked, though</strong>: raising capacity by adding parameters costs exactly that much memory</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 이 곡선이 <strong>이 수업 전체에서 가장 자주 돌아오는 그림</strong>이다. quantization과 pruning은 <strong>capacity를 일부러 깎는 기법</strong>이다. 그래프에서 왼쪽으로 미는 것이다. 최적점보다 오른쪽에 있다면 왼쪽으로 미는 것이 <strong>정확도를 거의 잃지 않으면서 메모리와 연산을 줄이는</strong> 일이 된다. <strong>"모델을 줄여도 정확도가 안 떨어진다"는 이 분야의 흔한 결과가 마법이 아닌 이유</strong>가 이 곡선에 있다. 원래 오른쪽에 너무 멀리 가 있었던 것이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> This curve is <strong>the figure that returns most often in this course.</strong> Quantization and pruning are <strong>techniques for deliberately cutting capacity</strong>, which is to say pushing left along this axis. If you were sitting to the right of the optimum, pushing left <strong>buys memory and arithmetic at almost no accuracy cost</strong>. The reason the field's familiar result, <strong>that you can shrink a model without losing accuracy, is not magic</strong>, lives in this curve: you were too far right to begin with.
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">슬라이드는 두 갈래로 나누는데 실무는 세 갈래다</h4>
+    <h4 lang="en">The slide splits the data two ways; practice splits it three</h4>
+    <p lang="ko">15쪽은 <strong>training set과 test set</strong>만 적었다. 실제로는 <strong>validation set</strong>이 하나 더 있어야 한다. 하이퍼파라미터(층 수, learning rate, 정규화 세기)를 고를 때 test set을 보고 고르면, <strong>test set이 사실상 학습에 쓰인 것</strong>이 되어 일반화 성능을 더 이상 정직하게 재지 못한다.</p>
+    <p lang="en">Page 15 names only a <strong>training set and a test set</strong>. In practice a <strong>validation set</strong> has to sit between them. If you pick hyperparameters (depth, learning rate, regularization strength) by looking at the test set, <strong>the test set has effectively been trained on</strong> and no longer measures generalization honestly.</p>
+    <p lang="ko">이건 Paper Reading에서 그대로 쓰는 점검 항목이다. <strong>논문이 test set으로 하이퍼파라미터를 고른 것처럼 읽히면 평가 항목의 약점</strong>이다.</p>
+    <p lang="en">This is a checklist item you carry straight into paper reading. <strong>If a paper reads as though hyperparameters were tuned on the test set, that is a weakness in its evaluation.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head" data-slide="16-17"><span class="sec-num">08</span><h2 lang="ko">Cost function</h2><h2 lang="en">Cost function</h2></div>
+  <p class="sec-sub" lang="ko">레시피의 <span class="m"><i>P</i></span> 칸이다. 두 장인데 <strong>두 번째 장이 이 수업과 직접 이어진다.</strong></p>
+  <p class="sec-sub" lang="en">The <span class="m"><i>P</i></span> slot of the recipe. Two slides, and <strong>the second one connects straight into this course.</strong></p>
+
+  <h3 data-slide="16"><span lang="ko">MSE, 그리고 "training"이라는 단어</span><span lang="en">MSE, and the word "training"</span></h3>
+  <p lang="ko">글머리 두 줄. cost function은 주어진 데이터에 대해 <strong>ML 모델의 성능을 잰다.</strong> 그리고 <strong><em>training</em> set에서</strong> 예측값과 기대값 사이의 오차를 정량화한다. 슬라이드가 <em>training</em>만 이탤릭으로 강조했다.</p>
+  <p lang="en">Two bullets: a cost function <strong>measures the performance of an ML model for given data</strong>, and quantifies the error between predicted and expected values <strong>in the <em>training</em> set</strong>. The slide italicises <em>training</em> and nothing else.</p>
+  <div class="eq"><span class="m"><i>CF</i> = <i>MSE</i><sub>train</sub> = <sup>1</sup>⁄<sub><i>m</i></sub> Σ (<i>ŷ<sub>i</sub></i> − <i>y<sub>i</sub></i>)<sup>2</sup></span></div>
+  <p lang="ko">오른쪽 아래에 작은 도해가 있다. 가로세로 축이 그려져 있고 <strong>빨간 직선</strong>이 대각선으로 지나가며 <em>Regression Line</em>이라고 적혀 있다. 검은 × 표시 네 개가 흩어져 있고, 그중 하나에서 <strong>회귀선까지 세로 화살표</strong>가 내려온다. 화살표 옆에 <em>Residual:</em> <span class="m"><i>y</i> − <i>ȳ</i></span>라고 적혀 있고, 위쪽 × 옆에 <em>Predicted 'y'</em>, 아래 파란 × 옆에 <em>Observed 'y'</em>가 붙어 있다.</p>
+  <p lang="en">A small diagram sits at the lower right: a pair of axes with a <strong>red straight line</strong> crossing diagonally, labelled <em>regression line</em>. Four black crosses are scattered around it, and from one of them a <strong>vertical arrow</strong> drops to the line, labelled <em>residual:</em> <span class="m"><i>y</i> − <i>ȳ</i></span>, with <em>predicted 'y'</em> beside the upper cross and <em>observed 'y'</em> beside the blue one below.</p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · MSE</span><span lang="en">Unpacking the notation · MSE</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>CF</i></td><td><span lang="ko">Cost Function. 이 슬라이드가 쓰는 약어다. loss function이라고도 한다</span><span lang="en">cost function, the slide's own abbreviation. Also called a loss function</span></td></tr>
+        <tr><td class="m"><i>ŷ<sub>i</sub></i></td><td><span lang="ko">모자(hat)가 붙은 것은 <strong>모델이 낸 예측값</strong>. 13쪽의 <span class="m"><i>h</i>(<i>x<sub>i</sub></i>)</span>와 같은 것을 다르게 쓴 것이다</span><span lang="en">the hat marks <strong>a predicted value</strong>. The same quantity page 13 wrote as <span class="m"><i>h</i>(<i>x<sub>i</sub></i>)</span></span></td></tr>
+        <tr><td class="m"><i>y<sub>i</sub></i></td><td><span lang="ko">모자가 없으면 <strong>실제 정답</strong>. 데이터셋이 갖고 있는 라벨</span><span lang="en">without a hat, <strong>the true value</strong>: the label the dataset carries</span></td></tr>
+        <tr><td class="m">( · )<sup>2</sup></td><td><span lang="ko">제곱하는 이유가 둘이다. <strong>부호를 없애고</strong>, <strong>큰 오차에 더 큰 벌점</strong>을 준다. 그리고 미분이 깔끔하다</span><span lang="en">squaring does two jobs: it <strong>removes the sign</strong> and <strong>penalises large errors harder</strong>. It also differentiates cleanly</span></td></tr>
+        <tr><td class="m"><sub>train</sub></td><td><span lang="ko">아래첨자가 <strong>어느 집합에서 쟀는지</strong>를 밝힌다. 15쪽 그래프의 파란 점선이 이 값이다. 초록 실선(generalization error)은 <strong>이 식으로 계산되는 값이 아니다</strong></span><span lang="en">the subscript says <strong>which set it was measured on</strong>. It is the blue dashed line on page 15's chart. The green solid line, generalization error, <strong>is not what this formula computes</strong></span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">슬라이드의 합 범위가 한 칸 어긋나 있다</h4>
+    <h4 lang="en">The summation range on the slide is off by one</h4>
+    <p lang="ko">13쪽과 16쪽 모두 합의 범위가 <span class="m"><i>i</i> = 0</span>부터 <span class="m"><i>m</i></span>까지로 적혀 있다. 그러면 <strong>항이 <span class="m"><i>m</i> + 1</span>개</strong>인데 앞에서는 <span class="m"><i>m</i></span>으로 나눈다. 관례대로라면 <span class="m"><i>i</i> = 1</span>부터 <span class="m"><i>m</i></span>까지이거나 <span class="m"><i>i</i> = 0</span>부터 <span class="m"><i>m</i> − 1</span>까지여야 한다.</p>
+    <p lang="en">On both page 13 and page 16 the sum runs from <span class="m"><i>i</i> = 0</span> to <span class="m"><i>m</i></span>, which is <strong><span class="m"><i>m</i> + 1</span> terms</strong> divided by <span class="m"><i>m</i></span>. By convention it should be either <span class="m"><i>i</i> = 1</span> to <span class="m"><i>m</i></span> or <span class="m"><i>i</i> = 0</span> to <span class="m"><i>m</i> − 1</span>.</p>
+    <p lang="ko"><strong>개념을 이해하는 데는 아무 지장이 없다.</strong> 슬라이드가 평균이라는 뜻으로 쓴 것이 명백하다. 다만 <strong>이 식을 그대로 코드로 옮기면 배열 끝을 하나 넘어간다.</strong> 그리고 논문에서 같은 표기를 만났을 때 <strong>인덱스가 0부터인지 1부터인지 확인하는 습관</strong>이 여기서 생긴다.</p>
+    <p lang="en"><strong>It does not get in the way of the idea</strong>; the slide plainly means an average. But <strong>transcribing it directly into code walks one past the end of the array</strong>, and it is where the habit of <strong>checking whether an index starts at 0 or 1</strong> comes from when you meet the same notation in a paper.</p>
+  </div>
+
+  <h3 data-slide="17"><span lang="ko">Regularization: L2와 L1</span><span lang="en">Regularization: L2 and L1</span></h3>
+  <p lang="ko">한 줄 정의부터. <strong>Regularization은 generalization error를 줄이되 training error는 줄이지 않는 수정</strong>이다. 15쪽 그래프에서 보면, <strong>초록 실선은 내리고 파란 점선은 안 건드리는</strong> 조작이다.</p>
+  <p lang="en">The definition first: <strong>regularization is a modification that reduces generalization error but not training error.</strong> On page 15's chart, that is an operation which <strong>pulls the green line down and leaves the blue one alone.</strong></p>
+  <p lang="ko">그 방법으로 <strong>weight decay (L2/1 regularization)</strong>가 제시된다. <em>작은 가중치를 선호한다는 뜻을 표현하는 것</em>이라고 적혀 있고, 식이 둘이다.</p>
+  <p lang="en">The method offered is <strong>weight decay (L2/1 regularization)</strong>, described as <em>expressing a preference for smaller weights</em>, with two formulas.</p>
+  <div class="eq"><span class="m"><i>CF</i> = <i>MSE</i><sub>train</sub> + <i>λ</i> Σ <i>w<sub>i</sub></i><sup>2</sup></span><span class="note">L2</span></div>
+  <div class="eq"><span class="m"><i>CF</i> = <i>MSE</i><sub>train</sub> + <i>λ</i> Σ |<i>w<sub>i</sub></i>|</span><span class="note">L1</span></div>
+  <p lang="ko">오른쪽에 도해가 있다. 검은 테두리 상자 안에 <span class="m"><i>x</i></span>와 <span class="m"><i>y</i></span> 축이 그려져 있고, <strong>빨간 점 여섯 개</strong>가 데이터를 나타낸다. 그 점들을 지나는 곡선이 둘이다. <strong>파란 곡선</strong>은 모든 점을 정확히 지나가려고 심하게 요동친다. <strong>초록 곡선</strong>은 완만하게 점들 사이를 지나간다. <strong>파란 곡선이 overfitting이고 초록 곡선이 regularization을 건 결과</strong>다.</p>
+  <p lang="en">A diagram sits on the right: inside a black-bordered box, an <span class="m"><i>x</i></span> and <span class="m"><i>y</i></span> axis with <strong>six red data points</strong>, and two curves through them. The <strong>blue curve</strong> oscillates violently to pass exactly through every point; the <strong>green curve</strong> runs smoothly between them. <strong>The blue curve is overfitting and the green one is what regularization produces.</strong></p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · regularization</span><span lang="en">Unpacking the notation · regularization</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>λ</i></td><td><span lang="ko">정규화의 <strong>세기</strong>. 스칼라이고 <strong>사람이 정하는 하이퍼파라미터</strong>다. 학습으로 구하는 값이 아니다. 크면 초록 곡선이 더 밋밋해지고, 0이면 정규화가 없다</span><span lang="en">the <strong>strength</strong> of the regularizer: a scalar, and <strong>a hyperparameter a person sets</strong> rather than something learned. Larger flattens the green curve further; zero removes regularization entirely</span></td></tr>
+        <tr><td class="m">Σ <i>w<sub>i</sub></i><sup>2</sup></td><td><span lang="ko">모든 가중치의 <strong>제곱합</strong>. L2 norm의 제곱이다. 큰 가중치에 특히 강한 벌점</span><span lang="en">the <strong>sum of squares</strong> of every weight, the squared L2 norm. It punishes large weights especially hard</span></td></tr>
+        <tr><td class="m">Σ |<i>w<sub>i</sub></i>|</td><td><span lang="ko">모든 가중치의 <strong>절댓값 합</strong>. L1 norm이다. 크기에 상관없이 <strong>같은 비율로</strong> 벌점을 준다</span><span lang="en">the <strong>sum of absolute values</strong>, the L1 norm. It punishes <strong>at the same rate</strong> regardless of magnitude</span></td></tr>
+        <tr><td class="m"><i>i</i></td><td><span lang="ko">여기서 <span class="m"><i>i</i></span>는 <strong>예제가 아니라 가중치</strong>를 센다. 16쪽의 <span class="m"><i>i</i></span>와 다른 것을 가리킨다. <strong>같은 글자가 두 슬라이드에서 다른 뜻</strong>이다</span><span lang="en">here <span class="m"><i>i</i></span> indexes <strong>weights, not examples</strong>. It points at something different from the <span class="m"><i>i</i></span> on page 16: <strong>the same letter meaning two things across two slides</strong></span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">L1과 L2는 비슷해 보이지만 하드웨어에서는 전혀 다르다</h4>
+    <h4 lang="en">L1 and L2 look alike and behave completely differently in hardware</h4>
+    <p lang="ko">슬라이드는 둘을 <strong>한 묶음</strong>으로 <code>L2/1 regularization</code>이라고 적어 놨다. 수식도 한 항만 다르다. 그런데 결과가 다르다.</p>
+    <p lang="en">The slide groups them as one thing, <code>L2/1 regularization</code>, and the formulas differ in a single term. The outcomes do not match.</p>
+    <table>
+      <thead><tr>
+        <th></th><th lang="ko">L2 (제곱합)</th><th lang="ko">L1 (절댓값 합)</th>
+        <th lang="en">L2 (sum of squares)</th><th lang="en">L1 (sum of absolute values)</th>
+      </tr></thead>
+      <tbody>
+        <tr><td lang="ko">가중치를</td><td lang="ko"><strong>작게</strong> 만든다</td><td lang="ko"><strong>0으로</strong> 만든다</td>
+            <td lang="en">Weights become</td><td lang="en"><strong>small</strong></td><td lang="en"><strong>exactly zero</strong></td></tr>
+        <tr><td lang="ko">이유</td><td lang="ko">벌점이 <span class="m">2<i>w</i></span>라 <span class="m"><i>w</i></span>가 작아질수록 압력도 약해진다</td><td lang="ko">벌점이 <strong>크기와 무관하게 일정</strong>해서 0까지 밀어붙인다</td>
+            <td lang="en">Why</td><td lang="en">the penalty gradient is <span class="m">2<i>w</i></span>, so the pressure fades as <span class="m"><i>w</i></span> shrinks</td><td lang="en">the penalty is <strong>constant regardless of size</strong>, so it pushes all the way to zero</td></tr>
+        <tr><td lang="ko">하드웨어 이득</td><td lang="ko"><strong>없다.</strong> 작아도 0이 아니면 곱셈은 해야 한다</td><td lang="ko"><strong>sparsity.</strong> 0인 가중치는 <span class="cGain">곱셈도 저장도 건너뛸 수 있다</span></td>
+            <td lang="en">Hardware payoff</td><td lang="en"><strong>none.</strong> Small is not zero, and you still have to multiply</td><td lang="en"><strong>sparsity</strong>: a zero weight lets you <span class="cGain">skip both the multiply and the storage</span></td></tr>
+      </tbody>
+    </table>
+    <p lang="ko"><strong>이 한 칸의 차이가 이 수업의 pruning 주제로 곧장 이어진다.</strong> 슬라이드는 여기서 멈추지만, "가중치를 0으로 만든다"와 "0인 가중치를 하드웨어가 실제로 건너뛴다"는 별개의 문제다. <strong>0이 흩어져 있으면 건너뛰는 제어 논리가 오히려 더 비싸진다.</strong> 그래서 뒤에서 <em>structured sparsity</em>가 나온다. 지금은 <strong>L1만 sparsity를 만든다</strong>는 것만 기억하면 된다.</p>
+    <p lang="en"><strong>That single difference leads directly into this course's pruning topic.</strong> The slide stops here, but "drive weights to zero" and "hardware actually skips the zeros" are separate problems. <strong>When the zeros are scattered, the control logic for skipping them can cost more than the multiplies saved</strong>, which is why <em>structured sparsity</em> shows up later. For now the thing to keep is that <strong>only L1 produces sparsity.</strong></p>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> cost function은 <strong>계산 자체는 싸다.</strong> 뺄셈, 제곱, 덧셈뿐이고 모델 forward pass에 비하면 무시할 수준이다. 문제는 모양이다. <strong>모든 예제의 값을 하나로 줄이는 축약(reduction)</strong>이라서, 여러 장치에 나눠 계산하면 <strong>마지막에 반드시 모아야</strong> 한다. L01 31쪽에서 P100 1024장을 붙였는데 속도가 116배밖에 안 나온 이유의 일부가 이것이다. <strong>연산은 나눌 수 있어도 합계는 나눌 수 없다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The cost function itself <strong>is cheap to compute</strong>: subtract, square, add, negligible next to the model's forward pass. The shape is the problem. It is <strong>a reduction of every example's value down to one</strong>, so splitting it across devices means <strong>gathering at the end no matter what</strong>. Part of why page 31 of lecture 1 got only 116x out of 1024 P100s lives here: <strong>the arithmetic divides, the sum does not.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head" data-slide="18"><span class="sec-num">09</span><h2 lang="ko">Dropout</h2><h2 lang="en">Dropout</h2></div>
+  <p class="sec-sub" lang="ko">regularization의 두 번째 방법. 17쪽과 <strong>제목 줄이 똑같다.</strong> 같은 목적을 다른 수단으로 이룬다는 뜻이다.</p>
+  <p class="sec-sub" lang="en">The second regularization method. <strong>Its opening line is identical to page 17's</strong>, which is the slide saying: same goal, different means.</p>
+
+  <p lang="ko">첫 줄은 17쪽과 글자 그대로 같다. <strong>generalization error는 줄이고 training error는 줄이지 않는 수정.</strong> 그 아래 dropout의 설명이 두 줄이다.</p>
+  <p lang="en">The first line repeats page 17 word for word: <strong>a modification that reduces generalization error but not training error.</strong> Two lines describe dropout below it.</p>
+  <ul lang="ko">
+    <li>네트워크에서 노드를 <strong>일시적으로 제거</strong>한다</li>
+    <li><strong>파라미터를 공유하는 거대한 모델 앙상블</strong>을 학습시키는 셈이 된다</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Temporally remove nodes</strong> from the network</li>
+    <li>It amounts to training <strong>a large ensemble of models that share parameters</strong></li>
+  </ul>
+  <p lang="ko">아래 도해는 <strong>네트워크 그림 두 개</strong>다. <strong>(a) Standard Neural Net</strong>은 3층짜리 완전 연결 신경망이고, 모든 노드에서 모든 노드로 화살표가 그려져 있어 선이 빽빽하다. <strong>(b) After applying dropout</strong>은 같은 구조인데 <strong>일부 노드에 X 표시</strong>가 되어 있고, X가 붙은 노드로 들어가고 나가는 <strong>화살표가 전부 사라져</strong> 있다. 그래서 오른쪽 그림은 선이 훨씬 성기다. 출처는 <em>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</em>이다.</p>
+  <p lang="en">The diagram below is <strong>two networks</strong>. <strong>(a) Standard Neural Net</strong> is a three-layer fully connected network, dense with arrows from every node to every node. <strong>(b) After applying dropout</strong> is the same structure with <strong>an X drawn through some nodes</strong> and <strong>every arrow into and out of those nodes removed</strong>, leaving the right-hand picture far sparser. Credited to <em>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</em>.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · dropout</span><span lang="en">Unpacking the jargon · dropout</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">학습 중 매 스텝마다 <strong>노드 일부를 무작위로 꺼서</strong> 네트워크가 특정 노드에 의존하지 못하게 하는 것</span><span lang="en">randomly <strong>switching off a fraction of the nodes</strong> at each training step so the network cannot come to depend on any particular one</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko"><strong>학습할 때만.</strong> 추론할 때는 모든 노드를 켠다. 이게 결정적인 성질이다</span><span lang="en"><strong>Training only.</strong> At inference every node is on. This is the decisive property</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">모델을 설계하는 쪽. 끄는 비율(보통 0.5)이 또 하나의 하이퍼파라미터다</span><span lang="en">whoever designs the model. The drop rate, often 0.5, is another hyperparameter</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>pruning과 다르다.</strong> dropout은 <strong>매 스텝마다 다른 노드를</strong> 임시로 끄고 학습이 끝나면 전부 되살린다. pruning은 <strong>영구적으로</strong> 잘라내서 배포되는 모델 자체를 줄인다. 둘 다 "노드를 없앤다"고 말하지만 <strong>배포된 모델의 크기에 영향을 주는 것은 pruning뿐</strong>이다</span><span lang="en"><strong>Not pruning.</strong> Dropout switches off <strong>a different set of nodes each step</strong> and restores all of them when training ends. Pruning removes them <strong>permanently</strong> and shrinks the model that ships. Both are described as removing nodes, but <strong>only pruning changes the size of the deployed model</strong></span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> <em>학습에만 있고 추론에는 없다</em>는 성질이 이 수업에서 계속 나오는 <strong>학습용 칩과 추론용 칩의 갈림</strong>을 만든다. 추론 전용 칩은 dropout을 구현할 필요가 없고, 그래서 난수 생성기도 마스킹 경로도 안 넣는다. L01 37쪽에서 <strong>TPU v1이 추론 전용</strong>이고 v2부터 학습을 지원한 것이 이런 차이들이 쌓인 결과다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The property that it <em>exists in training and not in inference</em> is one of the things that <strong>splits training silicon from inference silicon</strong>, a split this course keeps returning to. An inference-only part never has to implement dropout, so it carries no random number generator and no masking path. The fact that <strong>TPU v1 was inference only</strong> and v2 added training, back on page 37 of lecture 1, is the accumulation of differences like this one.
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>그리고 dropout은 sparsity를 만들지 않는다.</strong> 그림 (b)를 보면 연결이 성겨져서 계산이 줄 것처럼 보이지만, <strong>꺼지는 노드가 매 스텝마다 바뀐다.</strong> 어느 가중치가 0이 될지 미리 알 수 없으므로 하드웨어는 <strong>전체 배열을 그대로 유지</strong>해야 한다. 17쪽의 L1이 만드는 <strong>고정된</strong> 0과 여기의 <strong>움직이는</strong> 0은 하드웨어 입장에서 전혀 다른 것이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>And dropout does not create sparsity.</strong> Picture (b) looks like it should save computation, but <strong>which nodes go dark changes every step</strong>. Since you cannot know in advance which weights will be zero, the hardware has to <strong>keep the full array intact</strong>. The <strong>fixed</strong> zeros L1 produces on page 17 and the <strong>moving</strong> zeros here are entirely different objects from a hardware seat.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head" data-slide="19-20"><span class="sec-num">10</span><h2 lang="ko">Optimization</h2><h2 lang="en">Optimization</h2></div>
+  <p class="sec-sub" lang="ko">레시피의 마지막 칸. 두 장인데 <strong>두 번째 장이 학습 메모리의 정체를 알려준다.</strong></p>
+  <p class="sec-sub" lang="en">The last slot of the recipe. Two slides, and <strong>the second one explains where training memory actually goes.</strong></p>
+
+  <h3 data-slide="19"><span lang="ko">Gradient descent와 SGD</span><span lang="en">Gradient descent and SGD</span></h3>
+  <p lang="ko">최적화는 <strong>가중치를 갱신해서 cost function을 최소화하는 방법</strong>이다.</p>
+  <p lang="en">Optimization is <strong>the method for minimizing the cost function by updating weights.</strong></p>
+  <ul lang="ko">
+    <li><strong>Gradient descent</strong> · gradient의 음의 방향, 즉 <strong>가장 가파른 내리막</strong>으로 반복해서 움직인다</li>
+    <li><strong>Stochastic gradient descent (SGD)</strong>
+      <ul>
+        <li>큰 학습 집합을 다루기 위한 것</li>
+        <li>갱신 한 번마다 학습 집합의 <strong>부분집합(batch / minibatch)만</strong> 돌린다</li>
+        <li>수렴이 더 쉽다</li>
+      </ul></li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Gradient descent</strong> · iteratively move in the direction of <strong>steepest descent</strong>, defined by the negative of the gradient</li>
+    <li><strong>Stochastic gradient descent (SGD)</strong>
+      <ul>
+        <li>to handle large training sets</li>
+        <li>run only <strong>a subset of the training set, a batch or minibatch</strong>, per update</li>
+        <li>easier to converge</li>
+      </ul></li>
+  </ul>
+  <p lang="ko">오른쪽 그래프는 Goodfellow 책의 그림이다. 가로축이 <span class="m"><i>x</i></span>로 −2.0에서 2.0, 세로축도 −2.0에서 2.0이다. <strong>파란 점선</strong>이 <span class="m"><i>f</i>(<i>x</i>) = ½<i>x</i><sup>2</sup></span>이고 아래로 볼록한 포물선이다. <strong>초록 실선</strong>이 그 도함수 <span class="m"><i>f</i>′(<i>x</i>) = <i>x</i></span>로 원점을 지나는 직선이다. 그래프 위에 설명 세 개가 화살표로 붙어 있다.</p>
+  <p lang="en">The chart on the right comes from the Goodfellow book. Both axes run from −2.0 to 2.0. The <strong>blue dashed curve</strong> is <span class="m"><i>f</i>(<i>x</i>) = ½<i>x</i><sup>2</sup></span>, a parabola opening upward; the <strong>green solid line</strong> is its derivative <span class="m"><i>f</i>′(<i>x</i>) = <i>x</i></span>, a straight line through the origin. Three annotations point into the plot.</p>
+  <ul lang="ko">
+    <li><strong>왼쪽</strong> · <span class="m"><i>x</i> &lt; 0</span>이면 <span class="m"><i>f</i>′(<i>x</i>) &lt; 0</span>이므로 <strong>오른쪽으로 움직여</strong> <span class="m"><i>f</i></span>를 줄일 수 있다</li>
+    <li><strong>가운데</strong> · <span class="m"><i>x</i> = 0</span>에 global minimum이 있다. <span class="m"><i>f</i>′(<i>x</i>) = 0</span>이므로 <strong>gradient descent가 여기서 멈춘다</strong></li>
+    <li><strong>오른쪽</strong> · <span class="m"><i>x</i> &gt; 0</span>이면 <span class="m"><i>f</i>′(<i>x</i>) &gt; 0</span>이므로 <strong>왼쪽으로 움직여</strong> 줄일 수 있다</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Left</strong> · for <span class="m"><i>x</i> &lt; 0</span> we have <span class="m"><i>f</i>′(<i>x</i>) &lt; 0</span>, so <span class="m"><i>f</i></span> decreases by <strong>moving rightward</strong></li>
+    <li><strong>Centre</strong> · the global minimum is at <span class="m"><i>x</i> = 0</span>; since <span class="m"><i>f</i>′(<i>x</i>) = 0</span>, <strong>gradient descent halts here</strong></li>
+    <li><strong>Right</strong> · for <span class="m"><i>x</i> &gt; 0</span> we have <span class="m"><i>f</i>′(<i>x</i>) &gt; 0</span>, so it decreases by <strong>moving leftward</strong></li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"Easier to converge"를 곧이곧대로 읽지 마라</h4>
+    <h4 lang="en">Read "easier to converge" carefully</h4>
+    <p lang="ko">SGD는 전체 데이터의 gradient가 아니라 <strong>일부만 보고 근사한 gradient</strong>를 쓴다. 그러니 <strong>한 스텝의 방향은 오히려 부정확하다.</strong> 슬라이드의 <em>easier to converge</em>는 정확도가 좋아진다는 뜻이 아니라, <strong>한 스텝이 싸져서 같은 시간에 훨씬 많이 갱신할 수 있다</strong>는 뜻으로 읽는 편이 안전하다.</p>
+    <p lang="en">SGD uses <strong>a gradient approximated from a subset</strong> rather than the whole dataset, so <strong>each individual step points less accurately</strong>. The slide's <em>easier to converge</em> is safest read not as better accuracy but as <strong>each step becoming cheap enough to take far more of them in the same wall-clock time</strong>.</p>
+    <p lang="ko">그리고 <strong>이건 하드웨어가 강제한 선택이다.</strong> ImageNet 학습셋 전체의 gradient를 한 번 계산하려면 180 GB를 다 읽어야 한다. 그걸 한 스텝마다 한다는 것은 불가능하다. <strong>minibatch는 알고리즘의 개선이기 이전에 메모리 제약에 대한 타협이다.</strong></p>
+    <p lang="en">And <strong>the choice was forced by hardware.</strong> Computing one gradient over all of ImageNet means reading 180 GB, and doing that once per step is not possible. <strong>Minibatching is a concession to memory before it is an algorithmic improvement.</strong></p>
+  </div>
+
+  <h3 data-slide="20"><span lang="ko">Momentum</span><span lang="en">Momentum</span></h3>
+  <p lang="ko">한 줄 설명은 <strong>이전과 비슷한 방향으로 가는 것을 선호한다</strong>는 것이다. 이 장은 왼쪽에 도해, 오른쪽에 <strong>수식과 코드</strong>가 있다.</p>
+  <p lang="en">The one-line description: <strong>it prefers to go in a similar direction as before.</strong> The slide puts a diagram on the left and <strong>formulas with code</strong> on the right.</p>
+  <p lang="ko"><strong>왼쪽 도해.</strong> 세로축이 <em>cost</em>이고, 어두운 보라색 곡선이 왼쪽 높은 곳에서 내려와 굴곡을 만들며 오른쪽으로 간다. 곡선 위에 <strong>올리브색 공 네 개</strong>가 놓여 있고 각각에서 아래로 점선이 내려와 바닥의 <strong>빨간 점</strong>에 닿는다. 각 빨간 점에서 화살표 세 종류가 나온다. 범례가 이렇게 밝힌다. <strong>빨간 실선 화살표 = Negative of Gradient</strong>, <strong>초록 점선 화살표 = Momentum</strong>, <strong>파란 실선 화살표 = Real Movement</strong>. 그리고 상단에 식이 하나 적혀 있다: <strong>Movement = Negative of Gradient <span style="background:transparent">+ Momentum</span></strong>. 바닥에 빨간 글씨로 <em>Gradient = 0</em>이라고 적혀 있다.</p>
+  <p lang="en"><strong>The diagram on the left.</strong> The vertical axis is <em>cost</em>; a dark purple curve descends from the upper left and undulates to the right. <strong>Four olive balls</strong> sit on the curve, each dropping a dotted line to a <strong>red dot</strong> on the floor, and from each red dot three kinds of arrow emerge. The legend: <strong>solid red = negative of gradient</strong>, <strong>dashed green = momentum</strong>, <strong>solid blue = real movement</strong>. Above it, the relation <strong>Movement = Negative of Gradient + Momentum</strong>, and along the floor in red, <em>Gradient = 0</em>.</p>
+  <p lang="ko"><strong>네 번째 공을 보는 게 이 그림의 요점이다.</strong> 그 공은 오르막에 있어서 <strong>빨간 화살표가 왼쪽</strong>을 가리키는데, <strong>초록 화살표는 오른쪽</strong>을 가리킨다. 그 합인 <strong>파란 화살표는 오른쪽</strong>이다. 즉 <strong>gradient가 되돌아가라고 하는데도 관성 때문에 계속 나아간다.</strong> 세 번째 공은 <em>Gradient = 0</em>인 평평한 곳에 있는데 <strong>빨간 화살표가 없고 초록만 있어서</strong> 그래도 움직인다.</p>
+  <p lang="en"><strong>The fourth ball is the point of the picture.</strong> It sits on an upslope, so its <strong>red arrow points left</strong> while its <strong>green arrow points right</strong>, and their sum, the <strong>blue arrow, points right</strong>. The gradient says turn back and momentum carries it forward anyway. The third ball sits on flat ground where <em>gradient = 0</em>: it has <strong>no red arrow, only green</strong>, and still moves.</p>
+  <p lang="ko"><strong>오른쪽 수식과 코드.</strong> 위쪽이 <strong>SGD</strong>, 아래쪽이 <strong>SGD+Momentum</strong>이고 각각 식과 파이썬 의사코드가 짝을 이룬다.</p>
+  <p lang="en"><strong>The formulas and code on the right</strong>, with <strong>SGD</strong> above and <strong>SGD+Momentum</strong> below, each pairing a formula with Python pseudocode.</p>
+
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">SGD</span>
+      <div class="eq"><span class="m"><i>x</i><sub>t+1</sub> = <i>x<sub>t</sub></i> − <i>α</i>∇<i>f</i>(<i>x<sub>t</sub></i>)</span></div>
+<pre class="code"><span class="k">while</span> <span class="k">True</span>:
+  dx = compute_gradient(x)
+  x -= learning_rate * dx</pre>
+    </div>
+    <div class="def">
+      <span class="tag">SGD + Momentum</span>
+      <div class="eq"><span class="m"><i>v</i><sub>t+1</sub> = <i>ρv<sub>t</sub></i> + ∇<i>f</i>(<i>x<sub>t</sub></i>)</span></div>
+      <div class="eq"><span class="m"><i>x</i><sub>t+1</sub> = <i>x<sub>t</sub></i> − <i>αv</i><sub>t+1</sub></span></div>
+<pre class="code">vx = <span class="n">0</span>
+<span class="k">while</span> <span class="k">True</span>:
+  dx = compute_gradient(x)
+  vx = rho * vx + dx
+  x -= learning_rate * vx</pre>
+    </div>
+  </div>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · momentum</span><span lang="en">Unpacking the notation · momentum</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>x<sub>t</sub></i></td><td><span lang="ko"><span class="m"><i>t</i></span>번째 스텝의 <strong>파라미터 전체</strong>. 그림에서는 공의 위치처럼 1차원으로 그렸지만 실제로는 <strong>모델의 모든 가중치를 담은 벡터</strong>다. AlexNet이면 6천만 차원</span><span lang="en">the <strong>full parameter set</strong> at step <span class="m"><i>t</i></span>. Drawn as a ball's position in one dimension, but really <strong>a vector holding every weight in the model</strong>: sixty million dimensions for AlexNet</span></td></tr>
+        <tr><td class="m">∇<i>f</i>(<i>x<sub>t</sub></i>)</td><td><span lang="ko">그 지점에서의 <strong>gradient</strong>. <span class="m"><i>x</i></span>와 <strong>같은 모양의 벡터</strong>다. 이게 메모리 이야기의 핵심이다</span><span lang="en">the <strong>gradient</strong> at that point, <strong>a vector of the same shape as <span class="m"><i>x</i></span></strong>. This is the crux of the memory story</span></td></tr>
+        <tr><td class="m"><i>α</i></td><td><span lang="ko"><strong>learning rate.</strong> 스칼라 하이퍼파라미터. 코드의 <code>learning_rate</code></span><span lang="en">the <strong>learning rate</strong>, a scalar hyperparameter. The <code>learning_rate</code> in the code</span></td></tr>
+        <tr><td class="m"><i>v<sub>t</sub></i></td><td><span lang="ko"><strong>velocity.</strong> 지금까지의 이동 방향을 기억하는 버퍼이고, <strong>역시 <span class="m"><i>x</i></span>와 같은 모양</strong>이다. 코드의 <code>vx</code>. <strong>이 한 줄이 메모리를 늘린다</strong></span><span lang="en"><strong>Velocity</strong>: a buffer remembering the direction travelled so far, and <strong>again the same shape as <span class="m"><i>x</i></span></strong>. The <code>vx</code> in the code. <strong>This one line is what grows the memory</strong></span></td></tr>
+        <tr><td class="m"><i>ρ</i></td><td><span lang="ko">이전 속도를 얼마나 유지할지. 스칼라 하이퍼파라미터. 코드의 <code>rho</code>. 0이면 그냥 SGD가 된다</span><span lang="en">how much of the previous velocity to keep, a scalar hyperparameter. The <code>rho</code> in the code; at zero it degenerates to plain SGD</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout" lang="ko">
+    <strong>하드웨어로 넘어가면.</strong> 왼쪽 코드와 오른쪽 코드의 차이는 <strong>변수 하나</strong>다. <code>vx</code>가 늘었다. 그런데 그 <code>vx</code>는 <strong>모델 전체와 같은 크기</strong>다. 즉 momentum을 쓰는 순간 <strong>학습에 필요한 메모리가 가중치 하나만큼 더 늘어난다.</strong> Adam은 비슷한 버퍼를 <strong>둘</strong> 갖는다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>What this costs in hardware.</strong> The difference between the two code blocks is <strong>one variable</strong>: <code>vx</code>. And <code>vx</code> is <strong>the size of the entire model</strong>. So the moment you switch on momentum, <strong>training memory grows by another full copy of the weights.</strong> Adam keeps <strong>two</strong> such buffers.</div>
+
+  <div class="play">
+    <div class="plab" lang="ko">학습 메모리 계산기 · 가중치 말고 무엇이 더 필요한가</div>
+    <div class="plab" lang="en">Training memory calculator · what else besides the weights</div>
+
+    <div class="hintline" lang="ko" style="border-top:0;padding-top:0;margin-top:0">모델, 정밀도, 최적화 방법을 골라 본다. <strong>가중치만 세면 안 된다</strong>는 게 요점이다. 여기 activation은 안 들어 있다. 그건 batch 크기에 따라 또 따로 늘어난다.</div>
+    <div class="hintline" lang="en" style="border-top:0;padding-top:0;margin-top:0">Pick a model, a precision and an optimizer. The point is that <strong>counting the weights alone is not enough</strong>. Activations are not included here; those grow separately with batch size.</div>
+
+    <div class="plab" lang="ko">모델</div>
+    <div class="plab" lang="en">Model</div>
+    <div class="presets" id="memM"></div>
+
+    <div class="plab" lang="ko">정밀도</div>
+    <div class="plab" lang="en">Precision</div>
+    <div class="presets" id="memP"></div>
+
+    <div class="plab" lang="ko">최적화 방법</div>
+    <div class="plab" lang="en">Optimizer</div>
+    <div class="presets" id="memO"></div>
+
+    <div class="readout" id="memOut" style="margin-top:18px"></div>
+    <div class="verdict" id="memV" style="margin-top:14px"></div>
+
+    <div class="hintline" lang="ko"><strong>이 계산이 이 수업의 quantization 주제로 이어진다.</strong> 정밀도를 FP32에서 FP16으로 내리면 이 표의 모든 줄이 절반이 된다. 모델을 바꾸지 않고 메모리를 반으로 줄이는 것이고, 그게 왜 이 분야에서 가장 먼저 손대는 최적화인지가 여기서 보인다.</div>
+    <div class="hintline" lang="en"><strong>This calculation is the road into the course's quantization topic.</strong> Dropping the precision from FP32 to FP16 halves every row in the table: memory cut in half without touching the model. It is visible here why that is the first optimization anyone reaches for.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head" data-slide="21"><span class="sec-num">11</span><h2 lang="ko">정리 &amp; 다음 강의</h2><h2 lang="en">Recap &amp; next lecture</h2></div>
+
+  <p lang="ko">마지막 장은 <strong>Further Reading</strong>이고, 이번에는 <strong>The AlexNet Paper</strong> 하나다. 논문 첫 페이지의 제목 부분이 그대로 실려 있다. <em>ImageNet Classification with Deep Convolutional Neural Networks</em>, 저자는 <strong>Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton</strong>, 소속은 셋 다 University of Toronto다.</p>
+  <p lang="en">The closing slide is <strong>Further Reading</strong>, this time a single item: <strong>the AlexNet paper</strong>. The title block of its first page is reproduced: <em>ImageNet Classification with Deep Convolutional Neural Networks</em>, by <strong>Alex Krizhevsky, Ilya Sutskever and Geoffrey E. Hinton</strong>, all at the University of Toronto.</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 논문이 Paper Reading #1의 2번이다.</strong> 그리고 이 강의 안에서 이미 두 번 나왔다. 8쪽에서 <strong>모델 크기 그래프의 기준점</strong>으로 화살표를 받았고, 5쪽 데이터셋 그래프에서는 <strong>ImageNet</strong>이 그 무대였다. <strong>이 강의 전체가 그 논문을 읽기 위한 준비</strong>였다고 봐도 된다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This is paper 2 of the first reading assignment</strong>, and it has already appeared twice in this lecture: on page 8 as <strong>the reference point on the model size charts</strong>, and on page 5 where <strong>ImageNet</strong> is the stage it performed on. It is fair to read <strong>the whole lecture as preparation for that paper.</strong>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">읽기 전에</span><span class="tag" lang="en">Before you read it</span>
+    <p lang="ko">이 강의의 개념들이 AlexNet 논문의 어디에 대응하는지 미리 잡아두면 읽기가 훨씬 빠르다. 어느 절이 어느 슬라이드와 짝인지 짐작해 보자.</p>
+    <p lang="en">Mapping this lecture's concepts onto the AlexNet paper in advance makes it much faster to read. Try guessing which section pairs with which slide.</p>
+    <details>
+      <summary><span lang="ko">대응</span><span lang="en">The mapping</span></summary>
+      <table>
+        <thead><tr>
+          <th lang="ko">이 강의</th><th lang="ko">논문에서 찾을 것</th>
+          <th lang="en">This lecture</th><th lang="en">What to find in the paper</th>
+        </tr></thead>
+        <tbody>
+          <tr><td lang="ko">데이터셋 (5-7쪽)</td><td lang="ko">ImageNet 규모와 전처리 방식. <strong>왜 224×224로 잘랐나</strong></td>
+              <td lang="en">Datasets (p5-7)</td><td lang="en">the scale of ImageNet and the preprocessing. <strong>Why crop to 224×224</strong></td></tr>
+          <tr><td lang="ko">모델 크기 (8쪽)</td><td lang="ko">파라미터 수, 그리고 <strong>GPU 두 장에 나눠 올린 이유</strong></td>
+              <td lang="en">Model size (p8)</td><td lang="en">the parameter count, and <strong>why it was split across two GPUs</strong></td></tr>
+          <tr><td lang="ko">Regularization (17쪽)</td><td lang="ko">weight decay를 얼마로 썼는지. 그 값이 <strong>정확도에 영향을 줬다고 적혀 있는지</strong></td>
+              <td lang="en">Regularization (p17)</td><td lang="en">what weight decay value was used, and whether the paper says it <strong>affected accuracy</strong></td></tr>
+          <tr><td lang="ko">Dropout (18쪽)</td><td lang="ko">어느 층에 걸었는지, 그리고 <strong>그 대가로 무엇을 지불했는지</strong></td>
+              <td lang="en">Dropout (p18)</td><td lang="en">which layers it was applied to, and <strong>what it cost in exchange</strong></td></tr>
+          <tr><td lang="ko">SGD + momentum (19-20쪽)</td><td lang="ko"><span class="m"><i>ρ</i></span>와 <span class="m"><i>α</i></span>를 얼마로 뒀는지, learning rate를 어떻게 낮췄는지</td>
+              <td lang="en">SGD + momentum (p19-20)</td><td lang="en">the values chosen for <span class="m"><i>ρ</i></span> and <span class="m"><i>α</i></span>, and how the learning rate was decayed</td></tr>
+        </tbody>
+      </table>
+      <p lang="ko"><strong>그리고 리뷰를 쓸 때 쓸 질문 하나.</strong> 이 논문의 기여 중 <strong>알고리즘 쪽</strong>과 <strong>하드웨어 활용 쪽</strong>이 각각 무엇인가. 이 수업의 관점에서는 후자가 더 중요할 수 있는데, 논문 자체는 어느 쪽에 더 지면을 썼는가.</p>
+      <p lang="en"><strong>And one question to carry into the review.</strong> Of this paper's contributions, which belong to <strong>the algorithm</strong> and which to <strong>exploiting the hardware</strong>? From this course's angle the second may matter more, so which of the two does the paper itself spend more space on?</p>
+    </details>
+  </div>
+
+  <h3><span lang="ko">한 장 요약</span><span lang="en">One-page recap</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">레시피의 칸</th><th lang="ko">이 강의가 준 것</th><th lang="ko">하드웨어에서 무엇이 되나</th>
+      <th lang="en">Recipe slot</th><th lang="en">What the lecture gave</th><th lang="en">What it becomes in hardware</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">데이터셋 (<span class="m"><i>E</i></span>)</td><td lang="ko">supervised / unsupervised / reinforcement, train과 test 분리</td><td lang="ko"><span class="cMem">저장 용량과 대역폭.</span> ImageNet은 epoch마다 180 GB</td>
+          <td lang="en">Dataset (<span class="m"><i>E</i></span>)</td><td lang="en">supervised, unsupervised, reinforcement; the train/test split</td><td lang="en"><span class="cMem">Storage and bandwidth.</span> 180 GB per epoch for ImageNet</td></tr>
+      <tr><td lang="ko">모델 (<span class="m"><i>T</i></span>)</td><td lang="ko">capacity와 일반화 곡선</td><td lang="ko"><span class="cAlg">파라미터 수 = 메모리.</span> quantization과 pruning이 여기를 깎는다</td>
+          <td lang="en">Model (<span class="m"><i>T</i></span>)</td><td lang="en">capacity and the generalization curve</td><td lang="en"><span class="cAlg">Parameters are memory.</span> Quantization and pruning cut here</td></tr>
+      <tr><td lang="ko">cost function (<span class="m"><i>P</i></span>)</td><td lang="ko">MSE, L2와 L1 regularization</td><td lang="ko"><strong>L1만 sparsity를 만든다.</strong> 그리고 합계는 <span class="cCost">나눌 수 없는 축약</span></td>
+          <td lang="en">Cost function (<span class="m"><i>P</i></span>)</td><td lang="en">MSE, L2 and L1 regularization</td><td lang="en"><strong>Only L1 creates sparsity</strong>, and the sum is <span class="cCost">a reduction that will not divide</span></td></tr>
+      <tr><td lang="ko">최적화 (<span class="m"><i>T</i></span>)</td><td lang="ko">gradient descent, SGD, momentum</td><td lang="ko"><span class="cHw">gradient가 가중치와 같은 크기.</span> momentum이 한 벌 더, Adam은 두 벌 더</td>
+          <td lang="en">Optimization (<span class="m"><i>T</i></span>)</td><td lang="en">gradient descent, SGD, momentum</td><td lang="en"><span class="cHw">The gradient is the size of the weights.</span> Momentum adds one more copy, Adam two</td></tr>
+      <tr><td lang="ko">Dropout</td><td lang="ko">학습에만 있는 regularization</td><td lang="ko"><strong>학습용 칩과 추론용 칩이 갈리는 지점.</strong> 그리고 sparsity는 안 만든다</td>
+          <td lang="en">Dropout</td><td lang="en">regularization that exists only during training</td><td lang="en"><strong>Where training and inference silicon diverge</strong>, and it creates no sparsity</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span lang="ko">다음 강의</span><span lang="en">Next lecture</span></h3>
+  <p lang="ko">Canvas의 Schedule이 아직 전부 공개되지 않았다. 실라버스와 L01 7쪽이 예고한 순서대로라면 다음은 <strong>모델 최적화(quantization, pruning)</strong> 또는 <strong>아키텍처 최적화(성능, 에너지 효율, roofline)</strong>다. 어느 쪽이든 <strong>이 강의의 8절(L1 sparsity)과 10절(optimizer state)이 그 출발점</strong>이 된다.</p>
+  <p lang="en">The full Canvas schedule is not published yet. Going by the syllabus and page 7 of lecture 1, next is either <strong>model optimization (quantization, pruning)</strong> or <strong>architectural optimization (performance, energy efficiency, roofline)</strong>. Either way, <strong>section 08 of this note on L1 sparsity and section 10 on optimizer state are where it starts.</strong></p>
+  <p lang="ko"><strong>슬라이드가 올라오기 전에는 노트를 쓰지 않는다.</strong> 그 대신 지금 할 일은 Paper Reading #1이다. Golden Age(L01)와 AlexNet(L02-3) 두 편이고, 이 두 강의가 각각 그 준비였다.</p>
+  <p lang="en"><strong>No note gets written before the slides are posted.</strong> What there is to do meanwhile is the first paper reading: Golden Age from lecture 1 and AlexNet from lectures 2-3, each of which these two lectures were preparing you for.</p>
+</section>
+
+<footer>
+  <span lang="ko">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 2-3 개인 학습 노트<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  지정 교재: Sze, Chen, Yang, Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio, Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Jeff (Jun) Zhang 교수와 Arizona State University에 있습니다.</span><span lang="en">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 2-3 personal study notes<br>
+  Course: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  Assigned texts: Sze, Chen, Yang and Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio and Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Jeff (Jun) Zhang and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 학습 메모리 계산기. 20쪽의 vx 한 줄이 실제로 무엇을 요구하는지 세어 본다.
+// activation 은 batch 크기에 따라 따로 늘어나므로 여기 넣지 않았다.
+(function () {
+  var mHost = document.getElementById('memM');
+  if (!mHost) return;
+  var pHost = document.getElementById('memP');
+  var oHost = document.getElementById('memO');
+  var out = document.getElementById('memOut');
+  var vd = document.getElementById('memV');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var MODELS = [
+    { key: 'AlexNet', params: 60e6 },
+    { key: 'ResNet-50', params: 25e6 },
+    { key: 'GPT-3', params: 175e9 }
+  ];
+  var PRECS = [{ key: 'FP32', bytes: 4 }, { key: 'FP16', bytes: 2 }];
+  var OPTS = [
+    { key: 'SGD', extra: 0, ko: '추가 버퍼 없음', en: 'no extra buffer' },
+    { key: 'SGD+momentum', extra: 1, ko: 'velocity 한 벌', en: 'one velocity buffer' },
+    { key: 'Adam', extra: 2, ko: '1차/2차 모멘트 두 벌', en: 'first and second moment buffers' }
+  ];
+
+  var model = MODELS[0], prec = PRECS[0], opt = OPTS[1];
+
+  var GiB = 1024 * 1024 * 1024, MiB = 1024 * 1024;
+
+  function fmtBytes(b) {
+    if (b >= GiB) return (Math.round(b / GiB * 10) / 10).toLocaleString('en-US') + ' GB';
+    return (Math.round(b / MiB * 10) / 10).toLocaleString('en-US') + ' MB';
+  }
+
+  function row(label, value, strong) {
+    return '<div style="display:flex;justify-content:space-between;gap:14px">' +
+           '<span>' + label + '</span>' +
+           (strong ? '<strong>' + value + '</strong>' : '<span>' + value + '</span>') + '</div>';
+  }
+
+  function paint() {
+    var unit = model.params * prec.bytes;
+    var w = unit, g = unit, st = unit * opt.extra;
+    var total = w + g + st;
+
+    out.innerHTML =
+      row(L('가중치', 'weights'), fmtBytes(w)) +
+      row(L('gradient', 'gradients'), fmtBytes(g)) +
+      row(L('optimizer state', 'optimizer state'), fmtBytes(st)) +
+      row(L('합계 (activation 제외)', 'total, activations excluded'), fmtBytes(total), true);
+
+    var A100 = 80 * GiB;
+    var fits = total <= A100;
+    vd.className = 'verdict ' + (fits ? 'ok' : 'bad');
+    var n = Math.ceil(total / A100);
+    vd.innerHTML =
+      '<div class="hd">' + model.key + ' · ' + prec.key + ' · ' + opt.key + '</div>' +
+      (fits
+        ? L('A100 80 GB <strong>한 장</strong>에 상태가 들어간다. 가중치만 셌을 때보다 <strong>' +
+              (2 + opt.extra) + '배</strong>다.',
+            'The state fits on <strong>a single</strong> 80 GB A100. That is <strong>' +
+              (2 + opt.extra) + '×</strong> what counting the weights alone would suggest.')
+        : L('상태만으로 A100 80 GB가 <strong>' + n + '장</strong> 필요하다. activation은 아직 세지도 않았다.',
+            'The state alone needs <strong>' + n + '</strong> A100s at 80 GB, and activations have not been counted yet.'));
+  }
+
+  function build(host, items, isOn, onPick) {
+    host.textContent = '';
+    items.forEach(function (it) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = it.key;
+      if (isOn(it)) b.className = 'act';
+      b.addEventListener('click', function () { onPick(it); render(); });
+      host.appendChild(b);
+    });
+  }
+
+  function render() {
+    build(mHost, MODELS, function (i) { return i === model; }, function (i) { model = i; });
+    build(pHost, PRECS, function (i) { return i === prec; }, function (i) { prec = i; });
+    build(oHost, OPTS, function (i) { return i === opt; }, function (i) { opt = i; });
+    paint();
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="reader.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

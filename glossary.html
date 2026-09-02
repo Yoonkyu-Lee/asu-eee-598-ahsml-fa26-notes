@@ -443,6 +443,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gA">A</h2>
 
 <div class="gterm">
+  <div class="t">Adam</div>
+  <div class="f">Adaptive Moment Estimation</div>
+  <div class="d" lang="ko">가장 널리 쓰이는 optimizer. 1차 모멘트와 2차 모멘트 <strong>두 개의 버퍼</strong>를 파라미터마다 들고 있다. 그래서 학습 메모리가 <strong>가중치의 4배</strong>가 된다 (가중치 + gradient + 버퍼 둘). <a href="#gM">momentum</a>은 3배, 순수 <a href="#gS">SGD</a>는 2배다.</div>
+  <div class="d" lang="en">The most widely used optimizer. It keeps <strong>two buffers</strong> per parameter, a first and a second moment, which makes training memory <strong>four times the weights</strong> (weights, gradients and two buffers). <a href="#gM">Momentum</a> costs three times and plain <a href="#gS">SGD</a> twice.</div>
+  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">APR</div>
   <div class="f">Automatic Place and Route</div>
   <div class="d" lang="ko">합성이 만든 netlist의 게이트를 칩 위 어디에 놓고 어떻게 배선할지 도구가 정하는 단계. 이 수업 Project에서는 Cadence Innovus를 쓴다. <strong>합성 직후의 면적·지연 숫자는 배선을 모르는 추정치</strong>이므로, 논문에 넣는 값은 post-APR이어야 한다.</div>
@@ -458,6 +466,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">batch &middot; minibatch</div>
+  <div class="d" lang="ko">한 번의 가중치 갱신에 쓰는 학습 예제의 <strong>부분집합</strong>. 전체 데이터셋의 gradient를 매번 계산하는 것이 불가능해서 생긴 타협이다. <strong>크기를 키우면 하드웨어 효율은 오르지만 수렴이 나빠진다.</strong> L01 31쪽 표에서 minibatch 32,768이 정확도가 가장 낮은 것이 그 사례다.</div>
+  <div class="d" lang="en">The <strong>subset</strong> of training examples used for one weight update, a concession forced by the impossibility of computing the full-dataset gradient every step. <strong>Larger batches use the hardware better and converge worse</strong>: the 32,768 minibatch in the table on page 31 of lecture 1 has the lowest accuracy for exactly that reason.</div>
+  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
 <h2 class="gletter" id="gB">B</h2>
 
 <div class="gterm">
@@ -469,6 +484,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gC">C</h2>
+
+<div class="gterm">
+  <div class="t">capacity</div>
+  <div class="d" lang="ko">모델이 <strong>표현할 수 있는 함수의 범위</strong>. 파라미터 수, 층 깊이, 다항식 차수로 늘린다. <strong>메모리 용량과 다른 말이지만 연결되어 있다.</strong> capacity를 늘리려고 파라미터를 늘리면 그만큼 바이트가 필요하다. quantization과 pruning은 이 값을 일부러 깎는 기법이다.</div>
+  <div class="d" lang="en">The <strong>range of functions a model can represent</strong>, raised by adding parameters, depth or polynomial degree. <strong>A different word from memory capacity, though the two are linked</strong>: raising it by adding parameters costs exactly that many bytes. Quantization and pruning deliberately cut it back.</div>
+  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">CGRA</div>
@@ -488,11 +510,27 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">dropout</div>
+  <div class="d" lang="ko">학습 중 매 스텝마다 <strong>노드 일부를 무작위로 꺼서</strong> 특정 노드 의존을 막는 regularization. <strong>학습에만 있고 추론에는 없다</strong>는 것이 결정적이다. 추론 전용 칩은 이걸 구현할 필요가 없다. 그리고 <strong>꺼지는 노드가 매 스텝 바뀌므로 <a href="#gS">sparsity</a>를 만들지 않는다.</strong></div>
+  <div class="d" lang="en">Regularization that <strong>randomly switches off a fraction of the nodes</strong> at each training step so the network cannot depend on any one of them. The decisive property is that it <strong>exists in training and not in inference</strong>, so inference-only silicon never implements it. And because the set changes every step, it <strong>creates no <a href="#gS">sparsity</a></strong>.</div>
+  <div class="src"><a href="L02-ml-basics.html#s9">Lecture 2-3 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">DSA</div>
   <div class="f">Domain-Specific Accelerator / Architecture</div>
   <div class="d" lang="ko">슬라이드의 정의로는 <em>"customized hardware designed for a domain of applications"</em>. <strong>하나의 앱이 아니라 한 부류의 연산</strong>을 잘하는 회로다. Neural Engine은 특정 모델이 아니라 convolution과 matmul을 잘한다.</div>
   <div class="d" lang="en">In the slide's words, <em>"customized hardware designed for a domain of applications"</em>. A circuit good at <strong>a class of computation, not one application</strong>: a Neural Engine is not good at a particular model, it is good at convolution and matmul.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gE">E</h2>
+
+<div class="gterm">
+  <div class="t">epoch</div>
+  <div class="d" lang="ko">학습 데이터셋 <strong>전체를 한 번 훑는 것</strong>. 하드웨어에서 중요한 이유는 데이터셋이 메모리에 안 들어가면 <strong>매 epoch마다 디스크에서 다시 읽어야</strong> 하기 때문이다. ImageNet이면 epoch당 약 180 GB다.</div>
+  <div class="d" lang="en">One <strong>full pass over the training dataset</strong>. It matters in hardware because a dataset that does not fit in memory has to be <strong>re-read from disk every epoch</strong>: roughly 180 GB per epoch for ImageNet.</div>
+  <div class="src"><a href="L02-ml-basics.html#s3">Lecture 2-3 &middot; 03</a></div>
 </div>
 
 <h2 class="gletter" id="gF">F</h2>
@@ -512,6 +550,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
 </div>
 
+<h2 class="gletter" id="gG">G</h2>
+
+<div class="gterm">
+  <div class="t">generalization gap</div>
+  <div class="d" lang="ko">training error와 generalization error 사이의 <strong>간격</strong>. 이 간격이 크면 overfitting이다. L02-3 15쪽 그래프에서 오른쪽 끝의 양방향 화살표가 이것이다.</div>
+  <div class="d" lang="en">The <strong>distance</strong> between training error and generalization error. A large gap is overfitting. It is the double-headed arrow at the right edge of the chart on page 15 of lectures 2-3.</div>
+  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">gradient descent</div>
+  <div class="d" lang="ko">gradient의 <strong>음의 방향</strong>으로 반복해서 파라미터를 옮겨 cost function을 줄이는 방법. 닫힌 형태의 해 대신 이걸 쓰는 이유는 수학이 아니라 <strong>메모리와 연산량</strong>이다. 파라미터가 <span class="m"><i>n</i></span>개일 때 역행렬은 <span class="m"><i>n</i><sup>3</sup></span>이 들지만 한 스텝은 <span class="m"><i>n</i></span>에 비례한다. <strong>딥러닝 하드웨어가 <a href="#gM">MAC</a> 기계로 만들어진 근본 이유다.</strong></div>
+  <div class="d" lang="en">Reducing the cost function by repeatedly stepping the parameters in the <strong>negative gradient direction</strong>. It is preferred over a closed-form solution for reasons of <strong>memory and arithmetic, not mathematics</strong>: inverting an <span class="m"><i>n</i>&times;<i>n</i></span> matrix costs <span class="m"><i>n</i><sup>3</sup></span> while one step costs <span class="m"><i>n</i></span>. <strong>This is the root reason deep learning hardware is built as a <a href="#gM">MAC</a> machine.</strong></div>
+  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
 <h2 class="gletter" id="gH">H</h2>
 
 <div class="gterm">
@@ -522,6 +576,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">hyperparameter</div>
+  <div class="d" lang="ko">학습으로 구하지 않고 <strong>사람이 정하는 값</strong>. learning rate <span class="m"><i>&alpha;</i></span>, 정규화 세기 <span class="m"><i>&lambda;</i></span>, momentum 계수 <span class="m"><i>&rho;</i></span>, dropout 비율, batch 크기. <strong>이걸 test set으로 고르면 test set이 학습에 쓰인 셈</strong>이 되므로 validation set이 따로 필요하다.</div>
+  <div class="d" lang="en">A value <strong>set by a person</strong> rather than learned: the learning rate <span class="m"><i>&alpha;</i></span>, the regularization strength <span class="m"><i>&lambda;</i></span>, the momentum coefficient <span class="m"><i>&rho;</i></span>, the dropout rate, the batch size. <strong>Choosing them against the test set means the test set has effectively been trained on</strong>, which is why a separate validation set is needed.</div>
+  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+</div>
+
 <h2 class="gletter" id="gI">I</h2>
 
 <div class="gterm">
@@ -530,6 +591,16 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">이 분야에서 가장 오래되고 권위 있는 학회. <strong>Paper Reading 리뷰 폼의 종합 판정이 "ISCA에 붙을 만한가"를 기준으로 한다.</strong> 그래서 이 과제는 독후감이 아니라 학회 심사위원 흉내다.</div>
   <div class="d" lang="en">The oldest and most prestigious venue in the field. <strong>The overall-merit field of the paper review form asks whether a paper is ISCA-worthy</strong>, which is what makes the assignment program-committee work rather than a book report.</div>
   <div class="src"><a href="L01-introduction.html#s4">Lecture 1 · 04</a></div>
+</div>
+
+<h2 class="gletter" id="gL">L</h2>
+
+<div class="gterm">
+  <div class="t">L1 &middot; L2 regularization</div>
+  <div class="f">weight decay</div>
+  <div class="d" lang="ko">cost function에 가중치의 크기를 벌점으로 더하는 것. <strong>L2는 <span class="m">&Sigma;<i>w</i><sup>2</sup></span>, L1은 <span class="m">&Sigma;|<i>w</i>|</span>다.</strong> 슬라이드는 둘을 한 묶음으로 적지만 <strong>결과가 다르다.</strong> L2는 가중치를 작게 만들 뿐이고 <strong>L1만 정확히 0으로 만든다.</strong> 0인 가중치는 곱셈도 저장도 건너뛸 수 있으므로 <strong>L1만 하드웨어 이득이 있다.</strong> 이게 pruning으로 이어진다.</div>
+  <div class="d" lang="en">Adding a penalty on weight magnitude to the cost function: <strong>L2 uses <span class="m">&Sigma;<i>w</i><sup>2</sup></span> and L1 uses <span class="m">&Sigma;|<i>w</i>|</span></strong>. The slide groups them together but <strong>they behave differently</strong>. L2 only makes weights small; <strong>L1 drives them to exactly zero</strong>. A zero weight lets you skip both the multiply and the storage, so <strong>only L1 pays off in hardware</strong>, and that is the road to pruning.</div>
+  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
 <h2 class="gletter" id="gM">M</h2>
@@ -559,10 +630,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">momentum</div>
+  <div class="d" lang="ko">이전 스텝의 이동 방향을 기억해서 <strong>비슷한 방향으로 계속 가려는</strong> 최적화 기법. 코드로는 <code>vx</code> 변수 하나가 늘어나는 것인데, <strong>그 변수가 모델 전체와 같은 크기</strong>다. 즉 학습 메모리가 가중치 한 벌만큼 더 필요해진다. <a href="#gA">Adam</a>은 이런 버퍼를 둘 갖는다.</div>
+  <div class="d" lang="en">An optimization technique that remembers the previous direction of travel and <strong>keeps moving that way</strong>. In code it adds one variable, <code>vx</code>, and <strong>that variable is the size of the entire model</strong>, so training memory grows by another full copy of the weights. <a href="#gA">Adam</a> keeps two such buffers.</div>
+  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Moore's law</div>
   <div class="d" lang="ko">같은 면적에 들어가는 트랜지스터 <strong>개수</strong>가 약 2년마다 두 배가 된다는 관측. 슬라이드 33쪽이 <strong>14 nm에 5년 머물렀다</strong>는 것으로 정체를 보여준다. <a href="#gD">Dennard scaling</a>과 다른 이야기다.</div>
   <div class="d" lang="en">The observation that the <strong>number</strong> of transistors per unit area doubles about every two years. Slide 33 shows the stall by way of <strong>five years spent at 14 nm</strong>. A different claim from <a href="#gD">Dennard scaling</a>.</div>
   <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MSE</div>
+  <div class="f">Mean Squared Error</div>
+  <div class="d" lang="ko">예측값과 정답의 차이를 제곱해서 평균한 cost function. <span class="m"><i>MSE</i> = <sup>1</sup>&frasl;<sub><i>m</i></sub> &Sigma; (<i>ŷ<sub>i</sub></i> &minus; <i>y<sub>i</sub></i>)<sup>2</sup></span> 형태다. 계산 자체는 싸지만 <strong>모든 예제를 하나로 줄이는 축약</strong>이라 여러 장치에 나눠도 마지막에는 모아야 한다.</div>
+  <div class="d" lang="en">A cost function averaging the squared difference between prediction and truth. Cheap to compute, but <strong>a reduction of every example down to one value</strong>, so splitting it across devices still requires a gather at the end.</div>
+  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
 <h2 class="gletter" id="gN">N</h2>
@@ -573,6 +659,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Tesla FSD 칩의 다이 사진에서 신경망 전용 블록에 붙은 이름. 회사마다 부르는 이름이 다르다: Apple은 <strong>Neural Engine</strong>, Google은 <strong>TPU</strong>, NVIDIA는 <strong>Tensor Core</strong>(GPU 안의 유닛). 같은 일을 하는 것이 아니라 <strong>비슷한 자리에 있는 것</strong>이므로 스펙을 직접 비교하면 안 된다.</div>
   <div class="d" lang="en">The label on the neural-network block in the Tesla FSD die shot. Every company names it differently: Apple's <strong>Neural Engine</strong>, Google's <strong>TPU</strong>, NVIDIA's <strong>Tensor Core</strong> (a unit inside the GPU). These are not the same thing so much as <strong>things in a similar position</strong>, so their specs should not be compared head to head.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gO">O</h2>
+
+<div class="gterm">
+  <div class="t">overfitting &middot; underfitting</div>
+  <div class="d" lang="ko">capacity가 <strong>최적점보다 오른쪽</strong>에 있으면 overfitting, <strong>왼쪽</strong>에 있으면 underfitting이다. overfitting은 training error는 계속 내려가는데 generalization error가 올라가는 상태다. <strong>이 곡선이 이 수업에서 가장 자주 돌아오는 그림이다.</strong> quantization과 pruning이 정확도를 거의 안 잃고 모델을 줄일 수 있는 이유가 여기 있다. 원래 오른쪽에 너무 멀리 가 있었던 것이다.</div>
+  <div class="d" lang="en">Sitting <strong>to the right</strong> of the optimal capacity is overfitting, <strong>to the left</strong> is underfitting. Overfitting is the state where training error keeps falling while generalization error climbs. <strong>This curve is the figure that returns most often in this course</strong>: it is why quantization and pruning can shrink a model at almost no accuracy cost. You were too far right to begin with.</div>
+  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
 </div>
 
 <h2 class="gletter" id="gP">P</h2>
@@ -594,6 +689,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gS">S</h2>
+
+<div class="gterm">
+  <div class="t">SGD</div>
+  <div class="f">Stochastic Gradient Descent</div>
+  <div class="d" lang="ko">gradient를 전체 데이터가 아니라 <a href="#gB">minibatch</a>로 근사해서 갱신하는 방법. <strong>한 스텝의 방향은 오히려 부정확하다.</strong> 그래도 쓰는 이유는 한 스텝이 싸져서 같은 시간에 훨씬 많이 갱신할 수 있기 때문이다. <strong>알고리즘의 개선이기 이전에 메모리 제약에 대한 타협이다.</strong></div>
+  <div class="d" lang="en">Updating from a gradient approximated on a <a href="#gB">minibatch</a> rather than the whole dataset. <strong>Each individual step points less accurately</strong>; it is used anyway because a cheap step means far more of them in the same wall-clock time. <strong>A concession to memory before it is an algorithmic improvement.</strong></div>
+  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">sparsity</div>
+  <div class="d" lang="ko">텐서에서 <strong>0인 원소의 비율</strong>. 0은 곱셈도 저장도 건너뛸 수 있으므로 하드웨어 이득이 된다. 다만 <strong>0이 흩어져 있으면 건너뛰는 제어 논리가 오히려 더 비싸질 수 있다.</strong> 그래서 뒤에서 structured sparsity가 나온다. <a href="#gL">L1</a>은 sparsity를 만들고 L2와 <a href="#gD">dropout</a>은 만들지 않는다.</div>
+  <div class="d" lang="en">The <strong>fraction of zero elements</strong> in a tensor. Zeros let you skip both the multiply and the storage, which is the hardware payoff. But <strong>when the zeros are scattered, the control logic for skipping them can cost more than it saves</strong>, which is why structured sparsity appears later. <a href="#gL">L1</a> produces sparsity; L2 and <a href="#gD">dropout</a> do not.</div>
+  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">systolic array</div>
