@@ -824,10 +824,19 @@ node scripts/render-slides.mjs slides/L01-introduction.pdf 25-33
 
 현재 배포된 것:
 
-| # | 파일 | 주제 | 쪽 |
-|---|---|---|---|
-| 1 | `EEE 598 - Lecture 1 - Introduction.pdf` | Introduction | 43 |
-| 2-3 | `EEE 598 - Lecture 2-3 - ML Basics.pdf` | Machine Learning Basics | 21 |
+| # | 슬라이드 원본 | 노트 | 쪽 | 상태 |
+|---|---|---|---|---|
+| 1 | `EEE 598 - Lecture 1 - Introduction.pdf` | `L01-introduction.html` | 43 | 완료 |
+| 2-3 | `EEE 598 - Lecture 2-3 - ML Basics.pdf` | `L02-ml-basics.html` | 21 | 완료 |
+
+**두 노트 모두 슬라이드 전 쪽에 앵커가 걸려 있다** (미포함 0쪽).
+새 노트를 쓴 뒤에는 아래 명령으로 그것을 확인한다.
+
+```bash
+python -c "import io,re; s=io.open('L0N-....html',encoding='utf-8').read(); \
+cov=set(); [cov.update(range(int(a),int(b or a)+1)) for a,b in re.findall(r'data-slide=\"(\d+)(?:-(\d+))?\"',s)]; \
+print(sorted(set(range(1,N+1))-cov))"
+```
 
 실라버스와 L01 s7이 예고한 주제 (순서 미확정):
 
@@ -869,7 +878,14 @@ node scripts/render-slides.mjs slides/L01-introduction.pdf 25-33
    각 `.sec-head`에 `data-slide`를 붙인다. 슬라이드에 없는 보충에는 붙이지 않는다.
 7. **`glossary.html`을 갱신한다.** 이 강의에서 새로 푼 용어를 전부 넣는다. 미루지 않는다.
 8. `node scripts/verify.mjs L{NN}-{topic}.html` 실행. exit code 0이어야 통과다.
-   - `shots/` 폴더에 전체 스크린샷 2장과 도해별 개별 스크린샷 `-fig01.png…`이 생긴다.
+   - `shots/` 폴더에 전체 스크린샷과 도해별 개별 스크린샷 `-fig01.png…`이 생긴다.
+   - **전체 스크린샷은 여러 장으로 잘려 나온다.** 이 저장소의 노트는 한 슬라이드도
+     건너뛰지 않아서 페이지가 매우 길다 (L01이 데스크톱 33,525px, 모바일 54,014px).
+     크롬은 대략 16,384px를 넘는 이미지를 못 만들고 `fullPage` 캡처가
+     `Protocol error: Unable to capture screenshot`으로 통째로 실패한다.
+     그래서 `verify.mjs`의 `shootTall()`이 12,000px 단위로 잘라서 찍는다
+     (`-desktop-01.png`, `-desktop-02.png`, …). **이 동작을 fullPage 한 장으로 되돌리면
+     노트가 길어지는 순간 검증이 다시 죽는다.**
    - **도해 스크린샷을 한 장씩 다 열어본다.** 자동 검사가 통과해도 건너뛰지 않는다.
    - **미포함 슬라이드 경고를 반드시 확인한다.** 이 저장소에서는 그게 규칙 위반 신호다.
 9. **슬라이드 리더가 실제로 따라오는지 확인한다.** `node scripts/serve.mjs`로 띄우고
