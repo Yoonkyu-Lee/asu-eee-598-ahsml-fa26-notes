@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · Paper Reading 1 — Golden Age &amp; AlexNet</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Paper Reading #1</div>
+  <h1 class="title">A New Golden Age<br>&amp; AlexNet</h1>
+  <p class="subtitle" lang="ko">한 편은 하드웨어가 왜 이렇게 됐는지를 말하고, 다른 한 편은 그 수요를 만든 사건이다. 두 논문의 요지를 정리하고, 강의 슬라이드의 어느 장이 어디서 나왔는지 짚는다.</p>
+  <p class="subtitle" lang="en">One paper explains why the hardware turned out this way; the other is the event that created the demand. A summary of both, and a note on which lecture slides came from where.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">Hennessy &amp; Patterson · CACM 2019 · 13쪽</span>
+    <span class="chip">Krizhevsky, Sutskever, Hinton · NIPS 2012 · 9쪽</span>
+    <span class="chip hot">이 페이지는 리뷰가 아니다</span>
+    <span class="chip dim">슬라이드 리더 없음</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">Hennessy &amp; Patterson · CACM 2019 · 13 pp</span>
+    <span class="chip">Krizhevsky, Sutskever, Hinton · NIPS 2012 · 9 pp</span>
+    <span class="chip hot">this page is not a review</span>
+    <span class="chip dim">no slide reader</span>
+  </div>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <div class="mod">Paper Reading 1</div>
+    <div class="name">Golden Age &amp; AlexNet</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 페이지가 하는 일</span><span lang="en">What this page does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">Golden Age가 서 있는 자리</span><span lang="en">Where Golden Age stands</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">역사: 시장이 결정한다</span><span lang="en">History: the market decides</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">지금의 위기</span><span lang="en">The current crisis</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">놓치고 있던 것: 보안</span><span lang="en">The overlooked one: security</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">기회 1 · 소프트웨어</span><span lang="en">Opportunity 1 · software</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">기회 2 · 도메인 특화</span><span lang="en">Opportunity 2 · domain-specific</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">기회 3 · 개방과 애자일</span><span lang="en">Opportunity 3 · open and agile</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">AlexNet이 서 있는 자리</span><span lang="en">Where AlexNet stands</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">여덟 층</span><span lang="en">Eight layers</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">빠르게 만든 것 넷</span><span lang="en">Four things that made it fast</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">과적합을 막은 것 둘</span><span lang="en">Two things against overfitting</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">학습 세부</span><span lang="en">Details of learning</span></a>
+  <a href="#s13"><span class="n">13</span><span lang="ko">결과</span><span lang="en">Results</span></a>
+  <a href="#s14"><span class="n">14</span><span lang="ko">두 논문이 만나는 곳</span><span lang="en">Where the two meet</span></a>
+  <a href="#s15"><span class="n">15</span><span lang="ko">정리</span><span lang="en">Recap</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2 lang="ko">이 페이지가 하는 일</h2><h2 lang="en">What this page does</h2></div>
+  <p class="sec-sub" lang="ko">강의 슬라이드를 정리한 것과 같은 방식으로, <strong>논문 두 편의 요지를 정리한 학습 노트</strong>다.</p>
+  <p class="sec-sub" lang="en">A study note that <strong>lays out what the two papers say</strong>, in the same way the lecture slides were laid out.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">먼저 분명히</span><span class="tag" lang="en">To be clear</span>
+    <h4 lang="ko">이 페이지는 paper review가 아니다</h4>
+    <h4 lang="en">This page is not the paper review</h4>
+    <p lang="ko">이 과목의 Paper Reading 과제는 <strong>제출자 본인이 쓰는 리뷰</strong>다. 실라버스가 모든 과제에 AI 도구 사용을 금지하고, Canvas 공지는 리뷰 폼에 생성형 AI를 쓰면 <strong>자동 0점</strong>이라고 명시했다.</p>
+    <p lang="en">The paper reading assignment in this course is <strong>a review the student writes</strong>. The syllabus prohibits AI tools on every assignment, and the Canvas announcement states that generative AI on the review form is an <strong>automatic zero</strong>.</p>
+    <p lang="ko">그래서 이 페이지에는 <strong>강점, 약점, 신규성 평가, 임팩트 평가, 종합 판정, 저자에게 보내는 코멘트가 하나도 없다.</strong> 리뷰 폼의 내용도, 제출한 글도 싣지 않는다. 여기 있는 것은 <strong>논문이 무엇을 말했는가</strong>뿐이고, 그 판단은 읽는 사람의 몫이다.</p>
+    <p lang="en">So this page carries <strong>no strengths, no weaknesses, no novelty or impact judgement, no overall verdict, no comments for the authors.</strong> It does not reproduce the review form or anything submitted. What is here is <strong>what the papers say</strong>; the judging is the reader's job.</p>
+  </div>
+
+  <div class="def">
+    <span class="tag" lang="ko">두 편을 같이 낸 이유</span><span class="tag" lang="en">Why the two were assigned together</span>
+    <p lang="ko">두 논문은 <strong>같은 이야기의 양 끝</strong>이다. AlexNet(2012)은 <strong>수요를 만든 사건</strong>이고, Golden Age(2019)는 <strong>그 수요에 하드웨어가 어떻게 답해야 하는가</strong>에 대한 답이다. 그리고 Golden Age는 그 답으로 <strong>도메인 특화 아키텍처</strong>를 들면서 그 예시로 <strong>DNN 가속기</strong>를 꼽는다. 즉 AlexNet이 연 문이 Golden Age의 결론으로 이어진다.</p>
+    <p lang="en">The two papers are <strong>two ends of one story</strong>. AlexNet (2012) is <strong>the event that created the demand</strong>; Golden Age (2019) is an answer to <strong>how hardware should respond to it</strong>. And the answer Golden Age gives is <strong>domain-specific architectures</strong>, with <strong>DNN accelerators</strong> as its worked example. The door AlexNet opened leads to Golden Age's conclusion.</p>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>이 두 편이 이미 강의에 나왔다.</strong> <a href="L01-introduction.html#s14">Lecture 1의 34쪽</a>에 실린 <strong>그래프 두 개가 Golden Age 논문의 Figure 2와 Figure 3 그 자체</strong>다. 슬라이드에 논문 URL이 박혀 있는 것도 그 때문이다. 그리고 <a href="L02-ml-basics.html#s11">Lecture 2-3의 21쪽</a>이 AlexNet 논문의 첫 페이지를 그대로 실었다. <strong>두 강의는 이 과제를 위한 준비였다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>Both papers already appeared in the lectures.</strong> The <strong>two charts on <a href="L01-introduction.html#s14">page 34 of lecture 1</a> are Figures 2 and 3 of the Golden Age paper</strong>, which is why the slide carries the paper's URL. And <a href="L02-ml-basics.html#s11">page 21 of lectures 2-3</a> reproduces the first page of the AlexNet paper. <strong>The two lectures were preparation for this assignment.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-num">01</span><h2 lang="ko">Golden Age가 서 있는 자리</h2><h2 lang="en">Where Golden Age stands</h2></div>
+
+  <div class="def">
+    <span class="tag" lang="ko">서지</span><span class="tag" lang="en">Citation</span>
+    <p>John L. Hennessy and David A. Patterson. <strong>"A New Golden Age for Computer Architecture."</strong><br>
+    <em>Communications of the ACM</em>, Vol. 62, No. 2, February 2019, pp. 48-60. DOI: 10.1145/3282307.</p>
+    <p lang="ko">부제: <em>"Innovations like domain-specific hardware, enhanced security, open instruction sets, and agile chip development will lead the way."</em></p>
+    <p lang="en">Standfirst: <em>"Innovations like domain-specific hardware, enhanced security, open instruction sets, and agile chip development will lead the way."</em></p>
+  </div>
+
+  <p lang="ko"><strong>이건 일반 논문이 아니라 Turing Lecture다.</strong> 논문 첫 줄이 그것을 밝힌다: <em>"WE BEGAN OUR Turing Lecture June 4, 2018 with a review of computer architecture since the 1960s."</em> 두 저자는 RISC 연구로 2017년 ACM A.M. Turing Award를 받았고, 이 글은 그 수상 강연을 지면에 옮긴 것이다.</p>
+  <p lang="en"><strong>This is not an ordinary paper; it is a Turing Lecture.</strong> The opening line says so: <em>"WE BEGAN OUR Turing Lecture June 4, 2018 with a review of computer architecture since the 1960s."</em> The two authors received the 2017 ACM A.M. Turing Award for their work on RISC, and this piece is that award lecture put on the page.</p>
+
+  <div class="callout" lang="ko">
+    <strong>장르를 아는 것이 읽는 방법을 정한다.</strong> Turing Lecture는 <strong>새 결과를 발표하는 글이 아니다.</strong> 한 분야의 지난 50년을 정리하고 앞으로 10년을 전망하는 글이다. 그래서 이 논문에는 새 실험도, 새 시스템도 없다. 대신 <strong>다른 사람들의 결과를 모아 하나의 논지를 세운다.</strong> 논문의 그림 대부분에 출처가 따로 달려 있는 것도 그래서다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Knowing the genre settles how to read it.</strong> A Turing Lecture <strong>is not a paper presenting new results.</strong> It surveys fifty years of a field and projects the next ten. So there is no new experiment and no new system here. Instead it <strong>assembles other people's results into a single argument</strong>, which is why most of its figures carry their own separate credits.
+  </div>
+
+  <p lang="ko">논문이 스스로 밝힌 <strong>key insights</strong>가 첫 페이지 옆에 세 줄로 박혀 있다.</p>
+  <p lang="en">The paper's own <strong>key insights</strong> sit in three lines beside the first page.</p>
+  <ul lang="ko">
+    <li>소프트웨어의 발전이 아키텍처 혁신을 <strong>촉발할 수 있다</strong></li>
+    <li>하드웨어/소프트웨어 인터페이스를 <strong>끌어올리면</strong> 아키텍처 혁신의 기회가 생긴다</li>
+    <li><strong>시장이 결국 아키텍처 논쟁을 결정한다</strong></li>
+  </ul>
+  <ul lang="en">
+    <li>Software advances <strong>can inspire</strong> architecture innovation</li>
+    <li><strong>Elevating</strong> the hardware/software interface creates opportunities for architecture innovation</li>
+    <li><strong>The marketplace ultimately settles architecture debates</strong></li>
+  </ul>
+  <p lang="ko">글 전체가 이 세 줄의 증명이다. 그리고 서두에 조지 산타야나를 인용한다. <em>"과거를 기억하지 못하는 자는 그것을 반복하도록 저주받는다."</em></p>
+  <p lang="en">The whole essay is a proof of those three lines. It opens by quoting George Santayana: <em>"Those who cannot remember the past are condemned to repeat it."</em></p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2 lang="ko">역사: 시장이 결정한다</h2><h2 lang="en">History: the market decides</h2></div>
+  <p class="sec-sub" lang="ko">논문의 앞 절반이 역사다. 네 개의 사건을 지나는데, <strong>넷 다 같은 결론으로 끝난다.</strong></p>
+  <p class="sec-sub" lang="en">The first half of the paper is history: four episodes, and <strong>all four end at the same conclusion.</strong></p>
+
+  <h3><span lang="ko">1964 · IBM System/360과 마이크로프로그래밍</span><span lang="en">1964 · IBM System/360 and microprogramming</span></h3>
+  <p lang="ko">1960년대 초 IBM은 <strong>서로 호환되지 않는 컴퓨터 계열 넷</strong>을 갖고 있었다. 각각 자기 ISA, 소프트웨어 스택, I/O 시스템, 시장(소규모 사업, 대규모 사업, 과학, 실시간)을 따로 갖고 있었다. 그것을 하나로 합치는 것이 System/360이었다.</p>
+  <p lang="en">In the early 1960s IBM had <strong>four incompatible lines of computers</strong>, each with its own ISA, software stack, I/O system and market niche: small business, large business, scientific and real time. System/360 was the attempt to unify them.</p>
+  <p lang="ko">문제는 <strong>8비트 데이터패스만큼 싼 기계와 64비트만큼 빠른 기계가 같은 ISA를 공유</strong>해야 한다는 것이었다. 논문은 데이터패스를 프로세서의 <strong>"근육"</strong>, 제어 하드웨어를 <strong>"두뇌"</strong>라고 부른다. 근육은 넓히거나 좁히기 쉽지만 두뇌가 어렵다.</p>
+  <p lang="en">The difficulty was that machines <strong>as cheap as an 8-bit datapath and as fast as a 64-bit one had to share one ISA</strong>. The paper calls the datapath the processor's <strong>"brawn"</strong> and the control hardware its <strong>"brains"</strong>: the brawn is easy to widen or narrow, the brains are not.</p>
+  <p lang="ko">해법은 Maurice Wilkes가 제안한 <strong>control store</strong>였다. 제어를 2차원 배열로 적고, 각 열을 제어선 하나에, 각 행을 <strong>microinstruction</strong> 하나에 대응시킨다. control store에는 microinstruction으로 쓴 <strong>ISA 인터프리터</strong>가 들어 있다. 이것을 쓰는 일이 <strong>microprogramming</strong>이다. 결정적인 이유는 <strong>메모리가 논리 게이트보다 훨씬 쌌다</strong>는 것이다.</p>
+  <p lang="en">The solution was the <strong>control store</strong> proposed by Maurice Wilkes: control written as a two-dimensional array, each column a control line and each row a <strong>microinstruction</strong>. The control store holds an <strong>ISA interpreter</strong> written in microinstructions, and writing it is <strong>microprogramming</strong>. The decisive reason it worked: <strong>memory was far cheaper than logic gates.</strong></p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · System/360 네 모델 (1964년 4월 7일 발표)</div>
+    <div class="cap" lang="en">Sense of scale · four System/360 models, announced 7 April 1964</div>
+    <table>
+      <tr><td class="what"><span lang="ko">데이터패스 폭</span><span lang="en">datapath width</span></td>
+          <td class="num">8 → 64 bit</td>
+          <td><span lang="ko">M30에서 M65까지 <strong>8배</strong></span><span lang="en">M30 to M65, a factor of <strong>8</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">메모리 용량</span><span lang="en">memory capacity</span></td>
+          <td class="num">8 KiB → 1,024 KiB</td>
+          <td><span lang="ko"><strong>16배</strong></span><span lang="en">a factor of <strong>16</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">클럭</span><span lang="en">clock rate</span></td>
+          <td class="num">1.3 → 5 MHz</td>
+          <td><span lang="ko"><strong>4배 가까이</strong></span><span lang="en">nearly <strong>4</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">성능</span><span lang="en">performance</span></td>
+          <td class="num">29,000 → 567,000 IPS</td>
+          <td><span lang="ko"><strong>50배</strong></span><span lang="en">a factor of <strong>50</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">가격 (1964년 달러)</span><span lang="en">price, 1964 dollars</span></td>
+          <td class="num">$192,000 → $1,080,000</td>
+          <td><span lang="ko"><strong>6배 가까이.</strong> 2018년 달러로는 156만 → 872만</span><span lang="en">nearly <strong>6</strong>. In 2018 dollars, $1.56M to $8.72M</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: 55년 뒤 이 계열의 매출</span><span lang="en">reference: revenue of this family 55 years on</span></td>
+          <td class="num">$10B / <span lang="ko">년</span><span lang="en">yr</span></td>
+          <td><span lang="ko">IBM 메인프레임 후손이 아직도 벌어들이는 금액</span><span lang="en">what the descendants of the family still bring in</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">논문의 표를 그대로 옮긴 것이고, 마지막 줄만 본문에서 가져왔다. <strong>같은 ISA 위에서 성능이 50배 갈렸다</strong>는 것이 요점이다. 그리고 <strong>IBM은 회사의 미래를 여기에 걸었고 이겼다.</strong></div>
+    <div class="foot" lang="en">Straight from the paper's table, with the last row taken from the body text. The point is that <strong>performance varied 50-fold across one ISA</strong>. And <strong>IBM bet the future of the company on it and won.</strong></div>
+  </div>
+
+  <h3><span lang="ko">1981 · 8086이 iAPX-432를 이긴다</span><span lang="en">1981 · the 8086 beats the iAPX-432</span></h3>
+  <p lang="ko">Gordon Moore는 Intel의 다음 ISA가 <strong>Intel의 수명만큼 갈 것</strong>이라고 믿었다. 그래서 컴퓨터과학 박사들을 뽑아 포틀랜드의 새 시설로 보내 다음 위대한 ISA를 만들게 했다. 그 프로젝트가 <strong>8800</strong>, 나중의 <strong>iAPX-432</strong>다. 32비트 capability 기반 주소지정, 객체지향 아키텍처, 가변 비트 길이 명령어, 그리고 당시 신생 언어 Ada로 쓴 자체 운영체제까지. 논문은 이것을 <strong>"어느 시대를 놓고 봐도 야심적인, 1980년대에서 가장 야심적인"</strong> 프로젝트라고 적는다.</p>
+  <p lang="en">Gordon Moore believed Intel's next ISA <strong>would last the lifetime of Intel</strong>, so he hired computer science PhDs and sent them to a new facility in Portland to invent it. That project was the <strong>8800</strong>, later renamed the <strong>iAPX-432</strong>: 32-bit capability-based addressing, an object-oriented architecture, variable-bit-length instructions, and its own operating system written in the then-new language Ada. The paper calls it <strong>ambitious for any era, certainly the most aggressive of the 1980s.</strong></p>
+  <p lang="ko">그런데 그 프로젝트가 <strong>몇 년 늦어졌다.</strong> Intel은 산타클라라에서 <strong>긴급 대체 작업</strong>을 시작해야 했다. 새 팀에게 <strong>52주</strong>를 주고 16비트 마이크로프로세서를 만들라고 했다. 일정이 빡빡해서 <strong>ISA 설계에 쓴 시간은 3주에 걸친 10 person-week</strong>뿐이었고, 사실상 8080의 8비트 레지스터와 명령어 집합을 16비트로 늘린 것이었다. 그렇게 나온 것이 <strong>8086</strong>이고, 발표 당시 아무도 주목하지 않았다.</p>
+  <p lang="en">The project ran <strong>several years late</strong>, forcing Intel into an <strong>emergency replacement effort</strong> in Santa Clara. The new team got <strong>52 weeks</strong> to deliver a 16-bit microprocessor. The schedule was so tight that <strong>designing the ISA took only 10 person-weeks over three calendar weeks</strong>, essentially widening the 8080's 8-bit registers and instruction set to 16. That was the <strong>8086</strong>, and it was announced to little fanfare.</p>
+  <p lang="ko">그 다음이 유명한 이야기다. IBM이 Apple II와 경쟁할 개인용 컴퓨터를 만들면서 16비트 마이크로프로세서가 필요했다. IBM은 System/360과 비슷한 ISA를 가진 Motorola 68000을 원했지만 일정이 안 맞았다. 그래서 <strong>8086의 8비트 버스 버전</strong>으로 갈아탔다. 1981년 8월 12일 IBM PC 발표. <strong>1986년까지 25만 대를 팔기를 바랐는데 전 세계에 1억 대를 팔았다.</strong></p>
+  <p lang="en">Then the famous part. IBM, building a personal computer to compete with the Apple II, needed a 16-bit microprocessor. It wanted the Motorola 68000, whose ISA resembled the System/360, but the 68000 was behind IBM's schedule, so IBM switched to an <strong>8-bit-bus version of the 8086</strong>. The PC was announced on 12 August 1981. <strong>The hope was 250,000 units by 1986; the company sold 100 million worldwide.</strong></p>
+  <p lang="ko">iAPX-432는 1981년에 발표되었지만 여러 칩이 필요했고 성능이 심각하게 나빴다. <strong>1986년에 단종</strong>됐고, 그 전 해에 Intel은 80386에서 16비트 8086 ISA를 32비트로 확장했다. 논문의 정리는 이렇다. <strong>Moore의 예측은 맞았지만, 시장이 고른 것은 낙점된 432가 아니라 긴급 대체품 8086이었다.</strong></p>
+  <p lang="en">The iAPX-432 was announced in 1981, needed several chips, had severe performance problems, and was <strong>discontinued in 1986</strong>, the year after Intel extended the 16-bit 8086 to 32 bits in the 80386. The paper's summary: <strong>Moore's prediction was correct, but the marketplace chose the emergency replacement 8086 rather than the anointed 432.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>이 절이 세 번 반복하는 문장이 있다.</strong> <em>"시장은 좀처럼 참을성이 없다"</em>, <em>"시장이 결국 결정한다"</em>, <em>"시장은 다시 한번 인내심을 잃었다"</em>. Motorola 68000과 iAPX-432의 설계자들이 배운 것도, Itanium이 배운 것도 같은 것이다. <strong>이 논문의 세 key insight 중 하나가 이것이고, 남은 두 개보다 자주 나온다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>One sentence recurs three times in this section</strong>: <em>the marketplace is rarely patient</em>, <em>the marketplace ultimately determines</em>, <em>the marketplace again eventually ran out of patience</em>. It is what the architects of the Motorola 68000 and the iAPX-432 learned, and what Itanium learned later. <strong>It is one of the paper's three key insights, and the one it repeats most.</strong>
+  </div>
+
+  <h3><span lang="ko">1980년대 · CISC에서 RISC로</span><span lang="en">The 1980s · from CISC to RISC</span></h3>
+  <p lang="ko">Unix가 운영체제조차 고급 언어로 쓸 수 있음을 보이면서, 결정적인 질문이 바뀌었다. <em>"프로그래머가 어떤 어셈블리를 쓸 것인가"</em>에서 <em>"컴파일러가 어떤 명령어를 생성할 것인가"</em>로. 논문은 이것을 <strong>하드웨어/소프트웨어 인터페이스를 크게 끌어올린 것</strong>이라고 부르고, 그것이 아키텍처 혁신의 기회를 만들었다고 적는다.</p>
+  <p lang="en">Once Unix showed that even operating systems could be written in a high-level language, the critical question changed from <em>"what assembly language would programmers use?"</em> to <em>"what instructions would compilers generate?"</em> The paper calls this <strong>significantly raising the hardware/software interface</strong>, and says it created the opportunity for architecture innovation.</p>
+  <p lang="ko">근거로 든 측정 셋.</p>
+  <p lang="en">Three measurements are offered as evidence.</p>
+  <ul lang="ko">
+    <li><strong>John Cocke</strong>와 동료들이 연구용 컴파일러를 IBM 360 ISA의 <strong>단순한 register-register 연산과 load-store만</strong> 쓰도록 바꿨더니, 프로그램이 <strong>최대 3배 빨라졌다</strong></li>
+    <li><strong>Emer와 Clark</strong>: VAX 명령어의 <strong>20%가 마이크로코드의 60%를 필요로 하는데 실행 시간의 0.2%만 차지</strong>했다</li>
+    <li><strong>DEC 엔지니어들</strong>: CISC는 RISC 대비 명령어 수가 <strong>약 75%</strong>였지만, 비슷한 기술에서 명령어당 클럭 사이클이 <strong>5~6배</strong> 많았다. 곱하면 <strong>RISC가 약 4배 빠르다</strong></li>
+  </ul>
+  <ul lang="en">
+    <li><strong>John Cocke</strong> and colleagues retargeted their research compilers to use only the IBM 360 ISA's <strong>simple register-register operations and load-store transfers</strong>, and programs ran <strong>up to three times faster</strong></li>
+    <li><strong>Emer and Clark</strong>: <strong>20% of VAX instructions needed 60% of the microcode and accounted for only 0.2% of execution time</strong></li>
+    <li><strong>DEC engineers</strong>: CISC executed about <strong>75%</strong> as many instructions as RISC, but in similar technology took <strong>five to six times</strong> more clock cycles per instruction, making RISC roughly <strong>4× faster</strong></li>
+  </ul>
+  <p lang="ko">세 번째 측정이 논문에 실린 성능 공식과 이어진다.</p>
+  <p lang="en">That third measurement connects to the performance formula the paper prints.</p>
+  <div class="eq"><span class="m">Time/Program</span><br>
+  <span class="m">= Instructions/Program</span><br>
+  <span class="m">× (Clock cycles)/Instruction</span><br>
+  <span class="m">× Time/(Clock cycle)</span></div>
+  <p lang="ko">논문은 이런 공식이 1980년대 아키텍처 교과서에 없었다고 적고, 그래서 1989년에 <em>Computer Architecture: A Quantitative Approach</em>를 썼다고 밝힌다. 부제가 주제를 말한다. <strong>아키텍트의 직관과 경험 대신 측정과 벤치마크로 트레이드오프를 정량 평가하라.</strong></p>
+  <p lang="en">The paper notes that such formulas were not in 1980s architecture textbooks, which is why the authors wrote <em>Computer Architecture: A Quantitative Approach</em> in 1989. Its subtitle carries the theme: <strong>use measurements and benchmarks to evaluate trade-offs quantitatively instead of relying on the architect's intuition and experience.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>이 대목이 Paper Reading 과제와 직접 이어진다.</strong> 이 분야에서 주장은 <strong>측정으로 뒷받침되어야 한다</strong>는 규범이 여기서 나왔다. 리뷰 폼에 <strong>Evaluation 항목이 따로 있는 이유</strong>이기도 하다. 논문을 읽을 때 "무엇을 측정했는가"를 먼저 찾는 것이 이 분야의 기본기다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This passage connects directly to the reading assignment.</strong> The norm that claims in this field <strong>must be backed by measurement</strong> comes from here, and it is why the review form has <strong>a separate field for evaluation</strong>. Looking first for what was measured is the basic move when reading a paper in this area.
+  </div>
+
+  <h3><span lang="ko">1990년대 · VLIW, EPIC, Itanium</span><span lang="en">The 1990s · VLIW, EPIC, Itanium</span></h3>
+  <p lang="ko"><strong>VLIW</strong>(very long instruction word)와 그 사촌 <strong>EPIC</strong>(Intel과 HP가 붙인 이름)은 여러 독립 연산을 한 명령어에 묶는다. 명령어 하나가 데이터 전송 둘, 정수 연산 둘, 부동소수점 연산 둘 같은 <strong>독립적인 여섯 연산</strong>을 지정할 수 있고 컴파일러가 그 여섯 자리를 효율적으로 채울 수 있다면, <strong>하드웨어를 단순하게 만들 수 있다</strong>는 발상이었다. RISC처럼 <strong>일을 하드웨어에서 컴파일러로 옮긴 것</strong>이다.</p>
+  <p lang="en"><strong>VLIW</strong> and its cousin <strong>EPIC</strong>, the name Intel and Hewlett Packard gave the approach, bundle several independent operations into one wide instruction. If one instruction could specify <strong>six independent operations</strong>, say two data transfers, two integer operations and two floating-point operations, and the compiler could fill those six slots efficiently, then <strong>the hardware could be made simpler</strong>. Like RISC, it <strong>shifted work from hardware to the compiler.</strong></p>
+  <p lang="ko">Intel과 HP는 32비트 x86을 대체할 64비트 프로세서를 EPIC으로 설계했다. 그것이 <strong>Itanium</strong>이다. 결과는 기대에 못 미쳤다. EPIC은 <strong>구조가 잘 잡힌 부동소수점 프로그램</strong>에는 잘 맞았지만, 캐시 미스와 분기가 덜 예측 가능한 <strong>정수 프로그램</strong>에서 성능을 못 냈다. Donald Knuth의 말이 인용되어 있다. <em>"Itanium 접근은 아주 훌륭할 예정이었다. 그 바라던 컴파일러가 사실상 만들기 불가능한 것으로 밝혀지기 전까지는."</em> 평론가들은 <strong>Itanic</strong>이라는 별명을 붙였다.</p>
+  <p lang="en">Intel and HP designed a 64-bit processor on EPIC ideas to replace the 32-bit x86: <strong>Itanium</strong>. Reality fell short. EPIC worked well for <strong>highly structured floating-point programs</strong> but struggled on <strong>integer programs</strong> with less predictable cache misses and branches. Knuth is quoted: <em>"The Itanium approach ... was supposed to be so terrific, until it turned out that the wished-for compilers were basically impossible to write."</em> Pundits rechristened it <strong>Itanic</strong>.</p>
+  <p lang="ko">시장은 다시 인내심을 잃었고, 32비트 x86의 후계자는 Itanium이 아니라 <strong>64비트 x86</strong>이 되었다. 다만 논문은 좋은 소식도 적는다. <strong>VLIW는 프로그램이 작고 분기가 단순하며 캐시를 생략하는 좁은 응용에는 여전히 잘 맞는다.</strong> 디지털 신호 처리가 그 예다.</p>
+  <p lang="en">The marketplace ran out of patience again, and the successor to 32-bit x86 was <strong>64-bit x86</strong>, not Itanium. The paper adds the good news: <strong>VLIW still matches narrower applications with small programs, simpler branches and no caches</strong>, digital signal processing among them.</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 각주가 나중에 회수된다.</strong> 논문의 뒷부분에서 <strong>DSA가 VLIW를 쓴다</strong>고 적기 때문이다. 범용 코드에는 안 맞았던 접근이 <strong>도메인을 좁히면 살아난다.</strong> "실패한 아이디어"가 아니라 <strong>"범위를 잘못 잡은 아이디어"</strong>였다는 것이 이 논문이 역사에서 끌어내는 교훈 중 하나다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This footnote gets collected later.</strong> Further on, the paper says <strong>DSAs use VLIW</strong>. An approach that failed on general-purpose code <strong>comes back to life once the domain narrows.</strong> Not a failed idea but <strong>an idea scoped wrongly</strong>, which is one of the lessons the paper draws from its own history.
+  </div>
+
+  <h3><span lang="ko">그래서 지금은 누가 이겼나</span><span lang="en">So who won</span></h3>
+  <p lang="ko">AMD와 Intel은 <strong>500명 규모의 설계팀</strong>과 우월한 반도체 기술로 x86과 RISC의 성능 격차를 좁혔다. 방법은 <strong>명령어 디코더가 복잡한 x86 명령어를 내부의 RISC 같은 microinstruction으로 즉석에서 번역</strong>하는 것이었다. 그러면 RISC 설계자들이 쓰던 기법(명령어/데이터 캐시 분리, 온칩 2차 캐시, 깊은 파이프라인, 동시 다중 명령어 실행)을 x86에 그대로 넣을 수 있었다.</p>
+  <p lang="en">AMD and Intel used <strong>500-person design teams</strong> and superior semiconductor technology to close the gap. The method: <strong>the instruction decoder translated complex x86 instructions into internal RISC-like microinstructions on the fly</strong>, after which every technique RISC designers used, separate instruction and data caches, on-chip second-level caches, deep pipelines, fetching and executing several instructions at once, could be dropped into the x86.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · RISC와 CISC의 시장 성적</div>
+    <div class="cap" lang="en">Sense of scale · how RISC and CISC actually sold</div>
+    <table>
+      <tr><td class="what"><span lang="ko">PC 전성기(2011) x86 출하</span><span lang="en">x86 shipments at the 2011 PC peak</span></td>
+          <td class="num">~350M / <span lang="ko">년</span><span lang="en">yr</span></td>
+          <td><span lang="ko">AMD와 Intel 합계. 높은 물량과 낮은 마진이 RISC 컴퓨터보다 싼 가격을 만들었다</span><span lang="en">AMD and Intel combined; high volume and low margins made them cheaper than RISC machines</span></td></tr>
+      <tr><td class="what"><span lang="ko">2011년 이후 x86 출하 증감</span><span lang="en">x86 shipments since 2011</span></td>
+          <td class="num">−10% / <span lang="ko">년</span><span lang="en">yr</span></td>
+          <td><span lang="ko">post-PC 시대. 거의 매년 10%씩 줄었다</span><span lang="en">the post-PC era: falling almost 10% a year</span></td></tr>
+      <tr><td class="what"><span lang="ko">RISC 프로세서를 담은 칩</span><span lang="en">chips with RISC processors</span></td>
+          <td class="num">20B</td>
+          <td><span lang="ko"><strong>200억 개.</strong> 32비트와 64비트 프로세서의 <strong>99%가 RISC</strong>다</span><span lang="en"><strong>20 billion</strong>, and <strong>99% of 32-bit and 64-bit processors are RISC</strong></span></td></tr>
+    </table>
+    <div class="foot" lang="ko">논문의 결론은 이렇다. <strong>CISC가 PC 시대의 후반을 이겼고, RISC가 post-PC 시대를 이기고 있다.</strong> 수십 년간 새 CISC ISA는 없었고, 저자들 자신도 놀랍게 여기지만 <strong>35년이 지난 지금도 범용 프로세서의 ISA 원칙 합의는 여전히 RISC</strong>다.</div>
+    <div class="foot" lang="en">The paper's conclusion: <strong>CISC won the later stages of the PC era, and RISC is winning the post-PC era.</strong> There have been no new CISC ISAs in decades, and to the authors' own surprise <strong>the consensus on ISA principles for general-purpose processors is still RISC, 35 years on.</strong></div>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>왜 뒤집혔는가.</strong> Apple이 2007년 iPhone으로 post-PC 시대를 열면서, 스마트폰 회사들은 마이크로프로세서를 사는 대신 <strong>다른 회사의 설계로 자기 SoC를 만들기</strong> 시작했다. ARM의 RISC 프로세서가 그 설계였다. 모바일 설계자들은 <strong>다이 면적과 에너지 효율을 성능만큼 중시</strong>했고, 그것이 CISC에 불리하게 작용했다. IoT의 등장은 프로세서 수와 트레이드오프를 더 늘렸고 <strong>설계 시간과 비용의 중요성</strong>을 키워 CISC를 더 불리하게 만들었다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Why it flipped.</strong> When Apple opened the post-PC era with the iPhone in 2007, phone companies stopped buying microprocessors and started <strong>building their own SoCs from other companies' designs</strong>, and those designs were ARM's RISC processors. Mobile designers <strong>valued die area and energy efficiency as much as performance</strong>, which disadvantaged CISC. The arrival of the Internet of Things multiplied both processor counts and trade-offs, raising the importance of <strong>design time and cost</strong> and disadvantaging CISC further.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-num">03</span><h2 lang="ko">지금의 위기</h2><h2 lang="en">The current crisis</h2></div>
+  <p class="sec-sub" lang="ko">역사가 끝나고 논문의 논지가 시작된다. 시몬 페레스의 인용으로 문을 연다. <em>"해법이 없는 문제라면 그것은 문제가 아니라 사실이다. 푸는 것이 아니라 시간을 두고 감당하는 것이다."</em></p>
+  <p class="sec-sub" lang="en">The history ends and the argument begins, opening with Shimon Peres: <em>"If a problem has no solution, it may not be a problem, but a fact, not to be solved, but to be coped with over time."</em></p>
+
+  <h3><span lang="ko">벽 1 · Moore의 법칙</span><span lang="en">Wall 1 · Moore's law</span></h3>
+  <p lang="ko">Moore의 1965년 원래 예측은 트랜지스터 밀도가 <strong>매년</strong> 두 배가 된다는 것이었고, 1975년에 <strong>2년마다</strong>로 수정했다. 논문은 이 법칙이 <strong>2000년경부터 느려지기 시작했고, 2018년에는 Moore의 예측과 실제 능력 사이에 대략 15배의 격차</strong>가 있다고 적는다. 그리고 Moore 자신이 2003년에 이것이 불가피하다고 말했다는 점을 덧붙인다.</p>
+  <p lang="en">Moore's original 1965 prediction was a doubling of transistor density <strong>every year</strong>, revised in 1975 to <strong>every two years</strong>. The paper says the law <strong>began to slow around 2000, and by 2018 showed a roughly 15-fold gap between Moore's prediction and current capability</strong>, adding that Moore himself observed in 2003 that this was inevitable.</p>
+
+  <h3><span lang="ko">벽 2 · Dennard scaling</span><span lang="en">Wall 2 · Dennard scaling</span></h3>
+  <p lang="ko">Robert Dennard의 예측은 <strong>트랜지스터 밀도가 올라가면 트랜지스터당 전력 소비가 떨어져서 실리콘 <span class="m">mm<sup>2</sup></span>당 전력이 거의 일정하게 유지된다</strong>는 것이었다. 그래서 매 세대마다 컴퓨터가 더 에너지 효율적이 되었다. 논문은 <strong>2007년부터 크게 느려졌고 2012년경에는 거의 사라졌다</strong>고 적는다.</p>
+  <p lang="en">Robert Dennard's projection was that <strong>as transistor density rose, power consumption per transistor would fall, keeping power per <span class="m">mm<sup>2</sup></span> of silicon near constant</strong>, so each generation of computers became more energy efficient. The paper says it <strong>began to slow significantly in 2007 and faded to almost nothing by 2012.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>이 두 벽의 근거 그림이 강의에 이미 나왔다.</strong> <a href="L01-introduction.html#s14">Lecture 1의 34쪽</a> 왼쪽 위 그래프(Moore's Law vs. Intel Microprocessor Density)가 이 논문의 <strong>Figure 2</strong>이고, 오른쪽 위 그래프(Technology nm와 Power/nm²)가 <strong>Figure 3</strong>이다. 슬라이드가 논문의 그림 두 장을 그대로 잘라 붙인 것이다. 강의 노트에서 <strong>"Moore와 Dennard는 다른 이야기"</strong>라고 갈라 놓은 것이 여기 원문에서 확인된다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The evidence for both walls already appeared in the lectures.</strong> The upper-left chart on <a href="L01-introduction.html#s14">page 34 of lecture 1</a>, Moore's Law vs. Intel Microprocessor Density, is this paper's <strong>Figure 2</strong>, and the upper-right one, technology in nm against power per nm², is <strong>Figure 3</strong>. The slide is those two figures cut and pasted. The separation the lecture note drew between <strong>Moore and Dennard as different claims</strong> is confirmed here in the source.
+  </div>
+
+  <h3><span lang="ko">벽 3 · ILP는 낭비를 만든다</span><span lang="en">Wall 3 · ILP wastes work</span></h3>
+  <p lang="ko">1986년부터 2002년경까지 <strong>instruction level parallelism (ILP)</strong>가 성능을 얻는 주된 방법이었고, 트랜지스터 속도 향상과 합쳐져 <strong>연 50% 정도의 성능 증가</strong>를 냈다. 그런데 ILP를 늘리면 왜 비효율이 커지는가. 논문이 구체적인 프로세서 하나로 설명한다.</p>
+  <p lang="en">From 1986 to about 2002, <strong>instruction level parallelism</strong> was the primary way to gain performance, and together with faster transistors delivered <strong>roughly 50% performance improvement a year</strong>. Why does more ILP mean more inefficiency? The paper explains with one concrete processor.</p>
+  <ul lang="ko">
+    <li><strong>15단 파이프라인</strong>에 클럭당 <strong>4개 명령어 발행</strong> → 어느 순간에도 최대 <strong>60개 명령어</strong>가 파이프라인 안에 있다</li>
+    <li>실행 명령어의 약 <strong>25%가 분기</strong>이므로 그 60개 중 <strong>약 15개가 분기</strong>다</li>
+    <li>파이프라인을 채우려면 분기를 예측하고 <strong>투기적으로(speculatively)</strong> 코드를 넣어야 한다</li>
+    <li>예측이 맞으면 성능이 오르고 에너지는 거의 안 든다. <strong>틀리면 잘못 투기한 명령어를 버리고 상태를 되돌려야</strong> 하므로 그 계산과 에너지가 낭비된다</li>
+  </ul>
+  <ul lang="en">
+    <li>A <strong>15-stage pipeline</strong> issuing <strong>four instructions per clock</strong> holds up to <strong>60 instructions</strong> in flight at any moment</li>
+    <li>About <strong>25% of executed instructions are branches</strong>, so roughly <strong>15 of those 60</strong> are branches</li>
+    <li>Keeping the pipeline full means predicting the branches and placing code <strong>speculatively</strong> into it</li>
+    <li>Correct prediction improves performance at little energy cost. <strong>A mispredict means throwing away the speculated instructions and restoring state</strong>, wasting that work and energy</li>
+  </ul>
+
+  <div class="ex">
+    <span class="tag" lang="ko">논문이 던지는 계산</span><span class="tag" lang="en">The paper's own calculation</span>
+    <p lang="ko">낭비를 <strong>전체의 10% 이하</strong>로 묶으려면, 15개의 분기를 각각 얼마나 정확하게 맞혀야 할까?</p>
+    <p lang="en">To hold wasted work to <strong>10% of the time</strong>, how accurately does each of those 15 branches have to be predicted?</p>
+    <details>
+      <summary><span lang="ko">논문이 적은 숫자</span><span lang="en">The number the paper gives</span></summary>
+      <p lang="ko"><strong>각 분기를 99.3% 정확하게 맞혀야 한다.</strong> 그리고 논문은 곧바로 덧붙인다. <em>"그렇게 정확하게 예측할 수 있는 분기를 가진 범용 프로그램은 거의 없다."</em></p>
+      <p lang="en"><strong>Each branch has to be predicted correctly 99.3% of the time.</strong> And the paper immediately adds: <em>"Few general-purpose programs have branches that can be predicted so accurately."</em></p>
+      <p lang="ko">실측 결과가 Figure 4에 있다. Intel Core i7에서 SPEC 정수 벤치마크를 돌린 결과, <strong>평균 19%의 명령어가 낭비</strong>된다. 벤치마크별로는 <code>MCF</code>와 <code>SJENG</code>이 각각 39%와 38%로 가장 나쁘고, <code>LIBQUANTUM</code>이 1%로 가장 좋다. <strong>낭비된 에너지는 그보다 더 크다.</strong> 잘못 투기했을 때 상태를 복원하는 데도 에너지가 들기 때문이다.</p>
+      <p lang="en">The measurement is in Figure 4: running SPEC integer benchmarks on an Intel Core i7, <strong>19% of instructions are wasted on average</strong>. By benchmark, <code>MCF</code> and <code>SJENG</code> are worst at 39% and 38%, and <code>LIBQUANTUM</code> best at 1%. <strong>The wasted energy is larger still</strong>, because restoring state after a mispredict costs energy too.</p>
+    </details>
+  </div>
+
+  <h3><span lang="ko">벽 4 · Amdahl의 법칙</span><span lang="en">Wall 4 · Amdahl's law</span></h3>
+  <p lang="ko">ILP가 막히자 <strong>multicore 시대</strong>가 열렸다. 그런데 multicore는 병렬성을 찾고 활용하는 책임을 <strong>프로그래머와 언어 시스템으로 넘겼을 뿐</strong>, Dennard scaling의 종료로 악화된 에너지 효율 문제를 풀지 못한다. <strong>각 코어는 유용한 일을 하든 안 하든 전력을 태운다.</strong></p>
+  <p lang="en">With ILP blocked, the <strong>multicore era</strong> began. But multicore merely <strong>shifted the responsibility for finding and exploiting parallelism to the programmer and the language system</strong>, and it does not resolve the energy-efficiency challenge that the end of Dennard scaling made worse. <strong>Each active core burns power whether or not it contributes.</strong></p>
+  <p lang="ko">여기에 <strong>Amdahl의 법칙</strong>이 걸린다. 병렬 컴퓨터의 속도 향상은 <strong>계산 중 순차적인 부분의 비율</strong>에 의해 제한된다. 논문의 Figure 5가 그것을 보여준다.</p>
+  <p lang="en">On top of that sits <strong>Amdahl's law</strong>: the speedup of a parallel computer is limited by the fraction of the computation that is sequential. The paper's Figure 5 shows it.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 순차 비율 1%, 코어 64개</div>
+    <div class="cap" lang="en">Sense of scale · 1% serial, 64 cores</div>
+    <table>
+      <tr><td class="what"><span lang="ko">코어 수</span><span lang="en">cores</span></td>
+          <td class="num">64</td>
+          <td><span lang="ko">전력은 코어 64개에 비례해서 든다</span><span lang="en">power is drawn in proportion to all 64</span></td></tr>
+      <tr><td class="what"><span lang="ko">실제 속도 향상</span><span lang="en">actual speedup</span></td>
+          <td class="num">~35×</td>
+          <td><span lang="ko">시간의 1%만 순차인데도 이만큼밖에 안 나온다</span><span lang="en">and this is with only 1% of the time being serial</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">낭비되는 에너지</span><span lang="en">energy wasted</span></td>
+          <td class="num">~45%</td>
+          <td><span lang="ko">논문이 직접 계산해 적은 값</span><span lang="en">the figure the paper computes itself</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">논문은 Amdahl의 법칙이 <strong>50년이 넘었지만 여전히 넘기 힘든 장벽</strong>이라고 적는다. 실제 프로그램은 구조가 더 복잡해서, 통신과 동기화 때문에 <strong>대부분의 응용에 프로세서의 일부만 효과적으로 쓸 수 있는 구간</strong>이 있다.</div>
+    <div class="foot" lang="en">The paper notes that Amdahl's law is <strong>more than 50 years old and remains a difficult hurdle</strong>. Real programs are more complex, and the need to communicate and synchronize means <strong>most applications have portions that can effectively use only a fraction of the processors.</strong></div>
+  </div>
+
+  <h3><span lang="ko">벽 5 · dark silicon</span><span lang="en">Wall 5 · dark silicon</span></h3>
+  <p lang="ko">Dennard scaling이 끝난 상태에서 코어 수를 늘리면 <strong>전력도 거의 같은 비율로 늘어난다.</strong> 그리고 프로세서에 들어간 전력은 <strong>열로 빠져나가야</strong> 한다. 그래서 multicore 프로세서는 <strong>TDP</strong>(thermal dissipation power), 즉 패키지와 냉각 시스템이 제거할 수 있는 평균 전력에 묶인다.</p>
+  <p lang="en">With Dennard scaling gone, adding cores means <strong>power rises at nearly the same rate</strong>, and power that goes into a processor <strong>has to come out as heat</strong>. So multicore processors are bounded by <strong>thermal dissipation power</strong>, the average power the package and cooling system can remove.</p>
+  <p lang="ko">논문의 표현이 좋다. 고성능 데이터센터는 더 나은 패키지와 냉각을 쓸 수 있지만, <strong>책상 위에 작은 열교환기를 놓거나 휴대폰을 식히려고 등에 라디에이터를 지고 다니고 싶은 사용자는 없다.</strong></p>
+  <p lang="en">The paper puts it well: high-end data centers may use more advanced packaging and cooling, but <strong>no user wants to put a small heat exchanger on their desk or wear a radiator on their back to cool their cellphone.</strong></p>
+  <p lang="ko">TDP의 한계가 곧장 <strong>dark silicon</strong>의 시대로 이어진다. 과열을 막으려고 프로세서가 <strong>클럭을 낮추고 놀고 있는 코어를 끄는</strong> 상태다. 다르게 보면 <strong>노는 코어의 귀한 전력을 활성 코어로 재배분하는</strong> 것이다.</p>
+  <p lang="en">The TDP limit leads directly to the era of <strong>dark silicon</strong>, where processors <strong>slow the clock and turn off idle cores</strong> to prevent overheating. Another way to see it: chips <strong>reallocate their precious power from idle cores to active ones.</strong></p>
+
+  <h3><span lang="ko">다섯 벽을 합치면</span><span lang="en">Adding the five walls</span></h3>
+  <p lang="ko">Dennard scaling이 없고, Moore의 법칙이 약해지고, Amdahl의 법칙이 온전히 작동하는 시대에서 <strong>성능 향상은 연 몇 퍼센트에 그친다.</strong> 논문의 Figure 6이 그 역사를 하나의 그래프로 보여준다. 세로축은 VAX-11/780 대비 성능(로그), 가로축은 1980년부터 2015년 이후까지다.</p>
+  <p lang="en">In an era without Dennard scaling, with a reduced Moore's law and Amdahl's law in full effect, <strong>performance improvement is limited to a few percent a year.</strong> The paper's Figure 6 puts that history on one graph: performance relative to a VAX-11/780 on a log axis, years from 1980 to past 2015.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 270" role="img" aria-label="시대별 연간 성능 증가율 막대. RISC 시대 52퍼센트에서 현재 3퍼센트까지 떨어진다">
+      <text class="svglab" x="20" y="20" style="font-size:10.5px" fill="var(--ink3)">annual performance growth, by era</text>
+
+      <rect x="150" y="34" width="144" height="28" rx="4" fill="rgba(var(--violet-rgb),.30)" stroke="var(--violet)"/>
+      <text class="svglab" x="142" y="52" text-anchor="end" style="font-size:11px">CISC</text>
+      <text class="svgnum" x="302" y="53" style="font-size:12px" fill="var(--violet)">22%/yr · 2X/2.5yr</text>
+
+      <rect x="150" y="76" width="340" height="28" rx="4" fill="rgba(var(--green-rgb),.30)" stroke="var(--green)"/>
+      <text class="svglab" x="142" y="94" text-anchor="end" style="font-size:11px">RISC</text>
+      <text class="svgnum" x="498" y="95" style="font-size:12px" fill="var(--green)">52%/yr · 2X/1.5yr</text>
+
+      <rect x="150" y="118" width="150" height="28" rx="4" fill="rgba(var(--violet-rgb),.30)" stroke="var(--violet)"/>
+      <text class="svglab" x="142" y="136" text-anchor="end" style="font-size:11px">multicore</text>
+      <text class="svgnum" x="308" y="137" style="font-size:12px" fill="var(--violet)">23%/yr · 2X/3.5yr</text>
+
+      <rect x="150" y="160" width="78" height="28" rx="4" fill="rgba(var(--amber-rgb),.30)" stroke="var(--amber)"/>
+      <text class="svglab" x="142" y="178" text-anchor="end" style="font-size:11px">Amdahl</text>
+      <text class="svgnum" x="236" y="179" style="font-size:12px" fill="var(--amber)">12%/yr · 2X/6yr</text>
+
+      <rect x="150" y="202" width="20" height="28" rx="4" fill="rgba(var(--amber-rgb),.45)" stroke="var(--amber)"/>
+      <text class="svglab" x="142" y="220" text-anchor="end" style="font-size:11px">end of the line</text>
+      <text class="svgnum" x="178" y="221" style="font-size:12px" fill="var(--amber)">3%/yr · 2X/20yr</text>
+
+      <line x1="150" y1="28" x2="150" y2="236" stroke="var(--rule)"/>
+
+      <text class="svglab" lang="ko" x="150" y="254" style="font-size:10.5px" fill="var(--ink2)">52%에서 3%로. 배가 시간은 1.5년에서 20년으로</text>
+      <text class="svglab" lang="en" x="150" y="254" style="font-size:10.5px" fill="var(--ink2)">52% down to 3%: doubling time from 1.5 years to 20</text>
+    </svg>
+    <figcaption lang="ko">논문 Figure 6의 시대별 증가율만 뽑아 막대로 세운 것. 원본은 성능 곡선이고 이 막대 그림은 이 노트가 만든 것이다. <strong>RISC 시대의 52%가 지금 3%다.</strong> 배가 시간으로는 1.5년이 20년이 되었다.</figcaption>
+    <figcaption lang="en">The per-era growth rates from the paper's Figure 6, stood up as bars. The original is a performance curve; these bars are the note's. <strong>The 52% of the RISC era is 3% now</strong>, and the doubling time went from 1.5 years to 20.</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>이 다섯 벽이 강의 1강의 논증과 정확히 같다.</strong> <a href="L01-introduction.html#s14">Lecture 1의 33-34쪽</a>이 이 절을 슬라이드 세 장으로 압축한 것이다. 다만 강의는 <strong>수요 쪽</strong>(모델 연산량 6개월마다 두 배)을 먼저 보여주고 공급 쪽을 나중에 보여줬는데, 논문은 <strong>공급 쪽만</strong> 다룬다. 수요 쪽 숫자는 논문에 없다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>These five walls are exactly the argument of lecture 1.</strong> <a href="L01-introduction.html#s14">Pages 33 and 34 of lecture 1</a> compress this section into three slides. The lecture led with the <strong>demand side</strong>, model compute doubling every six months, and showed supply afterwards; the paper covers <strong>only the supply side</strong>. The demand numbers are not in it.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2 lang="ko">놓치고 있던 것: 보안</h2><h2 lang="en">The overlooked one: security</h2></div>
+  <p class="sec-sub" lang="ko">성능 이야기 사이에 한 절이 끼어 있다. 그리고 이 절이 <strong>3절의 speculation과 직접 이어진다.</strong></p>
+  <p class="sec-sub" lang="en">A section wedged into the performance story, and one that <strong>connects directly to the speculation of section 03.</strong></p>
+
+  <p lang="ko">1970년대 아키텍트들은 protection ring부터 capability까지 보안에 상당한 관심을 쏟았다. 대부분의 버그가 소프트웨어에 있다는 것은 알았지만 <strong>아키텍처 지원이 도움이 될 것</strong>이라고 믿었다. 그런데 이 기능들은 <strong>선의의 환경을 전제한 운영체제들이 거의 쓰지 않았고</strong>, 당시에는 오버헤드도 커서 제거되었다.</p>
+  <p lang="en">In the 1970s architects paid significant attention to security, from protection rings to capabilities. They knew most bugs would be in software but believed <strong>architectural support could help</strong>. Those features went <strong>largely unused by operating systems written for supposedly benign environments</strong>, carried significant overhead at the time, and were eliminated.</p>
+  <p lang="ko">그 사이 소프트웨어 규모와 성능에 대한 압력 때문에 형식 검증이나 마이크로커널 같은 기법이 프로세서 성능을 따라가지 못했다. 결과는 <strong>보안 결함이 많은 거대한 소프트웨어 시스템</strong>이고, 온라인 개인정보가 폭증하고 <strong>클라우드가 잠재적 적대자들과 물리적 하드웨어를 공유</strong>하면서 그 효과가 증폭되었다.</p>
+  <p lang="en">Meanwhile the scale of software and the drive for performance meant formal verification and microkernels could not keep up with processor performance. The result is <strong>large software systems with many security flaws</strong>, amplified by the growth of personal information online and by <strong>cloud computing sharing physical hardware among potential adversaries.</strong></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">Meltdown과 Spectre</span><span class="tag" lang="en">Meltdown and Spectre</span>
+    <p lang="ko">투기 실행(speculation)이 <strong>알려지지 않았지만 중대한 보안 결함</strong>을 많은 프로세서에 들여왔다. 둘 다 <strong>side-channel 공격</strong>이다. 작업에 걸린 <strong>시간을 관찰</strong>해서 정보를 흘리고, <strong>ISA 수준에서는 보이지 않는 정보를 타이밍이라는 보이는 속성으로 변환</strong>한다.</p>
+    <p lang="en">Speculation introduced an <strong>unknown but significant security flaw</strong> into many processors. Both are <strong>side-channel attacks</strong>: information leaks by <strong>observing the time a task takes</strong>, <strong>converting information invisible at the ISA level into a visible timing attribute.</strong></p>
+  </div>
+
+  <p lang="ko">2018년에는 Spectre 변종 하나를 이용해 <strong>네트워크 너머로 정보를 흘리는</strong> 방법이 발표되었다. <strong>NetSpectre</strong>라고 부르며, 정보가 느리게 새지만 <strong>공격자가 대상 프로세서에 코드를 올릴 필요가 없다.</strong> 같은 LAN이나 클라우드의 같은 클러스터에 있는 어떤 기계든 공격에 쓸 수 있다는 뜻이라 새 취약점이 많이 생긴다. 가상머신 아키텍처의 취약점도 뒤이어 보고되었고, 그중 <strong>Foreshadow</strong>는 암호화 키 같은 최고 위험 데이터를 보호하려고 만든 <strong>Intel SGX 보안 메커니즘을 뚫는다.</strong> 논문은 <strong>새 취약점이 매달 발견되고 있다</strong>고 적는다.</p>
+  <p lang="en">In 2018 researchers showed how to exploit a Spectre variant to <strong>leak information over a network</strong>. Called <strong>NetSpectre</strong>, it leaks slowly but <strong>does not require the attacker to load code onto the target processor</strong>, meaning any machine on the same LAN or in the same cloud cluster can be used, which creates many new vulnerabilities. Vulnerabilities in the virtual-machine architecture followed, one of them, <strong>Foreshadow</strong>, penetrating <strong>the Intel SGX mechanisms built to protect the highest-risk data</strong> such as encryption keys. The paper notes that <strong>new vulnerabilities are being discovered monthly.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 절의 핵심 문장</span><span class="tag" lang="en">The key sentence of this section</span>
+    <h4 lang="ko">side-channel 공격은 새롭지 않다. 새로운 것은 결함이 하드웨어에 있다는 것이다</h4>
+    <h4 lang="en">Side-channel attacks are not new; what is new is that the flaw is in the hardware</h4>
+    <p lang="ko">이전의 대부분은 <strong>소프트웨어 결함</strong>이 공격을 성립시켰다. Meltdown과 Spectre에서는 <strong>하드웨어 구현의 결함</strong>이 보호된 정보를 노출한다.</p>
+    <p lang="en">In most earlier cases <strong>a software flaw</strong> allowed the attack. In Meltdown and Spectre it is <strong>a flaw in the hardware implementation</strong> that exposes protected information.</p>
+    <p lang="ko">논문은 그 근본 원인을 이렇게 짚는다. <strong>ISA의 표준 정의는 명령어 시퀀스를 실행하는 데 걸리는 성능 효과에 대해 아무 말도 하지 않고, ISA에서 보이는 아키텍처 상태에 대해서만 말한다.</strong> 그래서 아키텍트가 "올바른 구현"이 무엇인지 정의하는 방식 자체에 근본적 어려움이 있다. 결론은 <strong>아키텍트가 올바른 구현의 정의를 다시 생각해야 한다</strong>는 것이다.</p>
+    <p lang="en">The paper names the root cause: <strong>the standard definition of an ISA says nothing about the performance effects of executing an instruction sequence, only about the ISA-visible architectural state.</strong> That makes defining a "correct implementation" fundamentally difficult, and the conclusion is that <strong>architects need to rethink that definition.</strong></p>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>여기가 3절과 이어지는 지점이다.</strong> speculation은 <strong>성능을 얻으려고 도입한 기법</strong>이었다. 그 대가가 19%의 낭비된 명령어였는데, 이제 <strong>대가가 하나 더 붙었다.</strong> Meltdown과 Spectre는 speculation이 없으면 존재하지 않는다. <strong>성능 최적화가 보안 구멍이 된 사례</strong>이고, 논문이 보안을 성능 이야기 한가운데에 끼워 넣은 이유다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This is where the section joins back to section 03.</strong> Speculation was <strong>introduced to buy performance</strong>. Its price was 19% wasted instructions, and now <strong>a second price has appeared</strong>: Meltdown and Spectre do not exist without speculation. <strong>A performance optimization turned into a security hole</strong>, which is why the paper wedges security into the middle of the performance story.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2 lang="ko">기회 1 · 소프트웨어</h2><h2 lang="en">Opportunity 1 · software</h2></div>
+  <p class="sec-sub" lang="ko">기회 절은 존 가드너의 인용으로 시작한다. <em>"우리 앞에 놓인 것은 풀 수 없는 문제로 위장한 숨막히는 기회들이다."</em></p>
+  <p class="sec-sub" lang="en">The opportunities section opens with John Gardner: <em>"What we have before us are some breathtaking opportunities disguised as insoluble problems."</em></p>
+
+  <p lang="ko">논문은 기회가 <strong>둘, 그리고 그 둘을 합쳐 만드는 셋째</strong>가 있다고 말한다. 첫째는 소프트웨어다. 지금의 소프트웨어는 <strong>동적 타입과 자동 메모리 관리를 쓰는 고급 언어</strong>를 광범위하게 쓰는데, 그런 언어는 대개 <strong>인터프리터로 실행되고 매우 비효율적</strong>이다.</p>
+  <p lang="en">The paper says there are <strong>two clear opportunities, plus a third created by combining them.</strong> The first is software. Existing practice makes extensive use of <strong>high-level languages with dynamic typing and storage management</strong>, and such languages are typically <strong>interpreted and execute very inefficiently.</strong></p>
+  <p lang="ko">Leiserson 등이 <strong>행렬 곱셈</strong>이라는 작은 예제로 그 비효율을 보였고, 논문이 Figure 7로 싣는다.</p>
+  <p lang="en">Leiserson et al. demonstrated the inefficiency with a small example, <strong>matrix multiply</strong>, which the paper reproduces as Figure 7.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 270" role="img" aria-label="Python 행렬 곱셈을 최적화할 때마다 누적되는 속도 향상. 로그 눈금으로 1배에서 62806배까지">
+      <line x1="46" y1="212" x2="678" y2="212" stroke="var(--rule)"/>
+      <line x1="46" y1="20" x2="46" y2="212" stroke="var(--rule)"/>
+      <text class="svglab" x="40" y="216" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">1×</text>
+      <text class="svglab" x="40" y="178" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">10×</text>
+      <text class="svglab" x="40" y="140" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">100×</text>
+      <text class="svglab" x="40" y="102" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">1K×</text>
+      <text class="svglab" x="40" y="64" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">10K×</text>
+      <text class="svglab" x="40" y="30" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">100K×</text>
+
+      <rect x="62" y="209" width="90" height="3" fill="rgba(var(--ink-rgb),.25)"/>
+      <rect x="192" y="148" width="90" height="64" fill="rgba(var(--pink-rgb),.25)" stroke="var(--pink)"/>
+      <rect x="322" y="114" width="90" height="98" fill="rgba(var(--pink-rgb),.35)" stroke="var(--pink)"/>
+      <rect x="452" y="66" width="90" height="146" fill="rgba(var(--brown-rgb),.30)" stroke="var(--brown)"/>
+      <rect x="582" y="30" width="90" height="182" fill="rgba(var(--violet-rgb),.30)" stroke="var(--violet)"/>
+
+      <text class="svgnum" x="107" y="202" text-anchor="middle" style="font-size:12px" fill="var(--ink3)">1</text>
+      <text class="svgnum" x="237" y="142" text-anchor="middle" style="font-size:12px" fill="var(--pink)">47</text>
+      <text class="svgnum" x="367" y="108" text-anchor="middle" style="font-size:12px" fill="var(--pink)">366</text>
+      <text class="svgnum" x="497" y="60" text-anchor="middle" style="font-size:12px" fill="var(--brown)">6,727</text>
+      <text class="svgnum" x="627" y="24" text-anchor="middle" style="font-size:13px" fill="var(--violet)">62,806</text>
+
+      <text class="svgtxt" x="107" y="232" text-anchor="middle" style="font-size:11px">Python</text>
+      <text class="svgtxt" x="237" y="232" text-anchor="middle" style="font-size:11px">C</text>
+      <text class="svgtxt" x="367" y="232" text-anchor="middle" style="font-size:11px">+ parallel</text>
+      <text class="svgtxt" x="367" y="246" text-anchor="middle" style="font-size:11px">loops</text>
+      <text class="svgtxt" x="497" y="232" text-anchor="middle" style="font-size:11px">+ memory</text>
+      <text class="svgtxt" x="497" y="246" text-anchor="middle" style="font-size:11px">optimization</text>
+      <text class="svgtxt" x="627" y="232" text-anchor="middle" style="font-size:11px">+ SIMD</text>
+      <text class="svgtxt" x="627" y="246" text-anchor="middle" style="font-size:11px">instructions</text>
+    </svg>
+    <figcaption lang="ko">논문 Figure 7. 세로축은 로그다. 색은 이 저장소의 규칙을 따랐다: <span class="cSw">소프트웨어 스택</span>이 분홍, <span class="cMem">메모리 최적화</span>가 갈색, <span class="cHw">연산 하드웨어 활용</span>이 보라. 마지막 SIMD 단계는 <strong>명령어 하나로 32비트 연산 16개</strong>를 수행하는 하드웨어 확장을 쓴 것이다.</figcaption>
+    <figcaption lang="en">The paper's Figure 7, on a log axis. Colours follow this site's convention: <span class="cSw">software stack</span> in pink, <span class="cMem">memory optimization</span> in brown, <span class="cHw">use of the compute hardware</span> in violet. The last step uses hardware extensions performing <strong>16 32-bit operations per instruction.</strong></figcaption>
+  </figure>
+
+  <p lang="ko">각 단계의 배수는 이렇다. Python을 <strong>C로 다시 쓰는 것만으로 47배</strong>. 여러 코어에서 <strong>병렬 루프</strong>를 돌려 약 7배. 캐시를 활용하도록 <strong>메모리 배치를 최적화</strong>해서 20배. 마지막으로 <strong>SIMD</strong> 하드웨어 확장으로 9배. 전부 곱하면 <strong>62,000배가 넘는다.</strong></p>
+  <p lang="en">Step by step: <strong>rewriting Python in C alone gives 47×</strong>; <strong>parallel loops</strong> across many cores about 7×; <strong>optimizing the memory layout</strong> to exploit caches 20×; and finally <strong>SIMD</strong> hardware extensions 9×. Multiplied out, <strong>more than 62,000×.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">논문이 스스로 붙인 단서</span><span class="tag" lang="en">The paper's own caveat</span>
+    <h4 lang="ko">이건 과장된 예다, 라고 논문이 먼저 말한다</h4>
+    <h4 lang="en">The paper itself says this exaggerates</h4>
+    <p lang="ko">논문은 곧바로 덧붙인다. <em>"물론 이것은 작은 예이고, 프로그래머라면 최적화된 라이브러리를 쓸 것으로 기대할 만한 종류다. 통상적인 성능 격차를 과장하기는 하지만, 100배에서 1,000배를 얻을 수 있는 프로그램이 많이 있을 것이다."</em></p>
+    <p lang="en">It immediately adds: <em>"This is of course a small example, one might expect programmers to use an optimized library for. Although it exaggerates the usual performance gap, there are likely many programs for which factors of 100 to 1,000 could be achieved."</em></p>
+    <p lang="ko"><strong>주장의 세기를 저자가 스스로 조절하는 대목</strong>이고, 좋은 논문이 자기 근거의 한계를 어떻게 다루는지 보여주는 예다. 62,806배라는 숫자만 인용하고 이 단서를 빼면 논문을 잘못 인용하는 것이 된다.</p>
+    <p lang="en">This is <strong>the authors dialing down the strength of their own claim</strong>, and a good example of how a strong paper handles the limits of its evidence. Quoting the 62,806 figure without the caveat misrepresents the paper.</p>
+  </div>
+
+  <p lang="ko">논문이 여기서 던지는 연구 방향은 <strong>"새 컴파일러 기술로, 어쩌면 아키텍처 지원을 받아서 그 성능 격차의 일부를 메울 수 있는가"</strong>이다. Python 같은 고급 스크립트 언어를 효율적으로 번역하고 구현하는 것은 어렵지만, <strong>잠재 이득의 25%만 달성해도 Python 프로그램이 수십에서 수백 배 빨라진다.</strong></p>
+  <p lang="en">The research direction the paper poses is <strong>whether some of that gap can be closed with new compiler technology, possibly assisted by architectural enhancements.</strong> Translating and implementing high-level scripting languages efficiently is hard, but <strong>achieving even 25% of the potential gain would make Python programs tens to hundreds of times faster.</strong></p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head"><span class="sec-num">06</span><h2 lang="ko">기회 2 · 도메인 특화</h2><h2 lang="en">Opportunity 2 · domain-specific</h2></div>
+  <p class="sec-sub" lang="ko">논문의 결론에 해당하는 절이고, <strong>이 수업 전체의 주제</strong>이기도 하다.</p>
+  <p class="sec-sub" lang="en">The section that carries the paper's conclusion, and <strong>the subject of this entire course.</strong></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">DSA의 정의</span><span class="tag" lang="en">What a DSA is</span>
+    <p lang="ko"><strong>domain-specific architectures (DSAs)</strong>는 특정 문제 영역에 맞춘 아키텍처다. <strong>프로그래밍 가능하고 종종 튜링 완전하지만 특정 응용 계열에 맞춰져 있다.</strong> 이 점에서 <strong>ASIC과 다르다.</strong> ASIC은 대개 단일 기능에 코드가 거의 바뀌지 않는다.</p>
+    <p lang="en"><strong>Domain-specific architectures</strong> are architectures tailored to a specific problem domain: <strong>programmable and often Turing-complete, but tailored to a specific class of applications.</strong> In this they <strong>differ from ASICs</strong>, which are usually built for a single function with code that rarely changes.</p>
+    <p lang="ko">DSA를 <strong>accelerator</strong>라고도 부른다. 응용 전체를 범용 CPU에서 돌리는 것과 비교해 <strong>응용의 일부를 가속</strong>하기 때문이다. 예로 든 것은 <strong>GPU, 딥러닝용 신경망 프로세서, 소프트웨어 정의 네트워크용 프로세서</strong>다.</p>
+    <p lang="en">DSAs are also called <strong>accelerators</strong>, since they accelerate part of an application relative to running the whole thing on a general-purpose CPU. The examples given are <strong>GPUs, neural network processors for deep learning, and processors for software-defined networks.</strong></p>
+  </div>
+
+  <h3><span lang="ko">DSA가 이기는 네 가지 이유</span><span lang="en">Four reasons DSAs win</span></h3>
+  <p lang="ko">논문이 <strong>중요한 순서대로</strong> 넷을 든다.</p>
+  <p lang="en">The paper lists four, <strong>in order of importance.</strong></p>
+
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">1 · <span lang="ko">병렬성</span><span lang="en">parallelism</span></span>
+      <p lang="ko"><strong>가장 중요한 이유.</strong> 해당 영역에 <strong>더 효율적인 형태의 병렬성</strong>을 쓴다. <strong>SIMD가 MIMD보다 효율적</strong>인데, 명령어 스트림을 하나만 가져오면 되고 처리 유닛들이 <strong>발맞춰(lockstep)</strong> 동작하기 때문이다. SIMD가 MIMD보다 유연성은 떨어지지만 많은 DSA에 잘 맞는다. 그리고 DSA는 투기적 out-of-order 대신 <strong>VLIW</strong>를 쓸 수 있다.</p>
+      <p lang="en"><strong>The most important one.</strong> DSAs exploit <strong>a more efficient form of parallelism for the domain.</strong> <strong>SIMD is more efficient than MIMD</strong> because it fetches only one instruction stream and the processing units operate in <strong>lockstep</strong>. SIMD is less flexible than MIMD but a good match for many DSAs. And DSAs can use <strong>VLIW</strong> for ILP rather than speculative out-of-order mechanisms.</p>
+    </div>
+    <div class="def">
+      <span class="tag">2 · <span lang="ko">메모리 계층</span><span lang="en">memory hierarchy</span></span>
+      <p lang="ko"><strong>메모리 접근이 산술 연산보다 훨씬 비싸졌다</strong>(Horowitz). 그래서 메모리 접근 최적화가 에너지 효율의 핵심이다. 범용 프로세서는 컴파일 시점에 접근 패턴을 예측하기 어려워 다단계 캐시를 쓰지만, <strong>DSL에서는 접근 패턴이 잘 정의되고 컴파일 시점에 알 수 있다.</strong> 그래서 DSA는 <strong>소프트웨어가 이동을 명시적으로 제어하는</strong> 메모리 계층을 쓴다.</p>
+      <p lang="en"><strong>Memory accesses have become much more costly than arithmetic</strong> (Horowitz), so optimizing them is critical to energy efficiency. General-purpose processors use multilevel caches because access patterns are not very predictable at compile time, but <strong>in typical DSLs the patterns are well defined and discoverable at compile time.</strong> So DSAs use a memory hierarchy with <strong>movement controlled explicitly by software.</strong></p>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="def">
+      <span class="tag">3 · <span lang="ko">정밀도</span><span lang="en">precision</span></span>
+      <p lang="ko">충분할 때는 <strong>낮은 정밀도</strong>를 쓴다. 범용 CPU는 보통 32비트와 64비트 정수와 부동소수점을 지원하는데, 머신러닝과 그래픽스의 많은 응용에는 <strong>필요 이상의 정확도</strong>다. DNN 추론은 <strong>4, 8, 16비트 정수</strong>를 흔히 쓰고, DNN 학습은 부동소수점이 유용하지만 <strong>32비트면 충분하고 16비트로도 되는 경우가 많다.</strong></p>
+      <p lang="en">DSAs can <strong>use less precision when it is adequate.</strong> General-purpose CPUs support 32- and 64-bit integer and floating point, which is <strong>more accuracy than many machine learning and graphics applications need.</strong> DNN inference regularly uses <strong>4-, 8- or 16-bit integers</strong>, and for DNN training floating point is useful but <strong>32 bits is enough and 16 often works.</strong></p>
+    </div>
+    <div class="def">
+      <span class="tag">4 · <span lang="ko">DSL</span><span lang="en">DSLs</span></span>
+      <p lang="ko"><strong>domain-specific language</strong>로 쓴 프로그램을 겨냥해서 이득을 본다. DSL은 <strong>병렬성을 더 드러내고, 메모리 접근의 구조와 표현을 개선하고, 응용을 도메인 특화 프로세서에 효율적으로 매핑하기 쉽게</strong> 만든다.</p>
+      <p lang="en">DSAs benefit from targeting programs written in <strong>domain-specific languages</strong>, which <strong>expose more parallelism, improve the structure and representation of memory access, and make it easier to map the application efficiently</strong> onto a domain-specific processor.</p>
+    </div>
+  </div>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 논문이 든 에너지 비교</div>
+    <div class="cap" lang="en">Sense of scale · the energy comparisons the paper gives</div>
+    <table>
+      <tr><td class="what"><span lang="ko">32비트 정수 덧셈</span><span lang="en">a 32-bit integer add</span></td>
+          <td class="num">1×</td>
+          <td><span lang="ko">기준</span><span lang="en">the baseline</span></td></tr>
+      <tr><td class="what"><span lang="ko">32 KB 캐시의 블록 접근</span><span lang="en">accessing a block in a 32 KB cache</span></td>
+          <td class="num">~200×</td>
+          <td><span lang="ko">덧셈 대비. <strong>이 격차가 메모리 접근 최적화를 결정적으로 만든다</strong></span><span lang="en">versus the add. <strong>This differential is what makes optimizing memory access critical</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">off-chip DRAM 접근</span><span lang="en">an off-chip DRAM access</span></td>
+          <td class="num">~10×</td>
+          <td><span lang="ko"><strong>last-level 캐시 접근 대비</strong>다. 위 200배와 기준이 다르므로 곱하면 안 된다</span><span lang="en"><strong>versus a last-level cache access</strong>, a different baseline from the 200 above, so the two must not be multiplied</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">다단계 캐시가 쓰는 전력</span><span lang="en">what the multilevel caches consume</span></td>
+          <td class="num">~50%</td>
+          <td><span lang="ko">프로세서 전력의 절반가량. 대신 off-chip DRAM 접근을 거의 다 막아준다</span><span lang="en">about half the processor's power, in exchange for avoiding almost all off-chip DRAM accesses</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">세 번째 줄의 기준이 두 번째 줄과 다르다는 점은 <strong>이 노트가 붙인 주의</strong>다. 논문은 두 문장을 따로 적었을 뿐 곱하라고 하지 않았다. <strong>이런 종류의 확인이 논문을 읽을 때 실제로 하는 일이다.</strong></div>
+    <div class="foot" lang="en">The warning that the third row uses a different baseline from the second is <strong>the note's addition</strong>. The paper states the two facts separately and never asks you to multiply them. <strong>Checking that kind of thing is what reading a paper actually consists of.</strong></div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">논문이 짚는 캐시의 두 가지 단점</span><span class="tag" lang="en">The paper's two objections to caches</span>
+    <h4 lang="ko">둘째 것이 특히 날카롭다</h4>
+    <h4 lang="en">The second one is the sharp one</h4>
+    <ul lang="ko">
+      <li><strong>데이터셋이 아주 클 때.</strong> 시간적, 공간적 지역성이 낮으면 캐시가 잘 동작하지 않는다</li>
+      <li><strong>캐시가 잘 동작할 때.</strong> 지역성이 아주 높다는 뜻이고, <strong>정의상 캐시의 대부분이 대부분의 시간 동안 놀고 있다</strong>는 뜻이다</li>
+    </ul>
+    <ul lang="ko" class="sec-sub"></ul>
+    <ul lang="en">
+      <li><strong>When datasets are very large</strong>, with low temporal or spatial locality, caches simply do not work well</li>
+      <li><strong>When caches work well</strong>, the locality is very high, meaning <strong>by definition most of the cache is idle most of the time</strong></li>
+    </ul>
+    <p lang="ko">둘째 항목이 논리적으로 재미있다. <strong>캐시는 잘 될 때도 낭비다.</strong> 다이 면적과 전력을 쓰면서 대부분이 놀고 있기 때문이다. 접근 패턴을 컴파일 시점에 알 수 있다면 <strong>그 면적을 소프트웨어가 제어하는 버퍼로 바꾸는 편이 낫다.</strong> 이것이 TPU가 캐시 대신 24 MB의 로컬 메모리를 쓴 이유다.</p>
+    <p lang="en">The second is the logically interesting one: <strong>a cache is wasteful even when it works</strong>, because it spends die area and power while most of it sits idle. If the access pattern is known at compile time, <strong>that area is better spent as a software-controlled buffer.</strong> This is why the TPU uses 24 MB of local memory instead of caches.</p>
+  </div>
+
+  <h3><span lang="ko">DSL</span><span lang="en">Domain-specific languages</span></h3>
+  <p lang="ko">DSA를 쓰려면 <strong>고수준 연산을 아키텍처에 겨냥</strong>해야 하는데, Python, Java, C, Fortran 같은 범용 언어에서 그 구조와 정보를 뽑아내는 것은 <strong>너무 어렵다.</strong> DSL이 그것을 가능하게 한다. DSL은 <strong>벡터, 밀집 행렬, 희소 행렬 연산을 명시적으로</strong> 만들어서 DSL 컴파일러가 연산을 프로세서에 효율적으로 매핑할 수 있게 한다.</p>
+  <p lang="en">Using a DSA requires <strong>targeting high-level operations to the architecture</strong>, and extracting that structure from a general-purpose language like Python, Java, C or Fortran is <strong>simply too difficult.</strong> DSLs make it possible by making <strong>vector, dense matrix and sparse matrix operations explicit</strong>, so the DSL compiler can map them efficiently onto the processor.</p>
+  <p lang="ko">논문이 든 예: <strong>Matlab</strong>(행렬 연산), <strong>TensorFlow</strong>(DNN을 프로그래밍하는 데이터플로우 언어), <strong>P4</strong>(SDN), <strong>Halide</strong>(고수준 변환을 지정하는 영상 처리 언어). 그리고 <strong>XLA</strong> 시스템이 TensorFlow를 Nvidia GPU나 TPU를 쓰는 이종 프로세서로 번역한다.</p>
+  <p lang="en">The examples: <strong>Matlab</strong> for matrices, <strong>TensorFlow</strong>, a dataflow language for programming DNNs, <strong>P4</strong> for SDNs, and <strong>Halide</strong>, an image-processing language specifying high-level transformations. The <strong>XLA</strong> system translates TensorFlow onto heterogeneous processors using Nvidia GPUs or TPUs.</p>
+  <p lang="ko">과제는 <strong>이식성과 효율의 균형</strong>이다. DSL로 쓴 소프트웨어가 여러 아키텍처로 옮겨갈 수 있을 만큼 아키텍처 독립적이면서, 동시에 소프트웨어를 DSA에 매핑할 때 높은 효율을 내야 한다.</p>
+  <p lang="en">The challenge is <strong>balancing portability against efficiency</strong>: retaining enough architecture independence that DSL software ports across architectures, while still mapping onto the DSA efficiently.</p>
+
+  <h3><span lang="ko">예시 DSA · TPU v1</span><span lang="en">The worked example · TPU v1</span></h3>
+  <p lang="ko">논문은 Google TPU v1을 예시로 든다. <strong>2015년부터 실제 운용 중</strong>이고 검색 질의부터 번역, 이미지 인식, 그리고 AlphaGo와 AlphaZero까지 지원한다. <strong>목표는 DNN 추론의 성능과 에너지 효율을 10배 개선하는 것</strong>이었다.</p>
+  <p lang="en">The paper's worked example is the Google TPU v1, <strong>in production since 2015</strong>, powering everything from search queries to translation to image recognition to AlphaGo and AlphaZero. <strong>The goal was to improve the performance and energy efficiency of deep neural net inference by a factor of 10.</strong></p>
+  <p lang="ko">Figure 8이 블록도다. 왼쪽에 <strong>PCIe Interface</strong>와 <strong>Host Interface</strong>가 14 GiB/s로 들어오고, 가운데에 <strong>Unified Buffer (Local Activation Storage)</strong>가 있다. 오른쪽 위에 <strong>DDR3 Interfaces</strong>가 있고 거기서 <strong>Weight FIFO (Weight Fetcher)</strong>로 30 GiB/s가 흐른다. 그리고 도해의 중심에 <strong>Matrix Multiply Unit (64K per cycle)</strong>이 있고, Unified Buffer에서 여기로 <strong>165 GiB/s</strong>가 들어간다. 그 아래로 <strong>Accumulators → Activation → Normalize/Pool</strong>이 이어지고, 결과가 다시 Unified Buffer로 165 GiB/s로 돌아온다.</p>
+  <p lang="en">Figure 8 is the block diagram. On the left, a <strong>PCIe interface</strong> and <strong>host interface</strong> arrive at 14 GiB/s; in the middle sits the <strong>unified buffer</strong>, described as local activation storage. At the upper right the <strong>DDR3 interfaces</strong> feed a <strong>weight FIFO, the weight fetcher</strong>, at 30 GiB/s. At the centre is the <strong>matrix multiply unit, 64K per cycle</strong>, fed from the unified buffer at <strong>165 GiB/s</strong>. Below it run <strong>accumulators, activation, normalize/pool</strong>, and the result returns to the unified buffer at 165 GiB/s.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · TPU v1이 범용 CPU 대비 얻은 것</div>
+    <div class="cap" lang="en">Sense of scale · what TPU v1 bought over a general-purpose CPU</div>
+    <table>
+      <tr><td class="what"><span lang="ko">행렬 유닛</span><span lang="en">matrix unit</span></td>
+          <td class="num">256 × 256</td>
+          <td><span lang="ko">systolic array 구조. <strong>클럭당 MAC 65,536회</strong> (도해의 64K)</span><span lang="en">a systolic array structure: <strong>65,536 MACs per clock</strong>, the 64K on the diagram</span></td></tr>
+      <tr><td class="what"><span lang="ko">클럭당 MAC 수</span><span lang="en">MACs per clock</span></td>
+          <td class="num">~100×</td>
+          <td><span lang="ko">범용 단일 코어 CPU가 지속할 수 있는 것 대비. 8비트 정밀도 + systolic 구조 + SIMD 제어 + 이 기능에 상당한 칩 면적을 할애한 결과</span><span lang="en">versus what a single general-purpose core can sustain, from 8-bit precision, the systolic structure, SIMD control and dedicating significant die area to this function</span></td></tr>
+      <tr><td class="what"><span lang="ko">로컬 메모리</span><span lang="en">local memory</span></td>
+          <td class="num">24 MB</td>
+          <td><span lang="ko">캐시가 아니다. <strong>같은 전력의 2015년 범용 CPU의 약 두 배</strong></span><span lang="en">not a cache. <strong>About double a 2015 general-purpose CPU at the same power dissipation</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">속도</span><span lang="en">speed</span></td>
+          <td class="num">29×</td>
+          <td><span lang="ko">Google 데이터센터의 <strong>추론 문제 여섯 개에 대한 가중 산술 평균</strong></span><span lang="en">a <strong>weighted arithmetic mean over six common inference problems</strong> in Google data centers</span></td></tr>
+      <tr><td class="what"><span lang="ko">에너지 효율</span><span lang="en">energy efficiency</span></td>
+          <td class="num">&gt;80×</td>
+          <td><span lang="ko">전력이 <strong>절반 이하</strong>이므로 29배 × 2배 이상</span><span lang="en">it draws <strong>less than half the power</strong>, so 29× times more than 2×</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: 원래 목표</span><span lang="en">reference: the original goal</span></td>
+          <td class="num">10×</td>
+          <td><span lang="ko">목표를 크게 넘겼다</span><span lang="en">comfortably exceeded</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">그리고 <strong>activation 메모리와 weight 메모리(FIFO 포함)가 사용자가 제어하는 고대역폭 메모리 채널로 연결</strong>되어 있다. 위에서 본 "캐시 대신 소프트웨어 제어 버퍼"가 실제로 구현된 모습이다.</div>
+    <div class="foot" lang="en">And <strong>both the activation memory and the weight memory, including the FIFO, are linked through user-controlled high-bandwidth memory channels</strong>. This is the "software-controlled buffer instead of a cache" idea actually built.</div>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>강의와의 연결이 여기서 촘촘하다.</strong> <a href="L01-introduction.html#s15">Lecture 1의 37쪽</a>이 "systolic-array-based architecture, V1은 추론 전용"이라고 적은 것이 이 절의 요약이다. 그리고 <a href="L01-introduction.html#s15">41쪽 목록의 마지막 줄</a>인 <em>Google In-Datacenter Performance Analysis of a Tensor Processing Unit, 2017</em>이 <strong>바로 이 29배와 80배 숫자가 나온 원 논문</strong>이다. 강의가 링크만 걸어둔 곳의 내용이 여기 요약되어 있다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The lecture connections are dense here.</strong> When <a href="L01-introduction.html#s15">page 37 of lecture 1</a> says "systolic-array-based architecture, V1 inference only", that is a summary of this section. And the last line of the list on <a href="L01-introduction.html#s15">page 41</a>, <em>Google In-Datacenter Performance Analysis of a Tensor Processing Unit, 2017</em>, is <strong>the original paper these 29× and 80× numbers come from.</strong> What the lecture only linked to is summarized here.
+  </div>
+
+  <h3><span lang="ko">아키텍처의 눈사태</span><span lang="en">The avalanche of architectures</span></h3>
+  <p lang="ko">논문은 이 기회가 이미 <strong>아키텍처 혁신의 급증</strong>을 불렀고 <strong>서로 경쟁하는 여러 아키텍처 철학</strong>을 끌어들였다고 적는다.</p>
+  <p lang="en">The paper says this opportunity has already led to <strong>a surge of architecture innovation</strong>, attracting <strong>many competing architectural philosophies.</strong></p>
+  <table>
+    <thead><tr>
+      <th lang="ko">진영</th><th lang="ko">논문이 적은 특징</th>
+      <th lang="en">Camp</th><th lang="en">What the paper says of it</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko"><strong>GPU</strong></td><td lang="ko">Nvidia. 많은 코어, 코어마다 큰 레지스터 파일, 많은 하드웨어 스레드, 캐시</td>
+          <td lang="en"><strong>GPUs</strong></td><td lang="en">Nvidia: many cores, each with large register files, many hardware threads, and caches</td></tr>
+      <tr><td lang="ko"><strong>TPU</strong></td><td lang="ko">Google. 큰 2차원 systolic 곱셈기와 <strong>소프트웨어가 제어하는 온칩 메모리</strong></td>
+          <td lang="en"><strong>TPUs</strong></td><td lang="en">Google: large two-dimensional systolic multipliers and <strong>software-controlled on-chip memories</strong></td></tr>
+      <tr><td lang="ko"><strong>FPGA</strong></td><td lang="ko">Microsoft. 데이터센터에 배치하고 신경망 응용에 맞춰 재구성</td>
+          <td lang="en"><strong>FPGAs</strong></td><td lang="en">Microsoft: deployed in data centers and tailored to neural network applications</td></tr>
+      <tr><td lang="ko"><strong>CPU</strong></td><td lang="ko">Intel. 많은 코어 + 큰 다단계 캐시 + 1차원 SIMD 명령어. 그리고 <strong>CPU보다 TPU에 가까운 새 신경망 프로세서</strong></td>
+          <td lang="en"><strong>CPUs</strong></td><td lang="en">Intel: many cores with large multi-level caches and one-dimensional SIMD, plus <strong>a new neural network processor closer to a TPU than to a CPU</strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">여기에 더해 <strong>수십 개의 스타트업</strong>이 각자의 제안을 밀고 있고, 수요를 맞추려고 아키텍트들이 <strong>수백에서 수천 개의 칩을 연결해 신경망 슈퍼컴퓨터를 만들고</strong> 있다. 논문의 마무리는 이렇다. <strong>2019년 시점에 어느 방향이 이길지, 아니 이기는 것이 있기는 할지 예측하기 어렵지만, 과거의 아키텍처 논쟁을 결정했듯 시장이 이 경쟁도 분명히 결정할 것이다.</strong></p>
+  <p lang="en">On top of that, <strong>dozens of startups</strong> are pursuing their own proposals, and to meet demand architects are <strong>interconnecting hundreds to thousands of such chips into neural-network supercomputers.</strong> The paper closes the section: <strong>it is difficult to predict in 2019 which, or even whether any, of these directions will win, but the marketplace will surely settle the competition just as it settled the architectural debates of the past.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong><a href="L01-introduction.html#s15">Lecture 1의 41쪽</a>이 이 문단의 확장판이다.</strong> 강의가 열한 줄의 링크 목록을 주고 <em>"What do you observe?"</em>라고 물었는데, 그 목록에 Esperanto, Cerebras, IBM, Qualcomm, SambaNova, Tesla, Apple, Amazon, Meta, Habana, Google이 있었다. <strong>논문이 네 진영으로 분류한 것을 강의는 회사 목록으로 준 것</strong>이고, 둘을 겹쳐 보면 각 회사가 어느 진영인지 보인다.
+  </div>
+  <div class="callout" lang="en">
+    <strong><a href="L01-introduction.html#s15">Page 41 of lecture 1</a> is the expanded version of this paragraph.</strong> The lecture gave eleven links and asked <em>"What do you observe?"</em>, listing Esperanto, Cerebras, IBM, Qualcomm, SambaNova, Tesla, Apple, Amazon, Meta, Habana and Google. <strong>What the paper sorts into four camps, the lecture hands over as a list of companies</strong>, and overlaying the two shows which company sits in which camp.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head"><span class="sec-num">07</span><h2 lang="ko">기회 3 · 개방과 애자일</h2><h2 lang="en">Opportunity 3 · open and agile</h2></div>
+  <p class="sec-sub" lang="ko">앞의 두 기회가 <strong>무엇을 만들 것인가</strong>였다면, 이 절은 <strong>어떻게 만들 것인가</strong>다.</p>
+  <p class="sec-sub" lang="en">The first two opportunities were <strong>what to build</strong>; this section is <strong>how to build it.</strong></p>
+
+  <h3><span lang="ko">개방형 ISA · RISC-V</span><span lang="en">Open ISAs · RISC-V</span></h3>
+  <p lang="ko">오픈소스 소프트웨어의 성공에서 영감을 받아, 둘째 기회는 <strong>개방형 ISA</strong>다. <strong>"프로세서를 위한 Linux"</strong>를 만들려면 업계 표준 개방형 ISA가 필요하다. 여러 조직이 같은 ISA로 프로세서를 설계하면 <strong>경쟁이 커지면서 혁신이 더 빨라질 수 있다.</strong> 목표는 <strong>몇 센트에서 100달러까지</strong> 하는 칩용 프로세서를 제공하는 것이다.</p>
+  <p lang="en">Inspired by open source software, the second opportunity is <strong>open ISAs</strong>. Creating a <strong>"Linux for processors"</strong> needs industry-standard open ISAs. If many organizations design processors on one ISA, <strong>greater competition may drive quicker innovation.</strong> The goal is to provide processors for chips costing <strong>from a few cents to $100.</strong></p>
+  <p lang="ko">첫 사례가 <strong>RISC-V</strong>다. Berkeley에서 만든 <strong>다섯 번째</strong> RISC 아키텍처이고 RISC-V Foundation이 관리한다. 개방의 이점 하나가 <strong>ISA 진화가 공개적으로 일어나서, 결정이 확정되기 전에 하드웨어와 소프트웨어 전문가가 협업</strong>할 수 있다는 것이다. 또 하나는 <strong>ISA가 마케팅 이유로 팽창하지 않는다</strong>는 것인데, 논문은 그것이 <strong>독점 명령어 집합 확장의 유일한 설명일 때가 있다</strong>고 적는다.</p>
+  <p lang="en">The first example is <strong>RISC-V</strong>, the fifth RISC architecture from Berkeley, maintained under the stewardship of the RISC-V Foundation. One benefit of openness is that <strong>ISA evolution happens in public, with hardware and software experts collaborating before decisions are finalized.</strong> Another is that <strong>the ISA is unlikely to expand primarily for marketing reasons</strong>, which the paper says is <strong>sometimes the only explanation for extensions of proprietary instruction sets.</strong></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">RISC-V의 네 가지 특징</span><span class="tag" lang="en">Four properties of RISC-V</span>
+    <ol lang="ko">
+      <li><strong>모듈식이다.</strong> 작은 기본 명령어 집합이 전체 오픈소스 소프트웨어 스택을 돌리고, 그 위에 <strong>선택적 표준 확장</strong>을 설계자가 필요에 따라 넣거나 뺀다. 기본에는 32비트 주소 버전과 64비트 주소 버전이 있다. <strong>RISC-V는 선택적 확장으로만 자란다.</strong> 아키텍트가 새 확장을 받아들이지 않아도 소프트웨어 스택은 잘 돈다. 독점 아키텍처는 대개 상향 바이너리 호환성을 요구해서, 한 번 기능을 추가하면 <strong>이후 모든 프로세서가 그것을 포함해야</strong> 한다.</li>
+      <li><strong>단순하다.</strong> 아래 표 참조.</li>
+      <li><strong>백지 설계다.</strong> 25년 뒤에 시작해서 선배들의 실수에서 배웠다. 1세대 RISC와 달리 <strong>delayed branch나 delayed load 같은 마이크로아키텍처/기술 의존적 기능</strong>이나 <strong>register window처럼 컴파일러 기술 발전에 밀려난 혁신</strong>을 피한다.</li>
+      <li><strong>DSA를 지원한다.</strong> <strong>커스텀 가속기를 위해 방대한 opcode 공간을 예약</strong>해 두었다.</li>
+    </ol>
+    <ol lang="en">
+      <li><strong>It is modular.</strong> A small base runs the full open source software stack, with <strong>optional standard extensions</strong> designers include or omit as needed. The base has 32-bit and 64-bit address versions. <strong>RISC-V can grow only through optional extensions</strong>, and the software stack still runs even if architects do not adopt them. Proprietary architectures generally require upward binary compatibility, so once a feature is added <strong>every future processor must include it.</strong></li>
+      <li><strong>It is simple.</strong> See the table below.</li>
+      <li><strong>It is a clean-slate design</strong>, started 25 years later and learning from its predecessors' mistakes. Unlike first-generation RISC it avoids <strong>microarchitecture- or technology-dependent features such as delayed branches and delayed loads</strong>, and <strong>innovations such as register windows that were superseded by advances in compiler technology.</strong></li>
+      <li><strong>It supports DSAs</strong>, by <strong>reserving a vast opcode space for custom accelerators.</strong></li>
+    </ol>
+  </div>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · RISC-V와 ARMv8의 단순함 비교</div>
+    <div class="cap" lang="en">Sense of scale · RISC-V against ARMv8 on simplicity</div>
+    <table>
+      <tr><td class="what"><span lang="ko">RISC-V 기본 명령어</span><span lang="en">RISC-V base instructions</span></td>
+          <td class="num">50</td>
+          <td><span lang="ko">원래 RISC-I과 수와 성격이 놀랄 만큼 비슷하다</span><span lang="en">surprisingly similar in number and nature to the original RISC-I</span></td></tr>
+      <tr><td class="what"><span lang="ko">+ 표준 확장 M, A, F, D</span><span lang="en">+ standard extensions M, A, F, D</span></td>
+          <td class="num">+53</td>
+          <td><span lang="ko">정수 곱셈/나눗셈 · 원자적 메모리 연산 · 단정밀도/배정밀도 부동소수점</span><span lang="en">integer multiply and divide, atomic memory operations, single and double precision floating point</span></td></tr>
+      <tr><td class="what"><span lang="ko">+ C (압축 명령어)</span><span lang="en">+ C, compressed instructions</span></td>
+          <td class="num">+34</td>
+          <td><span lang="ko">합계 <strong>137개</strong></span><span lang="en">for a total of <strong>137</strong></span></td></tr>
+      <tr class="base"><td class="what">ARMv8</td>
+          <td class="num">&gt;500</td>
+          <td><span lang="ko">같은 시기에 개발된 아키텍처. 명령어 형식도 RISC-V는 <strong>6개</strong>, ARMv8은 <strong>최소 14개</strong></span><span lang="en">developed contemporaneously. Instruction formats too: <strong>6</strong> for RISC-V against <strong>at least 14</strong></span></td></tr>
+    </table>
+    <div class="foot" lang="ko">논문이 단순함의 값어치를 이렇게 설명한다. <strong>단순함은 프로세서를 설계하는 노력과 하드웨어 정확성을 검증하는 노력을 모두 줄인다.</strong> RISC-V의 목표가 데이터센터 칩부터 IoT 기기까지 걸쳐 있어서 <strong>설계 검증이 개발 비용의 상당 부분</strong>이 되기 때문이다.</div>
+    <div class="foot" lang="en">The paper explains the value of simplicity: <strong>it reduces the effort both to design processors and to verify hardware correctness.</strong> Since RISC-V targets everything from data-center chips to IoT devices, <strong>design verification can be a significant part of the cost of development.</strong></div>
+  </div>
+
+  <p lang="ko">RISC-V 말고도 Nvidia가 2017년에 <strong>NVDLA</strong>(Nvidia Deep Learning Accelerator)라는 자유롭고 개방된 아키텍처를 발표했다. 머신러닝 추론용의 <strong>확장 가능하고 구성 가능한 DSA</strong>이고, 구성 옵션에 <strong>데이터 타입(int8, int16, fp16)</strong>과 <strong>2차원 곱셈 행렬의 크기</strong>가 있다. 다이 크기는 <strong>0.5 mm²에서 3 mm²</strong>, 전력은 <strong>20 mW에서 300 mW</strong>까지 확장된다. <strong>ISA, 소프트웨어 스택, 구현이 모두 개방</strong>되어 있다.</p>
+  <p lang="en">Beyond RISC-V, Nvidia announced in 2017 a free and open architecture it calls <strong>NVDLA</strong>, the Nvidia Deep Learning Accelerator: a <strong>scalable, configurable DSA</strong> for machine-learning inference whose configuration options include <strong>data type (int8, int16, fp16)</strong> and <strong>the size of the two-dimensional multiply matrix.</strong> Die size scales from <strong>0.5 mm² to 3 mm²</strong> and power from <strong>20 mW to 300 mW</strong>. The <strong>ISA, software stack and implementation are all open.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>개방과 보안이 서로를 돕는다.</strong> 논문의 논거 셋. 첫째, <strong>보안 전문가는 은닉을 통한 보안을 믿지 않으므로</strong> 개방 구현이 매력적이고, 개방 구현에는 개방 아키텍처가 필요하다. 둘째, <strong>안전한 아키텍처를 두고 혁신할 수 있는 사람과 조직의 수가 늘어난다.</strong> 독점 아키텍처는 참여를 직원으로 제한하지만 개방 아키텍처는 학계와 산업계의 모든 인재가 보안을 도울 수 있게 한다. 셋째, <strong>RISC-V의 단순함이 구현을 검사하기 쉽게</strong> 만든다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Openness and security reinforce each other.</strong> Three arguments. First, <strong>security experts do not believe in security through obscurity</strong>, so open implementations are attractive, and those require an open architecture. Second, it <strong>increases the number of people and organizations who can innovate around secure architectures</strong>: proprietary architectures limit participation to employees, open ones let all the best minds in academia and industry help. Third, <strong>the simplicity of RISC-V makes its implementations easier to check.</strong>
+  </div>
+  <p lang="ko">여기에 <strong>FPGA의 유연성</strong>이 더해지면 아키텍트가 <strong>새로운 해법을 온라인에 배포하고 평가하며 연 단위가 아니라 주 단위로 반복</strong>할 수 있다. FPGA가 커스텀 칩보다 <strong>10배 느리지만</strong> 온라인 사용자를 감당하기에는 충분히 빠르고, 그래서 <strong>보안 혁신을 실제 공격자에게 노출시킬 수 있다.</strong></p>
+  <p lang="en">Add <strong>the plasticity of FPGAs</strong> and architects can <strong>deploy and evaluate novel solutions online and iterate weekly instead of annually.</strong> FPGAs are <strong>10× slower than custom chips</strong> but still fast enough to support online users, which means <strong>security innovations can be subjected to real attackers.</strong></p>
+
+  <h3><span lang="ko">애자일 하드웨어 개발</span><span lang="en">Agile hardware development</span></h3>
+  <p lang="ko">2001년 <em>Manifesto for Agile Software Development</em>가 소프트웨어 개발을 바꿨다. 폭포수 개발의 거창한 계획과 문서화가 자주 실패했고, 작은 팀이 <strong>동작하지만 불완전한 프로토타입</strong>을 빠르게 만들어 다음 반복을 시작하기 전에 고객 피드백을 받았다. scrum 버전은 <strong>5~10명의 팀</strong>이 <strong>반복당 2~4주</strong>의 스프린트를 돈다.</p>
+  <p lang="en">The 2001 <em>Manifesto for Agile Software Development</em> changed software development, overcoming the frequent failure of elaborate planning and documentation in waterfall. Small teams built <strong>working-but-incomplete prototypes</strong> quickly and got customer feedback before the next iteration. The scrum version assembles <strong>teams of five to ten</strong> doing <strong>sprints of two to four weeks.</strong></p>
+  <p lang="ko">칩은 <strong>tape out에서 칩이 돌아오기까지 몇 달</strong>이 걸리므로 4주 스프린트가 말이 안 되어 보인다. Figure 9가 <strong>적절한 수준에서 프로토타입을 바꾸는 것</strong>으로 그것을 가능하게 하는 방법을 보여준다. 안쪽에서 바깥쪽으로 다섯 겹이다.</p>
+  <p lang="en">Chips take <strong>months between tape-out and silicon coming back</strong>, so four-week sprints seem implausible. Figure 9 shows how it works by <strong>changing the prototype at the appropriate level</strong>, five rings from inside out.</p>
+  <ol lang="ko">
+    <li><strong>소프트웨어 시뮬레이터.</strong> 가장 안쪽. 반복을 만족시킬 수 있다면 가장 쉽고 빠르게 바꾸는 곳</li>
+    <li><strong>FPGA.</strong> 상세 소프트웨어 시뮬레이터보다 <strong>수백 배 빠르게</strong> 돈다. 운영체제와 SPEC 같은 전체 벤치마크를 돌릴 수 있어 훨씬 정밀한 평가가 된다. <strong>AWS가 클라우드에서 FPGA를 제공</strong>하므로 하드웨어를 사고 실험실을 차리지 않아도 된다</li>
+    <li><strong>ECAD로 레이아웃 생성.</strong> 다이 면적과 전력의 문서화된 숫자를 얻는 곳</li>
+    <li><strong>tape in.</strong> 도구를 다 돌린 뒤 결과를 다듬는 수작업 단계</li>
+    <li><strong>tape out.</strong> 실제 제조</li>
+  </ol>
+  <ol lang="en">
+    <li><strong>A software simulator</strong>, the innermost and quickest place to make a change if a simulator can satisfy the iteration</li>
+    <li><strong>FPGAs</strong>, running <strong>hundreds of times faster</strong> than a detailed software simulator, able to run operating systems and full benchmarks such as SPEC, allowing much more precise evaluation. <strong>Amazon Web Services offers FPGAs in the cloud</strong>, so no hardware purchase or lab is needed</li>
+    <li><strong>ECAD-generated layout</strong>, which is where documented die area and power numbers come from</li>
+    <li><strong>Tape in</strong>, the manual refinement after the tools have run</li>
+    <li><strong>Tape out</strong>, actual manufacturing</li>
+  </ol>
+  <p lang="ko"><strong>앞의 네 단계가 모두 4주 스프린트를 지원한다.</strong> 연구 목적이라면 tape in에서 멈춰도 면적, 에너지, 성능 추정이 매우 정확하다. 그런데 논문은 멈추지 말라고 한다. <em>"긴 경주를 뛰고 결승선 100야드 앞에서 멈추는 것과 같다. 최종 기록을 정확히 예측할 수 있다는 이유로."</em></p>
+  <p lang="en"><strong>All four inner levels support four-week sprints.</strong> For research purposes one could stop at tape in, since area, energy and performance estimates are highly accurate there. The paper argues against stopping: <em>"it would be like running a long race and stopping 100 yards before the finish line because the runner can accurately predict the final time."</em></p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 작은 칩은 얼마나 싼가</div>
+    <div class="cap" lang="en">Sense of scale · how cheap a small chip is</div>
+    <table>
+      <tr><td class="what"><span lang="ko">1 mm² 칩 100개</span><span lang="en">100 chips of 1 mm²</span></td>
+          <td class="num">$14,000</td>
+          <td><span lang="ko">많은 연구자가 제조가 감당 불가능하다고 <strong>지레 가정한다</strong>고 논문이 적는다</span><span lang="en">the paper notes many researchers <strong>simply assume</strong> fabrication is unaffordable</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">28 nm에서 1 mm²에 들어가는 것</span><span lang="en">what fits in 1 mm² at 28 nm</span></td>
+          <td class="num"><span lang="ko">수백만 트랜지스터</span><span lang="en">millions of transistors</span></td>
+          <td><span lang="ko"><strong>RISC-V 프로세서 하나와 NVDLA 가속기 하나가 같이 들어갈 면적</strong></span><span lang="en"><strong>enough area for both a RISC-V processor and an NVDLA accelerator</strong></span></td></tr>
+    </table>
+    <div class="foot" lang="ko">논문이 하드웨어 엔지니어가 소프트웨어 엔지니어보다 나은 점 하나를 든다. <strong>물리적인 것을 만든다는 것.</strong> 칩을 받아 측정하고 실제 프로그램을 돌리고 친구와 가족에게 보여주는 것이 하드웨어 설계의 큰 기쁨이라고 적는다.</div>
+    <div class="foot" lang="en">The paper names one advantage hardware engineers have over software engineers: <strong>they build physical things.</strong> Getting chips back to measure, running real programs on them and showing them to friends and family is, it says, a great joy of hardware design.</div>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>이 절이 이 수업의 Project와 직접 이어진다.</strong> <a href="L01-introduction.html#s6">Lecture 1의 12쪽</a>이 권한 도구 체인(7nm 교육용 PDK, Design Compiler, Innovus, PrimeTime PX)이 정확히 논문의 <strong>세 번째 겹인 ECAD 레이아웃</strong>까지 가는 경로다. <strong>이 수업의 Project는 tape in 직전까지 가는 것</strong>이고, 논문의 표현으로는 "면적, 에너지, 성능 추정이 매우 정확한" 지점이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This section connects straight to the course project.</strong> The tool chain suggested on <a href="L01-introduction.html#s6">page 12 of lecture 1</a>, the 7nm educational PDK with Design Compiler, Innovus and PrimeTime PX, is exactly the path to the paper's <strong>third ring, ECAD layout</strong>. <strong>The project in this course goes up to just short of tape in</strong>, which in the paper's words is where "area, energy, and performance estimates are highly accurate".
+  </div>
+
+  <div class="def">
+    <span class="tag" lang="ko">논문의 결론</span><span class="tag" lang="en">The paper's conclusion</span>
+    <p lang="ko">토머스 풀러의 인용으로 시작한다. <em>"가장 어두운 시간은 동트기 직전이다."</em></p>
+    <p lang="en">It opens with Thomas Fuller: <em>"The darkest hour is just before the dawn."</em></p>
+    <p lang="ko">역사의 교훈은 셋으로 정리된다. <strong>소프트웨어 혁신이 아키텍트에게 영감을 줄 수 있다는 것, 하드웨어/소프트웨어 인터페이스의 추상화 수준을 올리면 혁신의 기회가 생긴다는 것, 그리고 시장이 결국 컴퓨터 아키텍처 논쟁을 결정한다는 것.</strong> iAPX-432와 Itanium은 <strong>아키텍처 투자가 수익을 넘어설 수 있음</strong>을 보여주고, S/360과 8086과 ARM은 <strong>끝이 보이지 않는 수십 년의 높은 연간 수익</strong>을 낸다.</p>
+    <p lang="en">Three lessons: <strong>software innovations can inspire architects; raising the abstraction level of the hardware/software interface yields opportunities for innovation; and the marketplace ultimately settles computer architecture debates.</strong> The iAPX-432 and Itanium show how <strong>architecture investment can exceed returns</strong>, while the S/360, the 8086 and ARM <strong>deliver high annual returns lasting decades with no end in sight.</strong></p>
+    <p lang="ko">그리고 마지막 문장이 이 글의 제목을 설명한다. <strong>Dennard scaling과 Moore의 법칙의 종료, 그리고 표준 마이크로프로세서 성능 향상의 감속은 반드시 풀어야 할 문제가 아니라, 인식하고 나면 숨막히는 기회를 제공하는 사실이다.</strong> 고수준의 도메인 특화 언어와 아키텍처, 독점 명령어 집합의 사슬에서 아키텍트를 풀어주는 것, 그리고 보안 개선에 대한 대중의 요구가 <strong>컴퓨터 아키텍트를 위한 새로운 황금기</strong>를 열 것이다. 그 칩들의 ISA 철학은 <strong>시간의 시험을 견딘 RISC</strong>가 될 가능성이 높다. 마지막 줄: <strong>다음 10년은 새로운 컴퓨터 아키텍처의 캄브리아기 대폭발을 볼 것이다.</strong></p>
+    <p lang="en">The closing sentences explain the title: <strong>the end of Dennard scaling and Moore's law and the deceleration of performance gains are not problems that must be solved but facts that, recognized, offer breathtaking opportunities.</strong> High-level, domain-specific languages and architectures, freeing architects from the chains of proprietary instruction sets, along with public demand for improved security, will usher in <strong>a new golden age for computer architects.</strong> The ISA philosophy of those chips will likely be <strong>RISC, which has stood the test of time.</strong> And the last line: <strong>the next decade will see a Cambrian explosion of novel computer architectures.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head"><span class="sec-num">08</span><h2 lang="ko">AlexNet이 서 있는 자리</h2><h2 lang="en">Where AlexNet stands</h2></div>
+
+  <div class="def">
+    <span class="tag" lang="ko">서지</span><span class="tag" lang="en">Citation</span>
+    <p>Alex Krizhevsky, Ilya Sutskever and Geoffrey E. Hinton. <strong>"ImageNet Classification with Deep Convolutional Neural Networks."</strong><br>
+    <em>Advances in Neural Information Processing Systems (NIPS) 25</em>, 2012. 저자 전원 University of Toronto.</p>
+  </div>
+
+  <p lang="ko">초록이 논문 전체를 여섯 문장으로 요약한다.</p>
+  <p lang="en">The abstract summarizes the paper in six sentences.</p>
+  <ul lang="ko">
+    <li>ImageNet LSVRC-2010의 <strong>120만 장 고해상도 이미지를 1,000개 클래스로</strong> 분류하는 크고 깊은 CNN을 학습시켰다</li>
+    <li>테스트 데이터에서 <strong>top-1 오류 37.5%, top-5 오류 17.0%</strong>. 이전 최고 기록보다 상당히 낫다</li>
+    <li>신경망은 <strong>파라미터 6천만 개, 뉴런 65만 개</strong>. <strong>합성곱 층 다섯 개</strong>(일부는 max-pooling이 뒤따름)와 <strong>완전 연결 층 셋</strong>, 마지막에 <strong>1000-way softmax</strong></li>
+    <li>학습을 빠르게 하려고 <strong>비포화 뉴런</strong>과 <strong>합성곱의 매우 효율적인 GPU 구현</strong>을 썼다</li>
+    <li>완전 연결 층의 과적합을 줄이려고 최근 나온 정규화 기법 <strong>dropout</strong>을 썼고 매우 효과적이었다</li>
+    <li>이 모델의 변형을 ILSVRC-2012에 출품해 <strong>top-5 테스트 오류 15.3%로 우승</strong>했다. <strong>2위는 26.2%</strong>였다</li>
+  </ul>
+  <ul lang="en">
+    <li>They trained a large, deep CNN to classify the <strong>1.2 million high-resolution images of ImageNet LSVRC-2010 into 1000 classes</strong></li>
+    <li>On the test data, <strong>top-1 error 37.5% and top-5 error 17.0%</strong>, considerably better than the previous state of the art</li>
+    <li>The network has <strong>60 million parameters and 650,000 neurons</strong>: <strong>five convolutional layers</strong>, some followed by max-pooling, and <strong>three fully-connected layers</strong> ending in a <strong>1000-way softmax</strong></li>
+    <li>To train faster they used <strong>non-saturating neurons</strong> and a <strong>very efficient GPU implementation of the convolution operation</strong></li>
+    <li>To reduce overfitting in the fully-connected layers they used a recently-developed regularization method called <strong>dropout</strong>, which proved very effective</li>
+    <li>A variant entered in ILSVRC-2012 achieved a <strong>winning top-5 test error rate of 15.3%</strong>, against <strong>26.2% for the second-best entry</strong></li>
+  </ul>
+
+  <div class="callout" lang="ko">
+    <strong>초록의 마지막 문장이 이 논문의 위상을 정한다.</strong> 15.3% 대 26.2%. <strong>2위와의 격차가 11포인트</strong>다. 이런 대회에서 보통 1위와 2위는 1포인트 안쪽으로 갈린다. <a href="L01-introduction.html#s11">Lecture 1의 23쪽</a> 아래 막대 그래프에서 2011년 회색 막대(약 26)와 2012년 파란 막대(약 16) 사이의 낙차가 바로 이것이고, 슬라이드가 거기에 빨간 화살표로 <em>Large error rate reduction using DNNs</em>라고 적어 놓았다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The last sentence of the abstract sets the paper's standing:</strong> 15.3% against 26.2%, <strong>an eleven-point gap to second place</strong>, in a competition where first and second are usually separated by less than one. The drop between the grey 2011 bar near 26 and the blue 2012 bar near 16 in the lower chart on <a href="L01-introduction.html#s11">page 23 of lecture 1</a> is exactly this, and the slide labels it with a red arrow reading <em>Large error rate reduction using DNNs.</em>
+  </div>
+
+  <h3><span lang="ko">논문이 스스로 밝힌 기여</span><span lang="en">The contributions the paper claims</span></h3>
+  <p lang="ko">서론 끝에 <strong>specific contributions</strong>가 네 줄로 적혀 있다.</p>
+  <p lang="en">At the end of the introduction, the <strong>specific contributions</strong> are stated in four lines.</p>
+  <ul lang="ko">
+    <li>ILSVRC-2010과 2012에 쓰인 ImageNet 부분집합에서 <strong>당시까지 가장 큰 CNN 중 하나</strong>를 학습시켜 <strong>그 데이터셋들에서 보고된 것 중 압도적으로 가장 좋은 결과</strong>를 얻었다</li>
+    <li><strong>2D 합성곱과 CNN 학습에 필요한 다른 모든 연산의 고도로 최적화된 GPU 구현</strong>을 작성했고 <strong>공개했다</strong> (<code>code.google.com/p/cuda-convnet/</code>)</li>
+    <li>성능을 개선하고 학습 시간을 줄이는 <strong>새롭고 특이한 기능들</strong>이 있다 (3절)</li>
+    <li>네트워크 크기 때문에 <strong>120만 장의 라벨 데이터로도 과적합이 심각한 문제</strong>였고, 이를 막는 효과적인 기법 여럿을 썼다 (4절)</li>
+  </ul>
+  <ul lang="en">
+    <li>They trained <strong>one of the largest CNNs to date</strong> on the ImageNet subsets used in ILSVRC-2010 and 2012 and achieved <strong>by far the best results ever reported on those datasets</strong></li>
+    <li>They wrote a <strong>highly-optimized GPU implementation of 2D convolution and every other operation involved in training CNNs</strong>, and <strong>made it public</strong> (<code>code.google.com/p/cuda-convnet/</code>)</li>
+    <li>The network contains <strong>a number of new and unusual features</strong> that improve performance and reduce training time (Section 3)</li>
+    <li>The network's size made <strong>overfitting a significant problem even with 1.2 million labeled examples</strong>, so several effective techniques were used against it (Section 4)</li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 논문에서 자주 놓치는 문장</span><span class="tag" lang="en">The sentence most often missed</span>
+    <h4 lang="ko">"네트워크의 크기는 주로 현재 GPU에서 쓸 수 있는 메모리 양에 의해 제한된다"</h4>
+    <h4 lang="en">"The network's size is limited mainly by the amount of memory available on current GPUs"</h4>
+    <p lang="ko">서론의 마지막 문단이다. 원문은 이렇다. <em>"In the end, the network's size is limited mainly by the amount of memory available on current GPUs and by the amount of training time that we are willing to tolerate."</em> 그리고 곧바로 <strong>"두 장의 GTX 580 3GB GPU에서 학습에 5~6일이 걸린다"</strong>고 적는다.</p>
+    <p lang="en">From the last paragraph of the introduction: <em>"In the end, the network's size is limited mainly by the amount of memory available on current GPUs and by the amount of training time that we are willing to tolerate."</em> It immediately adds that the network <strong>takes between five and six days to train on two GTX 580 3GB GPUs.</strong></p>
+    <p lang="ko"><strong>이 문장이 이 논문을 하드웨어 논문으로 만든다.</strong> 모델의 크기를 정한 것이 알고리즘이 아니라 <span class="cMem">GPU 메모리</span>였다. 그리고 논문은 이어서 <em>"모든 실험이 시사하는 바는, 더 빠른 GPU와 더 큰 데이터셋이 나오기를 기다리기만 하면 결과가 개선된다는 것"</em>이라고 적는다. <strong>알고리즘이 아니라 하드웨어를 기다리면 된다는 주장</strong>이고, 실제로 그렇게 되었다.</p>
+    <p lang="en"><strong>That sentence is what makes this a hardware paper.</strong> What set the model's size was not the algorithm but <span class="cMem">GPU memory</span>. The paper goes on: <em>"All of our experiments suggest that our results can be improved simply by waiting for faster GPUs and bigger datasets to become available."</em> <strong>A claim that you should wait for hardware rather than algorithms</strong>, and it turned out to be right.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head"><span class="sec-num">09</span><h2 lang="ko">여덟 층</h2><h2 lang="en">Eight layers</h2></div>
+  <p class="sec-sub" lang="ko">3.5절이 아키텍처 전체를 서술한다. 논문의 Figure 2가 그것을 그림으로 보여주는데, <strong>그림 자체가 두 GPU 사이의 책임 분담을 명시적으로 그린다.</strong></p>
+  <p class="sec-sub" lang="en">Section 3.5 describes the whole architecture. The paper's Figure 2 draws it, and <strong>the figure explicitly shows the division of responsibility between the two GPUs.</strong></p>
+
+  <p lang="ko"><strong>가중치를 가진 층이 여덟 개</strong>다. 앞의 다섯이 합성곱, 나머지 셋이 완전 연결이다. 마지막 완전 연결 층의 출력이 <strong>1000-way softmax</strong>로 들어가 1,000개 클래스에 대한 분포를 만든다. 네트워크는 <strong>multinomial logistic regression 목적함수</strong>를 최대화하는데, 이는 예측 분포에서 <strong>정답 라벨의 로그 확률의 학습 사례 평균</strong>을 최대화하는 것과 같다.</p>
+  <p lang="en">There are <strong>eight layers with weights</strong>: the first five convolutional, the remaining three fully connected. The output of the last fully-connected layer feeds a <strong>1000-way softmax</strong> producing a distribution over the 1000 class labels. The network maximizes the <strong>multinomial logistic regression objective</strong>, equivalent to maximizing <strong>the average across training cases of the log-probability of the correct label</strong> under the prediction distribution.</p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">층</th><th lang="ko">커널</th><th lang="ko">뒤따르는 것</th>
+      <th lang="en">Layer</th><th lang="en">Kernels</th><th lang="en">What follows it</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>conv1</td><td><strong>96</strong> × 11×11×3, stride 4</td><td lang="ko">response normalization → max-pooling</td>
+          <td>conv1</td><td><strong>96</strong> × 11×11×3, stride 4</td><td lang="en">response normalization, then max-pooling</td></tr>
+      <tr><td>conv2</td><td><strong>256</strong> × 5×5×48</td><td lang="ko">response normalization → max-pooling</td>
+          <td>conv2</td><td><strong>256</strong> × 5×5×48</td><td lang="en">response normalization, then max-pooling</td></tr>
+      <tr><td>conv3</td><td><strong>384</strong> × 3×3×256</td><td lang="ko">없음. <strong>2층의 모든 kernel map에 연결</strong></td>
+          <td>conv3</td><td><strong>384</strong> × 3×3×256</td><td lang="en">nothing. <strong>Connected to all kernel maps in layer 2</strong></td></tr>
+      <tr><td>conv4</td><td><strong>384</strong> × 3×3×192</td><td lang="ko">없음</td>
+          <td>conv4</td><td><strong>384</strong> × 3×3×192</td><td lang="en">nothing</td></tr>
+      <tr><td>conv5</td><td><strong>256</strong> × 3×3×192</td><td lang="ko">max-pooling</td>
+          <td>conv5</td><td><strong>256</strong> × 3×3×192</td><td lang="en">max-pooling</td></tr>
+      <tr><td>fc6, fc7</td><td lang="ko">각 <strong>4096</strong> 뉴런</td><td lang="ko">dropout (4.2절)</td>
+          <td>fc6, fc7</td><td lang="en"><strong>4096</strong> neurons each</td><td lang="en">dropout (Section 4.2)</td></tr>
+      <tr><td>fc8</td><td lang="ko"><strong>1000</strong> 출력</td><td lang="ko">softmax</td>
+          <td>fc8</td><td lang="en"><strong>1000</strong> outputs</td><td lang="en">softmax</td></tr>
+    </tbody>
+  </table>
+  <p lang="ko"><strong>ReLU 비선형성은 모든 합성곱 층과 완전 연결 층의 출력에 적용</strong>된다. 그리고 <strong>2, 4, 5번 합성곱 층의 커널은 같은 GPU에 있는 kernel map에만 연결</strong>되고, <strong>3번 합성곱 층만 2층의 모든 kernel map에 연결</strong>된다. 완전 연결 층의 뉴런은 이전 층의 모든 뉴런에 연결된다.</p>
+  <p lang="en">The <strong>ReLU nonlinearity is applied to the output of every convolutional and fully-connected layer.</strong> The <strong>kernels of the second, fourth and fifth convolutional layers connect only to kernel maps on the same GPU</strong>, and <strong>only the third convolutional layer connects to all kernel maps in the second.</strong> Neurons in the fully-connected layers connect to all neurons in the previous layer.</p>
+  <p lang="ko">Figure 2의 캡션이 뉴런 수를 층별로 적어 놓았다. 입력이 <strong>150,528차원</strong>이고, 이후 층들은 <strong>253,440 → 186,624 → 64,896 → 64,896 → 43,264 → 4096 → 4096 → 1000</strong>이다.</p>
+  <p lang="en">The caption of Figure 2 lists the neuron counts: the input is <strong>150,528-dimensional</strong>, and the remaining layers are <strong>253,440, 186,624, 64,896, 64,896, 43,264, 4096, 4096, 1000.</strong></p>
+
+  <div class="ex">
+    <span class="tag" lang="ko">직접 세어 보기</span><span class="tag" lang="en">Count it yourself</span>
+    <p lang="ko">논문은 파라미터가 <strong>6천만 개</strong>라고 하고, 각 합성곱 층이 <strong>모델 파라미터의 1%를 넘지 않는다</strong>고 적는다. 그렇다면 나머지는 어디에 있을까? 위 표의 커널 규격으로 직접 세어 보자.</p>
+    <p lang="en">The paper says there are <strong>60 million parameters</strong> and that each convolutional layer holds <strong>no more than 1% of the model's parameters.</strong> So where is the rest? Count it from the kernel specifications above.</p>
+    <details>
+      <summary><span lang="ko">계산</span><span lang="en">The arithmetic</span></summary>
+      <p lang="ko">합성곱 층부터. bias는 빼고 커널 가중치만 센다.</p>
+      <p lang="en">Convolutional layers first, counting kernel weights only and ignoring biases.</p>
+      <ul>
+        <li>conv1 : 96 × (11×11×3) = <strong>34,848</strong></li>
+        <li>conv2 : 256 × (5×5×48) = <strong>307,200</strong></li>
+        <li>conv3 : 384 × (3×3×256) = <strong>884,736</strong></li>
+        <li>conv4 : 384 × (3×3×192) = <strong>663,552</strong></li>
+        <li>conv5 : 256 × (3×3×192) = <strong>442,368</strong></li>
+      </ul>
+      <p lang="ko">합쳐서 <strong>약 233만 개</strong>다. 6천만의 <strong>4%도 안 된다.</strong></p>
+      <p lang="en">That totals <strong>about 2.33 million</strong>, <strong>under 4%</strong> of sixty million.</p>
+      <p lang="ko">완전 연결 층은 다르다. conv5의 출력이 pooling을 거치면 <span class="m">6×6×256 = 9,216</span>이 되고, 거기서 fc6로 간다.</p>
+      <p lang="en">The fully-connected layers are a different story. After pooling, conv5's output is <span class="m">6×6×256 = 9,216</span>, which feeds fc6.</p>
+      <ul>
+        <li>fc6 : 9,216 × 4,096 = <strong>37,748,736</strong></li>
+        <li>fc7 : 4,096 × 4,096 = <strong>16,777,216</strong></li>
+        <li>fc8 : 4,096 × 1,000 = <strong>4,096,000</strong></li>
+      </ul>
+      <p lang="ko">합쳐서 <strong>약 5,860만 개.</strong> 전체의 <strong>96%가 넘는다.</strong> 그리고 <strong>fc6 하나가 3,770만 개로 전체의 62%</strong>다.</p>
+      <p lang="en">That is <strong>about 58.6 million</strong>, <strong>over 96%</strong> of the total, with <strong>fc6 alone at 37.7 million, 62% of everything.</strong></p>
+      <p lang="ko"><strong>논문도 같은 말을 각주로 적어 놓았다.</strong> 3.2절의 각주 2에 <em>"most of the net's parameters are in the first fully-connected layer"</em>라고 되어 있다. 여기 숫자는 이 노트가 논문의 커널 규격으로 직접 센 어림값이고, bias와 두 GPU 분할의 세부에 따라 조금 달라질 수 있다.</p>
+      <p lang="en"><strong>The paper says the same thing in a footnote:</strong> footnote 2 of Section 3.2 states that <em>"most of the net's parameters are in the first fully-connected layer."</em> The numbers here are the note's own count from the kernel specifications and are approximate, varying slightly with biases and the details of the two-GPU split.</p>
+    </details>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>이 계산이 이 수업의 여러 주제로 갈라진다.</strong> 파라미터의 96%가 완전 연결 층에 있는데, 논문은 <strong>합성곱 층을 하나라도 빼면 성능이 나빠진다</strong>고 적는다 (중간 층 하나를 빼면 top-1이 약 2% 나빠진다). 즉 <strong><span class="cMem">메모리는 FC가 먹고 정확도는 conv가 만든다.</span></strong> ECE 479에서 <strong>"FC가 conv보다 압축을 잘 견딘다"</strong>고 배운 것의 근거가 여기 있고, 이 수업의 pruning과 quantization이 <strong>왜 층마다 다르게 적용되는지</strong>도 여기서 나온다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This calculation branches into several of the course's topics.</strong> 96% of the parameters sit in the fully-connected layers, yet the paper reports that <strong>removing any convolutional layer degrades performance</strong> (removing a middle one costs about 2% of top-1). So <strong><span class="cMem">the memory is spent by FC while the accuracy is produced by conv.</span></strong> This is the basis for what ECE 479 taught as <strong>"FC tolerates compression better than conv"</strong>, and it is where this course's habit of <strong>applying pruning and quantization differently per layer</strong> comes from.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head"><span class="sec-num">10</span><h2 lang="ko">빠르게 만든 것 넷</h2><h2 lang="en">Four things that made it fast</h2></div>
+  <p class="sec-sub" lang="ko">3절이 넷을 든다. 그리고 논문이 <strong>중요하다고 판단한 순서대로</strong> 정렬했다고 밝힌다. 이 순서 자체가 정보다.</p>
+  <p class="sec-sub" lang="en">Section 3 lists four, and the paper states they are <strong>sorted according to the authors' estimation of their importance, most important first.</strong> The order itself is information.</p>
+
+  <h3><span lang="ko">3.1 · ReLU (가장 중요)</span><span lang="en">3.1 · ReLU, the most important</span></h3>
+  <p lang="ko">뉴런 출력을 모델링하는 표준적 방법은 <span class="m"><i>f</i>(<i>x</i>) = tanh(<i>x</i>)</span>나 <span class="m"><i>f</i>(<i>x</i>) = (1 + <i>e</i><sup>−<i>x</i></sup>)<sup>−1</sup></span>였다. 논문은 이런 <strong>포화(saturating) 비선형성</strong>이 gradient descent 학습 시간 면에서 <strong>비포화 비선형성 <span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>보다 훨씬 느리다</strong>고 적는다. Nair와 Hinton을 따라 이런 뉴런을 <strong>Rectified Linear Units (ReLUs)</strong>라고 부른다.</p>
+  <p lang="en">The standard way to model a neuron's output was <span class="m"><i>f</i>(<i>x</i>) = tanh(<i>x</i>)</span> or <span class="m"><i>f</i>(<i>x</i>) = (1 + <i>e</i><sup>−<i>x</i></sup>)<sup>−1</sup></span>. The paper says these <strong>saturating nonlinearities are much slower</strong>, in training time with gradient descent, <strong>than the non-saturating <span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span></strong>. Following Nair and Hinton, they call such neurons <strong>Rectified Linear Units.</strong></p>
+  <p lang="ko">Figure 1이 근거다. CIFAR-10에서 특정 4층 합성곱 신경망이 <strong>25% 학습 오류에 도달하는 데 필요한 반복 횟수</strong>를 비교하는데, <strong>ReLU(실선)가 tanh(점선)보다 6배 빠르다.</strong> 캡션이 조건을 밝힌다. 각 네트워크의 learning rate는 학습이 최대한 빠르도록 <strong>독립적으로 선택</strong>했고, <strong>어떤 종류의 정규화도 쓰지 않았다.</strong></p>
+  <p lang="en">Figure 1 is the evidence: on CIFAR-10, a particular four-layer convolutional network <strong>reaches a 25% training error rate six times faster with ReLUs (solid line) than with tanh neurons (dashed line)</strong>, measured in iterations. The caption states the conditions: the learning rates were <strong>chosen independently</strong> for each network to make training as fast as possible, and <strong>no regularization of any kind was employed.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 절의 마지막 문장</span><span class="tag" lang="en">The last sentence of this subsection</span>
+    <h4 lang="ko">"전통적인 포화 뉴런 모델을 썼다면 이렇게 큰 신경망으로 실험할 수 없었을 것이다"</h4>
+    <h4 lang="en">"We would not have been able to experiment with such large neural networks if we had used traditional saturating neuron models"</h4>
+    <p lang="ko">이 문장이 ReLU를 <strong>정확도 기법이 아니라 규모 기법</strong>으로 만든다. 논문은 Jarrett 등이 다른 비선형성을 쓴 것과 자기들을 구분하면서, 저쪽은 <strong>과적합 방지</strong>가 관심사였고 자기들이 보고하는 것은 <strong>학습 집합을 맞추는 속도의 가속</strong>이라고 밝힌다. 그리고 덧붙인다. <strong>"큰 데이터셋에서 학습되는 큰 모델의 성능에는 빠른 학습이 큰 영향을 미친다."</strong></p>
+    <p lang="en">This sentence makes ReLU <strong>a scale technique, not an accuracy technique.</strong> The paper distinguishes itself from Jarrett et al., whose concern with a different nonlinearity was <strong>preventing overfitting</strong>, whereas what is reported here is <strong>accelerated ability to fit the training set.</strong> And it adds: <strong>"Faster learning has a great influence on the performance of large models trained on large datasets."</strong></p>
+    <p lang="ko"><strong>하드웨어 관점에서 ReLU가 중요한 이유는 하나 더 있다.</strong> <span class="m">max(0, <i>x</i>)</span>는 <strong>비교 하나</strong>다. tanh나 sigmoid는 지수 함수가 필요해서 전용 회로나 lookup table을 요구한다. <strong>가속기에서 활성 함수를 거의 공짜로 만든 것</strong>이 ReLU다. 이 논문은 그 이유를 적지 않았지만, 이후 모든 DNN 가속기가 ReLU를 전제로 설계된다.</p>
+    <p lang="en"><strong>There is one more reason ReLU matters in hardware.</strong> <span class="m">max(0, <i>x</i>)</span> is <strong>one comparison</strong>; tanh and sigmoid need an exponential, which means dedicated circuitry or a lookup table. <strong>ReLU is what made the activation function nearly free in an accelerator.</strong> This paper does not give that reason, but every DNN accelerator afterwards is designed assuming it.</p>
+  </div>
+
+  <h3><span lang="ko">3.2 · 두 개의 GPU</span><span lang="en">3.2 · training on two GPUs</span></h3>
+  <p lang="ko">첫 문장이 문제를 그대로 말한다. <strong>"GTX 580 GPU 한 장은 메모리가 3GB뿐이라, 그 위에서 학습시킬 수 있는 네트워크의 최대 크기가 제한된다."</strong> 그리고 <strong>120만 개의 학습 예제는 GPU 한 장에 안 들어가는 크기의 네트워크를 학습시키기에 충분하다</strong>는 것이 밝혀졌다. 그래서 <strong>네트워크를 두 GPU에 펼쳤다.</strong></p>
+  <p lang="en">The opening sentence states the problem plainly: <strong>"A single GTX 580 GPU has only 3GB of memory, which limits the maximum size of the networks that can be trained on it."</strong> And <strong>1.2 million training examples turn out to be enough to train networks too big to fit on one GPU.</strong> So they <strong>spread the net across two GPUs.</strong></p>
+  <p lang="ko">방식은 이렇다. <strong>커널(뉴런)의 절반을 각 GPU에 놓는다.</strong> 여기에 <strong>한 가지 트릭</strong>을 더한다. <strong>GPU는 특정 층에서만 통신한다.</strong> 예를 들어 3층의 커널은 2층의 <strong>모든</strong> kernel map에서 입력을 받지만, 4층의 커널은 <strong>같은 GPU에 있는</strong> 3층 kernel map에서만 입력을 받는다. 연결 패턴을 고르는 것은 교차 검증의 문제이지만, 이 방식이 <strong>통신량을 연산량 대비 받아들일 만한 비율이 될 때까지 정밀하게 조절</strong>할 수 있게 해 준다.</p>
+  <p lang="en">The scheme: <strong>half the kernels, or neurons, on each GPU</strong>, plus <strong>one additional trick: the GPUs communicate only in certain layers.</strong> The kernels of layer 3 take input from <strong>all</strong> kernel maps in layer 2, while kernels in layer 4 take input only from those in layer 3 <strong>residing on the same GPU.</strong> Choosing the connectivity pattern is a cross-validation problem, but it lets them <strong>tune the amount of communication precisely until it is an acceptable fraction of the amount of computation.</strong></p>
+  <p lang="ko">논문은 현재 GPU가 <strong>호스트 머신 메모리를 거치지 않고 서로의 메모리를 직접 읽고 쓸 수 있어서</strong> 교차 GPU 병렬화에 특히 적합하다고 적는다. 결과: 각 합성곱 층의 커널이 절반인 단일 GPU 네트워크 대비 <strong>top-1을 1.7%, top-5를 1.2% 낮춘다.</strong> 그리고 <strong>두 GPU 네트워크가 단일 GPU 네트워크보다 학습 시간이 약간 더 짧다.</strong></p>
+  <p lang="en">The paper notes that current GPUs are particularly well suited to cross-GPU parallelization because they can <strong>read and write one another's memory directly, without going through host memory.</strong> The result: compared with a net having half as many kernels in each convolutional layer on one GPU, this <strong>reduces top-1 error by 1.7% and top-5 by 1.2%</strong>, and <strong>the two-GPU net takes slightly less time to train than the one-GPU net.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>논문이 자기 비교의 편향을 각주로 밝힌다.</strong> 각주 2가 이렇게 적는다. 단일 GPU 네트워크는 마지막 합성곱 층의 커널 수가 두 GPU 네트워크와 <strong>같다.</strong> 파라미터 대부분이 첫 완전 연결 층에 있고 그 층이 마지막 합성곱 층을 입력으로 받기 때문에, <strong>두 네트워크의 파라미터 수를 비슷하게 맞추려고 마지막 합성곱 층(과 그 뒤 완전 연결 층)의 크기를 절반으로 줄이지 않았다.</strong> 그래서 <strong>이 비교는 단일 GPU 네트워크에 유리하게 편향되어 있다</strong>고 논문이 직접 적는다. 그런데도 두 GPU 쪽이 이겼다는 뜻이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The paper flags the bias in its own comparison in a footnote.</strong> Footnote 2 says the one-GPU net has the <strong>same</strong> number of kernels in the final convolutional layer as the two-GPU net, because most of the parameters live in the first fully-connected layer which takes that layer as input, so <strong>they did not halve the final convolutional layer or the fully-connected layers that follow it</strong> in order to keep the parameter counts comparable. Therefore <strong>the comparison is biased in favour of the one-GPU net</strong>, as the paper states outright. The two-GPU net won anyway.
+  </div>
+
+  <h3><span lang="ko">3.3 · Local Response Normalization</span><span lang="en">3.3 · local response normalization</span></h3>
+  <p lang="ko">ReLU는 포화를 막기 위한 입력 정규화가 <strong>필요 없다</strong>는 좋은 성질이 있다. 어떤 학습 예제라도 ReLU에 양의 입력을 만들면 그 뉴런에서 학습이 일어난다. 그런데도 논문은 <strong>다음의 국소 정규화 방식이 일반화에 도움이 된다</strong>고 밝힌다.</p>
+  <p lang="en">ReLUs have the desirable property that they <strong>do not require input normalization</strong> to prevent saturation: if at least some training examples produce a positive input, learning happens in that neuron. Even so, the paper finds that <strong>the following local normalization scheme aids generalization.</strong></p>
+  <p lang="ko">합은 같은 공간 위치에서 <strong><span class="m"><i>n</i></span>개의 "인접한" kernel map</strong>에 걸쳐 이루어지고, <span class="m"><i>N</i></span>은 그 층의 전체 커널 수다. kernel map의 순서는 물론 임의이고 <strong>학습 시작 전에 정해진다.</strong> 논문은 이것을 <strong>실제 뉴런에서 발견되는 종류의 측면 억제(lateral inhibition)</strong>의 한 형태로 설명하며, 서로 다른 커널로 계산된 뉴런 출력들 사이에 <strong>큰 활성을 두고 경쟁</strong>을 만든다고 적는다.</p>
+  <p lang="en">The sum runs over <strong><span class="m"><i>n</i></span> "adjacent" kernel maps</strong> at the same spatial position, where <span class="m"><i>N</i></span> is the total number of kernels in the layer. The ordering of the kernel maps is arbitrary and <strong>determined before training begins.</strong> The paper describes it as a form of <strong>lateral inhibition of the kind found in real neurons</strong>, creating <strong>competition for big activities</strong> among neuron outputs computed with different kernels.</p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · LRN의 하이퍼파라미터</span><span lang="en">Unpacking the notation · the LRN hyperparameters</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>a</i><sup><i>i</i></sup><sub><i>x,y</i></sub></td><td><span lang="ko">위치 <span class="m">(<i>x</i>, <i>y</i>)</span>에 커널 <span class="m"><i>i</i></span>를 적용하고 ReLU를 통과시킨 뉴런의 활성</span><span lang="en">the activity of a neuron computed by applying kernel <span class="m"><i>i</i></span> at position <span class="m">(<i>x</i>, <i>y</i>)</span> and then the ReLU</span></td></tr>
+        <tr><td class="m"><i>b</i><sup><i>i</i></sup><sub><i>x,y</i></sub></td><td><span lang="ko">정규화된 활성. 출력</span><span lang="en">the response-normalized activity, the output</span></td></tr>
+        <tr><td class="m"><i>k</i> = 2</td><td><span lang="ko">분모가 0이 되는 것을 막는 상수</span><span lang="en">a constant keeping the denominator away from zero</span></td></tr>
+        <tr><td class="m"><i>n</i> = 5</td><td><span lang="ko">합에 참여하는 인접 kernel map의 개수</span><span lang="en">how many adjacent kernel maps enter the sum</span></td></tr>
+        <tr><td class="m"><i>α</i> = 10<sup>−4</sup></td><td><span lang="ko">정규화의 세기</span><span lang="en">the strength of the normalization</span></td></tr>
+        <tr><td class="m"><i>β</i> = 0.75</td><td><span lang="ko">분모에 걸리는 지수</span><span lang="en">the exponent applied to the denominator</span></td></tr>
+      </table>
+      <p lang="ko">네 상수 모두 <strong>validation set으로 값을 정한 하이퍼파라미터</strong>라고 논문이 밝힌다. <a href="L02-ml-basics.html#s7">Lecture 2-3의 15쪽</a>에서 함정으로 짚은 <strong>"슬라이드는 train과 test 둘로 나누는데 실무는 validation을 포함해 셋"</strong>이 여기서 실제로 확인된다.</p>
+      <p lang="en">All four are <strong>hyperparameters whose values are determined using a validation set</strong>, as the paper states. The trap noted on <a href="L02-ml-basics.html#s7">page 15 of lectures 2-3</a>, that <strong>the slide splits data two ways while practice splits it three</strong>, is confirmed here in the wild.</p>
+    </div>
+  </details>
+
+  <p lang="ko">논문은 이것이 Jarrett 등의 local contrast normalization과 닮았지만, <strong>평균 활성을 빼지 않으므로 "brightness normalization"이라고 부르는 편이 더 정확하다</strong>고 밝힌다. 효과: <strong>top-1을 1.4%, top-5를 1.2% 낮춘다.</strong> CIFAR-10에서도 검증했는데, 4층 CNN이 <strong>정규화 없이 13%, 정규화로 11%</strong>의 테스트 오류를 냈다.</p>
+  <p lang="en">The paper notes the resemblance to Jarrett et al.'s local contrast normalization but says theirs <strong>would more correctly be termed "brightness normalization" since they do not subtract the mean activity.</strong> The effect: <strong>top-1 down 1.4% and top-5 down 1.2%.</strong> Verified on CIFAR-10 as well, where a four-layer CNN achieved <strong>13% test error without normalization and 11% with.</strong></p>
+
+  <h3><span lang="ko">3.4 · 겹치는 pooling</span><span lang="en">3.4 · overlapping pooling</span></h3>
+  <p lang="ko">CNN의 pooling 층은 같은 kernel map 안에서 이웃한 뉴런 그룹의 출력을 요약한다. 논문이 pooling 층을 <strong><span class="m"><i>s</i></span> 픽셀 간격으로 놓인 pooling 단위의 격자</strong>로 정의하고, 각 단위가 자기 위치를 중심으로 <strong><span class="m"><i>z</i> × <i>z</i></span> 크기의 이웃</strong>을 요약한다고 적는다.</p>
+  <p lang="en">A pooling layer summarizes the outputs of neighbouring groups of neurons in the same kernel map. The paper defines it as <strong>a grid of pooling units spaced <span class="m"><i>s</i></span> pixels apart</strong>, each summarizing a neighbourhood of size <strong><span class="m"><i>z</i> × <i>z</i></span></strong> centred on the unit.</p>
+  <ul lang="ko">
+    <li><span class="m"><i>s</i> = <i>z</i></span>이면 CNN에서 흔히 쓰는 <strong>전통적인 국소 pooling</strong></li>
+    <li><span class="m"><i>s</i> &lt; <i>z</i></span>이면 <strong>겹치는 pooling.</strong> 이 논문은 네트워크 전체에서 <strong><span class="m"><i>s</i> = 2</span>, <span class="m"><i>z</i> = 3</span></strong>을 쓴다</li>
+  </ul>
+  <ul lang="en">
+    <li><span class="m"><i>s</i> = <i>z</i></span> gives <strong>traditional local pooling</strong> as commonly used in CNNs</li>
+    <li><span class="m"><i>s</i> &lt; <i>z</i></span> gives <strong>overlapping pooling</strong>, and this paper uses <strong><span class="m"><i>s</i> = 2</span>, <span class="m"><i>z</i> = 3</span></strong> throughout</li>
+  </ul>
+  <p lang="ko">효과: 같은 크기의 출력을 내는 비겹침 방식(<span class="m"><i>s</i> = 2, <i>z</i> = 2</span>) 대비 <strong>top-1을 0.4%, top-5를 0.3% 낮춘다.</strong> 그리고 논문이 관찰을 하나 덧붙인다. <strong>겹치는 pooling을 쓰는 모델이 과적합되기가 약간 더 어렵다는 것을 학습 중에 대체로 관찰한다.</strong></p>
+  <p lang="en">The effect: compared with the non-overlapping scheme <span class="m"><i>s</i> = 2, <i>z</i> = 2</span>, which produces output of equivalent dimensions, it <strong>reduces top-1 by 0.4% and top-5 by 0.3%</strong>. The paper adds an observation: <strong>models with overlapping pooling generally seem slightly more difficult to overfit.</strong></p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head"><span class="sec-num">11</span><h2 lang="ko">과적합을 막은 것 둘</h2><h2 lang="en">Two things against overfitting</h2></div>
+  <p class="sec-sub" lang="ko">4절이 문제를 먼저 말한다. 파라미터가 <strong>6천만 개</strong>다. ILSVRC의 1,000개 클래스가 각 학습 예제에 <strong>이미지에서 라벨로 가는 매핑에 10비트의 제약</strong>을 걸지만, 그것으로는 <strong>이만큼의 파라미터를 상당한 과적합 없이 학습시키기에 부족하다.</strong></p>
+  <p class="sec-sub" lang="en">Section 4 states the problem first: <strong>60 million parameters.</strong> The 1000 classes of ILSVRC make each training example impose <strong>10 bits of constraint</strong> on the mapping from image to label, which <strong>turns out to be insufficient to learn so many parameters without considerable overfitting.</strong></p>
+
+  <h3><span lang="ko">4.1 · 데이터 증강</span><span lang="en">4.1 · data augmentation</span></h3>
+  <p lang="ko">이미지 데이터의 과적합을 줄이는 <strong>가장 쉽고 흔한 방법</strong>은 <strong>라벨을 보존하는 변환</strong>으로 데이터셋을 인위적으로 키우는 것이다. 논문은 두 형태를 쓰는데, 둘 다 원본 이미지에서 <strong>아주 적은 계산으로</strong> 변환 이미지를 만들 수 있어 <strong>변환된 이미지를 디스크에 저장할 필요가 없다.</strong></p>
+  <p lang="en">The <strong>easiest and most common</strong> way to reduce overfitting on image data is to artificially enlarge the dataset with <strong>label-preserving transformations.</strong> The paper uses two forms, both producing transformed images from the originals with <strong>very little computation</strong>, so <strong>the transformed images never need to be stored on disk.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>구현 방식이 하드웨어 이야기다.</strong> 논문이 적기를, 변환된 이미지는 <strong>CPU의 파이썬 코드에서 생성</strong>되고 그 사이 <strong>GPU는 이전 배치의 이미지로 학습</strong>한다. 그래서 이 증강 방식은 <strong>사실상 계산이 공짜다.</strong> <span class="cSw">CPU</span>와 <span class="cHw">GPU</span>를 겹쳐 돌려서 <strong>데이터 파이프라인을 학습의 임계 경로에서 빼낸 것</strong>이고, 이건 <a href="L02-ml-basics.html#s3">Lecture 2-3 노트의 3절</a>에서 말한 "GPU가 놀고 데이터 로더가 병목이 되는" 문제를 정확히 겨냥한 해법이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The implementation is a hardware story.</strong> The paper says the transformed images are <strong>generated in Python on the CPU while the GPU trains on the previous batch</strong>, making the augmentation <strong>computationally free in effect.</strong> Overlapping <span class="cSw">CPU</span> and <span class="cHw">GPU</span> takes <strong>the data pipeline off the critical path of training</strong>, which is exactly the problem section 03 of the <a href="L02-ml-basics.html#s3">lectures 2-3 note</a> described as the GPU sitting idle while the data loader becomes the bottleneck.
+  </div>
+
+  <div class="grid2">
+    <div class="def">
+      <span class="tag" lang="ko">첫째 형태 · 자르기와 반사</span><span class="tag" lang="en">First form · crops and reflections</span>
+      <p lang="ko">256×256 이미지에서 <strong>무작위 224×224 패치와 그 수평 반사</strong>를 뽑아 학습시킨다. 이것이 학습 집합 크기를 <strong>2048배</strong>로 늘린다. 다만 논문이 곧바로 단서를 단다. <strong>그렇게 만들어진 학습 예제들은 물론 서로 매우 의존적이다.</strong></p>
+      <p lang="en">Random <strong>224×224 patches and their horizontal reflections</strong> are extracted from the 256×256 images and trained on. This increases the training set by a factor of <strong>2048</strong>, though the paper immediately qualifies it: <strong>the resulting training examples are, of course, highly interdependent.</strong></p>
+      <p lang="ko"><strong>테스트할 때</strong>는 <strong>224×224 패치 다섯 개</strong>(네 모서리와 중앙)와 그 <strong>수평 반사</strong>를 합쳐 <strong>총 열 개 패치</strong>를 뽑아 softmax 층의 예측을 평균한다.</p>
+      <p lang="en"><strong>At test time</strong> the network extracts <strong>five 224×224 patches</strong>, the four corners and the centre, plus their <strong>horizontal reflections</strong>, <strong>ten patches in all</strong>, and averages the softmax predictions over them.</p>
+    </div>
+    <div class="def">
+      <span class="tag" lang="ko">둘째 형태 · RGB 강도 변경</span><span class="tag" lang="en">Second form · altering RGB intensities</span>
+      <p lang="ko">ImageNet 학습 집합 전체의 <strong>RGB 픽셀 값에 PCA</strong>를 수행한다. 각 학습 이미지에 <strong>찾아낸 주성분의 배수</strong>를 더하는데, 그 크기는 <strong>대응하는 고윳값에 평균 0, 표준편차 0.1의 가우시안에서 뽑은 확률변수를 곱한 것</strong>에 비례한다.</p>
+      <p lang="en">They perform <strong>PCA on the RGB pixel values</strong> across the whole ImageNet training set, then add to each training image <strong>multiples of the principal components found</strong>, with magnitudes proportional to <strong>the corresponding eigenvalues times a random variable drawn from a Gaussian with mean zero and standard deviation 0.1.</strong></p>
+      <p lang="ko">각 확률변수는 <strong>한 이미지의 모든 픽셀에 대해 한 번만</strong> 뽑고, 그 이미지가 다시 학습에 쓰일 때 새로 뽑는다. 이 방식은 자연 이미지의 중요한 성질 하나를 근사적으로 포착한다. <strong>물체의 정체는 조명의 강도와 색 변화에 불변이다.</strong> 효과는 <strong>top-1 오류를 1% 넘게 낮춘다.</strong></p>
+      <p lang="en">Each random variable is drawn <strong>only once for all the pixels of a given image</strong> and re-drawn when that image is used again. The scheme approximately captures an important property of natural images: <strong>object identity is invariant to changes in the intensity and colour of the illumination.</strong> It <strong>reduces the top-1 error rate by over 1%.</strong></p>
+    </div>
+  </div>
+
+  <h3><span lang="ko">4.2 · Dropout</span><span lang="en">4.2 · dropout</span></h3>
+  <p lang="ko">여러 모델의 예측을 결합하는 것은 테스트 오류를 줄이는 매우 성공적인 방법이지만, <strong>이미 학습에 며칠이 걸리는 큰 신경망에는 너무 비싸 보인다.</strong> 그런데 <strong>학습 중 대략 2배의 비용만 드는 매우 효율적인 모델 결합 방식</strong>이 있다. 그것이 dropout이다.</p>
+  <p lang="en">Combining the predictions of many models is very successful at reducing test error but <strong>appears too expensive for big neural networks that already take several days to train.</strong> There is, however, <strong>a very efficient version of model combination that costs only about a factor of two during training</strong>: dropout.</p>
+  <p lang="ko">방식은 <strong>각 은닉 뉴런의 출력을 확률 0.5로 0으로 만드는 것</strong>이다. 이렇게 <strong>드롭아웃된 뉴런은 forward pass에 기여하지 않고 backpropagation에도 참여하지 않는다.</strong> 그래서 입력이 제시될 때마다 <strong>신경망이 다른 아키텍처를 표본추출</strong>하지만 <strong>그 아키텍처들이 가중치를 공유</strong>한다.</p>
+  <p lang="en">The method is <strong>setting the output of each hidden neuron to zero with probability 0.5.</strong> Neurons dropped this way <strong>do not contribute to the forward pass and do not participate in backpropagation.</strong> So every time an input is presented <strong>the network samples a different architecture</strong>, but <strong>all these architectures share weights.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong><a href="L02-ml-basics.html#s9">Lecture 2-3의 18쪽</a>이 이 문단을 두 줄로 줄인 것이다.</strong> 슬라이드는 <em>"노드를 일시적으로 제거한다"</em>와 <em>"파라미터를 공유하는 거대한 모델 앙상블을 학습시킨다"</em>라고 적었는데, 원문의 <strong>"매번 다른 아키텍처를 표본추출하지만 가중치를 공유한다"</strong>가 그 두 줄의 출처다. 슬라이드가 인용한 논문 제목 <em>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</em>은 AlexNet이 참조 [10]으로 든 기법의 논문이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong><a href="L02-ml-basics.html#s9">Page 18 of lectures 2-3</a> is this paragraph reduced to two lines.</strong> The slide's <em>"temporally remove nodes"</em> and <em>"train a large ensemble of models that share parameters"</em> come from the original's <strong>"samples a different architecture, but all these architectures share weights."</strong> The paper title cited on that slide, <em>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</em>, is the work AlexNet references as [10] for the technique.
+  </div>
+
+  <p lang="ko">왜 효과가 있는가. <strong>뉴런이 특정한 다른 뉴런들의 존재에 의존할 수 없게 되므로 뉴런들의 복잡한 공적응(co-adaptation)이 줄어든다.</strong> 그래서 다른 뉴런들의 <strong>여러 무작위 부분집합과 함께 쓸모 있는 더 강건한 특징</strong>을 배우도록 강제된다.</p>
+  <p lang="en">Why it works: <strong>it reduces complex co-adaptations of neurons, since a neuron cannot rely on the presence of particular other neurons.</strong> It is therefore forced to learn <strong>more robust features that are useful in conjunction with many different random subsets</strong> of the others.</p>
+  <p lang="ko"><strong>테스트할 때는 모든 뉴런을 쓰되 출력에 0.5를 곱한다.</strong> 이것이 지수적으로 많은 dropout 네트워크가 만드는 예측 분포들의 <strong>기하 평균을 취하는 것의 합리적인 근사</strong>다.</p>
+  <p lang="en"><strong>At test time all neurons are used but their outputs are multiplied by 0.5</strong>, which is <strong>a reasonable approximation to taking the geometric mean</strong> of the predictive distributions produced by the exponentially many dropout networks.</p>
+  <p lang="ko">적용 위치는 <strong>Figure 2의 첫 두 완전 연결 층</strong>이다. <strong>dropout 없이는 네트워크가 상당한 과적합을 보인다.</strong> 그리고 대가가 명시되어 있다. <strong>dropout은 수렴에 필요한 반복 횟수를 대략 두 배로 만든다.</strong></p>
+  <p lang="en">It is applied in <strong>the first two fully-connected layers of Figure 2.</strong> <strong>Without dropout the network exhibits substantial overfitting.</strong> And the cost is stated: <strong>dropout roughly doubles the number of iterations required to converge.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>적용 위치가 이 수업의 관점에서 중요하다.</strong> dropout이 걸린 곳은 <strong>완전 연결 층 둘</strong>이고, 9절에서 센 대로 <strong>파라미터의 96%가 거기</strong> 있다. 즉 dropout은 <strong>과적합이 실제로 일어나는 곳에 정확히 걸려 있다.</strong> 합성곱 층에는 안 걸었다. <span class="cAlg">파라미터가 몰린 층</span>과 <span class="cGain">정규화가 필요한 층</span>이 같다는 것이 이 논문에서 확인된다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Where it is applied matters from this course's angle.</strong> Dropout sits on <strong>the two fully-connected layers</strong>, which is where, as counted in section 09, <strong>96% of the parameters live</strong>. So dropout is placed <strong>exactly where the overfitting actually happens</strong>, and not on the convolutional layers. The <span class="cAlg">layers holding the parameters</span> and the <span class="cGain">layers needing regularization</span> turn out to be the same layers.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head"><span class="sec-num">12</span><h2 lang="ko">학습 세부</h2><h2 lang="en">Details of learning</h2></div>
+  <p class="sec-sub" lang="ko">5절은 짧지만 <a href="L02-ml-basics.html#s10">Lecture 2-3의 19-20쪽</a>과 <strong>한 줄씩 대응</strong>한다.</p>
+  <p class="sec-sub" lang="en">Section 5 is short but corresponds <strong>line by line</strong> to <a href="L02-ml-basics.html#s10">pages 19 and 20 of lectures 2-3.</a></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">설정</span><span class="tag" lang="en">The setup</span>
+    <p lang="ko"><strong>stochastic gradient descent</strong>로 학습했고, <strong>배치 크기 128</strong>, <strong>momentum 0.9</strong>, <strong>weight decay 0.0005</strong>다.</p>
+    <p lang="en">Trained with <strong>stochastic gradient descent</strong>, <strong>batch size 128</strong>, <strong>momentum 0.9</strong> and <strong>weight decay 0.0005.</strong></p>
+    <div class="eq"><span class="m"><i>v</i><sub><i>i</i>+1</sub> := 0.9 · <i>v<sub>i</sub></i> − 0.0005 · <i>ε</i> · <i>w<sub>i</sub></i></span><br>
+  <span class="m">− <i>ε</i> · ⟨∂<i>L</i>/∂<i>w</i>⟩<sub><i>D<sub>i</sub></i></sub></span></div>
+    <div class="eq"><span class="m"><i>w</i><sub><i>i</i>+1</sub> := <i>w<sub>i</sub></i> + <i>v</i><sub><i>i</i>+1</sub></span></div>
+    <p lang="ko"><span class="m"><i>i</i></span>는 반복 인덱스, <span class="m"><i>v</i></span>는 momentum 변수, <span class="m"><i>ε</i></span>는 learning rate, 마지막 항은 <span class="m"><i>i</i></span>번째 배치 <span class="m"><i>D<sub>i</sub></i></span>에서 <span class="m"><i>w<sub>i</sub></i></span>로 평가한 목적함수의 <span class="m"><i>w</i></span>에 대한 도함수의 평균이다.</p>
+    <p lang="en">Here <span class="m"><i>i</i></span> is the iteration index, <span class="m"><i>v</i></span> the momentum variable, <span class="m"><i>ε</i></span> the learning rate, and the last term the average over the <span class="m"><i>i</i></span>th batch <span class="m"><i>D<sub>i</sub></i></span> of the derivative of the objective with respect to <span class="m"><i>w</i></span>, evaluated at <span class="m"><i>w<sub>i</sub></i></span>.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">강의와 어긋나는 대목</span><span class="tag" lang="en">Where the paper and the slide disagree</span>
+    <h4 lang="ko">"weight decay는 여기서 단순한 regularizer가 아니다. 모델의 학습 오류를 줄인다"</h4>
+    <h4 lang="en">"Weight decay here is not merely a regularizer: it reduces the model's training error"</h4>
+    <p lang="ko">논문의 원문이다. <em>"We found that this small amount of weight decay was important for the model to learn. In other words, weight decay here is not merely a regularizer: it reduces the model's training error."</em></p>
+    <p lang="en">The paper's own words: <em>"We found that this small amount of weight decay was important for the model to learn. In other words, weight decay here is not merely a regularizer: it reduces the model's training error."</em></p>
+    <p lang="ko"><strong>그런데 <a href="L02-ml-basics.html#s8">Lecture 2-3의 17쪽</a>은 regularization을 이렇게 정의했다.</strong> <em>"generalization error는 줄이되 training error는 줄이지 않는 수정."</em> 그리고 그 정의 바로 아래에 weight decay를 예로 들었다.</p>
+    <p lang="en"><strong>But <a href="L02-ml-basics.html#s8">page 17 of lectures 2-3</a> defines regularization as</strong> <em>"modifications to reduce the generalization error but not the training errors"</em>, and lists weight decay as the example directly underneath.</p>
+    <p lang="ko"><strong>둘 다 틀린 것이 아니다.</strong> 슬라이드의 정의는 regularization의 <strong>교과서적 정의</strong>이고, 논문은 <strong>실제로 관찰한 것</strong>을 적었다. 이 논문의 경우 weight decay가 학습 자체를 도왔다는 뜻이다. <strong>정의와 관찰이 어긋날 때 논문이 관찰 쪽을 적고 그것을 명시적으로 지적한다</strong>는 점이 중요하다. 저자들이 <em>"in other words"</em>로 그 어긋남을 굳이 밝힌 것이 이 문단의 값어치다.</p>
+    <p lang="en"><strong>Neither is wrong.</strong> The slide gives the <strong>textbook definition</strong>; the paper reports <strong>what was actually observed</strong>, namely that in this case weight decay helped the model learn at all. What matters is that <strong>when definition and observation diverge, the paper reports the observation and flags it explicitly.</strong> The value of that paragraph is the authors' deliberate <em>"in other words"</em> calling attention to the divergence.</p>
+  </div>
+
+  <p lang="ko"><strong>초기화.</strong> 각 층의 가중치를 <strong>평균 0, 표준편차 0.01의 가우시안</strong>에서 초기화했다. <strong>2, 4, 5번 합성곱 층과 완전 연결 은닉 층</strong>의 뉴런 bias는 <strong>상수 1</strong>로, <strong>나머지 층</strong>의 bias는 <strong>상수 0</strong>으로 초기화했다. 논문이 이유를 밝힌다. <strong>ReLU에 양의 입력을 제공해서 학습 초기 단계를 가속한다.</strong></p>
+  <p lang="en"><strong>Initialization.</strong> Weights in each layer were initialized from a <strong>zero-mean Gaussian with standard deviation 0.01.</strong> Neuron biases in the <strong>second, fourth and fifth convolutional layers and the fully-connected hidden layers</strong> were initialized to the <strong>constant 1</strong>, and in the <strong>remaining layers</strong> to <strong>0.</strong> The reason given: it <strong>accelerates the early stages of learning by providing the ReLUs with positive inputs.</strong></p>
+  <p lang="ko"><strong>Learning rate.</strong> 모든 층에 <strong>같은 learning rate</strong>를 쓰고 학습 내내 <strong>수동으로 조정</strong>했다. 따른 휴리스틱은 <strong>현재 learning rate로 validation 오류가 더 이상 개선되지 않으면 learning rate를 10으로 나누는 것</strong>이다. <strong>0.01에서 시작해 종료 전까지 세 번 줄였다.</strong></p>
+  <p lang="en"><strong>Learning rate.</strong> An <strong>equal learning rate for all layers</strong>, adjusted <strong>manually</strong> throughout training. The heuristic: <strong>divide the learning rate by 10 when the validation error rate stopped improving.</strong> It was <strong>initialized at 0.01 and reduced three times prior to termination.</strong></p>
+  <p lang="ko"><strong>총 학습.</strong> 120만 장의 학습 집합을 <strong>약 90 사이클</strong> 돌았고, <strong>NVIDIA GTX 580 3GB 두 장에서 5~6일</strong>이 걸렸다.</p>
+  <p lang="en"><strong>Total training.</strong> Roughly <strong>90 cycles</strong> through the 1.2 million image training set, taking <strong>five to six days on two NVIDIA GTX 580 3GB GPUs.</strong></p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 강의의 어느 슬라이드가 어디서 왔나</div>
+    <div class="cap" lang="en">Sense of scale · which slide came from which line</div>
+    <table>
+      <tr><td class="what"><span lang="ko">SGD 배치 크기</span><span lang="en">SGD batch size</span></td>
+          <td class="num">128</td>
+          <td><span lang="ko"><a href="L02-ml-basics.html#s10">L02-3 19쪽</a>의 "batch/minibatch"가 이것이다</span><span lang="en">the "batch/minibatch" of <a href="L02-ml-basics.html#s10">page 19</a></span></td></tr>
+      <tr><td class="what"><span lang="ko">momentum 계수 <span class="m"><i>ρ</i></span></span><span lang="en">momentum coefficient <span class="m"><i>ρ</i></span></span></td>
+          <td class="num">0.9</td>
+          <td><span lang="ko"><a href="L02-ml-basics.html#s10">L02-3 20쪽</a> 코드의 <code>rho</code>에 들어가는 값</span><span lang="en">the value that goes into <code>rho</code> in the code on <a href="L02-ml-basics.html#s10">page 20</a></span></td></tr>
+      <tr><td class="what"><span lang="ko">weight decay <span class="m"><i>λ</i></span></span><span lang="en">weight decay <span class="m"><i>λ</i></span></span></td>
+          <td class="num">0.0005</td>
+          <td><span lang="ko"><a href="L02-ml-basics.html#s8">L02-3 17쪽</a>의 L2 정규화 세기</span><span lang="en">the L2 strength on <a href="L02-ml-basics.html#s8">page 17</a></span></td></tr>
+      <tr><td class="what"><span lang="ko">dropout 확률</span><span lang="en">dropout probability</span></td>
+          <td class="num">0.5</td>
+          <td><span lang="ko"><a href="L02-ml-basics.html#s9">L02-3 18쪽</a>. 그리고 반복 횟수가 두 배가 된다</span><span lang="en"><a href="L02-ml-basics.html#s9">Page 18</a>, and it doubles the iteration count</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">기준점: 학습 시간</span><span lang="en">reference: training time</span></td>
+          <td class="num">5-6 <span lang="ko">일</span><span lang="en">days</span></td>
+          <td><span lang="ko">GTX 580 3GB 두 장. <strong>이 숫자가 위의 모든 하이퍼파라미터 선택을 설명한다</strong></span><span lang="en">on two GTX 580 3GB cards. <strong>This number explains every hyperparameter choice above</strong></span></td></tr>
+    </table>
+    <div class="foot" lang="ko">learning rate를 <strong>수동으로 조정</strong>했다는 것이 이 표의 마지막 줄과 이어진다. 한 번 돌리는 데 <strong>엿새</strong>가 걸리면 자동 탐색을 돌릴 수가 없다. <strong>하이퍼파라미터 탐색이 하드웨어 예산에 묶여 있었다</strong>는 뜻이고, 이 수업의 AutoML과 NAS 주제가 바로 그 제약을 푸는 이야기다.</div>
+    <div class="foot" lang="en">The fact that the learning rate was tuned <strong>by hand</strong> connects to the last row. When one run takes <strong>six days</strong>, an automated search is not an option. <strong>Hyperparameter search was bounded by the hardware budget</strong>, and this course's AutoML and NAS topics are the story of loosening that bound.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 13 -->
+<section id="s13">
+  <div class="sec-head"><span class="sec-num">13</span><h2 lang="ko">결과</h2><h2 lang="en">Results</h2></div>
+
+  <h3><span lang="ko">ILSVRC-2010 (Table 1)</span><span lang="en">ILSVRC-2010, Table 1</span></h3>
+  <p lang="ko">테스트 라벨이 공개된 유일한 버전이라 대부분의 실험을 여기서 했다.</p>
+  <p lang="en">The only version of ILSVRC whose test set labels are available, so most experiments were run on it.</p>
+  <table>
+    <thead><tr><th>Model</th><th>Top-1</th><th>Top-5</th></tr></thead>
+    <tbody>
+      <tr><td><em>Sparse coding [2]</em></td><td><em>47.1%</em></td><td><em>28.2%</em></td></tr>
+      <tr><td><em>SIFT + FVs [24]</em></td><td><em>45.7%</em></td><td><em>25.7%</em></td></tr>
+      <tr><td><strong>CNN</strong></td><td><strong>37.5%</strong></td><td><strong>17.0%</strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">이탤릭이 다른 팀의 최고 기록이다. 첫 줄은 <strong>서로 다른 특징으로 학습한 sparse-coding 모델 여섯 개의 예측을 평균</strong>한 것으로 2010년 대회 우승 성적이고, 둘째 줄은 <strong>두 종류의 densely-sampled 특징에서 계산한 Fisher Vector로 학습한 분류기 둘의 예측을 평균</strong>한 것으로 그 이후 최고 발표 성적이다.</p>
+  <p lang="en">The italicized rows are the best results by others. The first averages the predictions of <strong>six sparse-coding models trained on different features</strong>, the winning entry of the 2010 competition; the second averages <strong>two classifiers trained on Fisher Vectors computed from two types of densely-sampled features</strong>, the best published result since.</p>
+
+  <h3><span lang="ko">ILSVRC-2012 (Table 2)</span><span lang="en">ILSVRC-2012, Table 2</span></h3>
+  <p lang="ko">2012 테스트 라벨은 공개되지 않아 시도한 모든 모델의 테스트 오류를 보고할 수 없다. 논문은 validation과 test 오류를 <strong>서로 바꿔 써도 되는 것으로</strong> 취급하는데, 경험상 <strong>0.1%를 넘게 차이 나지 않기</strong> 때문이다.</p>
+  <p lang="en">The 2012 test labels are not public, so test error cannot be reported for every model tried. The paper treats validation and test error <strong>interchangeably</strong>, since in their experience they <strong>do not differ by more than 0.1%.</strong></p>
+  <table>
+    <thead><tr><th>Model</th><th>Top-1 (val)</th><th>Top-5 (val)</th><th>Top-5 (test)</th></tr></thead>
+    <tbody>
+      <tr><td><em>SIFT + FVs [7]</em></td><td>—</td><td>—</td><td><em>26.2%</em></td></tr>
+      <tr><td>1 CNN</td><td>40.7%</td><td>18.2%</td><td>—</td></tr>
+      <tr><td>5 CNNs</td><td>38.1%</td><td>16.4%</td><td>16.4%</td></tr>
+      <tr><td>1 CNN*</td><td>39.0%</td><td>16.6%</td><td>—</td></tr>
+      <tr><td><strong>7 CNNs*</strong></td><td><strong>36.7%</strong></td><td><strong>15.4%</strong></td><td><strong>15.3%</strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">별표(*)가 붙은 모델은 <strong>ImageNet 2011 Fall release 전체(1,500만 장, 22,000 범주)를 분류하도록 사전 학습</strong>된 것이다. 각 줄의 정체는 이렇다.</p>
+  <p lang="en">Models marked with an asterisk were <strong>pre-trained to classify the entire ImageNet 2011 Fall release</strong>, 15M images across 22K categories. Row by row:</p>
+  <ul lang="ko">
+    <li><strong>1 CNN</strong> · 이 논문이 서술한 그 네트워크</li>
+    <li><strong>5 CNNs</strong> · 비슷한 CNN 다섯 개의 예측을 평균</li>
+    <li><strong>1 CNN*</strong> · 마지막 pooling 층 위에 <strong>여섯 번째 합성곱 층</strong>을 얹어 Fall 2011 전체로 학습한 뒤 ILSVRC-2012에 <strong>fine-tuning</strong></li>
+    <li><strong>7 CNNs*</strong> · 위의 사전 학습된 CNN 둘과 앞의 다섯을 합쳐 평균. <strong>이것이 우승 기록 15.3%</strong></li>
+  </ul>
+  <ul lang="en">
+    <li><strong>1 CNN</strong>, the network described in the paper</li>
+    <li><strong>5 CNNs</strong>, averaging the predictions of five similar CNNs</li>
+    <li><strong>1 CNN*</strong>, with <strong>an extra sixth convolutional layer</strong> over the last pooling layer, trained on the whole Fall 2011 release then <strong>fine-tuned</strong> on ILSVRC-2012</li>
+    <li><strong>7 CNNs*</strong>, averaging two such pre-trained CNNs with the five above. <strong>This is the winning 15.3%</strong></li>
+  </ul>
+  <p lang="ko">그리고 <strong>Fall 2009 버전</strong>(10,184 범주, 890만 장)에서도 보고한다. 문헌의 관례를 따라 절반을 학습, 절반을 테스트로 나눴다. <strong>top-1 67.4%, top-5 40.9%</strong>이고, 그 전 최고 발표 성적은 <strong>78.1%와 60.9%</strong>였다.</p>
+  <p lang="en">Results on the <strong>Fall 2009 version</strong> are also reported: 10,184 categories, 8.9 million images, split half for training and half for testing per convention. <strong>Top-1 67.4% and top-5 40.9%</strong>, against best published results of <strong>78.1% and 60.9%.</strong></p>
+
+  <div class="play">
+    <div class="plab" lang="ko">기법별 기여도 · 논문이 보고한 감소폭을 켜고 꺼 보기</div>
+    <div class="plab" lang="en">Contribution by technique · toggle the reductions the paper reports</div>
+
+    <div class="hintline" lang="ko" style="border-top:0;padding-top:0;margin-top:0">전부 켠 상태가 논문의 ILSVRC-2010 결과 <strong>37.5% / 17.0%</strong>다. 하나씩 꺼 보면 각 기법이 실제로 몇 포인트짜리인지 보인다.</div>
+    <div class="hintline" lang="en" style="border-top:0;padding-top:0;margin-top:0">Everything on is the paper's ILSVRC-2010 result, <strong>37.5% / 17.0%</strong>. Turning items off shows how many points each technique is actually worth.</div>
+
+    <div class="plab" lang="ko">기법 (눌러서 켜고 끈다)</div>
+    <div class="plab" lang="en">Techniques, click to toggle</div>
+    <div class="presets" id="ablBtn"></div>
+
+    <div class="readout" id="ablOut" style="margin-top:18px"></div>
+    <div class="verdict" id="ablV" style="margin-top:14px"></div>
+
+    <div class="hintline" lang="ko"><strong>엄밀한 계산이 아니다.</strong> 논문은 각 감소폭을 <strong>그 기법만 뺀 변형과 비교해서</strong> 따로 보고했고, 그것들을 단순히 더하는 것은 저자들이 한 일이 아니다. 이 도구는 <strong>각 숫자가 얼마나 작은지</strong>를 보는 용도다. PCA 색상 증강의 top-5 감소폭은 논문이 보고하지 않았으므로 0으로 두었다.</div>
+    <div class="hintline" lang="en"><strong>This is not a rigorous calculation.</strong> The paper reports each reduction <strong>against a variant with that one technique removed</strong>, and summing them is not something the authors did. The tool is here to show <strong>how small each individual number is.</strong> The top-5 reduction for PCA colour augmentation is not reported in the paper, so it is left at zero.</div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 도구가 보여주는 것</span><span class="tag" lang="en">What the tool shows</span>
+    <h4 lang="ko">영리한 기법을 다 합쳐도 2위와의 격차보다 작다</h4>
+    <h4 lang="en">All the clever techniques together are smaller than the gap to second place</h4>
+    <p lang="ko">네 기법과 테스트 시 10-patch 평균을 전부 끄면 top-1이 <strong>약 6포인트</strong> 나빠진다. 그런데 2012년 대회에서 이 논문과 2위의 격차는 <strong>약 11포인트</strong>였다 (15.3% 대 26.2%).</p>
+    <p lang="en">Turning off all four techniques plus the ten-patch test-time averaging costs <strong>about six points</strong> of top-1. But the gap to second place in the 2012 competition was <strong>about eleven points</strong>: 15.3% against 26.2%.</p>
+    <p lang="ko">즉 <strong>승리의 대부분은 개별 기법이 아니라 다른 데서 왔다.</strong> 논문이 토론 절에서 그것을 직접 말한다. <em>"깊이가 정말 중요하다."</em> 중간 층 하나를 빼면 top-1이 <strong>약 2% 나빠진다</strong>고 적었고, 각 합성곱 층은 파라미터의 1%도 안 되는데도 그렇다. 그리고 그 깊이를 가능하게 한 것이 <strong>ReLU(학습 속도), 두 GPU(메모리), 120만 장의 데이터</strong>다.</p>
+    <p lang="en">So <strong>most of the win came from somewhere other than the individual techniques.</strong> The discussion section says it outright: <em>depth really is important.</em> Removing any middle layer costs <strong>about 2% of top-1</strong>, even though each convolutional layer holds under 1% of the parameters. And what made that depth possible was <strong>ReLU for training speed, two GPUs for memory, and 1.2 million images of data.</strong></p>
+  </div>
+
+  <h3><span lang="ko">정성 평가 (6.1절)</span><span lang="en">Qualitative evaluations, Section 6.1</span></h3>
+  <p lang="ko"><strong>Figure 3</strong>은 첫 합성곱 층이 224×224×3 입력 이미지에서 학습한 <strong>11×11×3 커널 96개</strong>를 보여준다. 네트워크가 <strong>다양한 주파수 선택적, 방향 선택적 커널</strong>과 <strong>여러 색 얼룩</strong>을 배웠다.</p>
+  <p lang="en"><strong>Figure 3</strong> shows the <strong>96 convolutional kernels of size 11×11×3</strong> learned by the first layer on the 224×224×3 input images. The network has learned <strong>a variety of frequency- and orientation-selective kernels</strong> as well as <strong>various coloured blobs.</strong></p>
+  <p lang="ko">여기서 논문이 짚는 것이 흥미롭다. <strong>두 GPU가 보이는 전문화</strong>다. <strong>위 48개는 GPU 1에서, 아래 48개는 GPU 2에서 학습</strong>되었는데, <strong>GPU 1의 커널은 대체로 색에 무관하고 GPU 2의 커널은 대체로 색에 특화</strong>되어 있다. 그리고 이 전문화는 <strong>매 실행마다 일어나고 특정 무작위 가중치 초기화와 무관</strong>하다 (GPU 번호가 바뀌는 것만 제외하면).</p>
+  <p lang="en">What the paper points out here is interesting: <strong>the specialization exhibited by the two GPUs.</strong> The <strong>top 48 kernels were learned on GPU 1 and the bottom 48 on GPU 2</strong>, and <strong>the GPU 1 kernels are largely colour-agnostic while the GPU 2 kernels are largely colour-specific.</strong> The specialization <strong>occurs during every run and is independent of any particular random weight initialization</strong>, modulo a renumbering of the GPUs.</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 관찰이 이 수업에서 특별한 이유.</strong> 두 GPU로 나눈 것은 <strong>메모리가 모자라서 한 순수한 하드웨어적 결정</strong>이었다. 그런데 그 결정이 <strong>모델이 배우는 표현을 바꿔 놓았다.</strong> 3.2절에서 <strong>2, 4, 5번 층이 같은 GPU 안에서만 연결</strong>되도록 한 제약이 두 그룹을 서로 다른 특징으로 밀어붙인 것이다. <strong>하드웨어 제약이 알고리즘의 결과에 흔적을 남긴 사례</strong>이고, 이 수업이 말하는 co-design의 가장 이른 사례 중 하나로 읽힌다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Why this observation is special for this course.</strong> Splitting across two GPUs was <strong>a purely hardware decision forced by memory</strong>. And that decision <strong>changed the representation the model learned.</strong> The restricted connectivity of Section 3.2, where layers 2, 4 and 5 connect only within a GPU, pushed the two halves toward different features. <strong>A hardware constraint leaving its mark on the algorithm's outcome</strong>, and readable as one of the earliest instances of the co-design this course is about.
+  </div>
+
+  <p lang="ko"><strong>Figure 4</strong>는 두 패널이다. <strong>왼쪽</strong>은 ILSVRC-2010 테스트 이미지 여덟 장과 모델이 가장 그럴듯하다고 본 다섯 개의 라벨이다. 정답 라벨이 각 이미지 아래 적혀 있고, 정답이 top-5 안에 있으면 그 확률이 <strong>빨간 막대</strong>로 표시된다. 논문은 <strong>왼쪽 위의 진드기처럼 중심에서 벗어난 물체도 인식된다</strong>고 짚고, <strong>표범에는 다른 종류의 고양이만 그럴듯한 라벨로 올라온다</strong>고 적는다. 그릴이나 체리 같은 경우에는 <strong>사진의 의도된 초점에 진짜 모호함이 있다</strong>고도 밝힌다.</p>
+  <p lang="en"><strong>Figure 4</strong> has two panels. On the <strong>left</strong>, eight ILSVRC-2010 test images with the five labels the model considered most probable; the correct label is written under each image and, if it is in the top five, its probability is shown as a <strong>red bar.</strong> The paper notes that <strong>even off-centre objects such as the mite in the top left are recognized</strong>, that <strong>only other types of cat are considered plausible for the leopard</strong>, and that in some cases, grille and cherry, <strong>there is genuine ambiguity about the intended focus of the photograph.</strong></p>
+  <p lang="ko"><strong>오른쪽</strong>은 다른 방식의 조사다. 마지막 <strong>4096차원 은닉 층</strong>에서 이미지가 유발한 특징 활성을 본다. 두 이미지가 <strong>유클리드 거리가 작은</strong> 특징 벡터를 만들면 신경망의 상위 층이 그 둘을 비슷하다고 본다는 뜻이다. 그림은 테스트 이미지 다섯 장과, 그 기준으로 가장 비슷한 <strong>학습 이미지 여섯 장씩</strong>을 보여준다.</p>
+  <p lang="en">On the <strong>right</strong> is a different probe: the feature activations an image induces at the last <strong>4096-dimensional hidden layer.</strong> If two images produce feature vectors with <strong>a small Euclidean separation</strong>, the higher levels of the network consider them similar. The figure shows five test images and, for each, <strong>the six most similar training images</strong> by that measure.</p>
+  <p lang="ko">중요한 관찰은 이것이다. <strong>픽셀 수준에서는 검색된 학습 이미지들이 질의 이미지와 L2로 가깝지 않다.</strong> 검색된 개와 코끼리가 <strong>다양한 자세</strong>로 나타난다.</p>
+  <p lang="en">The key observation: <strong>at the pixel level the retrieved training images are generally not close in L2 to the query images.</strong> The retrieved dogs and elephants appear <strong>in a variety of poses.</strong></p>
+  <p lang="ko">그리고 논문이 여기서 <strong>하드웨어적인 제안</strong>을 하나 던진다. 4096차원 실수 벡터 둘 사이의 유클리드 거리로 유사도를 계산하는 것은 <strong>비효율적</strong>이지만, <strong>auto-encoder를 학습시켜 이 벡터들을 짧은 이진 코드로 압축</strong>하면 효율적으로 만들 수 있다. 그리고 그것이 원시 픽셀에 auto-encoder를 적용하는 것보다 훨씬 나은 이미지 검색 방법이 될 것인데, 후자는 <strong>이미지 라벨을 쓰지 않으므로 의미적으로 비슷하든 아니든 가장자리 패턴이 비슷한 이미지를 검색하는 경향</strong>이 있기 때문이다.</p>
+  <p lang="en">And here the paper throws in <strong>a hardware-flavoured suggestion</strong>: computing similarity by Euclidean distance between two 4096-dimensional real-valued vectors is <strong>inefficient</strong>, but could be made efficient by <strong>training an auto-encoder to compress these vectors to short binary codes.</strong> That should produce a much better image retrieval method than applying auto-encoders to raw pixels, which <strong>does not use image labels and so tends to retrieve images with similar patterns of edges whether or not they are semantically similar.</strong></p>
+
+  <h3><span lang="ko">토론 (7절)</span><span lang="en">Discussion, Section 7</span></h3>
+  <ul lang="ko">
+    <li><strong>순수하게 지도 학습만으로</strong> 매우 어려운 데이터셋에서 기록을 깼다는 것이 주목할 만하다</li>
+    <li><strong>합성곱 층을 하나만 제거해도 성능이 나빠진다.</strong> 중간 층 하나를 빼면 top-1이 약 2% 손실된다. <strong>깊이가 정말 중요하다</strong></li>
+    <li>실험을 단순화하려고 <strong>비지도 사전 학습을 쓰지 않았다.</strong> 다만 도움이 될 것으로 예상하는데, 특히 라벨 데이터가 그만큼 늘지 않은 채로 네트워크 크기를 크게 늘릴 <strong>계산 능력</strong>을 얻는다면 그렇다</li>
+    <li>지금까지 <strong>네트워크를 더 크게 만들고 더 오래 학습시킬수록 결과가 개선</strong>되었지만, <strong>인간 시각 시스템의 infero-temporal 경로에 맞추려면 아직 여러 자릿수가 남았다</strong></li>
+    <li>궁극적으로는 <strong>비디오 시퀀스</strong>에 매우 크고 깊은 합성곱 신경망을 쓰고 싶다. 시간적 구조가 정지 이미지에는 없거나 훨씬 덜 뚜렷한 유용한 정보를 제공하기 때문이다</li>
+  </ul>
+  <ul lang="en">
+    <li>It is notable that record-breaking results came from <strong>purely supervised learning</strong> on a highly challenging dataset</li>
+    <li><strong>Performance degrades if a single convolutional layer is removed</strong>; removing a middle one loses about 2% of top-1. <strong>Depth really is important</strong></li>
+    <li>To simplify the experiments <strong>no unsupervised pre-training was used</strong>, though the authors expect it to help, especially given enough <strong>computational power</strong> to significantly increase network size without a corresponding increase in labelled data</li>
+    <li>Results have improved as the network got <strong>larger and was trained longer</strong>, but there are <strong>many orders of magnitude to go to match the infero-temporal pathway of the human visual system</strong></li>
+    <li>Ultimately they would like to use very large deep convolutional nets on <strong>video sequences</strong>, where temporal structure provides information missing or far less obvious in static images</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 14 -->
+<section id="s14">
+  <div class="sec-head"><span class="sec-num">14</span><h2 lang="ko">두 논문이 만나는 곳</h2><h2 lang="en">Where the two meet</h2></div>
+  <p class="sec-sub" lang="ko">7년 사이에 하나가 다른 하나의 전제가 되었다.</p>
+  <p class="sec-sub" lang="en">Seven years apart, and one became the premise of the other.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 220" role="img" aria-label="2012년 AlexNet에서 2019년 Golden Age까지의 연표">
+      <line x1="50" y1="120" x2="660" y2="120" stroke="var(--ink3)" stroke-width="1.2"/>
+
+      <circle cx="80" cy="120" r="6" fill="var(--blue)"/>
+      <line x1="80" y1="114" x2="80" y2="96" stroke="var(--rule)"/>
+      <text class="svgnum" x="80" y="142" text-anchor="middle" style="font-size:12px" fill="var(--blue)">2012</text>
+      <text class="svgtxt" x="80" y="88" text-anchor="middle" style="font-size:12px;font-weight:600" fill="var(--blue)">AlexNet</text>
+      <text class="svglab" x="80" y="72" text-anchor="middle" style="font-size:9.5px">two 3GB GPUs</text>
+
+      <circle cx="290" cy="120" r="6" fill="var(--violet)"/>
+      <line x1="290" y1="126" x2="290" y2="148" stroke="var(--rule)"/>
+      <text class="svgnum" x="290" y="112" text-anchor="middle" style="font-size:12px" fill="var(--violet)">2015</text>
+      <text class="svgtxt" x="290" y="164" text-anchor="middle" style="font-size:12px;font-weight:600" fill="var(--violet)">TPU v1 in production</text>
+      <text class="svglab" x="290" y="180" text-anchor="middle" style="font-size:9.5px">256x256 systolic array</text>
+
+      <circle cx="460" cy="120" r="6" fill="var(--violet)"/>
+      <line x1="460" y1="114" x2="460" y2="96" stroke="var(--rule)"/>
+      <text class="svgnum" x="460" y="142" text-anchor="middle" style="font-size:12px" fill="var(--violet)">2017</text>
+      <text class="svgtxt" x="460" y="88" text-anchor="middle" style="font-size:12px;font-weight:600" fill="var(--violet)">TPU paper · NVDLA</text>
+      <text class="svglab" x="460" y="72" text-anchor="middle" style="font-size:9.5px">29x faster, 80x efficiency</text>
+
+      <circle cx="640" cy="120" r="6" fill="var(--green)"/>
+      <line x1="640" y1="126" x2="640" y2="148" stroke="var(--rule)"/>
+      <text class="svgnum" x="640" y="112" text-anchor="end" style="font-size:12px" fill="var(--green)">2019</text>
+      <text class="svgtxt" x="660" y="164" text-anchor="end" style="font-size:12px;font-weight:600" fill="var(--green)">Golden Age</text>
+      <text class="svglab" x="660" y="180" text-anchor="end" style="font-size:9.5px">DSA is the answer</text>
+
+      <text class="svglab" lang="ko" x="50" y="30" style="font-size:10.5px" fill="var(--blue)">수요를 만든 사건</text>
+      <text class="svglab" lang="en" x="50" y="30" style="font-size:10.5px" fill="var(--blue)">the event that created demand</text>
+      <text class="svglab" lang="ko" x="660" y="30" text-anchor="end" style="font-size:10.5px" fill="var(--green)">그 수요에 대한 답</text>
+      <text class="svglab" lang="en" x="660" y="30" text-anchor="end" style="font-size:10.5px" fill="var(--green)">the answer to that demand</text>
+
+      <path d="M120,42 L600,42" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="5 4"/>
+    </svg>
+    <figcaption lang="ko">두 논문 사이에 놓인 사건들. 가운데 둘은 Golden Age가 자기 예시로 든 것이다. 이 연표는 슬라이드나 논문에 없고 이 노트가 만든 것이다.</figcaption>
+    <figcaption lang="en">What sits between the two papers. The middle two are Golden Age's own worked examples. The timeline is the note's, not the papers'.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">AlexNet이 겪은 것 (2012)</th><th lang="ko">Golden Age가 답한 것 (2019)</th>
+      <th lang="en">What AlexNet ran into, 2012</th><th lang="en">What Golden Age answers, 2019</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">GPU 메모리 3GB가 네트워크 크기를 정했다</td><td lang="ko">DSA의 두 번째 이유: <strong>소프트웨어가 제어하는 메모리 계층.</strong> TPU는 캐시 대신 24 MB 로컬 메모리</td>
+          <td lang="en">3GB of GPU memory set the network's size</td><td lang="en">DSA reason two: <strong>a software-controlled memory hierarchy.</strong> The TPU uses 24 MB of local memory instead of caches</td></tr>
+      <tr><td lang="ko">FP32로 학습했다</td><td lang="ko">DSA의 세 번째 이유: <strong>추론은 4, 8, 16비트 정수로 충분하고 학습도 16비트로 되는 경우가 많다</strong></td>
+          <td lang="en">Trained in FP32</td><td lang="en">DSA reason three: <strong>inference regularly uses 4-, 8- or 16-bit integers, and 16 bits often works for training</strong></td></tr>
+      <tr><td lang="ko">2D 합성곱의 GPU 구현을 직접 짜서 공개했다</td><td lang="ko">기회 1(소프트웨어)과 <strong>DSL.</strong> TensorFlow가 DNN용 DSL이고 XLA가 GPU와 TPU로 번역한다</td>
+          <td lang="en">Hand-wrote and released a GPU implementation of 2D convolution</td><td lang="en">Opportunity one, software, and <strong>DSLs.</strong> TensorFlow is the DNN DSL and XLA compiles it to GPUs and TPUs</td></tr>
+      <tr><td lang="ko">GPU 두 장을 직접 연결해 통신량을 조절했다</td><td lang="ko">아키텍트들이 <strong>수백에서 수천 개의 칩을 연결해 신경망 슈퍼컴퓨터</strong>를 만들고 있다</td>
+          <td lang="en">Wired two GPUs together and tuned the communication</td><td lang="en">Architects are <strong>interconnecting hundreds to thousands of chips into neural-network supercomputers</strong></td></tr>
+      <tr><td lang="ko"><strong>"더 빠른 GPU를 기다리기만 하면 된다"</strong></td><td lang="ko"><strong>그 기다림이 끝났다.</strong> 성능 향상은 연 3%, 배가 시간 20년</td>
+          <td lang="en"><strong>"Simply wait for faster GPUs"</strong></td><td lang="en"><strong>That wait is over.</strong> Performance improvement is 3% a year, doubling in 20</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout" lang="ko">
+    <strong>마지막 줄이 두 논문의 관계를 정한다.</strong> AlexNet의 서론이 <em>"모든 실험이 시사하는 바는, 더 빠른 GPU와 더 큰 데이터셋이 나오기를 기다리기만 하면 결과가 개선된다는 것"</em>이라고 적었다. <strong>2012년에는 맞는 말이었다.</strong> 그런데 Golden Age의 Figure 6이 보여주듯 <strong>그 전제가 만료되었다.</strong> 공정이 주던 배수가 사라졌으니, 같은 개선을 계속 얻으려면 <strong>구조에서 얻어야</strong> 한다. <strong>그것이 도메인 특화 하드웨어이고, 이 수업의 나머지 전부다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>That last row defines the relationship between the two papers.</strong> AlexNet's introduction says <em>"our results can be improved simply by waiting for faster GPUs and bigger datasets to become available."</em> <strong>In 2012 that was true.</strong> But as Golden Age's Figure 6 shows, <strong>the premise has expired.</strong> With the multiple the process used to supply now gone, continuing to get the same improvement means <strong>getting it from structure instead.</strong> <strong>That is domain-specific hardware, and it is the rest of this course.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 15 -->
+<section id="s15">
+  <div class="sec-head"><span class="sec-num">15</span><h2 lang="ko">정리</h2><h2 lang="en">Recap</h2></div>
+
+  <h3><span lang="ko">한 장 요약</span><span lang="en">One-page recap</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">기억할 것</th><th lang="ko">어느 논문</th><th lang="ko">강의와의 연결</th>
+      <th lang="en">What to keep</th><th lang="en">Which paper</th><th lang="en">Link to the lectures</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">성능 향상이 <strong>연 52%에서 3%</strong>로 떨어졌다</td><td lang="ko">Golden Age Fig 6</td><td lang="ko"><a href="L01-introduction.html#s14">L01 33-34쪽</a></td>
+          <td lang="en">Performance growth fell from <strong>52% to 3% a year</strong></td><td lang="en">Golden Age, Fig 6</td><td lang="en"><a href="L01-introduction.html#s14">L01 p33-34</a></td></tr>
+      <tr><td lang="ko"><strong>Moore와 Dennard는 다른 주장</strong>이고 DSA는 Dennard의 종료에 대한 답이다</td><td lang="ko">Golden Age Fig 2, 3</td><td lang="ko"><a href="L01-introduction.html#s14">L01 34쪽 함정</a></td>
+          <td lang="en"><strong>Moore and Dennard are different claims</strong>, and DSAs answer the end of Dennard</td><td lang="en">Golden Age, Figs 2 and 3</td><td lang="en"><a href="L01-introduction.html#s14">the trap on L01 p34</a></td></tr>
+      <tr><td lang="ko">메모리 접근이 <strong>덧셈의 200배 에너지</strong>. 그래서 캐시 대신 소프트웨어 제어 버퍼</td><td lang="ko">Golden Age 6절</td><td lang="ko"><span class="cMem">이 저장소의 갈색</span>이 뜻하는 것</td>
+          <td lang="en">A memory access costs <strong>200× the energy of an add</strong>, hence software-controlled buffers over caches</td><td lang="en">Golden Age, DSA section</td><td lang="en">what <span class="cMem">this site's brown</span> means</td></tr>
+      <tr><td lang="ko">TPU v1은 <strong>29배 빠르고 80배 이상 에너지 효율적</strong></td><td lang="ko">Golden Age 6절</td><td lang="ko"><a href="L01-introduction.html#s15">L01 37쪽, 41쪽</a></td>
+          <td lang="en">TPU v1 is <strong>29× faster and over 80× more energy efficient</strong></td><td lang="en">Golden Age, DSA section</td><td lang="en"><a href="L01-introduction.html#s15">L01 p37 and p41</a></td></tr>
+      <tr><td lang="ko">AlexNet의 크기를 정한 것은 <strong>GPU 메모리 3GB</strong>였다</td><td lang="ko">AlexNet 서론</td><td lang="ko"><a href="L02-ml-basics.html#s4">L02-3 8쪽</a> 모델 크기 그래프</td>
+          <td lang="en">AlexNet's size was set by <strong>3GB of GPU memory</strong></td><td lang="en">AlexNet, introduction</td><td lang="en">the model-size charts on <a href="L02-ml-basics.html#s4">L02-3 p8</a></td></tr>
+      <tr><td lang="ko">파라미터의 <strong>96%가 FC</strong>인데 정확도는 <strong>conv</strong>가 만든다</td><td lang="ko">AlexNet 3.5, 7절</td><td lang="ko">pruning과 quantization이 층마다 다른 이유</td>
+          <td lang="en"><strong>96% of parameters are in FC</strong> while <strong>conv</strong> produces the accuracy</td><td lang="en">AlexNet, Sections 3.5 and 7</td><td lang="en">why pruning and quantization differ per layer</td></tr>
+      <tr><td lang="ko"><strong>weight decay가 training error를 줄였다</strong>는 논문의 관찰</td><td lang="ko">AlexNet 5절</td><td lang="ko"><a href="L02-ml-basics.html#s8">L02-3 17쪽</a>의 정의와 어긋난다</td>
+          <td lang="en">The observation that <strong>weight decay reduced training error</strong></td><td lang="en">AlexNet, Section 5</td><td lang="en">it diverges from the definition on <a href="L02-ml-basics.html#s8">L02-3 p17</a></td></tr>
+      <tr><td lang="ko">GPU 분할이 <strong>학습된 특징을 색 특화와 색 무관으로 갈랐다</strong></td><td lang="ko">AlexNet 6.1절</td><td lang="ko">하드웨어 제약이 알고리즘에 남긴 흔적</td>
+          <td lang="en">The GPU split <strong>divided learned features into colour-specific and colour-agnostic</strong></td><td lang="en">AlexNet, Section 6.1</td><td lang="en">a hardware constraint marking the algorithm</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span lang="ko">이 두 편을 읽고 나면 달라지는 것</span><span lang="en">What changes after reading these two</span></h3>
+  <p lang="ko">강의 슬라이드에서 <strong>출처가 작게 적힌 그림</strong>들이 이제 읽힌다. <a href="L01-introduction.html#s14">L01 34쪽</a>의 두 그래프, <a href="L01-introduction.html#s15">37쪽</a>의 TPU 스펙, <a href="L01-introduction.html#s15">41쪽</a> 목록의 마지막 줄, <a href="L02-ml-basics.html#s4">L02-3 8쪽</a>의 AlexNet 화살표, <a href="L02-ml-basics.html#s9">18쪽</a>의 dropout 정의. <strong>슬라이드가 한 줄로 줄인 것의 원문이 어디인지</strong> 알게 된 상태다.</p>
+  <p lang="en">The figures on the slides with <strong>small credits underneath</strong> now read. The two charts on <a href="L01-introduction.html#s14">L01 p34</a>, the TPU specs on <a href="L01-introduction.html#s15">p37</a>, the last line of the list on <a href="L01-introduction.html#s15">p41</a>, the AlexNet arrow on <a href="L02-ml-basics.html#s4">L02-3 p8</a>, the dropout definition on <a href="L02-ml-basics.html#s9">p18</a>. You now know <strong>where the originals are for the lines the slides compressed.</strong></p>
+  <p lang="ko">그리고 <strong>이 분야의 논문이 어떻게 생겼는지</strong>를 두 종류로 보았다. 하나는 <strong>기존 결과를 모아 논지를 세우는 서베이형</strong>이고, 다른 하나는 <strong>시스템을 만들고 측정해서 기록을 세우는 실험형</strong>이다. 두 종류의 <strong>근거를 대는 방식이 완전히 다르다.</strong> Golden Age는 그림마다 출처를 달고, AlexNet은 기법마다 감소폭을 숫자로 댄다.</p>
+  <p lang="en">And you have seen <strong>two kinds of paper</strong> in this field: one a <strong>survey assembling existing results into an argument</strong>, the other an <strong>experimental paper building a system, measuring it and setting a record.</strong> <strong>The two support their claims in completely different ways</strong>: Golden Age credits every figure to a source, AlexNet attaches a numeric reduction to every technique.</p>
+
+  <div class="callout" lang="ko">
+    <strong>다음 Reading을 읽을 때 쓸 수 있는 것.</strong> 이 두 편에서 반복해서 확인한 습관이 셋이다. <strong>축과 단위를 먼저 읽는다</strong> (Golden Age의 이중 축, AlexNet의 top-1과 top-5). <strong>저자가 스스로 붙인 단서를 찾는다</strong> (62,806배의 "과장한다", 두 GPU 비교의 "편향되어 있다"). <strong>기준선이 무엇인지 확인한다</strong> (200배와 10배의 기준이 다르다, 감소폭이 어느 변형 대비인가).
+  </div>
+  <div class="callout" lang="en">
+    <strong>What carries over to the next reading.</strong> Three habits confirmed repeatedly across these two papers. <strong>Read the axes and units first</strong> (Golden Age's dual axis, AlexNet's top-1 versus top-5). <strong>Look for the caveats the authors attach themselves</strong> ("it exaggerates" on the 62,806×, "biased in favour of" on the two-GPU comparison). <strong>Check what the baseline is</strong> (the 200× and the 10× use different ones; each reduction is measured against a specific variant).
+  </div>
+</section>
+
+<footer>
+  <span lang="ko">EEE / CEN 598 Hardware and Systems for Machine Learning · Paper Reading #1 개인 학습 노트<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  다룬 논문: Hennessy &amp; Patterson, <em>A New Golden Age for Computer Architecture</em>, CACM 62(2), 2019 (DOI 10.1145/3282307) · Krizhevsky, Sutskever &amp; Hinton, <em>ImageNet Classification with Deep Convolutional Neural Networks</em>, NIPS 25, 2012<br>
+  이 페이지는 두 논문의 내용을 정리한 개인 학습 자료이며, <strong>제출한 paper review가 아닙니다.</strong> 리뷰 폼의 내용, 등급 선택, 저자에게 보내는 코멘트는 싣지 않았습니다.<br>
+  논문 본문의 저작권은 각 저자와 발행처(ACM, NeurIPS)에 있습니다. 이 저장소는 논문 파일을 배포하지 않습니다.</span><span lang="en">EEE / CEN 598 Hardware and Systems for Machine Learning · Paper Reading #1 personal study notes<br>
+  Course: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  Papers covered: Hennessy &amp; Patterson, <em>A New Golden Age for Computer Architecture</em>, CACM 62(2), 2019 (DOI 10.1145/3282307) · Krizhevsky, Sutskever &amp; Hinton, <em>ImageNet Classification with Deep Convolutional Neural Networks</em>, NIPS 25, 2012<br>
+  This page summarizes what the two papers say. It is <strong>not the submitted paper review</strong>: it contains none of the review form, none of the ratings, and no comments for the authors.<br>
+  Copyright in the papers belongs to their authors and publishers (ACM, NeurIPS). This repository does not distribute the paper files.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 기법별 기여도. 논문이 각각 따로 보고한 감소폭을 켜고 끌 수 있게 한 것이다.
+// 엄밀한 분해가 아니라 "각 숫자가 얼마나 작은지" 보는 용도. 힌트 줄에 그렇게 적어두었다.
+(function () {
+  var host = document.getElementById('ablBtn');
+  if (!host) return;
+  var out = document.getElementById('ablOut');
+  var vd = document.getElementById('ablV');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var BASE1 = 37.5, BASE5 = 17.0;
+
+  var ITEMS = [
+    { ko: '두 GPU', en: 'two GPUs', d1: 1.7, d5: 1.2, on: true },
+    { ko: 'LRN', en: 'LRN', d1: 1.4, d5: 1.2, on: true },
+    { ko: '겹치는 pooling', en: 'overlapping pooling', d1: 0.4, d5: 0.3, on: true },
+    { ko: 'PCA 색상 증강', en: 'PCA colour augmentation', d1: 1.0, d5: 0.0, on: true },
+    { ko: '테스트 10-patch 평균', en: 'ten-patch test averaging', d1: 1.5, d5: 1.3, on: true }
+  ];
+
+  function row(label, value, strong) {
+    return '<div style="display:flex;justify-content:space-between;gap:14px">' +
+           '<span>' + label + '</span>' +
+           (strong ? '<strong>' + value + '</strong>' : '<span>' + value + '</span>') + '</div>';
+  }
+
+  function paint() {
+    var t1 = BASE1, t5 = BASE5, off = 0;
+    ITEMS.forEach(function (it) {
+      if (!it.on) { t1 += it.d1; t5 += it.d5; off++; }
+    });
+    t1 = Math.round(t1 * 10) / 10;
+    t5 = Math.round(t5 * 10) / 10;
+
+    out.innerHTML =
+      row(L('top-1 오류', 'top-1 error'), t1.toFixed(1) + '%', true) +
+      row(L('top-5 오류', 'top-5 error'), t5.toFixed(1) + '%', true) +
+      row(L('끈 기법', 'techniques switched off'), off + ' / ' + ITEMS.length);
+
+    var all = off === ITEMS.length;
+    var none = off === 0;
+    vd.className = 'verdict ' + (none ? 'ok' : 'bad');
+    vd.innerHTML =
+      '<div class="hd">' + (none
+        ? L('논문의 ILSVRC-2010 결과', "the paper's ILSVRC-2010 result")
+        : L(off + '개를 껐을 때', 'with ' + off + ' switched off')) + '</div>' +
+      (none
+        ? L('전부 켠 상태다. 이 두 숫자가 Table 1의 CNN 줄이다.',
+            'Everything on. These two numbers are the CNN row of Table 1.')
+        : all
+          ? L('다 껐는데 top-1이 <strong>' + t1.toFixed(1) + '%</strong>다. 논문이 2위와 벌린 격차(15.3% 대 26.2%, 약 11포인트)보다 <strong>여전히 작다.</strong> 승리의 대부분은 개별 기법이 아니라 <strong>깊이와 데이터와 GPU</strong>에서 왔다.',
+              'With all of them off, top-1 is <strong>' + t1.toFixed(1) + '%</strong>, <strong>still a smaller move</strong> than the gap to second place (15.3% against 26.2%, about eleven points). Most of the win came not from the individual techniques but from <strong>depth, data and GPUs.</strong>')
+          : L('각 기법의 감소폭은 <strong>1~2포인트</strong> 규모다. 하나하나가 결정적이지는 않다.',
+              'Each technique is worth <strong>one or two points.</strong> None of them is decisive on its own.'));
+  }
+
+  function build() {
+    host.textContent = '';
+    ITEMS.forEach(function (it) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = L(it.ko, it.en);
+      if (it.on) b.className = 'act';
+      b.addEventListener('click', function () { it.on = !it.on; build(); });
+      host.appendChild(b);
+    });
+    paint();
+  }
+
+  window.addEventListener('langchange', build);
+  build();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -439,7 +439,6 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div id="list">
-
 <h2 class="gletter" id="gA">A</h2>
 
 <div class="gterm">
@@ -466,14 +465,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
+<h2 class="gletter" id="gB">B</h2>
+
 <div class="gterm">
   <div class="t">batch &middot; minibatch</div>
   <div class="d" lang="ko">한 번의 가중치 갱신에 쓰는 학습 예제의 <strong>부분집합</strong>. 전체 데이터셋의 gradient를 매번 계산하는 것이 불가능해서 생긴 타협이다. <strong>크기를 키우면 하드웨어 효율은 오르지만 수렴이 나빠진다.</strong> L01 31쪽 표에서 minibatch 32,768이 정확도가 가장 낮은 것이 그 사례다.</div>
   <div class="d" lang="en">The <strong>subset</strong> of training examples used for one weight update, a concession forced by the impossibility of computing the full-dataset gradient every step. <strong>Larger batches use the hardware better and converge worse</strong>: the 32,768 minibatch in the table on page 31 of lecture 1 has the lowest accuracy for exactly that reason.</div>
   <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
-
-<h2 class="gletter" id="gB">B</h2>
 
 <div class="gterm">
   <div class="t">bfloat</div>
@@ -503,6 +502,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gD">D</h2>
 
 <div class="gterm">
+  <div class="t">dark silicon</div>
+  <div class="d" lang="ko">TDP 한계 때문에 <strong>칩에 있는 트랜지스터를 동시에 다 켤 수 없는</strong> 상태. 프로세서가 과열을 막으려고 <strong>클럭을 낮추고 노는 코어를 끈다.</strong> 다르게 보면 <strong>노는 코어의 전력을 활성 코어로 재배분</strong>하는 것이다. <a href="#gD">Dennard scaling</a>이 끝난 결과이고, <a href="#gD">DSA</a>가 등장한 직접적인 이유다.</div>
+  <div class="d" lang="en">The condition where the TDP limit means <strong>not all transistors on a chip can be switched on at once.</strong> Processors <strong>slow the clock and turn off idle cores</strong> to avoid overheating, or seen another way, <strong>reallocate power from idle cores to active ones.</strong> A consequence of the end of <a href="#gD">Dennard scaling</a> and the direct reason <a href="#gD">DSAs</a> appeared.</div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Dennard scaling</div>
   <div class="d" lang="ko">트랜지스터가 작아져도 <strong>단위 면적당 전력이 일정하게 유지된다</strong>는 관측. 2000년대 중후반에 끝났다. <strong>Moore의 법칙과 다른 이야기다.</strong> Moore는 개수, Dennard는 전력이다. 도메인 특화 하드웨어는 Moore가 아니라 <strong>Dennard가 끝난 것에 대한 대답</strong>이다.</div>
   <div class="d" lang="en">The observation that <strong>power per unit area stays constant</strong> as transistors shrink. It ended in the mid to late 2000s. <strong>Not the same claim as Moore's law</strong>: Moore is about count, Dennard about power. Domain-specific hardware is a reply to the end of <strong>Dennard</strong>, not of Moore.</div>
@@ -522,6 +528,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">슬라이드의 정의로는 <em>"customized hardware designed for a domain of applications"</em>. <strong>하나의 앱이 아니라 한 부류의 연산</strong>을 잘하는 회로다. Neural Engine은 특정 모델이 아니라 convolution과 matmul을 잘한다.</div>
   <div class="d" lang="en">In the slide's words, <em>"customized hardware designed for a domain of applications"</em>. A circuit good at <strong>a class of computation, not one application</strong>: a Neural Engine is not good at a particular model, it is good at convolution and matmul.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DSL</div>
+  <div class="f">Domain-Specific Language</div>
+  <div class="d" lang="ko">특정 영역에 맞춘 언어. <strong>벡터, 밀집 행렬, 희소 행렬 연산을 명시적으로 만들어</strong> 컴파일러가 <a href="#gD">DSA</a>에 효율적으로 매핑할 수 있게 한다. 예: Matlab, <strong>TensorFlow</strong>(DNN용 데이터플로우 언어), P4(SDN), Halide(영상 처리). 과제는 <strong>이식성과 효율의 균형</strong>이다.</div>
+  <div class="d" lang="en">A language tailored to a domain. It makes <strong>vector, dense matrix and sparse matrix operations explicit</strong> so a compiler can map them efficiently onto a <a href="#gD">DSA</a>. Examples: Matlab, <strong>TensorFlow</strong> (a dataflow language for DNNs), P4 for SDNs, Halide for image processing. The challenge is <strong>balancing portability against efficiency.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s6">Paper Reading 1 &middot; 06</a></div>
 </div>
 
 <h2 class="gletter" id="gE">E</h2>
@@ -586,6 +600,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gI">I</h2>
 
 <div class="gterm">
+  <div class="t">ILP</div>
+  <div class="f">Instruction Level Parallelism</div>
+  <div class="d" lang="ko">한 명령어 스트림 안에서 동시에 실행할 수 있는 명령어를 찾아 쓰는 것. 1986년부터 2002년경까지 성능을 얻는 주된 방법이었고 <strong>연 50%의 성능 증가</strong>를 냈다. 대가는 <strong>투기 실행(speculation)의 낭비</strong>다. Intel Core i7에서 SPEC 정수 벤치마크를 돌리면 <strong>평균 19%의 명령어가 버려진다.</strong></div>
+  <div class="d" lang="en">Finding and using instructions that can execute simultaneously within one instruction stream. From 1986 to about 2002 it was the primary route to performance, delivering <strong>roughly 50% improvement a year.</strong> The price is <strong>the waste of speculation</strong>: on an Intel Core i7 running SPEC integer benchmarks, <strong>19% of instructions are thrown away on average.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ISA</div>
+  <div class="f">Instruction Set Architecture</div>
+  <div class="d" lang="ko">소프트웨어가 하드웨어에게 말을 거는 <strong>어휘</strong>. Golden Age 논문의 첫 문장이 그렇게 정의한다. 이 논문의 절반이 ISA를 둘러싼 역사(System/360, 8086 대 iAPX-432, RISC 대 CISC, Itanium)이고, 결론은 <strong>시장이 ISA 논쟁을 결정한다</strong>는 것이다. 지금 32비트와 64비트 프로세서의 <strong>99%가 RISC</strong>다.</div>
+  <div class="d" lang="en">The <strong>vocabulary</strong> through which software talks to hardware, as the Golden Age paper defines it in its opening sentence. Half that paper is the history around ISAs (System/360, the 8086 against the iAPX-432, RISC against CISC, Itanium), concluding that <strong>the marketplace settles ISA debates.</strong> Today <strong>99% of 32-bit and 64-bit processors are RISC.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ISCA</div>
   <div class="f">International Symposium on Computer Architecture</div>
   <div class="d" lang="ko">이 분야에서 가장 오래되고 권위 있는 학회. <strong>Paper Reading 리뷰 폼의 종합 판정이 "ISCA에 붙을 만한가"를 기준으로 한다.</strong> 그래서 이 과제는 독후감이 아니라 학회 심사위원 흉내다.</div>
@@ -601,6 +631,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">cost function에 가중치의 크기를 벌점으로 더하는 것. <strong>L2는 <span class="m">&Sigma;<i>w</i><sup>2</sup></span>, L1은 <span class="m">&Sigma;|<i>w</i>|</span>다.</strong> 슬라이드는 둘을 한 묶음으로 적지만 <strong>결과가 다르다.</strong> L2는 가중치를 작게 만들 뿐이고 <strong>L1만 정확히 0으로 만든다.</strong> 0인 가중치는 곱셈도 저장도 건너뛸 수 있으므로 <strong>L1만 하드웨어 이득이 있다.</strong> 이게 pruning으로 이어진다.</div>
   <div class="d" lang="en">Adding a penalty on weight magnitude to the cost function: <strong>L2 uses <span class="m">&Sigma;<i>w</i><sup>2</sup></span> and L1 uses <span class="m">&Sigma;|<i>w</i>|</span></strong>. The slide groups them together but <strong>they behave differently</strong>. L2 only makes weights small; <strong>L1 drives them to exactly zero</strong>. A zero weight lets you skip both the multiply and the storage, so <strong>only L1 pays off in hardware</strong>, and that is the road to pruning.</div>
   <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">LRN</div>
+  <div class="f">Local Response Normalization</div>
+  <div class="d" lang="ko">AlexNet이 쓴 정규화. 같은 공간 위치에서 <strong>인접한 kernel map <span class="m"><i>n</i></span>개</strong>에 걸쳐 활성을 정규화해서, 서로 다른 커널의 큰 활성끼리 <strong>경쟁</strong>하게 만든다. 하이퍼파라미터는 <span class="m"><i>k</i>=2, <i>n</i>=5, <i>&alpha;</i>=10<sup>&minus;4</sup>, <i>&beta;</i>=0.75</span>이고 <strong>전부 validation set으로 정했다.</strong> top-1을 1.4%, top-5를 1.2% 낮췄다.</div>
+  <div class="d" lang="en">The normalization AlexNet used: activities are normalized across <strong><span class="m"><i>n</i></span> adjacent kernel maps</strong> at the same spatial position, creating <strong>competition</strong> among large activities from different kernels. Its hyperparameters are <span class="m"><i>k</i>=2, <i>n</i>=5, <i>&alpha;</i>=10<sup>&minus;4</sup>, <i>&beta;</i>=0.75</span>, <strong>all determined on a validation set.</strong> It reduced top-1 by 1.4% and top-5 by 1.2%.</div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gM">M</h2>
@@ -688,6 +726,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
+<h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">ReLU</div>
+  <div class="f">Rectified Linear Unit</div>
+  <div class="d" lang="ko"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>. AlexNet이 <strong>가장 중요한 기법으로 첫 번째에 놓은</strong> 것이다. tanh 같은 <strong>포화 비선형성보다 학습이 훨씬 빠르다.</strong> CIFAR-10에서 25% 학습 오류에 도달하는 데 <strong>6배 적은 반복</strong>이 든다. 논문은 <em>"전통적인 포화 뉴런을 썼다면 이렇게 큰 신경망으로 실험할 수 없었을 것"</em>이라고 적었다. <strong>하드웨어에서는 비교 하나</strong>라 지수 함수가 필요한 tanh나 sigmoid와 달리 거의 공짜다.</div>
+  <div class="d" lang="en"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>, the technique AlexNet <strong>placed first as the most important.</strong> It <strong>trains much faster than saturating nonlinearities</strong> like tanh: <strong>six times fewer iterations</strong> to reach 25% training error on CIFAR-10. The paper writes that <em>they would not have been able to experiment with such large networks using traditional saturating neurons.</em> <strong>In hardware it is one comparison</strong>, nearly free, unlike tanh or sigmoid which need an exponential.</div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">RISC-V</div>
+  <div class="f">the fifth RISC architecture from Berkeley</div>
+  <div class="d" lang="ko">개방형 <a href="#gI">ISA</a>. Golden Age가 <strong>"프로세서를 위한 Linux"</strong>로 소개한다. <strong>모듈식</strong>이라 작은 기본 집합(50개 명령어)이 전체 소프트웨어 스택을 돌리고 확장(M, A, F, D로 53개, C로 34개, 합계 137개)은 선택이다. <strong>ARMv8은 500개가 넘고 명령어 형식도 최소 14개인데 RISC-V는 6개</strong>다. 그리고 <strong>커스텀 가속기를 위해 방대한 opcode 공간을 예약</strong>해 두었다.</div>
+  <div class="d" lang="en">An open <a href="#gI">ISA</a>, introduced by Golden Age as <strong>"a Linux for processors."</strong> It is <strong>modular</strong>: a small base of 50 instructions runs the full software stack and the extensions are optional (53 for M, A, F and D, another 34 for C, 137 in total). <strong>ARMv8 has over 500 instructions and at least 14 instruction formats against RISC-V's six.</strong> It also <strong>reserves a vast opcode space for custom accelerators.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s7">Paper Reading 1 &middot; 07</a></div>
+</div>
+
 <h2 class="gletter" id="gS">S</h2>
 
 <div class="gterm">
@@ -706,6 +762,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">speculation</div>
+  <div class="d" lang="ko">분기를 예측하고 <strong>결과가 확정되기 전에 명령어를 실행</strong>해서 파이프라인을 채우는 것. 맞으면 성능이 오르지만 <strong>틀리면 명령어를 버리고 상태를 되돌려야</strong> 한다. 15단 파이프라인에 4-issue면 명령어 60개가 in-flight이고 그중 <strong>약 15개가 분기</strong>라, 낭비를 10% 아래로 묶으려면 <strong>분기마다 99.3%의 정확도</strong>가 필요하다. 그리고 <strong>Meltdown과 Spectre가 여기서 나왔다.</strong></div>
+  <div class="d" lang="en">Predicting branches and <strong>executing instructions before the outcome is known</strong>, to keep the pipeline full. Correct predictions buy performance; <strong>a mispredict means discarding the instructions and restoring state.</strong> With a 15-stage 4-issue pipeline there are 60 instructions in flight, <strong>about 15 of them branches</strong>, so holding waste under 10% needs <strong>99.3% accuracy per branch.</strong> And <strong>Meltdown and Spectre came out of it.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s4">Paper Reading 1 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">systolic array</div>
   <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. <strong>이 수업에서 내부를 제대로 파는 것은 뒤쪽 강의다.</strong> L01에서는 이름만 나온다.</div>
   <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. <strong>The internals get opened up in a later lecture</strong>; lecture 1 only names it.</div>
@@ -719,6 +782,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">NVIDIA GPU 안에 들어 있는 행렬 곱셈 전용 유닛. <span class="m">D = A·B + C</span> 형태만 하고, 입력은 낮은 정밀도로 받아 FP32로 누산한다. V100의 <strong>15.7 TFLOP/s(FP32)와 125 Tensor TFLOP/s의 8배 차이</strong>가 이 유닛에서 나온다. <strong>범용 칩 안에 전용 가속기가 들어 있는 예다.</strong></div>
   <div class="d" lang="en">A matrix-multiply unit inside NVIDIA GPUs. It only does <span class="m">D = A·B + C</span>, taking reduced-precision inputs and accumulating in FP32. The <strong>eightfold gap between the V100's 15.7 FP32 TFLOP/s and its 125 Tensor TFLOP/s</strong> comes from this unit. <strong>An example of a dedicated accelerator living inside a general-purpose chip.</strong></div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">top-1 &middot; top-5 error</div>
+  <div class="d" lang="ko">ImageNet에서 관례적으로 함께 보고하는 두 오류율. <strong>top-5 오류는 모델이 가장 그럴듯하다고 본 다섯 라벨 안에 정답이 없는 테스트 이미지의 비율</strong>이다. AlexNet은 ILSVRC-2010에서 <strong>37.5% / 17.0%</strong>, ILSVRC-2012에서 <strong>top-5 15.3%로 우승</strong>했고 2위는 26.2%였다. <strong>둘을 섞어 인용하면 논지가 완전히 달라진다.</strong></div>
+  <div class="d" lang="en">The two error rates customarily reported together on ImageNet. <strong>Top-5 error is the fraction of test images for which the correct label is not among the five the model considers most probable.</strong> AlexNet reported <strong>37.5% and 17.0%</strong> on ILSVRC-2010 and <strong>won ILSVRC-2012 with a top-5 of 15.3%</strong> against 26.2% for second place. <strong>Quoting one for the other changes the claim entirely.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s13">Paper Reading 1 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -742,6 +812,16 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Google의 ML 가속기. <a href="#gS">systolic array</a> 기반이다. V1은 추론 전용, V2는 <a href="#gB">bfloat</a>으로 학습까지, V3는 V2의 2배. <strong>Edge TPU</strong>는 별개 제품으로 Coral 보드에 들어가고 4 TOPS / 2 TOPS/W다.</div>
   <div class="d" lang="en">Google's ML accelerator, built on a <a href="#gS">systolic array</a>. V1 is inference only, V2 trains using <a href="#gB">bfloat</a>, V3 is twice V2. The <strong>Edge TPU</strong> is a separate product on the Coral board at 4 TOPS and 2 TOPS/W.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gV">V</h2>
+
+<div class="gterm">
+  <div class="t">VLIW &middot; EPIC</div>
+  <div class="f">Very Long Instruction Word / Explicitly Parallel Instruction Computer</div>
+  <div class="d" lang="ko">독립적인 연산 여러 개를 <strong>한 명령어에 묶어</strong> 하드웨어를 단순하게 만드는 접근. RISC처럼 <strong>일을 하드웨어에서 컴파일러로 옮긴다.</strong> Intel과 HP의 <strong>Itanium</strong>이 이 방식이었고 정수 프로그램에서 실패했다. 그런데 Golden Age는 <strong>DSA가 투기적 out-of-order 대신 VLIW를 쓸 수 있다</strong>고 적는다. <strong>실패한 아이디어가 아니라 범위를 잘못 잡은 아이디어였다.</strong></div>
+  <div class="d" lang="en">Bundling several independent operations into <strong>one wide instruction</strong> so the hardware can be simpler, shifting work <strong>from hardware to the compiler</strong> as RISC did. Intel and HP's <strong>Itanium</strong> took this route and failed on integer programs. Yet Golden Age notes that <strong>DSAs can use VLIW instead of speculative out-of-order mechanisms</strong>: <strong>not a failed idea but an idea scoped wrongly.</strong></div>
+  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
 </div>
 
 <h2 class="gletter" id="gW">W</h2>
