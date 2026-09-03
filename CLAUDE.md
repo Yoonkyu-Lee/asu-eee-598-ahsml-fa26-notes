@@ -153,6 +153,7 @@ CEN 598은 AI를 허용하고 사용 내역만 적게 했다. **이 과목은 �
 | 강의 운영 | ASU Canvas (Announcements, 슬라이드, 과제, Readings), Ed Discussion |
 | **선수 과목 자료 (읽기 전용)** | `D:\Library\01 Immigration Documents\01 UIUC\4-2 SP26\ECE 479` |
 | 앞선 노트 저장소 (틀의 출처) | `D:\Engineering\asu-cen-598-addv-fa26-notes`, `D:\Engineering\asu-eee-554-notes` |
+| **논문·과제 자료 로컬 사본** | `papers/PR{N}/` · 커밋되지 않는다. 아래 [`papers/`](#papers--로컬-작업-사본) 참조 |
 
 ECE 479 폴더에서 볼 만한 것:
 
@@ -1000,10 +1001,34 @@ shots/
 package-lock.json
 *.pdf
 !slides/*.pdf
+papers/
+reviews/
+*Review Form*
+*Sample review*
+*review*.txt
+WHAT TO DO.md
 ```
 
 `*.pdf`로 전부 막고 `!slides/*.pdf`로 슬라이드만 되살린다.
-**논문 PDF를 저장소 안에 두지 않는다.** `.gitignore`가 막아주더라도 애초에 복사하지 않는다.
+
+### `papers/` — 로컬 작업 사본
+
+**논문과 과제 자료의 작업 사본은 `papers/PR{N}/`에 둔다.** 읽고 이야기하려면 손에 있어야 해서
+사용자가 2026년 9월에 그렇게 정했다. Drive 원본은 그대로 두고 여기 복사본으로 작업한다.
+
+**절대 커밋되지 않는다.** `.gitignore`가 네 겹으로 막고(`papers/`, `*.pdf`,
+`*Sample review*`, `*review*.txt`), `_config.yml`의 `exclude`에도 `papers/`가 들어 있어
+GitHub Pages 빌드에도 안 들어간다. 폴더 안의 `_LOCAL-ONLY.md`가 그 이유를 적어 놓았다.
+
+**새 자료를 넣은 뒤에는 반드시 확인한다.**
+
+```bash
+git status --short                    # 아무것도 안 나와야 정상
+git check-ignore -v papers/PR1/*      # 전부 걸려야 정상
+```
+
+`Sample review.txt`는 Canvas 공지가 **"Please don't share it outside the class!!"** 라고
+명시한 파일이다. 로컬에서 읽는 것과 저장소에 올리는 것은 다른 일이다. 이 구분을 흐리지 않는다.
 
 커밋 전에 `git status`로 의도하지 않은 파일이 스테이징됐는지 확인한다.
 
