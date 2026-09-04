@@ -840,6 +840,7 @@ node scripts/render-slides.mjs slides/L01-introduction.pdf 25-33
 |---|---|---|---|---|
 | 1 | `EEE 598 - Lecture 1 - Introduction.pdf` | `L01-introduction.html` | 43 | 완료 |
 | 2-3 | `EEE 598 - Lecture 2-3 - ML Basics.pdf` | `L02-ml-basics.html` | 21 | 완료 |
+| 4-5 | `EEE 598 - Lecture 4-5 - DNNs.pdf` | `L04-dnns.html` | 28 | 완료 |
 
 Paper Reading 노트:
 
@@ -847,7 +848,7 @@ Paper Reading 노트:
 |---|---|---|---|
 | 1 | Golden Age (CACM 2019, 13쪽) + AlexNet (NIPS 2012, 9쪽) | `PR1-golden-age-and-alexnet.html` | 완료 |
 
-**두 노트 모두 슬라이드 전 쪽에 앵커가 걸려 있다** (미포함 0쪽).
+**세 노트 모두 슬라이드 전 쪽에 앵커가 걸려 있다** (미포함 0쪽).
 새 노트를 쓴 뒤에는 아래 명령으로 그것을 확인한다.
 
 ```bash

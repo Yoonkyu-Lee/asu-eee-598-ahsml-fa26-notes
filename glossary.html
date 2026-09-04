@@ -442,6 +442,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gA">A</h2>
 
 <div class="gterm">
+  <div class="t">activation</div>
+  <div class="d" lang="ko"><strong>층이 내놓은 값들</strong>, 즉 텐서다. <strong>ReLU 같은 activation <em>function</em>과 다른 물건이다.</strong> 구별 기준은 <strong>바이트를 차지하는가</strong>이고, 하드웨어 논문에서 activation이라고 하면 거의 항상 텐서 쪽이다. 가중치와 달리 <strong>크기가 batch와 입력 해상도에 따라 변한다.</strong></div>
+  <div class="d" lang="en">The <strong>values a layer produced</strong>, that is, a tensor. <strong>A different object from an activation <em>function</em> like ReLU.</strong> The test is <strong>whether it occupies bytes</strong>, and in a hardware paper the word almost always means the tensor. Unlike weights, <strong>its size varies with batch and input resolution.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s1">Lecture 4-5 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">activation checkpointing</div>
+  <div class="f">gradient checkpointing, rematerialization</div>
+  <div class="d" lang="ko">forward의 중간 activation 일부를 <strong>일부러 버리고</strong>, backward에서 필요해지면 <strong>그 자리에서 다시 계산</strong>해 메모리를 아끼는 기법. <strong>연산은 늘고 메모리는 준다.</strong> 학습에만 쓴다. <strong>정확도가 비트 단위로 그대로</strong>라는 것이 pruning이나 quantization과 결정적으로 다른 점이다. 모델 가중치를 디스크에 저장하는 <code>.ckpt</code> 체크포인트와는 <strong>완전히 다른 말</strong>이다.</div>
+  <div class="d" lang="en">Deliberately <strong>discarding</strong> some forward activations and <strong>recomputing them on demand</strong> in the backward pass to save memory: <strong>more compute, less memory.</strong> Training only. Unlike pruning or quantization, <strong>accuracy stays bit-for-bit identical.</strong> <strong>Not the same thing at all</strong> as a <code>.ckpt</code> model checkpoint written to disk.</div>
+  <div class="src"><a href="L04-dnns.html#s12">Lecture 4-5 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Adam</div>
   <div class="f">Adaptive Moment Estimation</div>
   <div class="d" lang="ko">가장 널리 쓰이는 optimizer. 1차 모멘트와 2차 모멘트 <strong>두 개의 버퍼</strong>를 파라미터마다 들고 있다. 그래서 학습 메모리가 <strong>가중치의 4배</strong>가 된다 (가중치 + gradient + 버퍼 둘). <a href="#gM">momentum</a>은 3배, 순수 <a href="#gS">SGD</a>는 2배다.</div>
@@ -458,6 +473,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">arithmetic intensity</div>
+  <div class="f">operational intensity, OI</div>
+  <div class="d" lang="ko"><strong>메모리에서 1바이트 가져올 때마다 연산을 몇 번 하는가.</strong> 단위는 FLOP/byte 또는 MAC/byte이고, roofline의 가로축이다. <strong>모델의 성질이 아니라 실행의 성질</strong>이라서 같은 층이라도 <a href="#gB">batch</a>를 키우면 값이 올라간다. 가중치 바이트는 그대로인데 <a href="#gM">MAC</a>만 늘기 때문이다. 그래서 "이 층은 memory-bound다"는 <strong>batch와 하드웨어를 같이 말해야 완성되는 문장</strong>이다.</div>
+  <div class="d" lang="en"><strong>How much arithmetic you do per byte fetched from memory</strong>, in FLOP/byte or MAC/byte. It is the roofline's x axis. <strong>A property of the execution, not of the model</strong>: the same layer's intensity rises with <a href="#gB">batch</a>, because the weight bytes stay fixed while the <a href="#gM">MACs</a> grow. So "this layer is memory-bound" is <strong>only finished as a sentence once you name the batch and the hardware.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ASIC</div>
+  <div class="f">Application-Specific Integrated Circuit</div>
+  <div class="d" lang="ko">특정 용도에 맞춰 <strong>회로를 고정해서 만든 칩</strong>. <a href="#gC">CGRA</a>나 FPGA처럼 나중에 바꿀 수 없는 대신 면적과 전력에서 가장 효율적이다. <strong>용도를 말하는 이름이 아니라 구현 방식을 말하는 이름</strong>이라, <a href="#gT">TPU</a>도 <a href="#gN">NPU</a>도 대부분 ASIC이다. 나란히 놓고 비교할 수 있는 상대는 FPGA뿐이다.</div>
+  <div class="d" lang="en">A chip whose <strong>circuit is fixed for one purpose</strong>. It cannot be changed afterwards, unlike an FPGA or a <a href="#gC">CGRA</a>, and in exchange it is the most efficient option in area and power. <strong>The name describes how it was built, not what it does</strong>, so a <a href="#gT">TPU</a> and an <a href="#gN">NPU</a> are both usually ASICs. The only label it is genuinely comparable against is FPGA.</div>
+  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ASPLOS</div>
   <div class="f">Architectural Support for Programming Languages and Operating Systems</div>
   <div class="d" lang="ko">하드웨어와 소프트웨어의 <strong>경계</strong>를 다루는 최상위 학회. 이 수업의 compilation과 systems 주제가 가장 가까이 있는 곳이다.</div>
@@ -466,6 +497,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gB">B</h2>
+
+<div class="gterm">
+  <div class="t">backpropagation</div>
+  <div class="d" lang="ko">chain rule로 <strong>출력에서 입력 방향으로 gradient를 전파</strong>해 모든 가중치의 <span class="m">∂<i>L</i>/∂<i>w</i></span>를 구하는 절차. 하드웨어 쪽에서 중요한 것은 개념이 아니라 <strong>비용</strong>이다. 곱셈이 forward의 약 두 배라 <strong>학습은 추론의 약 3배</strong>가 되고, 더 비싼 쪽은 <strong>forward의 중간값을 전부 붙잡아 둬야 하는 메모리</strong>다. 그 부담을 덜어내는 것이 activation checkpointing이다.</div>
+  <div class="d" lang="en">Propagating gradients <strong>from output back toward input</strong> by the chain rule to obtain <span class="m">∂<i>L</i>/∂<i>w</i></span> for every weight. What matters downstairs is not the concept but <strong>the bill</strong>: roughly twice the multiplies of the forward pass, which makes <strong>training about 3x inference</strong>, and more expensive still is <strong>holding every forward intermediate in memory</strong> until it is consumed. Relieving that is what activation checkpointing does.</div>
+  <div class="src"><a href="L04-dnns.html#s11">Lecture 4-5 &middot; 11</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">batch &middot; minibatch</div>
@@ -499,6 +537,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s2">Lecture 1 · 02</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">conv layer</div>
+  <div class="f">convolutional layer</div>
+  <div class="d" lang="ko">같은 커널을 <strong>입력 전체에 미끄러뜨리며</strong> 적용하는 층. 하드웨어 관점의 핵심은 <strong>가중치 하나가 수백 번 재사용된다</strong>는 것이다. 그래서 파라미터는 적고 <a href="#gM">MAC</a>은 많다. AlexNet 기준으로 <strong>파라미터의 3.8%인데 GPU 시간의 92.1%</strong>를 쓴다. 대체로 compute-bound이고, <a href="#gS">systolic array</a>가 노리는 대상이 이쪽이다.</div>
+  <div class="d" lang="en">A layer that applies the same kernel <strong>sliding across the whole input</strong>. The point downstairs is that <strong>each weight gets reused hundreds of times</strong>, so parameters are few and <a href="#gM">MACs</a> are many. On AlexNet it is <strong>3.8% of the parameters and 92.1% of the GPU time.</strong> Typically compute-bound, and the thing a <a href="#gS">systolic array</a> is built for.</div>
+  <div class="src"><a href="L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">cross-entropy</div>
+  <div class="d" lang="ko">분류에서 쓰는 cost function. <span class="m"><i>CF</i> = − <sup>1</sup>⁄<sub><i>N</i></sub> Σ <i>y<sub>i</sub></i> · log(<i>ŷ<sub>i</sub></i>)</span>. <strong>정답인데 확률을 낮게 준 경우의 벌점이 폭발적으로 커진다.</strong> 정답 라벨이 one-hot이라 <strong>수식의 항 대부분이 0으로 사라지고</strong>, 실제 구현은 정답 클래스의 <span class="m">−log <i>ŷ</i></span> 하나만 계산한다. <strong>수식의 모양과 실제 연산량이 다른 대표 사례.</strong></div>
+  <div class="d" lang="en">The cost function used for classification, <span class="m"><i>CF</i> = − <sup>1</sup>⁄<sub><i>N</i></sub> Σ <i>y<sub>i</sub></i> · log(<i>ŷ<sub>i</sub></i>)</span>. <strong>The penalty explodes when the true label is given low probability.</strong> Because the label is one-hot, <strong>almost every term vanishes</strong> and a real implementation computes only <span class="m">−log <i>ŷ</i></span> at the true class. <strong>A textbook case of a formula's shape differing from its op count.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+</div>
+
 <h2 class="gletter" id="gD">D</h2>
 
 <div class="gterm">
@@ -513,6 +566,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">트랜지스터가 작아져도 <strong>단위 면적당 전력이 일정하게 유지된다</strong>는 관측. 2000년대 중후반에 끝났다. <strong>Moore의 법칙과 다른 이야기다.</strong> Moore는 개수, Dennard는 전력이다. 도메인 특화 하드웨어는 Moore가 아니라 <strong>Dennard가 끝난 것에 대한 대답</strong>이다.</div>
   <div class="d" lang="en">The observation that <strong>power per unit area stays constant</strong> as transistors shrink. It ended in the mid to late 2000s. <strong>Not the same claim as Moore's law</strong>: Moore is about count, Dennard about power. Domain-specific hardware is a reply to the end of <strong>Dennard</strong>, not of Moore.</div>
   <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">double buffering</div>
+  <div class="f">ping-pong buffering</div>
+  <div class="d" lang="ko">같은 용도의 버퍼를 <strong>두 벌</strong> 두고, 한 벌을 연산기가 읽는 동안 다른 한 벌을 채운 뒤 <strong>역할을 맞바꾸는</strong> 기법. 데이터를 가져오는 일과 계산하는 일을 <strong>정말로 동시에</strong> 시킬 수 있게 한다. <strong>공짜가 아니다.</strong> on-chip SRAM이 두 배로 들고, <strong>느린 쪽을 빠르게 만들지는 못한다.</strong> 메모리가 압도적으로 느리면 stall은 그대로 남는다.</div>
+  <div class="d" lang="en">Keeping <strong>two</strong> buffers for one purpose, filling one while the arithmetic reads the other and then <strong>swapping their roles</strong>, so fetching and computing can genuinely proceed at once. <strong>Not free</strong>: it doubles the on-chip SRAM, and <strong>it does not make the slow side faster.</strong> When memory dominates, the stall survives.</div>
+  <div class="src"><a href="L04-dnns.html#s9">Lecture 4-5 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -550,6 +611,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gF">F</h2>
 
 <div class="gterm">
+  <div class="t">FC layer</div>
+  <div class="f">fully connected layer, dense layer</div>
+  <div class="d" lang="ko">모든 입력이 모든 출력에 연결된 층. <strong>가중치 하나당 곱셈이 정확히 한 번</strong>이라 재사용이 0이고, 그래서 <a href="#gA">arithmetic intensity</a>가 FP32 기준 <strong>0.25 MAC/byte</strong>다. 4바이트 읽고 한 번 곱한다는 뜻. AlexNet 기준으로 <strong>파라미터의 96.2%인데 GPU 시간의 2.6%</strong>다. batch 1에서는 거의 항상 memory-bound이고, <strong>batch를 키우면 판정이 뒤집힌다.</strong></div>
+  <div class="d" lang="en">A layer where every input connects to every output. There is <strong>exactly one multiply per weight</strong>, so reuse is zero and <a href="#gA">arithmetic intensity</a> is <strong>0.25 MAC/byte</strong> in FP32: four bytes read per multiply. On AlexNet it is <strong>96.2% of the parameters and 2.6% of the GPU time.</strong> Almost always memory-bound at batch 1, and <strong>the verdict flips as the batch grows.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">FLOP</div>
   <div class="f">FLoating-point OPeration</div>
   <div class="d" lang="ko">부동소수점 연산 <strong>한 번</strong>. 세는 단위다. "이 모델을 학습시키는 데 총 몇 번"처럼 <strong>워크로드</strong>를 말할 때 쓴다. <strong>MAC 한 번은 FLOP 두 번</strong>(곱하기 + 더하기)이므로, MAC으로 적힌 논문과 비교하려면 2배를 맞춘다.</div>
@@ -562,6 +631,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">초당 FLOP. <strong>속도</strong>이고 <strong>기계</strong>를 말할 때 쓴다. V100의 15.7 TFLOP/s가 이것이다. FLOP과 헷갈리면 논지가 뒤집힌다.</div>
   <div class="d" lang="en">FLOP per second: a <strong>rate</strong>, used to describe <strong>a machine</strong>, as in the V100's 15.7 TFLOP/s. Confusing it with FLOP inverts the argument.</div>
   <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FPGA</div>
+  <div class="f">Field-Programmable Gate Array</div>
+  <div class="d" lang="ko"><strong>bit 단위 LUT로 아무 회로나 구성할 수 있는</strong> 재구성 가능 칩. <a href="#gA">ASIC</a>과 대비되는 짝이고, 유연한 대신 같은 기능에서 면적과 속도를 손해 본다. 재구성 단위를 연산기로 키운 것이 <a href="#gC">CGRA</a>다. 이 수업에서는 accelerator 프로토타이핑의 수단으로 나온다.</div>
+  <div class="d" lang="en">A reconfigurable chip that can <strong>form arbitrary logic out of bit-level LUTs.</strong> The genuine counterpart to an <a href="#gA">ASIC</a>: flexible, and paying for it in area and speed at equal function. Raising the unit of reconfiguration to whole arithmetic units gives a <a href="#gC">CGRA</a>. In this course it shows up as the way accelerators get prototyped.</div>
+  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gG">G</h2>
@@ -608,6 +685,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">ILSVRC</div>
+  <div class="f">ImageNet Large Scale Visual Recognition Challenge</div>
+  <div class="d" lang="ko">2010년부터 열린 이미지 분류 대회. AlexNet이 우승한 것은 <strong>2012년</strong>이다. 그런데 <strong>AlexNet 논문의 주된 실험은 2010년 데이터셋으로 했다.</strong> 2010 대회만 테스트 라벨이 공개돼 있어서 <a href="#gT">top-1 오차</a>를 논문에 실을 수 있었기 때문. <strong>한 논문 안에 두 연도가 섞여 있으니 숫자를 인용할 때 어느 쪽인지 확인해야 한다.</strong></div>
+  <div class="d" lang="en">The image classification competition run from 2010. AlexNet won it in <strong>2012</strong>, yet <strong>the paper's main experiments use the 2010 dataset</strong>, because 2010 is the year whose test labels were public and so the only one where a <a href="#gT">top-1 error</a> could be reported. <strong>Two years are mixed inside one paper, so check which before quoting a number.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ISA</div>
   <div class="f">Instruction Set Architecture</div>
   <div class="d" lang="ko">소프트웨어가 하드웨어에게 말을 거는 <strong>어휘</strong>. Golden Age 논문의 첫 문장이 그렇게 정의한다. 이 논문의 절반이 ISA를 둘러싼 역사(System/360, 8086 대 iAPX-432, RISC 대 CISC, Itanium)이고, 결론은 <strong>시장이 ISA 논쟁을 결정한다</strong>는 것이다. 지금 32비트와 64비트 프로세서의 <strong>99%가 RISC</strong>다.</div>
@@ -649,6 +734,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">곱해서 누적하는 연산 한 번, 그리고 그 연산을 하는 회로. DNN 연산의 기본 단위다. Tesla FSD 칩이 <strong>96×96 MAC</strong>을 갖고 있다는 식으로 배열 크기를 세는 데 쓴다. <strong>MAC 1회 = FLOP 2회.</strong></div>
   <div class="d" lang="en">One multiply-and-accumulate operation, and the circuit that performs it. The basic unit of DNN arithmetic, also used to size arrays, as in the Tesla FSD chip's <strong>96×96 MACs</strong>. <strong>One MAC is two FLOPs.</strong></div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MCU</div>
+  <div class="f">Microcontroller Unit</div>
+  <div class="d" lang="ko">CPU와 메모리와 주변장치가 한 칩에 든 <strong>아주 작은 컴퓨터 전체</strong>. 가속기가 아니다. SRAM이 수백 KB 수준이고 <strong>DRAM이 아예 없는 경우가 많아서</strong>, 모델이 여기 안 들어가면 방법이 없다. TinyML이 상대하는 것이 이 급이다.</div>
+  <div class="d" lang="en"><strong>An entire very small computer</strong>, CPU plus memory plus peripherals on one chip. Not an accelerator. SRAM runs to a few hundred kilobytes and <strong>there is frequently no DRAM at all</strong>, so a model that does not fit has nowhere to go. This is the class TinyML addresses.</div>
+  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">memory-bound &middot; compute-bound</div>
+  <div class="d" lang="ko">데이터를 가져오는 시간이 연산 시간보다 길면 <strong>memory-bound</strong>, 반대면 <strong>compute-bound</strong>. <strong>용량 이야기가 아니라 시간 이야기</strong>다. memory-bound는 돌아가긴 하는데 연산기가 놀고, out of memory는 아예 안 돌아간다. <strong>단위가 구별 기준</strong>이라 초가 붙어 있으면 이쪽, 안 붙어 있으면 용량 쪽이다. 판정을 안 하고 손대면 <strong>연산기를 더 붙여도 아무 일이 안 생긴다.</strong></div>
+  <div class="d" lang="en"><strong>Memory-bound</strong> when fetching takes longer than computing, <strong>compute-bound</strong> when the reverse. <strong>A claim about time, not capacity</strong>: memory-bound still runs, with the arithmetic idling, whereas out of memory does not run at all. <strong>The unit is the test</strong>: a per-second in it means this, no per-second means capacity. Reach for a fix without making the verdict and <strong>adding arithmetic units changes nothing.</strong></div>
+  <div class="src"><a href="L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -697,6 +797,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Tesla FSD 칩의 다이 사진에서 신경망 전용 블록에 붙은 이름. 회사마다 부르는 이름이 다르다: Apple은 <strong>Neural Engine</strong>, Google은 <strong>TPU</strong>, NVIDIA는 <strong>Tensor Core</strong>(GPU 안의 유닛). 같은 일을 하는 것이 아니라 <strong>비슷한 자리에 있는 것</strong>이므로 스펙을 직접 비교하면 안 된다.</div>
   <div class="d" lang="en">The label on the neural-network block in the Tesla FSD die shot. Every company names it differently: Apple's <strong>Neural Engine</strong>, Google's <strong>TPU</strong>, NVIDIA's <strong>Tensor Core</strong> (a unit inside the GPU). These are not the same thing so much as <strong>things in a similar position</strong>, so their specs should not be compared head to head.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">NPU</div>
+  <div class="f">Neural Processing Unit</div>
+  <div class="d" lang="ko">SoC 안에 CPU/GPU와 나란히 들어가는 <strong>신경망 전용 블록</strong>. 대개 추론 전용이다. <strong>주로 벤더의 마케팅 용어</strong>라 이름이 회사마다 다르고 (Neural Engine, Hexagon NPU, AI Engine), 논문에서는 accelerator라고 쓰는 편이다. <a href="#gA">ASIC</a>과 배타적이지 않다. NPU는 <em>무엇을 하는가</em>, ASIC은 <em>어떻게 만들었는가</em>를 말한다.</div>
+  <div class="d" lang="en">A <strong>neural-network-only block</strong> sitting alongside the CPU and GPU inside an SoC, usually inference-only. <strong>Largely a vendor marketing term</strong>, so the name differs by company (Neural Engine, Hexagon NPU, AI Engine) while papers tend to say accelerator. Not exclusive with <a href="#gA">ASIC</a>: NPU names <em>what it does</em>, ASIC <em>how it was built</em>.</div>
+  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gO">O</h2>
@@ -824,7 +932,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">von Neumann bottleneck</div>
+  <div class="d" lang="ko">연산기와 메모리가 <strong>하나의 통로</strong>로 연결돼 있어서, 연산기를 아무리 빠르게 만들어도 <strong>그 통로의 폭이 성능 상한</strong>이 되는 현상. <strong>memory wall과 다르다.</strong> memory wall은 연산 속도와 메모리 속도의 격차가 <em>시간이 갈수록 벌어진다</em>는 추세 이야기이고, 이쪽은 <strong>구조 자체</strong>의 이야기라 처음부터 있었다. 대역폭을 늘려도 구조는 그대로다.</div>
+  <div class="d" lang="en">Compute and memory joined by <strong>one channel</strong>, so however fast the arithmetic gets, <strong>the width of that channel caps performance.</strong> <strong>Not the memory wall</strong>, which is a claim about a <em>trend</em>, the gap between compute and memory speed widening over time. This is about <strong>the structure itself</strong> and was there from the start; widening the bus leaves it unchanged.</div>
+  <div class="src"><a href="L04-dnns.html#s6">Lecture 4-5 &middot; 06</a></div>
+</div>
+
 <h2 class="gletter" id="gW">W</h2>
+
+<div class="gterm">
+  <div class="t">weight decay</div>
+  <div class="d" lang="ko"><a href="#gL">L2 regularization</a>을 <strong>갱신 규칙 안에 직접 넣은 형태</strong>. cost function에 항을 더하는 대신, 가중치를 갱신할 때마다 <strong>현재 값에 비례하는 양을 빼는</strong> 것으로 같은 효과를 낸다. AlexNet은 계수 <strong>0.0005</strong>를 썼다. 두 형태가 순수 <a href="#gS">SGD</a>에서는 같지만 <a href="#gA">Adam</a>에서는 달라진다는 것이 나중에 문제가 됐다.</div>
+  <div class="d" lang="en"><a href="#gL">L2 regularization</a> written <strong>directly into the update rule</strong>: instead of adding a term to the cost function, each update <strong>subtracts an amount proportional to the current weight</strong>, to the same effect. AlexNet used a coefficient of <strong>0.0005</strong>. The two forms coincide under plain <a href="#gS">SGD</a> but diverge under <a href="#gA">Adam</a>, which later turned out to matter.</div>
+  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">WSE</div>

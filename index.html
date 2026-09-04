@@ -478,8 +478,8 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt from the lecture deck <strong>without skipping a single slide</strong>. Whichever half you arrive with, ML or hardware, the other half is missing. Filling that half is the point here, down to telling you whether a number is big or small.</p>
 
   <div class="facts">
-    <span class="chip" lang="ko">2 / 2 강 정리</span>
-    <span class="chip" lang="en">2 of 2 lectures written</span>
+    <span class="chip" lang="ko">3 / 3 강 정리</span>
+    <span class="chip" lang="en">3 of 3 lectures written</span>
     <span class="chip">Tue/Thu 10:30-11:45 · LSEB04</span>
     <span class="chip hot" lang="ko">Project 50%</span>
     <span class="chip hot" lang="en">Project is 50%</span>
@@ -554,6 +554,26 @@ a.mod:hover .num{color:var(--blue)}
       <span class="tag t">L1 sparsity</span>
       <span class="tag p">optimizer state</span>
       <span class="tag v">capacity</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="L04-dnns.html">
+  <span class="num">04</span>
+  <div>
+    <h3 lang="ko">Deep Neural Networks</h3>
+    <h3 lang="en">Deep Neural Networks</h3>
+    <div class="when">28 slides &middot; Lecture 4-5 &middot; Jeff Zhang</div>
+    <p lang="ko">DNN을 칩에 올리려면 파라미터 바이트, MAC 개수, 데이터 의존성 셋으로 환산해야 한다. 그 환산이 끝나면 memory-bound인지 compute-bound인지가 갈린다. backward는 forward의 약 두 배, checkpointing은 연산을 더 해서 메모리를 산다. 그리고 시간의 92%는 conv에, 파라미터의 96%는 FC에 있다.</p>
+    <p lang="en">Putting a DNN on a chip means converting it into parameter bytes, MAC counts and data dependencies. Where that lands decides memory-bound or compute-bound. Backward costs about twice forward, checkpointing buys memory with extra compute, and 92% of the time sits in conv while 96% of the parameters sit in FC.</p>
+    <div class="tags">
+      <span class="tag d">AlexNet</span>
+      <span class="tag p">memory vs compute bound</span>
+      <span class="tag t">double buffering</span>
+      <span class="tag v">checkpointing</span>
+      <span class="tag">MAC &middot; backprop 2:1</span>
     </div>
   </div>
   <span class="status done" lang="ko">읽기</span>
