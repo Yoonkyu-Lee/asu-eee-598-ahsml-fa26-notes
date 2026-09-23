@@ -449,6 +449,15 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </div>
   <div class="lab">목차</div>
   <a href="#s0"><span class="n">00</span><span>들어가기 전에</span></a>
+  <div class="grp">Part 0 · 배경지식</div>
+  <a href="#b1"><span class="n">B1</span><span>딥러닝이 뭔데</span></a>
+  <a href="#b2"><span class="n">B2</span><span>loss</span></a>
+  <a href="#b3"><span class="n">B3</span><span>gradient</span></a>
+  <a href="#b4"><span class="n">B4</span><span>SGD, batch, epoch</span></a>
+  <a href="#b5"><span class="n">B5</span><span>잘 배웠는지 재는 법</span></a>
+  <a href="#b6"><span class="n">B6</span><span>숫자 하나에 몇 bit</span></a>
+  <a href="#b7"><span class="n">B7</span><span>분산학습과 동기화 통신</span></a>
+  <a href="#b8"><span class="n">B8</span><span>수학 기호 급속 충전</span></a>
   <div class="grp">Part 1 · TernGrad</div>
   <a href="#s1"><span class="n">01</span><span>이 논문 뭐임</span></a>
   <a href="#s2"><span class="n">02</span><span>통신이 왜 빌런인가</span></a>
@@ -461,6 +470,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <a href="#s9"><span class="n">09</span><span>실험 2: ImageNet</span></a>
   <a href="#s10"><span class="n">10</span><span>성능 모델</span></a>
   <div class="grp">Part 2 · Transformer</div>
+  <a href="#t0"><span class="n">T0</span><span>Part 2 준비물</span></a>
   <a href="#s11"><span class="n">11</span><span>이 논문 뭐임</span></a>
   <a href="#s12"><span class="n">12</span><span>RNN이 왜 답답한가</span></a>
   <a href="#s13"><span class="n">13</span><span>전체 구조 한 장</span></a>
@@ -482,6 +492,10 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
 <section id="s0">
   <div class="sec-head"><span class="sec-num">00</span><h2>들어가기 전에</h2></div>
   <p class="sec-sub">ㅎㅇ. Paper Reading #2 두 편 오늘 한 번에 조진다. 스압 개쩌니까 3줄요약부터 박고 간다.</p>
+
+  <div class="callout">
+    <strong>딥러닝 수업 하나도 안 들었으면 <a href="#b1">Part 0</a>부터 읽으셈.</strong> gradient가 뭔지, 분산학습이 뭔지, 동기화 통신이 뭔지 0부터 설명해둠. Transformer 쪽은 <a href="#t0">Part 2 준비물</a>에서 내적, softmax, RNN을 따로 풀어둠. 아래 3줄요약이 외계어처럼 보이면 그게 신호임.
+  </div>
 
   <div class="tldr">
     <span class="tag">3줄요약</span>
@@ -512,6 +526,309 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
     <div class="hd">댓글</div>
     <div class="cmt"><span class="who">핑프(1.1)</span>그래서 둘 중에 뭐가 더 중요함?</div>
     <div class="cmt op"><span class="who">글쓴이</span>인용 수로 치면 Transformer가 압도적으로 넘사벽임. 지금 LLM 전부 이 논문 자손이니까. 근데 이 수업 관점에선 둘 다 똑같이 중요함. TernGrad는 "학습을 여러 칩에 쪼개면 통신이 문제다"를, Transformer는 "이 과목이 가속해야 할 연산이 앞으로 뭐가 되냐"를 보여줌.</div>
+  </div>
+</section>
+
+<div class="part"><div class="k">Part 0</div><div class="t">배경지식 0부터: 관련 수업 하나도 안 들은 사람용</div></div>
+
+<!-- ══════════════════════════════════════════════════════ B1 -->
+<section id="b1">
+  <div class="sec-head"><span class="sec-num">B1</span><h2>딥러닝이 뭔데</h2></div>
+  <p class="sec-sub">Part 0 전체가 논문 밖 배경지식임. 이미 아는 사람은 <a href="#s1">Part 1</a>로 점프하셈. 모르는 사람은 여기서 딱 필요한 만큼만 채우고 감.</p>
+
+  <h3>신경망 = 다이얼이 엄청 많이 달린 계산기</h3>
+  <p>딥러닝 모델은 결국 <strong>숫자를 넣으면 숫자가 나오는 함수</strong>임. 사진을 숫자로 바꿔서 넣으면 "고양이일 확률 92%" 같은 숫자가 나옴. 문장을 넣으면 번역된 문장이 나옴.</p>
+  <p>제일 단순한 예부터 보자. 평수로 집값 맞히기:</p>
+  <div class="eq"><span class="m">집값 = <i>w</i> × 평수 + <i>b</i></span></div>
+  <p>여기서 <span class="m"><i>w</i></span>랑 <span class="m"><i>b</i></span>가 <strong>다이얼</strong>임. 이 값을 잘 맞춰놓으면 평수만 넣어도 집값이 그럴듯하게 나옴. 이 다이얼들을 <strong>parameter</strong>라고 부르고, 곱하는 쪽(<span class="m"><i>w</i></span>)을 특히 <strong>weight</strong>, 더하는 쪽(<span class="m"><i>b</i></span>)을 <strong>bias</strong>라고 부름.</p>
+  <p><strong>신경망(neural network)</strong>은 이런 "곱하고 더하기"를 한 겹이 아니라 <strong>여러 겹(layer)</strong>으로 쌓은 거임. 겹 사이마다 "음수면 0으로 바꾸기"(ReLU) 같은 단순한 꺾기를 끼워넣어서 복잡한 모양도 표현할 수 있게 함. 겹이 많으면 <strong>deep</strong>이라서 딥러닝.</p>
+
+  <div class="scale">
+    <div class="cap">숫자 감각 · 다이얼이 몇 개냐</div>
+    <table>
+      <tr><td class="what">집값 예시</td><td class="num">2개</td><td>w, b</td></tr>
+      <tr><td class="what">AlexNet (2012, 사진 분류)</td><td class="num">약 6100만 개</td><td>Part 1 실험에 나옴</td></tr>
+      <tr><td class="what">Transformer base (2017, 번역)</td><td class="num">6500만 개</td><td>Part 2 논문 Table 3</td></tr>
+      <tr><td class="what">Transformer big</td><td class="num">2억 1300만 개</td><td>같은 표</td></tr>
+    </table>
+    <div class="foot">다이얼 수천만 개를 사람이 손으로 맞추는 건 불가능함. 그래서 데이터를 보여주면서 기계가 알아서 맞추게 하는데, 그게 학습임.</div>
+  </div>
+
+  <h3>training vs inference</h3>
+  <ul>
+    <li><strong>training (학습)</strong>: 정답이 달린 데이터를 잔뜩 보여주면서 <strong>다이얼을 맞추는 과정</strong>. 몇 시간에서 몇 주 걸림. <strong>TernGrad는 이 단계만</strong> 다룸</li>
+    <li><strong>inference (추론)</strong>: 다 맞춘 다이얼로 <strong>실제로 쓰는 것</strong>. 새 사진 넣고 답 받기</li>
+  </ul>
+
+  <h3>이 글에 나오는 모델과 데이터셋 이름</h3>
+  <table>
+    <thead><tr><th>이름</th><th>정체</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">CNN</td><td>Convolutional Neural Network. <strong>사진용</strong> 신경망 종류. 작은 창(필터)을 사진 위로 밀면서 무늬를 찾음</td></tr>
+      <tr><td class="hd">LeNet, AlexNet, VggNet, GoogLeNet, ResNet</td><td>전부 유명한 <strong>CNN 모델 이름</strong>. 뒤로 갈수록 대체로 최신이고 깊음. CifarNet은 CIFAR-10용 작은 CNN</td></tr>
+      <tr><td class="hd">MNIST</td><td>손글씨 숫자(0~9) 사진 데이터셋. 입문용이라 쉬움</td></tr>
+      <tr><td class="hd">CIFAR-10</td><td>32×32 크기 작은 컬러 사진, 10종류(비행기, 고양이 등)</td></tr>
+      <tr><td class="hd">ImageNet</td><td>사진 약 120만 장, 1000종류. 당시 사진 분류의 본게임</td></tr>
+      <tr><td class="hd">WMT 2014</td><td>번역 대회용 데이터. 영어→독일어, 영어→프랑스어 문장 쌍</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B2 -->
+<section id="b2">
+  <div class="sec-head"><span class="sec-num">B2</span><h2>loss: 얼마나 틀렸나 점수</h2></div>
+  <p>다이얼을 맞추려면 먼저 <strong>"지금 얼마나 틀렸냐"</strong>를 숫자 하나로 재야 함. 그게 <strong>loss</strong>임. 작을수록 좋음.</p>
+  <div class="ex">
+    <span class="tag">예시</span>
+    <p>진짜 집값 10억, 모델 예측 7억. 차이를 제곱해서 loss = (10 − 7)² = <strong>9</strong>. 예측이 9억이면 (10 − 9)² = <strong>1</strong>. 딱 맞으면 <strong>0</strong>.</p>
+  </div>
+  <p>그러니까 <strong>학습 = loss가 작아지도록 다이얼을 돌리는 것</strong>. 문제는 다이얼이 6100만 개일 때 <strong>각각 어느 쪽으로, 얼마나</strong> 돌려야 하냐는 거고, 그 답이 다음 절의 gradient임.</p>
+  <p>loss를 영어로 cost라고도 부르고, 논문에 따라 <span class="m"><i>Q</i></span>, <span class="m"><i>C</i></span>, <span class="m"><i>J</i></span> 같은 글자로 씀. TernGrad 논문은 <span class="m"><i>Q</i>(<i>z</i>, <i>w</i>)</span>라고 씀. <span class="m"><i>z</i></span>는 데이터, <span class="m"><i>w</i></span>는 다이얼 전부.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B3 -->
+<section id="b3">
+  <div class="sec-head"><span class="sec-num">B3</span><h2>gradient: 어느 쪽으로 돌려야 하나</h2></div>
+  <p class="sec-sub">이 글 전체에서 제일 많이 나오는 단어. 여기만큼은 확실히 먹고 가셈.</p>
+
+  <h3>다이얼 하나일 때: 기울기</h3>
+  <p>다이얼 <span class="m"><i>w</i></span> 하나만 있고, loss가 <span class="m">(<i>w</i> − 3)²</span>이라고 치자. 정답은 <span class="m"><i>w</i> = 3</span>(여기서 loss가 0)인데 모델은 그걸 모름.</p>
+  <p>지금 <span class="m"><i>w</i> = 5</span>에 있음. 다이얼을 오른쪽으로 아주 살짝 돌리면 loss가 늘어나고, 왼쪽으로 돌리면 줄어듦. 이 <strong>"살짝 돌렸을 때 loss가 얼마나, 어느 방향으로 변하냐"</strong>가 <strong>기울기</strong>(미분)임. 이 경우 기울기는 <span class="m">2(<i>w</i> − 3) = 4</span>. 양수니까 "오른쪽으로 가면 loss가 늘어난다"는 뜻 → <strong>반대쪽(왼쪽)으로</strong> 가야 함.</p>
+
+  <div class="def">
+    <span class="tag">비유: 안개 낀 산에서 눈 감고 내려가기</span>
+    <p>산 전체 지도는 안 보임. 대신 <strong>발밑 경사</strong>는 느낄 수 있음. 경사가 내려가는 쪽으로 한 걸음 가고, 다시 경사 느끼고, 또 한 걸음. 이게 <strong>gradient descent</strong>(경사 하강법)임. 산의 높이가 loss, 내 위치가 다이얼 값, 발밑 경사가 gradient.</p>
+  </div>
+
+  <h3>다이얼이 여러 개면: gradient = 기울기 목록</h3>
+  <p>다이얼이 6100만 개면 기울기도 <strong>다이얼마다 하나씩, 6100만 개</strong> 있음. 이걸 한 줄로 늘어놓은 목록(벡터)이 <strong>gradient</strong>임. 기호로는 <span class="m"><i>g</i></span> 또는 <span class="m">∇<i>Q</i></span>라고 씀.</p>
+  <p>여기서 Part 1 이해에 결정적인 사실 하나: <strong>gradient는 parameter랑 크기가 똑같음</strong>. 모델이 크면 gradient도 똑같이 큼. 이걸 네트워크로 보내야 하니까 통신이 문제가 되는 거임 (<a href="#b7">B7</a>).</p>
+
+  <h3>한 걸음 내딛는 규칙</h3>
+  <div class="eq"><span class="m"><i>w</i> ← <i>w</i> − η · <i>g</i></span></div>
+  <ul>
+    <li><span class="m"><i>g</i></span>: 지금 위치의 기울기</li>
+    <li><span class="m">η</span> (에타): <strong>learning rate</strong>. 보폭. 논문에 따라 <span class="m">γ</span>(감마)로도 씀</li>
+    <li>빼는 이유: 기울기가 가리키는 건 <strong>올라가는</strong> 방향이라서, 반대로 가야 내려감</li>
+  </ul>
+  <div class="ex">
+    <span class="tag">손으로 두 걸음</span>
+    <p>loss = <span class="m">(<i>w</i> − 3)²</span>, 시작 <span class="m"><i>w</i> = 5</span>, <span class="m">η = 0.1</span>.</p>
+    <ol>
+      <li>기울기 = 2(5 − 3) = 4. 새 <span class="m"><i>w</i> = 5 − 0.1 × 4 = 4.6</span>. loss 4 → <strong>2.56</strong></li>
+      <li>기울기 = 2(4.6 − 3) = 3.2. 새 <span class="m"><i>w</i> = 4.6 − 0.32 = 4.28</span>. loss → <strong>1.64</strong></li>
+    </ol>
+    <p>한 걸음마다 정답 3에 다가감. 이걸 수만~수십만 번 반복하는 게 학습임.</p>
+  </div>
+
+  <div class="play" id="gdPlay">
+    <div class="plab">직접 굴려보기 · gradient descent (보충)</div>
+    <p style="font-size:14px;color:var(--ink2);margin:0 0 10px">loss = (w − 3)². 공이 w = 6에서 출발함. learning rate(보폭)를 골라서 한 걸음씩 가보셈.</p>
+    <div class="presets" id="gdLr"></div>
+    <div class="presets" id="gdAct" style="margin-top:8px"></div>
+    <svg id="gdSvg" viewBox="0 0 700 240" role="img" aria-label="loss 곡선 위에서 공이 learning rate만큼 한 걸음씩 이동하는 그림"></svg>
+    <div class="readout" id="gdOut"></div>
+    <div class="hintline">보폭이 작으면 안전하지만 느림. 너무 크면 골짜기를 넘어가서 <strong>지그재그</strong>하거나 아예 <strong>튕겨나감</strong>(발산). 그래서 learning rate는 딥러닝에서 제일 중요한 설정값 중 하나임. Part 1에서 "worker가 늘면 LR을 키웠다", Part 2에서 "warmup" 같은 말이 다 이 보폭 얘기임.</div>
+  </div>
+
+  <h3>backprop은 뭐임?</h3>
+  <p>6100만 개 기울기를 하나하나 따로 재면 영원히 걸림. <strong>backpropagation(backprop, 역전파)</strong>은 출력 쪽부터 입력 쪽으로 거꾸로 훑으면서 <strong>모든 기울기를 한 번에 효율적으로 계산하는 방법</strong>임 (미분의 연쇄법칙 활용). 이 글에선 <strong>"backprop 돌리면 gradient가 나온다"</strong>만 알면 충분함. 더 궁금하면 <a href="L04-dnns.html#s11">Lecture 4-5</a>.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B4 -->
+<section id="b4">
+  <div class="sec-head"><span class="sec-num">B4</span><h2>SGD, mini-batch, iteration, epoch</h2></div>
+
+  <h3>데이터 전부로 계산하면 너무 느림</h3>
+  <p>정확한 gradient를 구하려면 <strong>데이터 전부</strong>(ImageNet이면 사진 120만 장)에 대해 loss를 계산해야 함. 한 걸음 내딛는 데 120만 장을 다 봐야 하면 학습이 안 끝남.</p>
+  <p>그래서 <strong>몇백 장만 랜덤으로 뽑아서</strong> 그걸로 gradient를 대충 계산하고 한 걸음 감. 이게 <strong>SGD</strong>(Stochastic Gradient Descent, 확률적 경사 하강법)임. stochastic = 랜덤하게 뽑는다는 뜻.</p>
+  <div class="def">
+    <span class="tag">비유: 여론조사</span>
+    <p>대선 지지율 알려고 국민 전원한테 안 물어봄. 1000명만 랜덤으로 물어봄. <strong>매번 결과가 조금씩 흔들리지만(noise), 평균적으로는 맞음(unbiased).</strong> SGD의 gradient가 딱 이 성격임. 그리고 TernGrad의 핵심 아이디어도 "흔들려도 평균만 맞으면 된다"는 거라서 이 비유가 Part 1 내내 통함.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>용어</th><th>뜻</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">mini-batch</td><td>한 걸음 계산에 쓰려고 뽑은 데이터 묶음</td></tr>
+      <tr><td class="hd">batch size</td><td>그 묶음의 크기. 예: 256장</td></tr>
+      <tr><td class="hd">iteration (= step)</td><td>다이얼을 <strong>한 번</strong> 갱신하는 것. mini-batch 하나 보고 한 걸음</td></tr>
+      <tr><td class="hd">epoch</td><td>데이터 <strong>전체를 한 바퀴</strong> 다 보는 것. 120만 장 ÷ 256 ≈ 4700 iteration이 1 epoch</td></tr>
+      <tr><td class="hd">vanilla SGD</td><td>위의 가장 기본 규칙 <span class="m"><i>w</i> ← <i>w</i> − η<i>g</i></span> 그대로. vanilla = 아무것도 안 얹은 기본맛</td></tr>
+      <tr><td class="hd">momentum SGD</td><td>공이 굴러가듯 <strong>관성</strong>을 줌. 이전 걸음 방향을 일부 이어받아서 흔들림이 줄고 빨라짐. 논문의 "momentum 0.9" = 이전 방향을 90% 이어받음</td></tr>
+      <tr><td class="hd">Adam</td><td>다이얼마다 <strong>보폭을 자동으로 조절</strong>하는 인기 optimizer. Transformer도 이걸 씀</td></tr>
+      <tr><td class="hd">LR decay / schedule</td><td>학습이 진행될수록 보폭을 줄이는 규칙. 처음엔 성큼성큼, 정답 근처에선 살살</td></tr>
+      <tr><td class="hd">hyperparameter</td><td><strong>사람이 정하는</strong> 설정값. learning rate, batch size, dropout 비율 등. 학습으로 배우는 parameter랑 구별</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B5 -->
+<section id="b5">
+  <div class="sec-head"><span class="sec-num">B5</span><h2>잘 배웠는지 재는 법</h2></div>
+  <p>논문의 결과표를 읽으려면 이것만 알면 됨.</p>
+  <table>
+    <thead><tr><th>용어</th><th>뜻</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">accuracy (정확도)</td><td>맞힌 비율. 학습에 <strong>안 쓴</strong> 데이터(test/validation set)로 재야 의미 있음</td></tr>
+      <tr><td class="hd">top-1 / top-5</td><td>1000종류 중 모델이 <strong>1순위로 꼽은 게 정답</strong>이면 top-1 맞힘. <strong>5순위 안에 정답이 있으면</strong> top-5 맞힘. 그래서 top-5가 항상 더 높음</td></tr>
+      <tr><td class="hd">overfitting (과적합)</td><td>문제집 답만 <strong>외워서</strong> 새 문제는 못 푸는 상태. 학습 데이터 성적은 좋은데 테스트 성적이 나쁨</td></tr>
+      <tr><td class="hd">regularization</td><td>외우기 방지 장치의 총칭. 아래 셋이 이 글에 나옴</td></tr>
+      <tr><td class="hd">dropout</td><td>학습 중에 뉴런을 <strong>랜덤으로 일부 꺼버림</strong>. 특정 뉴런에 의존하는 걸 막음. 논문의 DR 0.5 = 매번 절반을 끔</td></tr>
+      <tr><td class="hd">weight decay</td><td>다이얼 값이 너무 커지면 <strong>벌점</strong>을 줌. 모델을 단순하게 유지</td></tr>
+      <tr><td class="hd">data augmentation</td><td>사진을 자르고, 뒤집고, 밝기 바꿔서 <strong>데이터를 불리는 것</strong></td></tr>
+      <tr><td class="hd">Batch Normalization</td><td>층 사이를 흐르는 숫자들의 크기를 매번 정리해줘서 학습을 안정시키는 장치</td></tr>
+      <tr><td class="hd">convergence (수렴)</td><td>학습을 계속하면 loss가 더 안 줄고 <strong>어딘가에 자리 잡는 것</strong>. "수렴한다" = 학습이 제대로 끝난다</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B6 -->
+<section id="b6">
+  <div class="sec-head"><span class="sec-num">B6</span><h2>숫자 하나에 몇 bit</h2></div>
+  <p>통신량을 계산하려면 컴퓨터가 숫자를 어떻게 저장하는지 알아야 함.</p>
+  <ul>
+    <li><strong>bit</strong>: 0 아니면 1. 컴퓨터 정보의 최소 단위</li>
+    <li><strong>byte</strong>: bit 8개. 파일 크기(MB, GB)는 byte 단위</li>
+    <li><strong>FP32</strong>: 소수점 있는 숫자(부동소수점, floating point) 하나를 <strong>32 bit = 4 byte</strong>로 저장하는 형식. 딥러닝 기본값. 논문에서 "floating gradients"라고 하면 이거</li>
+    <li>bit <span class="m"><i>k</i></span>개로 표현 가능한 값은 <span class="m">2<sup><i>k</i></sup></span>가지. 그래서 값이 3종류(−1, 0, +1)면 <strong>2 bit</strong>로 충분함 (00, 01, 10 쓰고 11은 버림)</li>
+  </ul>
+
+  <div class="scale">
+    <div class="cap">숫자 감각 · 네트워크 속도</div>
+    <table>
+      <tr><td class="what">1 Gbps Ethernet</td><td class="num">초당 125 MB</td><td>일반 유선 랜. Gbps = 초당 10억 <strong>bit</strong>. byte로 바꾸려면 8로 나눔</td></tr>
+      <tr><td class="what">100 Gbps InfiniBand</td><td class="num">초당 12.5 GB</td><td>슈퍼컴, 데이터센터용 고급 네트워크</td></tr>
+      <tr><td class="what">AlexNet gradient 한 벌 (FP32)</td><td class="num">약 244 MB</td><td>6100만 × 4 byte. 1 Gbps로 약 2초</td></tr>
+    </table>
+    <div class="foot">PCIe, NVLink는 <strong>한 컴퓨터 안에서</strong> GPU끼리 잇는 연결선이고, Ethernet, InfiniBand는 <strong>컴퓨터끼리</strong> 잇는 네트워크임. 안쪽이 훨씬 빠름.</div>
+  </div>
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>b와 B</h4>
+    <p>Gbps의 b는 <strong>bit</strong>, MB의 B는 <strong>byte</strong>. 8배 차이남. 네트워크 속도는 bit, 파일 크기는 byte로 적는 게 관례라서 계산할 때 8로 나누는 걸 까먹으면 8배 틀림.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B7 -->
+<section id="b7">
+  <div class="sec-head"><span class="sec-num">B7</span><h2>분산학습과 동기화 통신</h2></div>
+  <p class="sec-sub">TernGrad 논문이 푸는 문제가 정확히 여기서 생김.</p>
+
+  <h3>GPU 여러 장 = 분산학습</h3>
+  <p><strong>GPU</strong>는 단순한 곱셈, 덧셈을 <strong>수천 개 동시에</strong> 하는 칩임. 신경망 계산이 거의 곱하고 더하기라서 딥러닝은 GPU로 돌림. 그래도 큰 모델은 한 장으로 몇 주씩 걸리니까 <strong>여러 장에 나눠서</strong> 돌림. 이게 <strong>분산학습(distributed training)</strong>임.</p>
+  <ul>
+    <li><strong>worker</strong>: 계산을 맡은 GPU 하나(또는 컴퓨터 하나)</li>
+    <li><strong>node</strong>: 컴퓨터 한 대. 한 대에 GPU가 여러 장 꽂혀 있기도 함</li>
+    <li><strong>cluster</strong>: node 여러 대를 네트워크로 묶은 것</li>
+  </ul>
+
+  <h3>조별과제로 비유하면</h3>
+  <p>시험 대비 요약본(= 모델) 하나를 4명이 같이 고친다고 치자.</p>
+  <ol>
+    <li>문제집을 4등분해서 각자 풀어봄 (= 각 GPU가 자기 몫의 mini-batch로 계산)</li>
+    <li>각자 "요약본 여기를 이렇게 고쳐야 함"이라는 <strong>수정 메모</strong>를 씀 (= gradient)</li>
+    <li>메모를 <strong>반장한테 보냄</strong> (= push, 통신)</li>
+    <li>반장이 4명 메모를 <strong>평균 내서</strong> 최종 수정안을 만듦</li>
+    <li>수정안을 <strong>다시 4명한테 나눠줌</strong> (= pull, 통신)</li>
+    <li>다 같이 요약본을 고침. 이제 <strong>4명 요약본이 다시 똑같아짐</strong></li>
+    <li>1번으로 돌아가서 반복</li>
+  </ol>
+  <p>이렇게 데이터만 나누고 모델은 모두가 통째로 들고 있는 방식을 <strong>data parallelism</strong>, 반장 역할을 하는 컴퓨터를 <strong>parameter server</strong>라고 부름.</p>
+
+  <h3>동기화 통신 = 3번부터 6번</h3>
+  <ul>
+    <li><strong>동기화(synchronization)</strong>: 여러 명이 들고 있는 값을 <strong>서로 똑같이 맞추는 것</strong></li>
+    <li><strong>통신(communication)</strong>: 그걸 맞추려고 <strong>네트워크로 데이터를 주고받는 것</strong></li>
+  </ul>
+  <p>논문에서 3번은 <strong>gradient synchronization</strong>, 5번은 <strong>parameter synchronization</strong>이라고 부름.</p>
+
+  <h3>synchronous(동기) = 다 같이 기다림</h3>
+  <p><strong>모두 끝날 때까지 기다렸다가 다 같이 다음 단계로</strong> 가는 방식임.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 220" role="img" aria-label="GPU 4개가 계산을 마치는 시간이 다르고, 제일 느린 GPU가 끝날 때까지 기다린 뒤 다 같이 통신하는 타임라인">
+      <text class="svglab" x="190" y="22" text-anchor="middle" style="font-size:11px" fill="var(--violet)">계산</text>
+      <text class="svglab" x="520" y="22" text-anchor="middle" style="font-size:11px" fill="var(--brown)">통신 (보내고 받기)</text>
+      <text class="svglab" x="78" y="51" text-anchor="end" style="font-size:11px">GPU 1</text>
+      <rect x="90" y="36" width="180" height="22" rx="3" fill="rgba(var(--violet-rgb),.35)" stroke="var(--violet)"/>
+      <line x1="272" y1="47" x2="388" y2="47" stroke="var(--amber)" stroke-width="1.6" stroke-dasharray="3 4"/>
+      <rect x="392" y="36" width="256" height="22" rx="3" fill="rgba(var(--brown-rgb),.3)" stroke="var(--brown)"/>
+      <text class="svglab" x="78" y="86" text-anchor="end" style="font-size:11px">GPU 2</text>
+      <rect x="90" y="71" width="200" height="22" rx="3" fill="rgba(var(--violet-rgb),.35)" stroke="var(--violet)"/>
+      <line x1="292" y1="82" x2="388" y2="82" stroke="var(--amber)" stroke-width="1.6" stroke-dasharray="3 4"/>
+      <rect x="392" y="71" width="256" height="22" rx="3" fill="rgba(var(--brown-rgb),.3)" stroke="var(--brown)"/>
+      <text class="svglab" x="78" y="121" text-anchor="end" style="font-size:11px">GPU 3</text>
+      <rect x="90" y="106" width="175" height="22" rx="3" fill="rgba(var(--violet-rgb),.35)" stroke="var(--violet)"/>
+      <line x1="267" y1="117" x2="388" y2="117" stroke="var(--amber)" stroke-width="1.6" stroke-dasharray="3 4"/>
+      <rect x="392" y="106" width="256" height="22" rx="3" fill="rgba(var(--brown-rgb),.3)" stroke="var(--brown)"/>
+      <text class="svglab" x="78" y="156" text-anchor="end" style="font-size:11px">GPU 4</text>
+      <rect x="90" y="141" width="298" height="22" rx="3" fill="rgba(var(--violet-rgb),.35)" stroke="var(--violet)"/>
+      <rect x="392" y="141" width="256" height="22" rx="3" fill="rgba(var(--brown-rgb),.3)" stroke="var(--brown)"/>
+      <line x1="390" y1="30" x2="390" y2="172" stroke="var(--ink2)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text class="svglab" x="390" y="190" text-anchor="middle" style="font-size:10.5px">제일 느린 GPU 4가 끝나야 다 같이 통신 시작</text>
+      <text class="svglab" x="330" y="211" text-anchor="middle" style="font-size:10.5px" fill="var(--amber)">점선 = 노는 시간</text>
+    </svg>
+    <figcaption>한 iteration의 시간 = (제일 느린 GPU의 계산 시간) + (통신 시간). 막대 길이는 설명용으로 대충 그린 것 (보충).</figcaption>
+  </figure>
+
+  <p>여기서 문제가 생김.</p>
+  <ul>
+    <li>GPU를 늘리면 <span class="cGain">계산은 N등분돼서 줄어듦</span></li>
+    <li>근데 각자 보내는 메모(gradient) 길이는 <span class="cCost">모델 크기 그대로라서 안 줄어듦</span> (<a href="#b3">B3</a>: gradient 크기 = parameter 크기)</li>
+    <li>AlexNet이면 한 명당 244 MB. 1 Gbps면 한 방향만 약 2초</li>
+    <li>결국 GPU가 대부분의 시간을 <strong>메모 주고받기 기다리면서</strong> 보냄</li>
+  </ul>
+  <p><strong>TernGrad는 이 메모를 "+, 0, −" 세 기호로만 적게 해서 전달 시간을 줄이는 논문</strong>임. 이제 Part 1 첫 문장이 이해될 거임.</p>
+
+  <h3>반대말: asynchronous(비동기)</h3>
+  <p><strong>안 기다리고 각자 알아서 진행</strong>함. 빠른 애는 느린 애를 기다리지 않고 바로 다음 계산 들어감. 장점은 노는 시간이 없다는 것. 단점은 각자 <strong>조금씩 옛날 버전 요약본(stale value)</strong>으로 계산하게 돼서 정확도가 떨어지거나 학습이 망가질 수 있고, 돌릴 때마다 결과가 달라서 디버깅이 헬이라는 것. TernGrad는 <strong>동기 방식은 유지하고 주고받는 양을 줄이는</strong> 쪽을 택함.</p>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>디지털 회로의 synchronous랑 다른 말</h4>
+    <p>회로에서 synchronous는 "clock에 맞춰 동작"이라는 뜻임. 여기서는 clock 얘기가 아니라 <strong>"worker들이 iteration마다 서로를 기다리느냐"</strong>라는 알고리즘 쪽 뜻임. 공통점은 "다 같이 박자를 맞춘다" 정도.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ B8 -->
+<section id="b8">
+  <div class="sec-head"><span class="sec-num">B8</span><h2>수학 기호 급속 충전</h2></div>
+  <p class="sec-sub">Part 1의 06절 수렴 증명, Part 2의 수식에 나오는 것만 모음. 고등학교 수학이면 충분함.</p>
+
+  <table>
+    <thead><tr><th>기호, 용어</th><th>뜻</th><th>예시</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">벡터, 원소</td><td>숫자를 한 줄로 늘어놓은 목록, 그 안의 숫자 하나</td><td><span class="m"><i>g</i> = [3, −4, 1]</span>의 두 번째 원소 <span class="m"><i>g</i><sub>2</sub> = −4</span></td></tr>
+      <tr><td class="hd">아래첨자 <span class="m"><i>t</i></span>, <span class="m"><i>k</i></span></td><td>논문에선 보통 <span class="m"><i>t</i></span> = 몇 번째 iteration, <span class="m"><i>k</i></span> = 몇 번째 원소</td><td><span class="m"><i>g</i><sub><i>tk</i></sub></span> = <i>t</i>번째 iteration gradient의 <i>k</i>번째 원소</td></tr>
+      <tr><td class="hd">Σ</td><td>다 더하기</td><td><span class="m">Σ<i>g</i><sub><i>k</i></sub> = 3 − 4 + 1 = 0</span></td></tr>
+      <tr><td class="hd">|<i>x</i>|, sign(<i>x</i>)</td><td>절댓값, 부호(+1 또는 −1)</td><td>|−4| = 4, sign(−4) = −1</td></tr>
+      <tr><td class="hd">P(…)</td><td>확률</td><td>동전 앞면 P = 0.5</td></tr>
+      <tr><td class="hd">E[…] 기댓값</td><td><strong>무한히 반복했을 때의 평균</strong></td><td>주사위 눈의 기댓값 = (1+2+…+6)/6 = 3.5</td></tr>
+      <tr><td class="hd">unbiased</td><td>기댓값이 참값과 같음. 한 번 한 번은 틀려도 평균은 맞음</td><td>여론조사 (<a href="#b4">B4</a>)</td></tr>
+      <tr><td class="hd">분산, 표준편차 σ</td><td>값이 평균에서 <strong>얼마나 흩어지냐</strong>. σ는 분산의 제곱근</td><td>항상 3.5만 나오는 주사위는 분산 0</td></tr>
+      <tr><td class="hd">max</td><td>제일 큰 값</td><td>max(3, 4, 1) = 4</td></tr>
+      <tr><td class="hd">log<sub>2</sub> <i>N</i></td><td>값 <i>N</i>종류를 구별하는 데 필요한 bit 수</td><td>log<sub>2</sub>4 = 2, log<sub>2</sub>3 ≈ 1.585</td></tr>
+      <tr><td class="hd">convex</td><td><strong>그릇 모양</strong> 함수. 바닥이 하나뿐이라 어디서 출발해도 굴러 내려가면 같은 바닥</td><td>(w − 3)²</td></tr>
+      <tr><td class="hd">O(…) 표기</td><td>입력이 커질 때 <strong>대충 몇 배로 커지냐</strong>만 보는 표기. 상수 배는 무시</td><td>O(<i>n</i>²) = <i>n</i>이 2배면 약 4배</td></tr>
+      <tr><td class="hd">e<sup><i>x</i></sup>, exp</td><td>자연상수 e ≈ 2.718의 거듭제곱. 항상 양수</td><td>e<sup>0</sup> = 1, e<sup>1</sup> ≈ 2.718</td></tr>
+    </tbody>
+  </table>
+
+  <h3>norm: 벡터의 "크기"를 재는 세 가지 방법</h3>
+  <p>TernGrad 06절이 전부 이걸로 돌아감. <span class="m"><i>g</i> = [3, −4, 1]</span>로 계산해보자.</p>
+  <table>
+    <thead><tr><th>이름</th><th>계산법</th><th>이 예시</th></tr></thead>
+    <tbody>
+      <tr><td class="hd"><span class="m">‖<i>g</i>‖<sub>∞</sub></span> (무한대 norm)</td><td>절댓값 중 <strong>최댓값</strong></td><td>4</td></tr>
+      <tr><td class="hd"><span class="m">‖<i>g</i>‖<sub>1</sub></span> (ℓ1 norm)</td><td>절댓값을 <strong>다 더함</strong></td><td>3 + 4 + 1 = 8</td></tr>
+      <tr><td class="hd"><span class="m">‖<i>g</i>‖</span> 또는 <span class="m">‖<i>g</i>‖<sub>2</sub></span> (ℓ2 norm)</td><td>제곱해서 더하고 루트. <strong>화살표 길이</strong></td><td>√(9 + 16 + 1) = √26 ≈ 5.10</td></tr>
+    </tbody>
+  </table>
+  <p>06절에 나오는 부등식 <span class="m">‖<i>g</i>‖<sub>∞</sub>·‖<i>g</i>‖<sub>1</sub> ≥ ‖<i>g</i>‖²</span>를 이 예시로 확인하면 4 × 8 = 32 ≥ 26. 맞음.</p>
+
+  <div class="callout">
+    <strong>여기까지 읽었으면 Part 1 준비 끝.</strong> gradient는 다이얼마다의 기울기 목록이고, 모델만큼 크고, 분산학습에선 이걸 매 iteration 네트워크로 주고받아야 해서 느리다. 이 세 문장이면 TernGrad의 출발점이 전부 설명됨.
   </div>
 </section>
 
@@ -567,7 +884,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <p class="sec-sub">논문 1절 + 3.1절. 이거 모르면 뒤에 전부 이해 안 됨. 천천히 감.</p>
 
   <h3>상황 설정: 모델 하나를 GPU 여러 장으로 학습함</h3>
-  <p>모델이 크고 데이터가 많으면 GPU 한 장으로 학습하면 몇 주 걸림. 그래서 여러 장에 나눠서 돌림. 나누는 방법 중 제일 흔한 게 <strong>data parallelism</strong>임.</p>
+  <p>모델이 크고 데이터가 많으면 GPU 한 장으로 학습하면 몇 주 걸림. 그래서 여러 장에 나눠서 돌림 (조별과제 비유는 <a href="#b7">B7</a>). 나누는 방법 중 제일 흔한 게 <strong>data parallelism</strong>임.</p>
 
   <details class="jargon" open>
     <summary>용어 뜯어보기 · data parallelism</summary>
@@ -584,7 +901,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
 
   <p>한 iteration이 어떻게 도는지 보자. 논문 Figure 1이 이거임.</p>
   <ol>
-    <li>mini-batch를 N등분해서 worker <span class="m"><i>i</i></span>한테 <span class="m"><i>z</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>를 줌</li>
+    <li><a href="#b4">mini-batch</a>를 N등분해서 worker <span class="m"><i>i</i></span>한테 <span class="m"><i>z</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>를 줌</li>
     <li>worker마다 자기 몫으로 gradient <span class="m"><i>g</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span> 계산</li>
     <li>전부 <strong>parameter server</strong>로 보냄 (push)</li>
     <li>server가 평균 냄</li>
@@ -883,7 +1200,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <p class="sec-sub">3.2절. 여기서 다들 탈주함. 근데 뼈대는 단순함: <strong>"기존 SGD 수렴 증명에 가정 하나만 바꿔 끼웠다."</strong></p>
 
   <h3>무대 설정: online learning</h3>
-  <p>논문은 수렴을 <strong>online learning 시스템</strong> 틀에서 분석함. 관측 <span class="m"><i>z</i></span>가 모르는 분포에서 하나씩 뽑혀 나오고, loss <span class="m"><i>Q</i>(<i>z</i>, <i>w</i>)</span>로 성능을 잼. 줄이고 싶은 건 loss의 기댓값:</p>
+  <p>기호가 낯설면 <a href="#b8">B8</a>의 norm, 기댓값부터 보고 오셈. 논문은 수렴을 <strong>online learning 시스템</strong> 틀에서 분석함. 관측 <span class="m"><i>z</i></span>가 모르는 분포에서 하나씩 뽑혀 나오고, loss <span class="m"><i>Q</i>(<i>z</i>, <i>w</i>)</span>로 성능을 잼. 줄이고 싶은 건 loss의 기댓값:</p>
   <div class="eq"><span class="m"><i>C</i>(<i>w</i>) ≜ E{<i>Q</i>(<i>z</i>, <i>w</i>)}</span><span class="note">식 (5)</span></div>
   <p>기준이 되는 알고리즘은 Bottou의 <strong>GOGA</strong>(General Online Gradient Algorithm, [33])임. 그냥 SGD라고 보면 됨:</p>
   <div class="eq"><span class="m"><i>w</i><sub><i>t</i>+1</sub> = <i>w</i><sub><i>t</i></sub> − γ<sub><i>t</i></sub><i>g</i><sub><i>t</i></sub> = <i>w</i><sub><i>t</i></sub> − γ<sub><i>t</i></sub> · ∇<sub><i>w</i></sub><i>Q</i>(<i>z</i><sub><i>t</i></sub>, <i>w</i><sub><i>t</i></sub>)</span><span class="note">식 (6)</span></div>
@@ -898,7 +1215,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <table>
     <thead><tr><th>가정</th><th>수식</th><th>핑프어</th></tr></thead>
     <tbody>
-      <tr><td class="hd">Assumption 1</td><td><span class="m">inf<sub>‖<i>w</i>−<i>w</i>*‖²&gt;ε</sub> (<i>w</i> − <i>w</i>*)<sup>T</sup>∇<i>C</i>(<i>w</i>) &gt; 0</span></td><td>최솟값 <span class="m"><i>w</i>*</span>가 <strong>하나뿐</strong>이고, 어디 있든 <strong>−gradient가 항상 <span class="m"><i>w</i>*</span> 쪽을 가리킴</strong>. convex면 자동으로 만족. 논문은 convex 아닌데 이걸 만족하는 함수도 쉽게 찾을 수 있다고 함</td></tr>
+      <tr><td class="hd">Assumption 1</td><td><span class="m">inf<sub>‖<i>w</i>−<i>w</i>*‖²&gt;ε</sub> (<i>w</i> − <i>w</i>*)<sup>T</sup>∇<i>C</i>(<i>w</i>) &gt; 0</span></td><td>최솟값 <span class="m"><i>w</i>*</span>가 <strong>하나뿐</strong>이고, 어디 있든 <strong>−gradient가 항상 <span class="m"><i>w</i>*</span> 쪽을 가리킴</strong>. <a href="#b8">convex</a>면 자동으로 만족. 논문은 convex 아닌데 이걸 만족하는 함수도 쉽게 찾을 수 있다고 함</td></tr>
       <tr><td class="hd">Assumption 2</td><td><span class="m">Σγ<sub><i>t</i></sub>² &lt; ∞,&nbsp; Σγ<sub><i>t</i></sub> = ∞</span></td><td>learning rate가 <strong>너무 빨리도, 너무 느리게도 안 줄어듦</strong>. 합이 무한이라 어디든 갈 수 있고, 제곱합은 유한이라 노이즈가 결국 잦아듦. 예: γ<sub><i>t</i></sub> = 1/<i>t</i></td></tr>
       <tr><td class="hd">Assumption 3 (새것)</td><td><span class="m">E{‖<i>g</i>‖<sub>∞</sub> · ‖<i>g</i>‖<sub>1</sub>} ≤ <i>A</i> + <i>B</i>‖<i>w</i> − <i>w</i>*‖²</span></td><td>gradient의 <strong>"최댓값 × 절댓값 합"</strong>이 너무 크지 않음. 최솟값에서 멀어질수록 커지는 건 허용 (<span class="m"><i>B</i></span>항)</td></tr>
     </tbody>
@@ -970,7 +1287,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <div class="eq"><span class="m"><i>f</i>(<i>g</i><sub><i>i</i></sub>) = <i>g</i><sub><i>i</i></sub> &nbsp;(|<i>g</i><sub><i>i</i></sub>| ≤ <i>c</i>σ),&nbsp;&nbsp; sign(<i>g</i><sub><i>i</i></sub>) · <i>c</i>σ &nbsp;(|<i>g</i><sub><i>i</i></sub>| &gt; <i>c</i>σ)</span><span class="note">식 (21)</span></div>
   <ul>
     <li><span class="m">σ</span>: 그 gradient 벡터의 표준편차</li>
-    <li><span class="m"><i>c</i></span>: 하이퍼파라미터. CIFAR-10 CNN([35])을 momentum SGD로 학습하면서 <strong>딱 한 번</strong> cross-validation해서 <span class="m"><i>c</i> = 2.5</span>로 정하고 모든 실험에 그대로 씀</li>
+    <li><span class="m"><i>c</i></span>: 하이퍼파라미터. CIFAR-10 CNN([35])을 momentum SGD로 학습하면서 <strong>딱 한 번</strong> cross-validation해서(후보 값을 여러 개 넣어보고 검증 데이터 성적이 제일 좋은 걸 고르는 것) <span class="m"><i>c</i> = 2.5</span>로 정하고 모든 실험에 그대로 씀</li>
     <li>분산학습에선 ternarize 직전에 <strong>worker마다</strong> 적용</li>
   </ul>
   <p>gradient가 Gaussian에 가깝다면(Figure 2(a)) <span class="m">[−2.5σ, 2.5σ]</span> 밖으로 나가는 건 극소수임. 그 극소수만 자르면 <span class="m"><i>s</i></span>가 확 작아지는데, 원래 벡터는 거의 안 바뀜. 논문 수치:</p>
@@ -1015,9 +1332,9 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <h3>공통 세팅 (4절 도입)</h3>
   <ul>
     <li>구현: <strong>TensorFlow</strong></li>
-    <li>parameter의 exponential moving average 유지 (decay 0.9999). 정확도는 이 평균 parameter로 잼. 약간 더 좋게 나왔다고 함</li>
+    <li>parameter의 exponential moving average 유지 (decay 0.9999). 최근 parameter 값들의 가중 평균을 따로 계속 들고 있는 것. 정확도는 이 평균 parameter로 잼. 약간 더 좋게 나왔다고 함</li>
     <li>공정 비교: float vs ternary 쌍마다 <strong>다른 하이퍼파라미터는 명시 안 하면 전부 동일</strong></li>
-    <li>momentum 쓸 땐 0.9. polynomial LR decay는 power 0.5로 base LR에서 0까지</li>
+    <li>momentum 쓸 땐 0.9. polynomial LR decay(보폭을 학습 끝까지 곡선 모양으로 0까지 줄이는 <a href="#b4">schedule</a>)는 power 0.5로 base LR에서 0까지</li>
   </ul>
 
   <h3>LeNet on MNIST (Figure 3)</h3>
@@ -1070,7 +1387,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <ol>
     <li><strong>dropout 비율 낮추기</strong> (더 많은 뉴런 유지). 이유: dropout도 랜덤성으로 규제하고 TernGrad도 랜덤성을 넣으니까, 둘 다 세면 <strong>"과한 랜덤"</strong>이 됨</li>
     <li><strong>weight decay 줄이기</strong>. 같은 이유. TernGrad 랜덤성이 이미 규제 역할을 함</li>
-    <li><strong>마지막 분류 layer는 ternarize 안 함</strong>. 레이블 one-hot 때문에 마지막 layer gradient 분포가 한쪽으로 쏠리는데(skew), 대칭인 {−1, 0, 1}은 이런 분포에 안 맞음. 비대칭 ternary도 방법이지만 단순하게 그냥 float로 보냄. 비용은 작음: 마지막 layer는 전체 parameter의 <strong>AlexNet 6.7%, ResNet-152 3.99%</strong></li>
+    <li><strong>마지막 분류 layer는 ternarize 안 함</strong>. 레이블이 one-hot(정답 칸만 1, 나머지 0)이라서 마지막 layer gradient 분포가 한쪽으로 쏠리는데(skew), 대칭인 {−1, 0, 1}은 이런 분포에 안 맞음. 비대칭 ternary도 방법이지만 단순하게 그냥 float로 보냄. 비용은 작음: 마지막 layer는 전체 parameter의 <strong>AlexNet 6.7%, ResNet-152 3.99%</strong></li>
   </ol>
   <p>그 외 세팅: 전부 momentum SGD, conv layer에 Batch Normalization. AlexNet은 Caffe 하이퍼파라미터와 augmentation, GoogLeNet은 polynomial LR decay와 [41]의 augmentation. GoogLeNet 구현은 <strong>auxiliary classifier 없음</strong>. 검증 정확도는 가운데 crop만으로 평가.</p>
 
@@ -1179,6 +1496,75 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
 
 <div class="part"><div class="k">Part 2</div><div class="t">Attention Is All You Need: RNN 버리고 attention만 쓰기</div></div>
 
+<!-- ══════════════════════════════════════════════════════ T0 -->
+<section id="t0">
+  <div class="sec-head"><span class="sec-num">T0</span><h2>Part 2 준비물</h2></div>
+  <p class="sec-sub">번역 모델 얘기라 Part 0과 다른 배경지식이 필요함. 이것도 전부 논문 밖 보충이고, 이미 아는 사람은 <a href="#s11">11</a>로 점프.</p>
+
+  <h3>1. 문장은 토큰의 줄 (sequence, token)</h3>
+  <p>모델은 글자를 모름. 문장을 <strong>토큰</strong>이라는 조각으로 쪼개서 번호를 붙임. 토큰은 단어일 수도, 단어 조각일 수도 있음. "unhappiness"를 "un", "happi", "ness"로 쪼개는 식. 논문에 나오는 <strong>byte-pair encoding(BPE)</strong>, <strong>word-piece</strong>가 이렇게 <strong>자주 나오는 조각 단위로 쪼개는 방법</strong>의 이름임. 가능한 토큰 전체 목록이 <strong>vocab(어휘)</strong>이고 논문은 약 37000개, 32000개를 씀.</p>
+  <p>토큰이 순서대로 늘어선 것을 <strong>sequence</strong>라고 함. 번역은 <strong>sequence를 받아서 다른 sequence를 내놓는 일</strong>이라서 논문은 이걸 <strong>sequence transduction</strong>이라고 부름. 문장 길이(토큰 수)는 보통 <span class="m"><i>n</i></span>으로 씀.</p>
+
+  <h3>2. 토큰을 숫자 목록으로: embedding</h3>
+  <p>토큰 번호(예: 4821번)는 그냥 이름표라서 계산에 못 씀. 그래서 토큰마다 <strong>숫자 512개짜리 벡터</strong>를 하나씩 배정함. 이게 <strong>embedding</strong>이고, 이 숫자들도 학습으로 맞추는 다이얼임.</p>
+  <div class="def">
+    <span class="tag">비유: 성격검사 점수표</span>
+    <p>사람을 "외향성 7, 성실성 3, …"처럼 점수 여러 개로 나타내면 비슷한 사람끼리 점수도 비슷함. embedding은 단어한테 이런 점수표를 512칸짜리로 붙여주는 거임. 학습이 끝나면 "고양이"랑 "강아지"의 점수표가 비슷해짐. 이 512가 논문의 <span class="m"><i>d</i><sub>model</sub></span>임.</p>
+  </div>
+
+  <h3>3. 내적(dot product): 두 벡터가 얼마나 닮았나</h3>
+  <p>같은 칸끼리 곱해서 다 더하면 됨.</p>
+  <div class="eq"><span class="m">[1, 2, 0] · [2, 1, 1] = 1×2 + 2×1 + 0×1 = 4</span></div>
+  <p>두 벡터가 <strong>같은 쪽을 가리킬수록 크고</strong>, 상관없으면 0 근처, 반대면 음수가 나옴. 그래서 <strong>"닮음 점수"</strong>로 씀. Transformer의 attention이 정확히 이걸로 "이 단어가 저 단어랑 얼마나 관련 있냐"를 잼.</p>
+
+  <h3>4. softmax: 점수를 비율로 바꾸기</h3>
+  <p>점수 여러 개를 <strong>전부 양수이고 합이 1인 비율</strong>로 바꾸는 함수임. 방법: 각 점수에 <span class="m"><i>e</i><sup><i>x</i></sup></span>를 씌우고(<a href="#b8">B8</a>), 전체 합으로 나눔.</p>
+  <div class="ex">
+    <span class="tag">예시</span>
+    <p>점수 [2, 1, 0] → <span class="m"><i>e</i><sup>2</sup> = 7.389, <i>e</i><sup>1</sup> = 2.718, <i>e</i><sup>0</sup> = 1</span>, 합 11.107 → 비율 <strong>[0.665, 0.245, 0.090]</strong>. 점수가 높은 쪽이 비율을 많이 가져가되, 낮은 쪽도 0은 아님.</p>
+  </div>
+  <p>분류 모델의 마지막에서 "고양이 92%, 개 7%, …" 같은 확률을 만들 때도 softmax를 씀. 점수 차이가 크면 한쪽이 거의 1을 다 가져가는데, 이게 Part 2 <a href="#s14">14</a>의 √d<sub>k</sub> 얘기로 이어짐.</p>
+
+  <h3>5. 행렬과 행렬곱: 내적을 한꺼번에</h3>
+  <p><strong>행렬</strong>은 숫자를 표(가로 × 세로)로 늘어놓은 것. "<span class="m"><i>n</i> × <i>d</i></span> 행렬"은 <span class="m"><i>n</i></span>줄, <span class="m"><i>d</i></span>칸짜리 표임. 문장 하나를 embedding으로 바꾸면 토큰마다 한 줄씩이라 <span class="m"><i>n</i> × 512</span> 행렬이 됨.</p>
+  <p><strong>행렬곱</strong>은 "왼쪽 행렬의 각 줄"과 "오른쪽 행렬의 각 칸"을 <strong>전부 짝지어 내적</strong>하는 것. 내적 수천만 번을 한 번에 하는 셈이고, 서로 독립이라 <strong>동시에 계산 가능</strong>함. GPU가 제일 잘하는 게 바로 이거임. Transformer가 빠른 이유의 절반이 "모든 계산을 행렬곱으로 바꿨다"임.</p>
+  <p>기호 <span class="m"><i>K</i><sup>T</sup></span>의 T는 <strong>전치(transpose)</strong>: 표를 대각선으로 뒤집어서 가로와 세로를 바꾼 것. 행렬곱 모양을 맞추려고 씀.</p>
+
+  <h3>6. 번역기의 기본 구조: encoder-decoder</h3>
+  <ul>
+    <li><strong>encoder</strong>: 원문을 <strong>읽고 이해하는</strong> 담당. 원문을 숫자 표현으로 바꿔둠</li>
+    <li><strong>decoder</strong>: 그 표현을 보면서 번역문을 <strong>한 단어씩 써내려가는</strong> 담당</li>
+    <li><strong>auto-regressive</strong>: 다음 단어를 쓸 때 <strong>자기가 방금까지 쓴 단어들</strong>을 입력으로 다시 넣음. 스마트폰 자동완성이랑 같은 방식</li>
+  </ul>
+
+  <h3>7. RNN: 한 단어씩 읽으면서 메모 고치기</h3>
+  <p>2017년 전 번역기의 주력은 <strong>RNN</strong>(Recurrent Neural Network)이었음. 문장을 <strong>왼쪽부터 한 단어씩</strong> 읽으면서 <strong>메모장(hidden state)</strong>을 고쳐나감. "메모장 5번 상태 = 메모장 4번 상태 + 5번째 단어". <strong>LSTM</strong>, <strong>GRU</strong>는 이 메모장이 긴 문장에서 앞 내용을 까먹지 않게 개량한 RNN 버전 이름임.</p>
+  <p>문제는 <strong>5번을 하려면 4번이 끝나야 함</strong>. 한 줄로 서서 차례 기다리는 구조라 GPU 수천 개 연산기를 동시에 못 씀. 이게 Transformer가 RNN을 버린 이유임 (<a href="#s12">12</a>).</p>
+
+  <h3>8. attention (원래 쓰임): 원문 어디를 볼지 고르기</h3>
+  <p>RNN 번역기는 원문 전체를 메모장 하나에 욱여넣어서 긴 문장에서 정보가 뭉개졌음. 그래서 2014년쯤 나온 보조 장치가 <strong>attention</strong>: 번역 단어 하나를 쓸 때마다 <strong>원문 단어들 중 어디를 얼마나 볼지 비율(가중치)</strong>을 정해서 그 부분을 섞어 가져옴. 3번의 내적으로 관련도를 재고, 4번의 softmax로 비율을 만든다고 보면 됨. Transformer는 이 보조 장치를 <strong>본체로 승격</strong>시킨 거임.</p>
+
+  <h3>9. 그 외 부품 사전</h3>
+  <table>
+    <thead><tr><th>용어</th><th>뜻</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">ReLU</td><td>음수면 0, 양수면 그대로. <span class="m">max(0, <i>x</i>)</span>. 층 사이에 끼우는 꺾기</td></tr>
+      <tr><td class="hd">feed-forward network</td><td>그냥 "곱하고 더하고 ReLU" 층을 몇 개 쌓은 기본형 신경망. fully connected layer라고도 함</td></tr>
+      <tr><td class="hd">residual connection</td><td>층의 출력에 <strong>입력을 그대로 더해주는 우회로</strong>. 층이 깊어도 학습이 잘 되게 해줌 (ResNet에서 유명해짐)</td></tr>
+      <tr><td class="hd">layer normalization</td><td>한 토큰 벡터의 숫자들을 평균 0, 분산 1 근처로 정리. Batch Normalization(<a href="#b5">B5</a>)의 사촌</td></tr>
+      <tr><td class="hd">one-hot</td><td>정답 칸만 1, 나머지 전부 0인 벡터. 정답 레이블 표현법</td></tr>
+      <tr><td class="hd">perplexity (PPL)</td><td>다음 토큰을 맞힐 때 모델이 <strong>평균 몇 개 후보 사이에서 헷갈리냐</strong>. 낮을수록 좋음</td></tr>
+      <tr><td class="hd">beam search</td><td>번역문을 만들 때 매 단계 1등만 고르지 않고 <strong>상위 몇 개 후보 문장</strong>을 같이 키워가며 최종 1등을 고르는 방법. beam 4 = 후보 4개 유지</td></tr>
+      <tr><td class="hd">checkpoint</td><td>학습 중간중간 저장해둔 다이얼 값 스냅샷</td></tr>
+      <tr><td class="hd">ensemble</td><td>모델 여러 개의 답을 합쳐서 내는 것. 보통 단일 모델보다 성능이 좋지만 몇 배 비쌈</td></tr>
+      <tr><td class="hd">SOTA</td><td>state of the art. "현재 최고 기록"</td></tr>
+      <tr><td class="hd">ablation</td><td>부품을 하나씩 빼거나 바꿔보면서 <strong>각 부품이 얼마나 기여하는지</strong> 재는 실험. Table 3이 이거</td></tr>
+      <tr><td class="hd">FLOPs</td><td>floating-point operations. 소수 계산(곱셈, 덧셈)을 몇 번 했냐. 학습 비용의 척도</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
 <!-- ══════════════════════════════════════════════════════ 11 -->
 <section id="s11">
   <div class="sec-head"><span class="sec-num">11</span><h2>이 논문 뭐임</h2></div>
@@ -1225,6 +1611,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <p class="sec-sub">1절 + 2절. "왜 RNN을 버렸냐"를 이해하면 이 논문 동기가 다 이해됨.</p>
 
   <h3>RNN의 태생적 한계: 한 줄로 서서 기다림</h3>
+  <p>RNN이 처음이면 <a href="#t0">T0</a>의 7번부터 보고 오셈.</p>
   <p>RNN(LSTM, GRU 포함)은 hidden state <span class="m"><i>h</i><sub><i>t</i></sub></span>를 <strong>이전 hidden state <span class="m"><i>h</i><sub><i>t</i>−1</sub></span>와 <i>t</i>번째 입력의 함수</strong>로 만듦. 즉 <span class="m"><i>h</i><sub>5</sub></span>를 계산하려면 <span class="m"><i>h</i><sub>4</sub></span>가 있어야 하고, 그건 <span class="m"><i>h</i><sub>3</sub></span>이 있어야 하고... 50단어 문장이면 50번을 <strong>순서대로</strong> 해야 함.</p>
   <p>논문이 짚는 문제:</p>
   <ul>
@@ -1922,6 +2309,97 @@ function svgEl(tag, attrs, text) {
   if (text != null) e.textContent = text;
   return e;
 }
+</script>
+
+<script>
+// gradient descent 체험. B3절. loss = (w − 3)².
+(function () {
+  var svg = document.getElementById('gdSvg');
+  if (!svg) return;
+  var lrHost = document.getElementById('gdLr');
+  var actHost = document.getElementById('gdAct');
+  var out = document.getElementById('gdOut');
+  var LRS = [
+    { v: 0.1, key: 'η = 0.1 (소심)' },
+    { v: 0.5, key: 'η = 0.5 (딱 맞음)' },
+    { v: 0.9, key: 'η = 0.9 (지그재그)' },
+    { v: 1.05, key: 'η = 1.05 (발산)' }
+  ];
+  var lr = LRS[0], W0 = 6, trail;
+
+  function X(w) { return 60 + 75 * (w + 1); }
+  function Y(l) { return 212 - 11 * l; }
+  function loss(w) { return (w - 3) * (w - 3); }
+
+  function reset() { trail = [W0]; }
+
+  function step(k) {
+    for (var i = 0; i < k; i++) {
+      var w = trail[trail.length - 1];
+      trail.push(w - lr.v * 2 * (w - 3));
+    }
+  }
+
+  function draw() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.appendChild(svgEl('line', { x1: 60, y1: 212, x2: 660, y2: 212, stroke: 'var(--ink3)' }));
+    var d = '', w;
+    for (w = -1; w <= 7.001; w += 0.1) {
+      var l = loss(w);
+      if (l > 16.5) continue;
+      d += (d ? ' L' : 'M') + X(w).toFixed(1) + ',' + Y(l).toFixed(1);
+    }
+    svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: 'var(--blue)', 'stroke-width': 1.8 }));
+    [0, 3, 6].forEach(function (t) {
+      svg.appendChild(svgEl('text', { class: 'svglab', x: X(t), y: 230, 'text-anchor': 'middle', style: 'font-size:10.5px' }, 'w = ' + t));
+    });
+    svg.appendChild(svgEl('text', { class: 'svglab', x: X(3), y: 202, 'text-anchor': 'middle', style: 'font-size:10px', fill: 'var(--green)' }, '정답'));
+    svg.appendChild(svgEl('text', { class: 'svglab', x: 62, y: 16, style: 'font-size:10.5px' }, 'loss'));
+    for (var i = 0; i < trail.length; i++) {
+      var tw = trail[i];
+      if (tw < -1 || tw > 7) continue;
+      var last = i === trail.length - 1;
+      if (i > 0 && trail[i - 1] >= -1 && trail[i - 1] <= 7) {
+        svg.appendChild(svgEl('line', { x1: X(trail[i - 1]), y1: Y(loss(trail[i - 1])), x2: X(tw), y2: Y(loss(tw)), stroke: 'var(--ink3)', 'stroke-dasharray': '3 3' }));
+      }
+      svg.appendChild(svgEl('circle', { cx: X(tw), cy: Y(loss(tw)), r: last ? 7 : 3.5, fill: last ? 'var(--amber)' : 'var(--ink3)' }));
+    }
+  }
+
+  function paint() {
+    draw();
+    var w = trail[trail.length - 1], g = 2 * (w - 3);
+    var gone = w < -1 || w > 7;
+    var msg;
+    if (Math.abs(w - 3) < 0.005) msg = '정답 도착. loss ≈ 0';
+    else if (gone) msg = '그래프 밖으로 튕겨나감. 보폭이 너무 커서 발산 중';
+    else msg = '아직 가는 중';
+    out.innerHTML =
+      '걸음 수 = <strong>' + (trail.length - 1) + '</strong> · w = <strong>' + w.toFixed(3) + '</strong><br>' +
+      '기울기 g = 2(w − 3) = <strong>' + g.toFixed(3) + '</strong> · loss = <strong>' + loss(w).toFixed(4) + '</strong><br>' +
+      '다음 w = w − η·g = ' + (w - lr.v * g).toFixed(3) + ' · ' + msg;
+  }
+
+  function btn(host, label, on, fn) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = label;
+    if (on) b.className = 'act';
+    b.addEventListener('click', fn);
+    host.appendChild(b);
+  }
+
+  function build() {
+    lrHost.textContent = ''; actHost.textContent = '';
+    LRS.forEach(function (o) { btn(lrHost, o.key, o === lr, function () { lr = o; reset(); build(); }); });
+    btn(actHost, '한 걸음', false, function () { step(1); paint(); });
+    btn(actHost, '5걸음', false, function () { step(5); paint(); });
+    btn(actHost, '처음부터', false, function () { reset(); paint(); });
+    paint();
+  }
+
+  reset();
+  build();
+})();
 </script>
 
 <script>
