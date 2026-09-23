@@ -421,6 +421,10 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
 .readout strong{color:var(--ink)}
 /* 긴 수식이 390px에서 페이지를 밀지 않게, 모바일에서는 수식 안 줄바꿈을 허용한다. */
 @media(max-width:900px){.eq{font-size:16.5px}.m{white-space:normal;overflow-wrap:anywhere}}
+/* 논문 원문 캡처. png 자체가 흰 종이라 다크모드에서도 원본 그대로 보인다. */
+figure.paperfig{background:var(--card)}
+figure.paperfig img{display:block;width:100%;height:auto;margin:0 auto;border-radius:4px}
+figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink3);display:block;margin-bottom:4px}
 .rowlab{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px;color:var(--ink2);margin-top:10px}
 </style>
 </head>
@@ -900,6 +904,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </details>
 
   <p>한 iteration이 어떻게 도는지 보자. 논문 Figure 1이 이거임.</p>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-fig1.png" alt="TernGrad 논문 Figure 1: parameter server와 worker 1..N 사이 gradient 화살표" loading="lazy" style="max-width:380px">
+    <figcaption><span class="src">원문 캡처 · TernGrad Figure 1 · Wen et al., NIPS 2017, 3쪽</span> 주황 화살표가 worker가 올려보내는 gradient <span class="m"><i>g</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>, 파란 화살표가 server가 내려주는 평균 <span class="m"><i>ḡ</i><sub><i>t</i></sub></span>. worker 박스 안의 작은 식이 각자 하는 갱신 <span class="m"><i>w</i><sub><i>t</i>+1</sub> ← <i>w</i><sub><i>t</i></sub> − <i>ḡ</i><sub><i>t</i></sub></span>.</figcaption>
+  </figure>
+
   <ol>
     <li><a href="#b4">mini-batch</a>를 N등분해서 worker <span class="m"><i>i</i></span>한테 <span class="m"><i>z</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>를 줌</li>
     <li>worker마다 자기 몫으로 gradient <span class="m"><i>g</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span> 계산</li>
@@ -1115,6 +1124,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </div>
 
   <h3>Algorithm 1: 한 iteration 전체</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-alg1.png" alt="TernGrad 논문 Algorithm 1: worker 6단계와 server 1단계" loading="lazy" style="max-width:460px">
+    <figcaption><span class="src">원문 캡처 · TernGrad Algorithm 1 · Wen et al., NIPS 2017, 3쪽</span> 원문 그대로. 아래 코드 블록은 이걸 줄마다 주석 달아서 옮긴 것.</figcaption>
+  </figure>
+
   <pre class="code"><span class="c"># Worker i = 1..N (전부 동시에)</span>
 <span class="n">1</span>  z_t(i) 받기                     <span class="c"># mini-batch의 내 몫</span>
 <span class="n">2</span>  g_t(i) = gradient(w_t, z_t(i))  <span class="c"># 평소처럼 backprop. FP32</span>
@@ -1302,6 +1316,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </div>
 
   <h3>Figure 2 읽는 법</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-fig2.png" alt="TernGrad 논문 Figure 2: conv와 fc layer gradient 히스토그램 네 단계" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Figure 2 · Wen et al., NIPS 2017, 5쪽</span> 아래 표에서 패널 (a)~(d)를 하나씩 풀어줌. 윗줄 conv, 아랫줄 fc. 가로축 눈금 범위가 (a)에서 (b)로 가면서 확 줄어드는 걸 먼저 보셈.</figcaption>
+  </figure>
+
   <p>AlexNet을 worker 2개로 분산학습하면서 TensorBoard로 찍은 gradient 히스토그램임. <strong>윗줄은 세 번째 conv layer, 아랫줄은 첫 FC layer</strong>. 세로축이 학습 iteration(위에서 아래로 진행), 가로축이 gradient 값.</p>
   <table>
     <thead><tr><th>패널</th><th>뭘 보여주나</th></tr></thead>
@@ -1338,6 +1357,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </ul>
 
   <h3>LeNet on MNIST (Figure 3)</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-fig3.png" alt="TernGrad 논문 Figure 3: worker 수에 따른 LeNet 정확도, momentum SGD와 vanilla SGD" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Figure 3 · Wen et al., NIPS 2017, 6쪽</span> 세로축이 98%에서 시작한다는 거 주의. 선이 꽤 출렁여 보여도 실제 차이는 0.2%포인트 안쪽임.</figcaption>
+  </figure>
+
   <p>그래프 읽는 법: 가로축이 worker 수 N(2, 4, 8, 16, 32, 64), 세로축 정확도(98~100%), 파란 점선이 baseline(float), 주황 실선이 TernGrad. (a)는 momentum SGD, (b)는 vanilla SGD.</p>
   <ul>
     <li><strong>total mini-batch 64로 고정</strong>, 최대 10K iteration. 그래서 worker당 batch는 <span class="m">64/<i>N</i></span></li>
@@ -1347,6 +1371,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </ul>
 
   <h3>CifarNet on CIFAR-10 (Table 1)</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-tab1.png" alt="TernGrad 논문 Table 1: CifarNet 결과" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Table 1 · Wen et al., NIPS 2017, 7쪽</span> 아래에 같은 숫자를 다시 옮겨둠.</figcaption>
+  </figure>
+
   <p>augmentation: 24×24 랜덤 crop, 좌우 반전, 밝기와 대비 랜덤 조정. 테스트는 가운데 crop만. optimizer는 <strong>Adam</strong>. 여기선 04와 반대로 <strong>worker당 batch를 고정</strong>하고 worker 수를 늘려서 total batch가 선형으로 커짐.</p>
   <table>
     <thead><tr><th>SGD</th><th>base LR</th><th>total batch</th><th>iterations</th><th>workers</th><th>floating</th><th>TernGrad</th></tr></thead>
@@ -1398,6 +1427,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </div>
 
   <h3>AlexNet 결과 (Table 2)</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-tab2.png" alt="TernGrad 논문 Table 2: AlexNet 정확도 비교" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Table 2 · Wen et al., NIPS 2017, 8쪽</span> 굵은 두 숫자(56.62%, 57.54%)가 논문이 강조한 batch 1024 비교. 각주의 † DR = dropout 비율, ‡ noclip = clipping 뺀 것.</figcaption>
+  </figure>
+
   <p>worker당 mini-batch 128로 고정, <strong>모두 같은 epoch 수</strong>만큼 학습. 그래서 worker가 늘면 iteration 수는 줄어듦. 이걸 보완하려고 large-batch일 때 LR을 키움 ([10]).</p>
   <table>
     <thead><tr><th>base LR</th><th>batch</th><th>workers</th><th>iter</th><th>gradients</th><th>wd</th><th>DR</th><th>top-1</th><th>top-5</th></tr></thead>
@@ -1420,6 +1454,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </ul>
 
   <h3>Figure 4 (AlexNet, 4 workers, batch 512)</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-fig4.png" alt="TernGrad 논문 Figure 4: AlexNet top-1 정확도, training loss, fc6 gradient sparsity vs iteration" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Figure 4 · Wen et al., NIPS 2017, 8쪽</span> 가로축은 전부 iteration(시간 아님). (c)는 TernGrad 줄만 있음. 0으로 뭉개진 비율이라 baseline엔 해당 없음.</figcaption>
+  </figure>
+
   <ul>
     <li><strong>(a) top-1 정확도 vs iteration</strong>: 두 곡선이 거의 겹침. TernGrad 수렴 곡선이 baseline이랑 매치됨</li>
     <li><strong>(b) training loss vs iteration</strong>: TernGrad가 <strong>살짝 더 낮은</strong> loss로 수렴. 논문: ternary로도 목표 함수를 최소화할 수 있다는 추가 근거. 다만 dropout이 작은 것도 원인일 수 있다고 스스로 단서 담</li>
@@ -1428,6 +1467,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <p>그리고 "학습 효율은 통신 시간을 줄이면 더 좋아진다(5절)"는 말로 넘어감. 즉 Figure 4는 <strong>iteration 기준</strong>이지 <strong>시간 기준</strong>이 아님.</p>
 
   <h3>GoogLeNet 결과 (Table 3, top-5)</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-tab3.png" alt="TernGrad 논문 Table 3: GoogLeNet top-5 정확도 비교" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Table 3 · Wen et al., NIPS 2017, 8쪽</span> top-1 열이 없고 top-5만 있음. weight decay와 DR 둘 다 TernGrad 줄에서 바뀌어 있음.</figcaption>
+  </figure>
+
   <table>
     <thead><tr><th>base LR</th><th>batch</th><th>workers</th><th>iter</th><th>gradients</th><th>wd</th><th>DR</th><th>top-5</th></tr></thead>
     <tbody>
@@ -1463,6 +1507,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </ul>
 
   <h3>Figure 5 읽는 법</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tg-fig5.png" alt="TernGrad 논문 Figure 5: 두 GPU 클러스터에서 GPU 수별 학습 throughput 막대그래프" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · TernGrad Figure 5 · Wen et al., NIPS 2017, 9쪽</span> 왼쪽 (a) 싼 클러스터, 오른쪽 (b) 비싼 클러스터. 각 그래프 안의 확대 박스가 GPU 1~16개 구간을 키운 것 (눈금이 따로 있음, 박스 안 4000과 바깥 100000을 헷갈리지 말 것). 옅은 무늬 막대가 TernGrad, 진한 막대가 FP32.</figcaption>
+  </figure>
+
   <p>가로축 GPU 수(1~512, 2배씩), 세로축 학습 throughput(images/sec). 모델 셋(AlexNet, GoogLeNet, VggNet-A) × FP32/TernGrad 막대 여섯 개. GPU 16개 이하 구간은 막대가 너무 작아서 확대 박스를 따로 넣어둠.</p>
   <table>
     <thead><tr><th></th><th>(a) 싼 클러스터</th><th>(b) 비싼 HPC 클러스터</th></tr></thead>
@@ -1662,7 +1711,12 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
     <li><strong>auto-regressive</strong>: 다음 기호를 만들 때 <strong>자기가 이전에 만든 기호들</strong>을 추가 입력으로 씀</li>
   </ul>
 
-  <figure>
+  
+  <figure class="paperfig">
+    <img src="img/pr2/tf-fig1.png" alt="Transformer 논문 Figure 1: 왼쪽 encoder, 오른쪽 decoder 구조도" loading="lazy" style="max-width:430px">
+    <figcaption><span class="src">원문 캡처 · Transformer Figure 1 · Vaswani et al., NIPS 2017, 3쪽</span> 인터넷에서 제일 많이 본 그 그림. 왼쪽 회색 상자가 encoder 한 층, 오른쪽이 decoder 한 층이고 옆의 N×가 그걸 N번(=6) 쌓는다는 뜻. 상자 옆으로 돌아가는 화살표가 residual 연결. 아래 그림은 이걸 핑프용으로 단순화한 것.</figcaption>
+  </figure>
+<figure>
     <svg viewBox="0 0 700 470" role="img" aria-label="Transformer 구조: 왼쪽 encoder 6층, 오른쪽 decoder 6층, encoder 출력이 decoder의 encoder-decoder attention으로 들어감">
       <defs>
         <marker id="arT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink2)"/></marker>
@@ -1756,7 +1810,12 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
     <p><strong>Query</strong> = 내가 검색창에 친 검색어. <strong>Key</strong> = 책마다 붙은 태그. <strong>Value</strong> = 책 내용. 검색어랑 태그가 잘 맞을수록 그 책 내용을 많이 가져옴. 결과물은 "관련도 비율대로 책 내용을 섞은 것"임. 다만 진짜 검색이랑 다른 건, <strong>딱 한 권만 고르는 게 아니라 전부 조금씩 섞는다</strong>는 것. 그래서 미분이 되고 학습이 됨.</p>
   </div>
 
-  <h3>식 (1)</h3>
+  
+  <figure class="paperfig">
+    <img src="img/pr2/tf-fig2.png" alt="Transformer 논문 Figure 2: 왼쪽 scaled dot-product attention, 오른쪽 multi-head attention" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · Transformer Figure 2 · Vaswani et al., NIPS 2017, 4쪽</span> 왼쪽: 아래에서 위로 MatMul(QKᵀ) → Scale(÷√d<sub>k</sub>) → Mask(선택) → SoftMax → MatMul(×V). 식 (1)을 그림으로 그린 것. 오른쪽: 그걸 h개 겹쳐 돌리고 Concat → Linear. 오른쪽은 <a href="#s15">15</a>에서 설명함.</figcaption>
+  </figure>
+<h3>식 (1)</h3>
   <div class="eq"><span class="m">Attention(<i>Q</i>, <i>K</i>, <i>V</i>) = softmax(<i>QK</i><sup>T</sup> / √<i>d</i><sub><i>k</i></sub>) <i>V</i></span><span class="note">식 (1)</span></div>
 
   <details class="nota" open>
@@ -1896,7 +1955,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </table>
 
   <h3>mask 구현법</h3>
-  <p>decoder에서 왼쪽으로 정보가 거꾸로 흐르는 걸 막아야 auto-regressive 성질이 유지됨. 구현: softmax 들어가기 직전에 <strong>불법 연결에 해당하는 값을 −∞로</strong> 바꿈. <span class="m"><i>e</i><sup>−∞</sup> = 0</span>이라 softmax 후 가중치가 정확히 0이 됨. <span class="m"><i>n</i>×<i>n</i></span> 점수 행렬의 <strong>대각선 위쪽 삼각형</strong>을 전부 −∞로 칠하는 거라고 생각하면 됨. Figure 2 왼쪽 그림의 "Mask (opt.)" 칸이 이거임.</p>
+  <p>decoder에서 왼쪽으로 정보가 거꾸로 흐르는 걸 막아야 auto-regressive 성질이 유지됨. 구현: softmax 들어가기 직전에 <strong>불법 연결에 해당하는 값을 −∞로</strong> 바꿈. <span class="m"><i>e</i><sup>−∞</sup> = 0</span>이라 softmax 후 가중치가 정확히 0이 됨. <span class="m"><i>n</i>×<i>n</i></span> 점수 행렬의 <strong>대각선 위쪽 삼각형</strong>을 전부 −∞로 칠하는 거라고 생각하면 됨. <a href="#s14">14</a>에 붙인 Figure 2 왼쪽 그림의 "Mask (opt.)" 칸이 이거임.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 16 -->
@@ -1959,6 +2018,11 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </ol>
 
   <h3>Table 1 한 칸씩 풀기</h3>
+  <figure class="paperfig">
+    <img src="img/pr2/tf-tab1.png" alt="Transformer 논문 Table 1: layer 종류별 복잡도, 순차 연산, 최대 경로 길이" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · Transformer Table 1 · Vaswani et al., NIPS 2017, 6쪽</span> 아래에서 같은 표를 한 줄씩 풀어줌.</figcaption>
+  </figure>
+
   <p>기호: <span class="m"><i>n</i></span> = 시퀀스 길이, <span class="m"><i>d</i></span> = 표현 차원, <span class="m"><i>k</i></span> = conv kernel 크기, <span class="m"><i>r</i></span> = restricted attention의 이웃 크기.</p>
   <table>
     <thead><tr><th>Layer</th><th>층당 복잡도</th><th>순차 연산</th><th>최대 경로 길이</th></tr></thead>
@@ -2092,7 +2156,12 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   </table>
   <p>(Transformer 두 줄은 논문 표에서 FLOPs가 EN-DE, EN-FR 두 열에 걸쳐 하나만 적혀 있음.)</p>
 
-  <h3>논문이 주장하는 것</h3>
+  
+  <figure class="paperfig">
+    <img src="img/pr2/tf-tab2.png" alt="Transformer 논문 Table 2: BLEU와 학습 FLOPs 비교" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · Transformer Table 2 · Vaswani et al., NIPS 2017, 8쪽</span> 가운데 가로줄 위가 단일 모델, 아래 세 줄이 앙상블, 굵은 선 아래가 Transformer. 굵은 글씨가 열마다 최고값인데 EN-FR은 41.29(앙상블)와 41.0(단일)이 둘 다 굵음.</figcaption>
+  </figure>
+<h3>논문이 주장하는 것</h3>
   <ul>
     <li><strong>영→독</strong>: big 모델이 앙상블 포함 기존 최고보다 <strong>2.0 BLEU 이상</strong> 높은 28.4로 새 SOTA. <strong>base 모델도</strong> 기존 모든 모델과 앙상블을 이기는데 학습 비용은 그들의 일부</li>
     <li><strong>영→불</strong>: big 모델이 41.0으로 기존 <strong>모든 단일 모델</strong>을 이김. 이전 SOTA 학습 비용의 <strong>1/4 미만</strong>. 이때 dropout은 0.3이 아니라 <strong>0.1</strong>을 씀</li>
@@ -2133,7 +2202,12 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   <div class="sec-head"><span class="sec-num">20</span><h2>Ablation 표 읽기</h2></div>
   <p class="sec-sub">6.2절 + Table 3. 부품 하나씩 바꿔보고 성능 변화 보기.</p>
 
-  <p>조건: 영→독 <strong>개발셋 newstest2013</strong>. beam search는 위와 같지만 <strong>checkpoint averaging 없음</strong>. 표에 안 적힌 값은 base와 같음. perplexity(PPL)는 <strong>word-piece 단위</strong>라 단어 단위 perplexity랑 비교하면 안 됨.</p>
+  
+  <figure class="paperfig">
+    <img src="img/pr2/tf-tab3.png" alt="Transformer 논문 Table 3: Transformer 구조 변형별 perplexity, BLEU, parameter 수" loading="lazy">
+    <figcaption><span class="src">원문 캡처 · Transformer Table 3 · Vaswani et al., NIPS 2017, 9쪽</span> 빈칸 = base와 같은 값. 줄 묶음 (A)~(E)가 각각 한 가지 부품만 바꾼 실험. 아래에 같은 표를 옮기면서 칸을 채워둠.</figcaption>
+  </figure>
+<p>조건: 영→독 <strong>개발셋 newstest2013</strong>. beam search는 위와 같지만 <strong>checkpoint averaging 없음</strong>. 표에 안 적힌 값은 base와 같음. perplexity(PPL)는 <strong>word-piece 단위</strong>라 단어 단위 perplexity랑 비교하면 안 됨.</p>
 
   <div class="trap">
     <span class="tag">함정</span>
@@ -2281,7 +2355,7 @@ nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-tr
   EEE / CEN 598 Hardware and Systems for Machine Learning · Paper Reading #2 개인 학습 노트<br>
   강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
   다룬 논문: Wen, Xu, Yan, Wu, Wang, Chen &amp; Li, <em>TernGrad: Ternary Gradients to Reduce Communication in Distributed Deep Learning</em>, NIPS 2017 · Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser &amp; Polosukhin, <em>Attention Is All You Need</em>, NIPS 2017<br>
-  논문 본문의 저작권은 각 저자와 NeurIPS에 있습니다. 이 저장소는 논문 파일을 배포하지 않습니다. 표의 숫자는 논문에서 옮겼고, "(보충)" 표시가 붙은 계산과 설명은 이 노트가 덧붙인 것입니다. 댓글 닉네임은 전부 지어낸 것입니다.
+  논문 본문의 저작권은 각 저자와 NeurIPS에 있습니다. 이 저장소는 논문 파일을 배포하지 않습니다. "원문 캡처"로 표시한 그림과 표는 해설을 위해 두 논문에서 잘라 온 것이며 출처와 쪽수를 각 캡션에 적었습니다. 표의 숫자는 논문에서 옮겼고, "(보충)" 표시가 붙은 계산과 설명은 이 노트가 덧붙인 것입니다. 댓글 닉네임은 전부 지어낸 것입니다.
 </footer>
 
 </main>
