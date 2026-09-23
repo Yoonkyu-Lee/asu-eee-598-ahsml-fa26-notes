@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · Paper Reading 2 · TernGrad &amp; Transformer</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+
+
+/* ─────────────────────────────────────────────────────────────
+   PR2 추가분. 디시 강좌 톤에 맞춘 장치 셋.
+   ───────────────────────────────────────────────────────────── */
+
+/* 3줄요약 박스. 글머리에 한 번, 파트마다 한 번. */
+.tldr{background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:16px 20px;margin:22px 0}
+.tldr .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);display:block;margin-bottom:8px;font-weight:700}
+.tldr ol{margin:0;padding-left:22px}
+.tldr li:last-child{margin-bottom:0}
+
+/* 댓글. 핑프가 물을 법한 질문과 글쓴이의 답. 닉은 전부 지어낸 것이다. */
+.cmts{margin:22px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--rule)}
+.cmts .hd{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:8px 0;border-bottom:1px solid var(--rule)}
+.cmt{padding:10px 0 10px;border-bottom:1px dashed var(--rule);font-size:14.5px;line-height:1.65}
+.cmt:last-child{border-bottom:0}
+.cmt .who{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-right:8px;white-space:nowrap}
+.cmt.op{padding-left:22px}
+.cmt.op .who{color:var(--blue);font-weight:700}
+.cmt.op .who::before{content:"\21b3\a0";color:var(--ink3);font-weight:400}
+
+/* 파트 구분 띠. */
+.part{grid-column:auto;margin:10px 0 40px;padding:14px 18px;border-radius:8px;background:var(--chip);border:1px solid var(--rule)}
+.part .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.part .t{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+nav.toc .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:16px 0 4px}
+
+/* 인터랙티브 판 안의 막대 도해와 슬라이더 */
+.play svg{display:block;width:100%;height:auto}
+.play input[type=range]{width:100%;accent-color:var(--blue)}
+.readout{font-family:var(--mono);font-size:13px;line-height:1.8;background:var(--chip);border-radius:7px;padding:10px 14px;margin-top:12px;color:var(--ink2)}
+.readout strong{color:var(--ink)}
+/* 긴 수식이 390px에서 페이지를 밀지 않게, 모바일에서는 수식 안 줄바꿈을 허용한다. */
+@media(max-width:900px){.eq{font-size:16.5px}.m{white-space:normal;overflow-wrap:anywhere}}
+.rowlab{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px;color:var(--ink2);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Paper Reading #2</div>
+  <h1 class="title">TernGrad<br>&amp; Attention Is All You Need</h1>
+  <p class="subtitle">[강좌] 논문 두 편 핑프도 알아먹게 뜯어봄 (스압 주의). 한 편은 gradient를 3단계로 뭉개서 통신을 줄이고, 다른 한 편은 RNN을 버리고 attention만으로 번역기를 만든다. 둘 다 NIPS 2017이다.</p>
+  <div class="meta">
+    <span class="chip">Wen et al. · NIPS 2017 · 9쪽 + 참고문헌</span>
+    <span class="chip">Vaswani et al. · NIPS 2017 · 9쪽 + 참고문헌</span>
+    <span class="chip hot">스압 주의</span>
+    <span class="chip dim">슬라이드 리더 없음</span>
+  </div>
+  <a class="backlink" href="index.html">← 강의 목록으로</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html">← 강의 목록</a>
+    <div class="mod">Paper Reading 2</div>
+    <div class="name">TernGrad &amp; Transformer</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab">목차</div>
+  <a href="#s0"><span class="n">00</span><span>들어가기 전에</span></a>
+  <div class="grp">Part 1 · TernGrad</div>
+  <a href="#s1"><span class="n">01</span><span>이 논문 뭐임</span></a>
+  <a href="#s2"><span class="n">02</span><span>통신이 왜 빌런인가</span></a>
+  <a href="#s3"><span class="n">03</span><span>선행연구 족보</span></a>
+  <a href="#s4"><span class="n">04</span><span>본체: 3단계로 뭉개기</span></a>
+  <a href="#s5"><span class="n">05</span><span>그래서 몇 배 줄었냐</span></a>
+  <a href="#s6"><span class="n">06</span><span>수렴 증명 번역</span></a>
+  <a href="#s7"><span class="n">07</span><span>bound 좁히기 기술 둘</span></a>
+  <a href="#s8"><span class="n">08</span><span>실험 1: 작은 데이터</span></a>
+  <a href="#s9"><span class="n">09</span><span>실험 2: ImageNet</span></a>
+  <a href="#s10"><span class="n">10</span><span>성능 모델</span></a>
+  <div class="grp">Part 2 · Transformer</div>
+  <a href="#s11"><span class="n">11</span><span>이 논문 뭐임</span></a>
+  <a href="#s12"><span class="n">12</span><span>RNN이 왜 답답한가</span></a>
+  <a href="#s13"><span class="n">13</span><span>전체 구조 한 장</span></a>
+  <a href="#s14"><span class="n">14</span><span>Scaled dot-product attention</span></a>
+  <a href="#s15"><span class="n">15</span><span>Multi-head와 mask</span></a>
+  <a href="#s16"><span class="n">16</span><span>FFN, embedding, 위치</span></a>
+  <a href="#s17"><span class="n">17</span><span>왜 self-attention인가</span></a>
+  <a href="#s18"><span class="n">18</span><span>학습 세팅</span></a>
+  <a href="#s19"><span class="n">19</span><span>결과와 FLOPs 검산</span></a>
+  <a href="#s20"><span class="n">20</span><span>Ablation 표 읽기</span></a>
+  <div class="grp">Part 3 · 엮기</div>
+  <a href="#s21"><span class="n">21</span><span>두 편을 같이 보면</span></a>
+  <a href="#s22"><span class="n">22</span><span>최종 3줄요약 &amp; 퀴즈</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2>들어가기 전에</h2></div>
+  <p class="sec-sub">ㅎㅇ. Paper Reading #2 두 편 오늘 한 번에 조진다. 스압 개쩌니까 3줄요약부터 박고 간다.</p>
+
+  <div class="tldr">
+    <span class="tag">3줄요약</span>
+    <ol>
+      <li><strong>TernGrad</strong>: 분산학습에서 worker들이 gradient를 주고받는 게 병목임. 그래서 gradient를 <strong>{−1, 0, +1} × 숫자 하나</strong>로 뭉개서 보냄. 대충 뭉개는 게 아니라 <strong>확률적으로</strong> 뭉개서 평균은 원래 값이랑 똑같게 만들고, 그래도 학습이 수렴한다는 걸 수식으로 증명함.</li>
+      <li><strong>Transformer</strong>: 번역 모델에서 RNN이 한 글자씩 순서대로 돌아야 해서 느림. 그래서 RNN을 통째로 버리고 <strong>attention(행렬곱 덩어리)만</strong>으로 모델을 만듦. 병렬로 쫙 돌아가니까 학습이 훨씬 싸지고 BLEU도 당시 최고 찍음.</li>
+      <li>둘 다 결국 <strong>"하드웨어가 잘하는 모양으로 문제를 바꿔라"</strong>라는 얘기임. 하나는 <span class="cMem">네트워크로 옮기는 바이트</span>를 줄이고, 하나는 <span class="cHw">GPU가 병렬로 할 수 있는 일</span>을 늘림.</li>
+    </ol>
+  </div>
+
+  <h3>핑프용 읽는 순서</h3>
+  <p>둘이 분야가 좀 다름. TernGrad는 <strong>시스템 + 최적화 이론</strong> 논문이고, Transformer는 <strong>모델 아키텍처</strong> 논문임. 그래서 막히는 데가 다름.</p>
+  <table>
+    <thead><tr><th>논문</th><th>제일 많이 막히는 곳</th><th>이 글에서 해결하는 곳</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">TernGrad</td><td>3.2절 수렴 증명. 기호가 갑자기 쏟아짐</td><td><a href="#s6">06</a>에서 기호 하나하나 한국어로 번역함</td></tr>
+      <tr><td class="hd">TernGrad</td><td>"통신량 20.18배 감소"가 어디서 나온 숫자인지</td><td><a href="#s5">05</a>에서 손으로 계산함</td></tr>
+      <tr><td class="hd">Transformer</td><td>Q, K, V가 대체 뭔지. 왜 세 개인지</td><td><a href="#s14">14</a>에서 숫자 넣어서 손계산함</td></tr>
+      <tr><td class="hd">Transformer</td><td>Table 1의 O(n²·d) 같은 복잡도 표</td><td><a href="#s17">17</a>에서 한 칸씩 풀어줌</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>이 글 규칙.</strong> 업계 용어(gradient, worker, attention, embedding 같은 거)는 영어 그대로 씀. 번역하면 논문 다시 펼쳤을 때 못 알아먹음. 대신 처음 나올 때 <em>용어 뜯어보기</em> 박스로 풀어줌. 논문에 없는 내 보충은 <strong>"(보충)"</strong>이라고 따로 표시함. 논문이 한 말이랑 내가 덧붙인 말 섞이면 리뷰 쓸 때 사고남.
+  </div>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">핑프(1.1)</span>그래서 둘 중에 뭐가 더 중요함?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>인용 수로 치면 Transformer가 압도적으로 넘사벽임. 지금 LLM 전부 이 논문 자손이니까. 근데 이 수업 관점에선 둘 다 똑같이 중요함. TernGrad는 "학습을 여러 칩에 쪼개면 통신이 문제다"를, Transformer는 "이 과목이 가속해야 할 연산이 앞으로 뭐가 되냐"를 보여줌.</div>
+  </div>
+</section>
+
+<div class="part"><div class="k">Part 1</div><div class="t">TernGrad: gradient를 3단계로 뭉개서 통신 줄이기</div></div>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-num">01</span><h2>이 논문 뭐임</h2></div>
+
+  <div class="def">
+    <span class="tag">서지</span>
+    <p>Wei Wen, Cong Xu, Feng Yan, Chunpeng Wu, Yandan Wang, Yiran Chen, Hai Li. <strong>"TernGrad: Ternary Gradients to Reduce Communication in Distributed Deep Learning."</strong> <em>31st Conference on Neural Information Processing Systems (NIPS 2017)</em>, Long Beach, CA.<br>
+    소속: Duke University, Hewlett Packard Labs, University of Nevada Reno, University of Pittsburgh. 코드: <code>github.com/wenwei202/terngrad</code></p>
+  </div>
+
+  <p>한 줄로 말하면 이거임.</p>
+  <div class="def">
+    <span class="tag">초록을 핑프어로</span>
+    <p>분산학습은 gradient 동기화 통신 비용이 병목인 게 국룰임. 우리는 gradient를 <strong>세 값 {−1, 0, 1}</strong>로만 표현하는 <strong>TernGrad</strong>를 제안함. gradient 크기에 bound가 있다는 가정 아래 <strong>수렴을 수학적으로 증명</strong>했고, 그 bound를 보고 <strong>layer-wise ternarizing</strong>이랑 <strong>gradient clipping</strong>을 만들어서 수렴을 개선함. AlexNet은 정확도 손실 없음(오히려 오름), GoogLeNet은 평균 2% 미만 손실. 마지막으로 성능 모델로 확장성까지 봄.</p>
+  </div>
+
+  <p>논문이 스스로 밝힌 기여는 네 개임 (1절 끝).</p>
+  <ol>
+    <li>gradient에 <strong>ternary(3값)</strong>를 써서 통신 줄임</li>
+    <li>gradient에 대한 <strong>통계적 bound</strong>를 제시해서 TernGrad의 수렴을 <strong>일반적으로 증명</strong>함</li>
+    <li><strong>layer-wise ternarizing</strong>과 <strong>gradient clipping</strong>으로 그 bound를 표준 SGD bound에 가깝게 당김</li>
+    <li>압축 gradient 학습의 속도를 평가하는 <strong>성능 모델</strong>을 만듦</li>
+  </ol>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · ternary</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>풀네임</td><td>ternary = 3진. binary(2값)의 형제</td></tr>
+        <tr><td>한 줄</td><td>값이 딱 세 종류만 가능하다는 뜻. 여기선 {−1, 0, +1}</td></tr>
+        <tr><td>언제</td><td>양자화 논문에서 weight나 gradient를 극단적으로 줄일 때</td></tr>
+        <tr><td>누가</td><td>TWN(Ternary Weight Networks) 같은 weight 쪽 연구도 있음. 이 논문은 <strong>gradient</strong>를 ternary로 만든다는 게 포인트</td></tr>
+        <tr><td>헷갈리는 것</td><td>값이 3종류라고 2진 비트 1.58개로 딱 떨어지는 건 아님. 실제 저장은 보통 2 bit씩 씀. <a href="#s5">05</a>에서 계산함</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">ㅇㅇ(118.2)</span>Hai Li, Yiran Chen 이름 어디서 봤는데</div>
+    <div class="cmt op"><span class="who">글쓴이</span>Duke 하드웨어/뉴로모픽 쪽 유명 연구실임. 1저자 Wei Wen은 structured sparsity(참고문헌 [18], SSL) 논문 쓴 사람이고. 그래서 이 논문이 "하드웨어 감각 있는 사람이 쓴 최적화 논문" 느낌이 나는 거임.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2>통신이 왜 빌런인가</h2></div>
+  <p class="sec-sub">논문 1절 + 3.1절. 이거 모르면 뒤에 전부 이해 안 됨. 천천히 감.</p>
+
+  <h3>상황 설정: 모델 하나를 GPU 여러 장으로 학습함</h3>
+  <p>모델이 크고 데이터가 많으면 GPU 한 장으로 학습하면 몇 주 걸림. 그래서 여러 장에 나눠서 돌림. 나누는 방법 중 제일 흔한 게 <strong>data parallelism</strong>임.</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · data parallelism</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>풀네임</td><td>data parallelism, 데이터 병렬화</td></tr>
+        <tr><td>한 줄</td><td>모든 worker가 <strong>모델 전체 사본</strong>을 들고, <strong>데이터만</strong> 나눠서 각자 gradient를 계산함</td></tr>
+        <tr><td>언제</td><td>모델이 GPU 한 장에 들어갈 때. 2017년엔 거의 이거였음</td></tr>
+        <tr><td>누가</td><td>PyTorch DDP, Horovod, TensorFlow 분산 전략의 기본값</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>model parallelism</strong>은 반대로 모델을 쪼개서 여러 장에 나눠 담는 것. AlexNet이 GPU 2장에 층을 반씩 나눈 게 그쪽에 가까움</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p>한 iteration이 어떻게 도는지 보자. 논문 Figure 1이 이거임.</p>
+  <ol>
+    <li>mini-batch를 N등분해서 worker <span class="m"><i>i</i></span>한테 <span class="m"><i>z</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>를 줌</li>
+    <li>worker마다 자기 몫으로 gradient <span class="m"><i>g</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span> 계산</li>
+    <li>전부 <strong>parameter server</strong>로 보냄 (push)</li>
+    <li>server가 평균 냄</li>
+    <li>평균 낸 걸로 parameter 갱신하고 그걸 다시 worker들한테 뿌림 (pull)</li>
+  </ol>
+  <p>3번이 <strong>gradient synchronization</strong>, 5번이 <strong>parameter synchronization</strong>임. 둘 다 <span class="cMem">네트워크로 모델 크기만큼의 데이터가 오가는 일</span>임.</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · parameter server</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>풀네임</td><td>parameter server (PS)</td></tr>
+        <tr><td>한 줄</td><td>worker들이 보낸 gradient를 모아서 평균 내고 공유 parameter를 들고 있는 중앙 서버</td></tr>
+        <tr><td>언제</td><td>2012~2017년 분산학습의 대세 구조. 참고문헌 [11], [12] (Mu Li et al.)</td></tr>
+        <tr><td>누가</td><td>Google DistBelief, MXNet, TensorFlow 초기 분산 모드</td></tr>
+        <tr><td>헷갈리는 것</td><td>이 논문은 PS를 <strong>parameter가 아니라 gradient를 공유하는 곳</strong>으로 좀 다르게 씀 (3.1절). 요즘 대세는 PS 없이 worker끼리 주고받는 <strong>all-reduce</strong>인데 이 논문 범위는 아님</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="Parameter server와 worker N개 사이에서 gradient가 오가는 data parallel 학습 구조">
+      <defs>
+        <marker id="arB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--brown)"/></marker>
+      </defs>
+      <rect x="260" y="18" width="180" height="56" rx="8" fill="var(--card)" stroke="var(--pink)" stroke-width="1.6"/>
+      <text class="svgtxt" x="350" y="41" text-anchor="middle" style="font-size:13px;font-weight:600" fill="var(--pink)">Parameter server</text>
+      <text class="svglab" x="350" y="61" text-anchor="middle" style="font-size:10.5px">ḡ = Σ g̃(i) / N</text>
+
+      <line x1="100" y1="208" x2="290" y2="78" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#arB)"/>
+      <line x1="122" y1="210" x2="306" y2="84" stroke="var(--brown)" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#arB)"/>
+      <line x1="342" y1="208" x2="342" y2="80" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#arB)"/>
+      <line x1="358" y1="208" x2="358" y2="80" stroke="var(--brown)" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#arB)"/>
+      <line x1="578" y1="208" x2="394" y2="84" stroke="var(--brown)" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#arB)"/>
+      <line x1="600" y1="210" x2="410" y2="78" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#arB)"/>
+
+      <text class="svglab" x="176" y="128" text-anchor="end" style="font-size:10.5px" fill="var(--brown)">push g̃ (실선)</text>
+      <text class="svglab" x="176" y="143" text-anchor="end" style="font-size:10.5px" fill="var(--brown)">pull ḡ (점선)</text>
+      <text class="svglab" x="520" y="128" style="font-size:10.5px" fill="var(--brown)">worker마다</text>
+      <text class="svglab" x="520" y="143" style="font-size:10.5px" fill="var(--brown)">매 iteration</text>
+
+      <rect x="30" y="212" width="170" height="62" rx="8" fill="var(--card)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="115" y="236" text-anchor="middle" style="font-size:13px;font-weight:600" fill="var(--violet)">Worker 1</text>
+      <text class="svglab" x="115" y="257" text-anchor="middle" style="font-size:10.5px">w ← w − η·ḡ</text>
+      <rect x="265" y="212" width="170" height="62" rx="8" fill="var(--card)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="236" text-anchor="middle" style="font-size:13px;font-weight:600" fill="var(--violet)">Worker 2</text>
+      <text class="svglab" x="350" y="257" text-anchor="middle" style="font-size:10.5px">w ← w − η·ḡ</text>
+      <text class="svgtxt" x="467" y="248" text-anchor="middle" style="font-size:16px" fill="var(--ink3)">…</text>
+      <rect x="500" y="212" width="170" height="62" rx="8" fill="var(--card)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="585" y="236" text-anchor="middle" style="font-size:13px;font-weight:600" fill="var(--violet)">Worker N</text>
+      <text class="svglab" x="585" y="257" text-anchor="middle" style="font-size:10.5px">w ← w − η·ḡ</text>
+    </svg>
+    <figcaption>논문 Figure 1의 구조를 다시 그린 것. <span class="cMem">갈색 화살표</span>가 네트워크로 오가는 데이터고, 이게 이 논문이 줄이려는 대상임. 원래 그림은 PS가 parameter를 돌려주지만, TernGrad는 worker가 parameter 사본을 각자 들고 <strong>평균 gradient ḡ만 받아서</strong> 스스로 갱신함(<a href="#s5">05</a>의 parameter localization).</figcaption>
+  </figure>
+
+  <h3>근데 worker를 늘리면 왜 안 빨라짐?</h3>
+  <p>논문 1절 요지: worker 늘리면 <span class="cGain">계산 시간은 확 줄어듦</span>. 근데 <span class="cCost">통신 시간은 안 줄거나 오히려 늚</span>. 결국 어느 순간부터 통신 시간이 계산 절약분을 <strong>다 까먹음</strong> (논문 표현으로 "amortize the savings of computation time").</p>
+  <p>왜냐면 worker 한 명이 보내는 양은 <strong>worker 수랑 상관없이 모델 크기 그대로</strong>거든. 계산은 N으로 나눠지는데 통신은 안 나눠짐. 이게 핵심임.</p>
+
+  <div class="scale">
+    <div class="cap">숫자 감각 (보충) · AlexNet gradient 한 번 보내는 데 얼마나 걸리나</div>
+    <table>
+      <tr><td class="what">AlexNet parameter 수</td><td class="num">약 61M</td><td>논문엔 안 나옴. 일반적으로 알려진 값</td></tr>
+      <tr><td class="what">FP32 gradient 한 벌</td><td class="num">약 244 MB</td><td>61M × 4 byte. worker가 <strong>매 iteration</strong> 이걸 보냄</td></tr>
+      <tr><td class="what">1 Gbps Ethernet</td><td class="num">125 MB/s</td><td>논문 Figure 5(a)의 클러스터 네트워크</td></tr>
+      <tr><td class="what">244 MB 보내는 시간</td><td class="num">약 2 s</td><td>한 방향만. 이론 최대 대역폭 가정. 실제론 더 걸림</td></tr>
+      <tr><td class="what">2-bit ternary로 보내면</td><td class="num">약 15 MB, 0.12 s</td><td>61M × 2 bit. 16분의 1</td></tr>
+    </table>
+    <div class="foot">GPU가 AlexNet 한 iteration 계산을 1초 안쪽에 끝내는데 통신에 2초씩 쓰면 GPU는 대부분 놀고 있는 거임. 그래서 "통신이 병목"이라는 말이 과장이 아님.</div>
+  </div>
+
+  <h3>기존 탈출구: asynchronous SGD</h3>
+  <p>흔한 해결책이 <strong>asynchronous SGD</strong>임. 동기화 끝날 때까지 안 기다리고 <strong>옛날 값(stale value)</strong>으로 그냥 계속 계산함. 논문이 꼽는 문제 둘:</p>
+  <ul>
+    <li>worker마다 parameter가 달라져서 <span class="cCost">정확도가 떨어지고 가끔 발산함</span> (참고문헌 [15], [16])</li>
+    <li>작업 타이밍에 따라 결과가 달라져서 <span class="cCost">학습이 비결정적이고 디버깅이 헬</span>임</li>
+  </ul>
+  <p>그래서 이 논문은 <strong>synchronous SGD는 유지</strong>하고, 대신 <strong>보내는 데이터 자체를 줄이는</strong> 쪽으로 감. 스코프도 논문이 밝혀놨음: Asynchronous SGD랑도 합칠 수 있지만 <strong>이 논문은 Figure 1의 동기식 분산 SGD만</strong> 다룸.</p>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>synchronous vs asynchronous를 "빠름 vs 느림"으로 외우지 마셈</h4>
+    <p>구별 기준은 <strong>"다음 iteration을 시작하기 전에 모두의 gradient가 합쳐지길 기다리냐"</strong> 하나임. sync는 기다려서 느리지만 결과가 단일 GPU SGD랑 수학적으로 같음. async는 안 기다려서 빠르지만 stale gradient로 갱신하니까 다른 알고리즘이 됨. TernGrad는 <strong>sync의 결정성을 지키면서 통신을 줄이는</strong> 쪽임.</p>
+  </div>
+
+  <div class="callout">
+    <strong>강의 연결.</strong> <a href="L04-dnns.html#s8">Lecture 4-5의 memory-bound vs compute-bound</a>랑 똑같은 구도임. 거기선 칩 안에서 "DRAM에서 가져오는 속도 vs 연산 속도"였고, 여기선 칩 밖에서 <strong>"네트워크로 보내는 속도 vs GPU 연산 속도"</strong>임. 층만 바뀌었지 <strong>"데이터 옮기는 게 연산보다 비싸다"</strong>는 결론은 같음.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-num">03</span><h2>선행연구 족보</h2></div>
+  <p class="sec-sub">2절 Related work. 이거 알아야 "그래서 이 논문이 뭐가 새로운데?"에 답할 수 있음.</p>
+
+  <p>통신 줄이는 방법은 크게 두 갈래임.</p>
+  <ul>
+    <li><strong>Sparsification</strong>: 작은 gradient는 <strong>아예 안 보냄</strong>. 큰 것만 보냄</li>
+    <li><strong>Quantization</strong>: 전부 보내되 <strong>비트 수를 줄여서</strong> 보냄</li>
+  </ul>
+  <p>TernGrad는 quantization 쪽이고, 논문은 둘이 <strong>orthogonal</strong>(서로 독립이라 같이 쓸 수 있음)하다고 말함.</p>
+
+  <table>
+    <thead><tr><th>선행연구</th><th>뭘 했나</th><th>논문이 지적한 한계</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">Aji &amp; Heafield [27]</td><td>작은 gradient 잘라버리는 휴리스틱 sparsification. 번역 모델, GPU 4장에서 22% 속도 향상, 번역 품질 영향 없음</td><td>(sparsity 계열이라 TernGrad와 직교)</td></tr>
+      <tr><td class="hd">Garg et al. [31]</td><td>비슷한 방식</td><td>학습 가속이 아니라 sparse recovery가 목적</td></tr>
+      <tr><td class="hd">DoReFa-Net [22]</td><td>AlexNet에서 weight, activation, gradient를 각각 1, 2, 6 bit로</td><td><span class="cCost">정확도 9.8% 손실</span>. 게다가 단일 worker 가속이 목적</td></tr>
+      <tr><td class="hd">Gupta et al. [30]</td><td>16-bit로 MNIST, CIFAR-10 학습. 에너지 효율 가속기용</td><td>목적이 다름 (단일 가속기)</td></tr>
+      <tr><td class="hd">1-bit SGD, Seide et al. [28]</td><td>gradient를 1 bit로. 음성 인식에서 효과 확인</td><td>① 열(column)마다 float scaler가 필요해서 CNN에선 이득이 없음 ② <strong>"cold start"</strong>: float로 먼저 좀 학습해서 좋은 시작점을 만들어야 함 ③ <strong>수렴 조건이 알려지지 않음</strong></td></tr>
+      <tr><td class="hd">Suresh et al. [32]</td><td>stochastic rotated quantization, 4 bit까지. MNIST, CIFAR</td><td>TernGrad는 더 낮은 정밀도로, 더 큰 데이터셋(ImageNet)에서 되고, worker 쪽 계산도 더 싸다고 주장</td></tr>
+      <tr><td class="hd">QSGD, Alistarh et al. [29]</td><td>동시기 연구. 정확도와 정밀도 trade-off 탐구. 수렴 증명 있음</td><td>아래에서 따로 봄</td></tr>
+    </tbody>
+  </table>
+
+  <h3>QSGD랑은 뭐가 다름? (리뷰 쓸 때 제일 중요한 문단)</h3>
+  <p>논문이 직접 "concept은 같다"고 인정함. 둘 다 <strong>stochastic rounding으로 unbiased 양자화</strong>하는 거라서. 대신 세 가지가 앞선다고 주장함:</p>
+  <ol>
+    <li>수렴을 <strong>gradient의 통계적 bound 관점</strong>에서 증명함. 그리고 이 bound가 <strong>QSGD에서 왜 여러 개의 quantization bucket이 필요한지</strong>도 설명해줌</li>
+    <li>이 bound를 보고 <strong>layer-wise ternarizing과 gradient clipping</strong>을 설계함. 즉 이론이 실제 기법을 이끌어냄</li>
+    <li><strong>3단계만</strong> 써서 AlexNet top-1 정확도가 <span class="cGain">0.92% 올랐음</span>. QSGD는 4단계로 <span class="cCost">1.73% 떨어졌고</span>, 손실을 없애려면 4 bit(16단계) 이상이 필요했음</li>
+  </ol>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">핑프(1.1)</span>그럼 그냥 QSGD 짭 아님?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>"동시기(developed simultaneously)"라고 논문이 박아둠. 둘 다 NIPS 2017임. 누가 누구 베낀 게 아니라 같은 아이디어를 동시에 낸 케이스고, 그래서 논문이 차별점 세 개를 저렇게 열심히 적은 거임. 이게 새로운지 아닌지 판단은 리뷰 쓰는 사람 몫이고.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2>본체: 3단계로 뭉개기</h2></div>
+  <p class="sec-sub">3.1절. 이 논문 알고리즘은 사실 식 세 개가 전부임. 여기만 확실히 먹으면 절반 끝.</p>
+
+  <div class="eq"><span class="m"><i>g̃</i><sub><i>t</i></sub> = ternarize(<i>g</i><sub><i>t</i></sub>) = <i>s</i><sub><i>t</i></sub> · sign(<i>g</i><sub><i>t</i></sub>) ∘ <i>b</i><sub><i>t</i></sub></span><span class="note">식 (1)</span></div>
+  <div class="eq"><span class="m"><i>s</i><sub><i>t</i></sub> ≜ max(abs(<i>g</i><sub><i>t</i></sub>)) ≜ ‖<i>g</i><sub><i>t</i></sub>‖<sub>∞</sub></span><span class="note">식 (2)</span></div>
+  <div class="eq"><span class="m">P(<i>b</i><sub><i>tk</i></sub> = 1 | <i>g</i><sub><i>t</i></sub>) = |<i>g</i><sub><i>tk</i></sub>| / <i>s</i><sub><i>t</i></sub></span><br><span class="m">P(<i>b</i><sub><i>tk</i></sub> = 0 | <i>g</i><sub><i>t</i></sub>) = 1 − |<i>g</i><sub><i>tk</i></sub>| / <i>s</i><sub><i>t</i></sub></span><span class="note">식 (3)</span></div>
+
+  <details class="nota" open>
+    <summary>기호 뜯어보기</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>g</i><sub><i>t</i></sub></td><td>iteration <i>t</i>에서 원래 gradient. <strong>parameter 수만큼 긴 벡터</strong>. FP32임</td></tr>
+        <tr><td class="m"><i>g</i><sub><i>tk</i></sub></td><td>그 벡터의 <i>k</i>번째 원소 하나. 스칼라</td></tr>
+        <tr><td class="m"><i>s</i><sub><i>t</i></sub></td><td><strong>scaler</strong>. 벡터 안에서 절댓값이 제일 큰 값. 스칼라 <strong>딱 하나</strong>. ±1을 실제 크기로 늘려주는 배율</td></tr>
+        <tr><td class="m">‖·‖<sub>∞</sub></td><td>무한대 norm = 절댓값 최댓값. 이름만 무섭지 그냥 max임</td></tr>
+        <tr><td class="m">sign(·)</td><td>원소마다 부호만 남김. 양수면 +1, 음수면 −1</td></tr>
+        <tr><td class="m"><i>b</i><sub><i>t</i></sub></td><td>원소마다 0 아니면 1인 <strong>랜덤 이진 벡터</strong>. 원소마다 동전을 따로 던짐</td></tr>
+        <tr><td class="m">∘</td><td>Hadamard product. 원소끼리 곱하기. 행렬곱 아님</td></tr>
+        <tr><td class="m"><i>g̃</i><sub><i>t</i></sub></td><td>결과물. 원소 하나하나가 <strong>−<i>s</i><sub><i>t</i></sub>, 0, +<i>s</i><sub><i>t</i></sub> 셋 중 하나</strong></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3>말로 풀면</h3>
+  <p>원소 하나 <span class="m"><i>g</i><sub><i>k</i></sub></span>에 대해 이렇게 함:</p>
+  <ol>
+    <li>벡터 전체에서 제일 큰 절댓값 <span class="m"><i>s</i></span>를 찾음</li>
+    <li><span class="m">|<i>g</i><sub><i>k</i></sub>| / <i>s</i></span> 확률로 동전 앞면. 이 비율은 항상 0~1 사이임 (<span class="m"><i>s</i></span>가 최댓값이니까)</li>
+    <li>앞면이면 <span class="m"><i>g</i><sub><i>k</i></sub></span>를 <strong>부호는 그대로 두고 크기를 <span class="m"><i>s</i></span>로</strong> 뻥튀기함. 뒷면이면 0으로 만듦</li>
+  </ol>
+  <p>그러면 보낼 건 <strong>원소마다 {−1, 0, +1} 중 하나</strong> + <strong>float 하나(<span class="m"><i>s</i></span>)</strong>뿐임.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 210" role="img" aria-label="g=0.3s인 원소가 30% 확률로 +s, 70% 확률로 0이 되는 stochastic rounding 그림">
+      <defs>
+        <marker id="arA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--blue)"/></marker>
+      </defs>
+      <line x1="60" y1="120" x2="640" y2="120" stroke="var(--ink3)" stroke-width="1.4"/>
+      <line x1="60" y1="112" x2="60" y2="128" stroke="var(--ink)" stroke-width="1.6"/>
+      <line x1="350" y1="112" x2="350" y2="128" stroke="var(--ink)" stroke-width="1.6"/>
+      <line x1="640" y1="112" x2="640" y2="128" stroke="var(--ink)" stroke-width="1.6"/>
+      <text class="svgnum" x="60" y="148" text-anchor="middle" style="font-size:13px" fill="var(--ink)">−s</text>
+      <text class="svgnum" x="350" y="148" text-anchor="middle" style="font-size:13px" fill="var(--ink)">0</text>
+      <text class="svgnum" x="640" y="148" text-anchor="middle" style="font-size:13px" fill="var(--ink)">+s</text>
+      <circle cx="437" cy="120" r="7" fill="var(--blue)"/>
+      <text class="svgnum" x="437" y="148" text-anchor="middle" style="font-size:13px" fill="var(--blue)">g = 0.3s</text>
+      <path d="M442,110 Q540,30 634,110" fill="none" stroke="var(--blue)" stroke-width="1.6" marker-end="url(#arA)"/>
+      <path d="M432,110 Q393,62 356,110" fill="none" stroke="var(--blue)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arA)"/>
+      <text class="svglab" x="540" y="44" text-anchor="middle" style="font-size:11px" fill="var(--blue)">확률 0.3 → +s</text>
+      <text class="svglab" x="330" y="64" text-anchor="end" style="font-size:11px" fill="var(--blue)">확률 0.7 → 0</text>
+      <text class="svgtxt" x="350" y="190" text-anchor="middle" style="font-size:13px">기댓값 = 0.3 × s + 0.7 × 0 = 0.3s = g (정확히 원래 값)</text>
+    </svg>
+    <figcaption>stochastic rounding 한 장 요약. 매번 결과는 +s 아니면 0이라 틀리지만, <strong>평균 내면 원래 값이 정확히 나옴</strong>. 이게 unbiased임.</figcaption>
+  </figure>
+
+  <h3>왜 "그냥 반올림" 안 하고 동전을 던짐?</h3>
+  <p>이게 제일 중요한 포인트임. <strong>deterministic rounding</strong>(그냥 가까운 쪽으로 반올림)을 하면 0.3s짜리는 <strong>매번</strong> 0이 됨. 작은 gradient는 영원히 0이 되는 거임. 그럼 그 방향으로는 학습이 영원히 안 됨.</p>
+  <p>동전을 던지면 10번 중 3번은 +s로 가니까 <strong>평균적으로는 0.3s만큼 움직임</strong>. 수식으로:</p>
+  <div class="eq"><span class="m">E[<i>s</i> · sign(<i>g</i><sub><i>k</i></sub>) · <i>b</i><sub><i>k</i></sub>] = <i>s</i> · sign(<i>g</i><sub><i>k</i></sub>) · |<i>g</i><sub><i>k</i></sub>| / <i>s</i> = <i>g</i><sub><i>k</i></sub></span></div>
+  <p>이걸 <strong>unbiased</strong>(편향 없음)라고 함. 논문은 이 stochastic rounding이 QSGD도 똑같이 택한 방식이고 저정밀 연산에서 이미 검증된 기법이라고 밝힘 ([20], [30]).</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · unbiased estimator</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>풀네임</td><td>unbiased estimator, 불편 추정량</td></tr>
+        <tr><td>한 줄</td><td>한 번 한 번은 틀려도 <strong>기댓값이 참값과 같은</strong> 추정</td></tr>
+        <tr><td>언제</td><td>SGD 자체가 이미 이거임. mini-batch gradient도 전체 gradient의 unbiased 추정임</td></tr>
+        <tr><td>누가</td><td>확률 과목, 최적화 이론. SGD 수렴 증명의 기본 재료</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>unbiased ≠ 정확함.</strong> 평균은 맞아도 분산(흔들림)은 커질 수 있음. TernGrad의 모든 고민은 이 <strong>분산을 어떻게 줄이냐</strong>임 (<a href="#s7">07</a>)</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">ㅇㅇ(39.7)</span>근데 그럼 노이즈 엄청 끼는 거 아님? 그게 왜 됨?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>ㅇㅇ 노이즈 낌. 근데 SGD는 원래 mini-batch 때문에 노이즈 낀 gradient로 학습하는 알고리즘임. 노이즈가 좀 더 끼는 거지 성격이 바뀌는 게 아님. 평균만 맞으면 learning rate가 적당히 줄어드는 한 결국 수렴한다는 게 06절 증명의 내용이고. 심지어 논문은 이 노이즈가 오히려 도움 되는 경우도 보여줌 (<a href="#s9">09</a>).</div>
+  </div>
+
+  <h3>Algorithm 1: 한 iteration 전체</h3>
+  <pre class="code"><span class="c"># Worker i = 1..N (전부 동시에)</span>
+<span class="n">1</span>  z_t(i) 받기                     <span class="c"># mini-batch의 내 몫</span>
+<span class="n">2</span>  g_t(i) = gradient(w_t, z_t(i))  <span class="c"># 평소처럼 backprop. FP32</span>
+<span class="n">3</span>  g̃_t(i) = ternarize(g_t(i))      <span class="c"># ← 여기만 새로 추가됨</span>
+<span class="n">4</span>  push g̃_t(i) → server            <span class="c"># 2 bit/원소 + scaler</span>
+<span class="n">5</span>  pull ḡ_t ← server               <span class="c"># 평균 gradient</span>
+<span class="n">6</span>  w_{t+1} = w_t − η · ḡ_t          <span class="c"># 각자 자기 사본 갱신</span>
+
+<span class="c"># Server</span>
+<span class="n">7</span>  ḡ_t = Σ_i g̃_t(i) / N            <span class="c"># ternary들의 평균</span></pre>
+  <p>논문 말 그대로 <strong>"대부분 단계는 전통적인 분산학습과 같고, 서버로 보내기 전에 ternary로 양자화하는 것만 다르다."</strong> 코드 한 줄 추가 수준이라는 게 이 기법의 매력 포인트임.</p>
+
+  <div class="play" id="ternPlay">
+    <div class="plab">직접 굴려보기 · ternarize 시뮬레이터 (보충)</div>
+    <p style="font-size:14px;color:var(--ink2);margin:0 0 10px">gradient 16개짜리 가짜 벡터임. <strong>한 번 굴리면</strong> 원소마다 동전을 던져서 −s, 0, +s 중 하나가 됨. <strong>여러 번 굴려서 평균</strong> 내면 파란 막대(원래 값)에 수렴하는 게 보임.</p>
+    <div class="presets" id="ternPre"></div>
+    <div class="presets" id="ternAct" style="margin-top:8px"></div>
+    <svg id="ternSvg" viewBox="0 0 700 250" role="img" aria-label="원래 gradient, ternary 한 번 샘플, 누적 평균을 원소별 막대로 비교"></svg>
+    <div class="readout" id="ternOut"></div>
+    <div class="hintline">회색 막대 = 방금 한 번 굴린 ternary 결과, 초록 점 = 지금까지 굴린 것의 평균. 파란 막대 = 원래 gradient. <strong>outlier 하나</strong> 프리셋에서 clipping을 켰다 껐다 해보면, s가 작아지면서 <strong>0이 되는 비율이 줄고 평균이 더 빨리 붙는 것</strong>이 보임. 이게 <a href="#s7">07</a>의 얘기임.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2>그래서 몇 배 줄었냐</h2></div>
+  <p class="sec-sub">3.1절 후반. 숫자 두 개(20.18배, 16배)와 트릭 두 개(parameter localization, scaler sharing)를 봄.</p>
+
+  <h3>worker → server: 20.18배, 실제론 16배</h3>
+  <p>FP32 원소 하나는 32 bit임. ternary 원소 하나는 가능한 값이 3개니까 정보량이 <span class="m">log<sub>2</sub>3 ≈ 1.585</span> bit임. 그래서 이론상:</p>
+  <div class="eq"><span class="m">32 / log<sub>2</sub>(3) = 20.18×</span></div>
+  <p>근데 컴퓨터는 비트를 반 토막 낼 수 없으니 현실적으로는 원소당 <strong>2 bit</strong>로 저장함. 그러면 <span class="m">32 / 2 = 16×</span>. 논문도 "2 bit로 인코딩해도 16배"라고 같이 적어둠.</p>
+  <p>기준이 FP32인 이유도 적어놨음: 당시 딥러닝 프레임워크의 기본 정밀도라서. 16-bit로 충분한 경우도 있겠지만 <strong>그래도 TernGrad의 가치가 줄진 않는다</strong>고 함.</p>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">핑프(1.1)</span>scaler float 하나는 왜 계산에 안 넣음?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>원소 수천만 개에 float 하나 붙는 거라 반올림 오차 수준이라서. 61M개면 2 bit × 61M = 122 Mbit에 32 bit 추가임. 무시해도 됨. 다만 이게 <strong>layer마다</strong> 하나씩 붙는 걸로 바뀌면(<a href="#s7">07</a>) 개수가 layer 수만큼 늘어나는데, 그래도 무시 가능한 수준임.</div>
+  </div>
+
+  <h3>server → worker: 여기가 더 까다로움</h3>
+  <p>worker들이 보낸 ternary를 server가 더하면 <strong>더 이상 ternary가 아님</strong>. 예를 들어 worker 2명이 둘 다 +1을 보내면 합이 +2가 됨. 합이 가질 수 있는 값의 종류가 늘어남 (논문 Figure 2(d)가 그 모습임).</p>
+  <p>여기서 트릭 두 개가 나옴.</p>
+
+  <h4>트릭 1 · parameter localization</h4>
+  <p>원래 PS는 갱신된 <strong>parameter(FP32)</strong>를 돌려줌. TernGrad는 대신 <strong>worker마다 parameter 사본을 로컬에 들고</strong>, server한테서 <strong>평균 gradient만</strong> 받아서 각자 갱신함 (Algorithm 1의 6번 줄).</p>
+  <p>"사본이 여러 개면 서로 달라지지 않음?" → 안 달라짐. <strong>같은 random seed로 초기화</strong>하고, 모두가 <strong>똑같은 ḡ</strong>로 갱신하니까 계속 똑같음. 이렇게 하면 FP32 parameter 대신 <strong>저정밀 gradient</strong>만 받으면 됨.</p>
+
+  <h4>트릭 2 · scaler sharing</h4>
+  <p>worker마다 scaler <span class="m"><i>s</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>가 다르면, 합의 값 종류가 폭발함 (0.7 + 1.3 + ... 온갖 조합). 그래서 <strong>모든 worker가 같은 scaler</strong>를 쓰게 함:</p>
+  <div class="eq"><span class="m"><i>s</i><sub><i>t</i></sub> = max({<i>s</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup> : <i>i</i> = 1…N})</span><span class="note">식 (4)</span></div>
+  <p>비용은 float scalar <strong>2N개</strong> 주고받는 것뿐 (각자 자기 거 올리고, 최댓값 받고). 이러면 N명의 {−1, 0, +1} 합은 <strong>−N부터 +N까지의 정수</strong>, 즉 최대 <strong>2N+1가지</strong>로 묶임. 그래서:</p>
+  <div class="eq"><span class="m">server→worker 감소율 = 32 / log<sub>2</sub>(1 + 2N)</span><span class="note">N ≥ 2<sup>30</sup>이 아닌 한 감소함</span></div>
+
+  <div class="scale">
+    <div class="cap">숫자 감각 (보충) · worker 수에 따른 server→worker 감소율</div>
+    <table>
+      <tr><td class="what">N = 2</td><td class="num">5가지 값</td><td>32 / log<sub>2</sub>5 = <strong>13.8×</strong></td></tr>
+      <tr><td class="what">N = 8</td><td class="num">17가지 값</td><td>32 / log<sub>2</sub>17 = <strong>7.8×</strong></td></tr>
+      <tr><td class="what">N = 64</td><td class="num">129가지 값</td><td>32 / log<sub>2</sub>129 = <strong>4.6×</strong></td></tr>
+      <tr><td class="what">N = 512</td><td class="num">1025가지 값</td><td>32 / log<sub>2</sub>1025 = <strong>3.2×</strong></td></tr>
+      <tr class="base"><td class="what">N = 2<sup>30</sup></td><td class="num">약 21억 가지</td><td>log<sub>2</sub>(2<sup>31</sup>+1) ≈ 31 bit. 겨우 본전 근처. 논문이 "N ≥ 2<sup>30</sup>이 아닌 한"이라고 단 이유</td></tr>
+    </table>
+    <div class="foot">worker가 늘수록 server→worker 쪽 이득은 로그로 줄어듦. 반면 worker→server는 N과 상관없이 항상 16×(2 bit 기준). 비대칭이라는 거 기억해두셈.</div>
+  </div>
+
+  <div class="play" id="commPlay">
+    <div class="plab">계산기 · 한 iteration 통신량 (보충, 논문의 성능 모델 아님)</div>
+    <div class="rowlab"><span>parameter 수</span><strong id="cmPv"></strong></div>
+    <input type="range" id="cmP" min="1" max="150" value="61" aria-label="parameter 수 (백만)">
+    <div class="rowlab"><span>worker 수 N</span><strong id="cmNv"></strong></div>
+    <input type="range" id="cmN" min="1" max="9" value="3" aria-label="worker 수 (2의 거듭제곱)">
+    <div class="plab">링크 대역폭</div>
+    <div class="presets" id="cmBw"></div>
+    <div class="readout" id="cmOut"></div>
+    <div class="hintline">worker 한 명의 링크 기준으로 push 한 번 + pull 한 번 시간을 단순 계산한 것. PS 쪽 링크 혼잡, 계산과 통신의 겹침, 프로토콜 오버헤드는 전부 무시함. 방향만 보라고 만든 장난감임. pull 쪽 bit 수는 논문처럼 log<sub>2</sub>(2N+1)을 그대로 씀.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head"><span class="sec-num">06</span><h2>수렴 증명 번역</h2></div>
+  <p class="sec-sub">3.2절. 여기서 다들 탈주함. 근데 뼈대는 단순함: <strong>"기존 SGD 수렴 증명에 가정 하나만 바꿔 끼웠다."</strong></p>
+
+  <h3>무대 설정: online learning</h3>
+  <p>논문은 수렴을 <strong>online learning 시스템</strong> 틀에서 분석함. 관측 <span class="m"><i>z</i></span>가 모르는 분포에서 하나씩 뽑혀 나오고, loss <span class="m"><i>Q</i>(<i>z</i>, <i>w</i>)</span>로 성능을 잼. 줄이고 싶은 건 loss의 기댓값:</p>
+  <div class="eq"><span class="m"><i>C</i>(<i>w</i>) ≜ E{<i>Q</i>(<i>z</i>, <i>w</i>)}</span><span class="note">식 (5)</span></div>
+  <p>기준이 되는 알고리즘은 Bottou의 <strong>GOGA</strong>(General Online Gradient Algorithm, [33])임. 그냥 SGD라고 보면 됨:</p>
+  <div class="eq"><span class="m"><i>w</i><sub><i>t</i>+1</sub> = <i>w</i><sub><i>t</i></sub> − γ<sub><i>t</i></sub><i>g</i><sub><i>t</i></sub> = <i>w</i><sub><i>t</i></sub> − γ<sub><i>t</i></sub> · ∇<sub><i>w</i></sub><i>Q</i>(<i>z</i><sub><i>t</i></sub>, <i>w</i><sub><i>t</i></sub>)</span><span class="note">식 (6)</span></div>
+  <p>TernGrad는 여기서 <span class="m"><i>g</i><sub><i>t</i></sub></span> 자리에 ternary를 넣은 것:</p>
+  <div class="eq"><span class="m"><i>w</i><sub><i>t</i>+1</sub> = <i>w</i><sub><i>t</i></sub> − γ<sub><i>t</i></sub>(<i>s</i><sub><i>t</i></sub> · sign(<i>g</i><sub><i>t</i></sub>) ∘ <i>b</i><sub><i>t</i></sub>)</span><span class="note">식 (8)</span></div>
+  <p>그리고 04에서 본 대로 기댓값이 원래 gradient랑 같음 (식 10):</p>
+  <div class="eq"><span class="m">E{<i>s</i><sub><i>t</i></sub> · sign(<i>g</i><sub><i>t</i></sub>) ∘ <i>b</i><sub><i>t</i></sub>} = E{<i>g</i><sub><i>t</i></sub>} = ∇<sub><i>w</i></sub><i>C</i>(<i>w</i><sub><i>t</i></sub>)</span></div>
+
+  <h3>가정 세 개</h3>
+  <p>앞의 둘은 <strong>원래 GOGA 증명의 가정 그대로</strong>고, 세 번째만 TernGrad용으로 새로 만든 것임.</p>
+
+  <table>
+    <thead><tr><th>가정</th><th>수식</th><th>핑프어</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">Assumption 1</td><td><span class="m">inf<sub>‖<i>w</i>−<i>w</i>*‖²&gt;ε</sub> (<i>w</i> − <i>w</i>*)<sup>T</sup>∇<i>C</i>(<i>w</i>) &gt; 0</span></td><td>최솟값 <span class="m"><i>w</i>*</span>가 <strong>하나뿐</strong>이고, 어디 있든 <strong>−gradient가 항상 <span class="m"><i>w</i>*</span> 쪽을 가리킴</strong>. convex면 자동으로 만족. 논문은 convex 아닌데 이걸 만족하는 함수도 쉽게 찾을 수 있다고 함</td></tr>
+      <tr><td class="hd">Assumption 2</td><td><span class="m">Σγ<sub><i>t</i></sub>² &lt; ∞,&nbsp; Σγ<sub><i>t</i></sub> = ∞</span></td><td>learning rate가 <strong>너무 빨리도, 너무 느리게도 안 줄어듦</strong>. 합이 무한이라 어디든 갈 수 있고, 제곱합은 유한이라 노이즈가 결국 잦아듦. 예: γ<sub><i>t</i></sub> = 1/<i>t</i></td></tr>
+      <tr><td class="hd">Assumption 3 (새것)</td><td><span class="m">E{‖<i>g</i>‖<sub>∞</sub> · ‖<i>g</i>‖<sub>1</sub>} ≤ <i>A</i> + <i>B</i>‖<i>w</i> − <i>w</i>*‖²</span></td><td>gradient의 <strong>"최댓값 × 절댓값 합"</strong>이 너무 크지 않음. 최솟값에서 멀어질수록 커지는 건 허용 (<span class="m"><i>B</i></span>항)</td></tr>
+    </tbody>
+  </table>
+
+  <details class="nota" open>
+    <summary>기호 뜯어보기 · 증명에 나오는 것들</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>w</i>*</td><td>정답 parameter. loss 최솟값 위치</td></tr>
+        <tr><td class="m">γ<sub><i>t</i></sub></td><td>learning rate. 논문이 3.2절에선 η 대신 γ를 씀. 같은 거임</td></tr>
+        <tr><td class="m"><i>h</i><sub><i>t</i></sub> ≜ ‖<i>w</i><sub><i>t</i></sub> − <i>w</i>*‖²</td><td>지금 위치와 정답 사이 거리의 제곱 (식 13). 이게 0으로 가면 수렴</td></tr>
+        <tr><td class="m"><i>X</i><sub><i>t</i></sub></td><td>step <i>t</i> 전까지 나온 모든 랜덤 변수 (샘플 <i>z</i>들과 동전 <i>b</i>들). "과거 전부"</td></tr>
+        <tr><td class="m">‖·‖<sub>1</sub></td><td>ℓ1 norm = 원소 절댓값의 합</td></tr>
+        <tr><td class="m">‖·‖ (첨자 없음)</td><td>ℓ2 norm = 유클리드 길이</td></tr>
+        <tr><td class="m"><i>A</i>, <i>B</i></td><td>그냥 양수 상수. 값 자체는 중요하지 않고 "존재한다"가 중요</td></tr>
+        <tr><td class="m">almost surely</td><td>확률 1로. "운 나쁜 경우가 있긴 한데 그 확률이 0"</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3>증명 흐름 (3단 구조)</h3>
+  <ol>
+    <li><strong>Lemma 1</strong> (Bottou가 이미 증명한 것): 만약 <span class="m">E{(<i>h</i><sub><i>t</i>+1</sub> − (1 + γ<sub><i>t</i></sub>²<i>B</i>)<i>h</i><sub><i>t</i></sub>) | <i>X</i><sub><i>t</i></sub>} ≤ −2γ<sub><i>t</i></sub>(<i>w</i><sub><i>t</i></sub> − <i>w</i>*)<sup>T</sup>∇<i>C</i>(<i>w</i><sub><i>t</i></sub>) + γ<sub><i>t</i></sub>²<i>A</i></span>를 만족하는 <span class="m"><i>A</i>, <i>B</i></span>가 있으면 → 확률 1로 <span class="m"><i>w</i>*</span>로 수렴함. (Lyapunov process, quasi-martingale 수렴 정리로 증명)<br><strong>핑프어:</strong> "한 스텝마다 정답까지 거리가 기대값으로 볼 때 대충 줄어들면, 결국 정답에 도착한다."</li>
+    <li><strong>Assumption 3을 넣으면</strong> TernGrad 업데이트가 Lemma 1의 조건을 만족한다는 걸 보임 (증명 본체는 Supplementary Material에 있음. 본문엔 없음)</li>
+    <li><strong>Theorem 1</strong>: 그래서 TernGrad도 확률 1로 <span class="m"><i>w</i>*</span>로 수렴함</li>
+  </ol>
+
+  <h3>핵심: 왜 가정 3이 원래 가정보다 "세냐"</h3>
+  <p>원래 GOGA의 gradient bound는 이거임:</p>
+  <div class="eq"><span class="m">E{‖<i>g</i>‖²} ≤ <i>A</i> + <i>B</i>‖<i>w</i> − <i>w</i>*‖²</span><span class="note">식 (18), 표준 SGD</span></div>
+  <p>그리고 항상 이게 성립함:</p>
+  <div class="eq"><span class="m">‖<i>g</i>‖<sub>∞</sub> · ‖<i>g</i>‖<sub>1</sub> ≥ ‖<i>g</i>‖²</span><span class="note">식 (19)</span></div>
+  <p>왜냐면 <span class="m">‖<i>g</i>‖² = Σ<i>g</i><sub><i>k</i></sub>² = Σ|<i>g</i><sub><i>k</i></sub>|·|<i>g</i><sub><i>k</i></sub>| ≤ Σ max|<i>g</i>| · |<i>g</i><sub><i>k</i></sub>| = ‖<i>g</i>‖<sub>∞</sub>‖<i>g</i>‖<sub>1</sub></span>. 곱하는 한쪽을 최댓값으로 바꿨으니 커질 수밖에 없음.</p>
+  <p>그래서 TernGrad의 가정 3은 <strong>왼쪽이 더 큰 값인데 같은 상한 아래 있어야 하니까 더 까다로운(stronger) 가정</strong>임. 좌변이 커질수록 만족하기 어려움.</p>
+
+  <div class="callout">
+    <strong>(보충) 이 좌변이 사실 ternary gradient의 "크기 제곱의 기댓값"임.</strong> 원소 하나를 보면 <span class="m"><i>g̃</i><sub><i>k</i></sub>²</span>은 확률 <span class="m">|<i>g</i><sub><i>k</i></sub>|/<i>s</i></span>로 <span class="m"><i>s</i>²</span>, 아니면 0임. 그래서 <span class="m">E[<i>g̃</i><sub><i>k</i></sub>²] = <i>s</i>|<i>g</i><sub><i>k</i></sub>|</span>이고, 다 더하면 <span class="m">E‖<i>g̃</i>‖² = <i>s</i> · Σ|<i>g</i><sub><i>k</i></sub>| = ‖<i>g</i>‖<sub>∞</sub>‖<i>g</i>‖<sub>1</sub></span>. 즉 가정 3은 <strong>"ternary gradient에 대해 원래 SGD랑 똑같은 bound를 건 것"</strong>이라고 읽으면 한 방에 이해됨. 원래 값보다 커진 만큼(=<span class="m">‖<i>g</i>‖<sub>∞</sub>‖<i>g</i>‖<sub>1</sub> − ‖<i>g</i>‖²</span>)이 ternarize가 추가한 분산임.
+  </div>
+
+  <p>논문의 곁다리 결과도 하나 있음: 같은 절차로 gradient에 <strong>Gaussian noise <span class="m">N(0, σ²)</span></strong>를 더한 GOGA도 <span class="m">E{‖<i>g</i>‖²} ≤ <i>A</i> + <i>B</i>‖<i>w</i> − <i>w</i>*‖² − σ²</span> 아래서 수렴함을 증명할 수 있다고 함 (식 20). bound는 더 세지지만, gradient noise가 파라미터 공간 탐색을 도와 정확도를 올린다는 선행 관찰([34])이 있고, <strong>TernGrad의 랜덤성도 비슷하게 탐색을 도와 일부 모델에서 정확도를 올린다</strong>고 연결함.</p>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>"수렴을 증명했다" ≠ "딥러닝에서 수렴이 보장된다"</h4>
+    <p>가정 1은 최솟값이 <strong>하나뿐</strong>이라고 함. 실제 DNN loss는 최솟값이 엄청 많은 non-convex 지형임. 그러니까 이 정리는 <strong>"이런 조건이면 ternary로 바꿔도 SGD 수렴 성질이 안 깨진다"</strong>는 방향 확인이지, AlexNet 학습이 수렴한다는 보증서가 아님. 논문도 가정을 명시적으로 박아뒀음. 이걸 어떻게 평가할지는 리뷰어 몫이고.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head"><span class="sec-num">07</span><h2>bound 좁히기 기술 둘</h2></div>
+  <p class="sec-sub">3.3절. 이론이 "ternary는 <span class="m">‖<i>g</i>‖<sub>∞</sub></span>이 크면 불리하다"고 알려줌 → 그럼 <span class="m">‖<i>g</i>‖<sub>∞</sub></span>을 줄이자. 이론이 기법을 낳는 구조라 논문의 제일 깔끔한 부분임.</p>
+
+  <h3>문제: 최댓값 하나가 전체를 망침</h3>
+  <p><span class="m">‖<i>g</i>‖<sub>∞</sub></span>은 DNN <strong>전체</strong> gradient 중 최댓값임. 큰 DNN이면 이게 대부분 gradient보다 <strong>훨씬</strong> 클 수 있음. 그러면:</p>
+  <ul>
+    <li><span class="m"><i>s</i></span>가 거대함 → 대부분 원소의 <span class="m">|<i>g</i><sub><i>k</i></sub>|/<i>s</i></span>가 0에 가까움 → <strong>거의 다 0으로 뭉개짐</strong></li>
+    <li>가끔 운 좋게 1이 뜬 원소는 <strong>거대한 <span class="m"><i>s</i></span>만큼</strong> 확 움직임</li>
+    <li>논문 표현: "대부분 parameter는 안 바뀌고 나머지는 overshoot" → <span class="cCost">학습 분산이 커짐</span></li>
+  </ul>
+
+  <h3>기술 1 · layer-wise ternarizing</h3>
+  <p>gradient 범위는 backprop 하면서 <strong>layer마다 다름</strong>. 그러니 전체에 scaler 하나 쓰지 말고 <strong>layer마다 따로</strong> <span class="m"><i>s</i></span>를 구해서 ternarize함. 심지어 <strong>같은 layer 안에서도 weight랑 bias를 따로</strong> 함.</p>
+  <p>더 잘게 쪼개서 bucket마다 따로 하면(QSGD 방식) 표준 bound에 더 가까워지지만 float scaler가 늘어서 통신이 늚. <strong>bucket 크기가 1이면 그냥 float gradient</strong>가 돼버림. 즉 bucket 크기는 정확도와 통신 사이의 다이얼임. 03에서 "bound가 QSGD의 bucket 필요성을 설명한다"는 게 이 얘기였음.</p>
+
+  <h3>기술 2 · gradient clipping</h3>
+  <p>layer 안에서도 튀는 값이 문제면, 그냥 <strong>튀는 값을 잘라버림</strong>:</p>
+  <div class="eq"><span class="m"><i>f</i>(<i>g</i><sub><i>i</i></sub>) = <i>g</i><sub><i>i</i></sub> &nbsp;(|<i>g</i><sub><i>i</i></sub>| ≤ <i>c</i>σ),&nbsp;&nbsp; sign(<i>g</i><sub><i>i</i></sub>) · <i>c</i>σ &nbsp;(|<i>g</i><sub><i>i</i></sub>| &gt; <i>c</i>σ)</span><span class="note">식 (21)</span></div>
+  <ul>
+    <li><span class="m">σ</span>: 그 gradient 벡터의 표준편차</li>
+    <li><span class="m"><i>c</i></span>: 하이퍼파라미터. CIFAR-10 CNN([35])을 momentum SGD로 학습하면서 <strong>딱 한 번</strong> cross-validation해서 <span class="m"><i>c</i> = 2.5</span>로 정하고 모든 실험에 그대로 씀</li>
+    <li>분산학습에선 ternarize 직전에 <strong>worker마다</strong> 적용</li>
+  </ul>
+  <p>gradient가 Gaussian에 가깝다면(Figure 2(a)) <span class="m">[−2.5σ, 2.5σ]</span> 밖으로 나가는 건 극소수임. 그 극소수만 자르면 <span class="m"><i>s</i></span>가 확 작아지는데, 원래 벡터는 거의 안 바뀜. 논문 수치:</p>
+  <div class="scale">
+    <div class="cap">숫자 감각 · c = 2.5 clipping이 gradient를 얼마나 바꾸나</div>
+    <table>
+      <tr><td class="what">벡터 길이 변화</td><td class="num">1.0% ~ 1.5%</td><td>거의 그대로</td></tr>
+      <tr><td class="what">방향 변화</td><td class="num">2° ~ 3°</td><td>거의 같은 쪽을 가리킴</td></tr>
+      <tr><td class="what">Gaussian이 2.5σ 밖에 있을 확률</td><td class="num">약 1.2%</td><td>(보충) 표준정규분포 양쪽 꼬리 합</td></tr>
+      <tr><td class="what">c = 2.5가 유효했던 범위</td><td class="num">-</td><td>MNIST, CIFAR-10, ImageNet / LeNet, CifarNet, AlexNet, GoogLeNet / momentum, vanilla SGD, Adam</td></tr>
+    </table>
+  </div>
+
+  <h3>Figure 2 읽는 법</h3>
+  <p>AlexNet을 worker 2개로 분산학습하면서 TensorBoard로 찍은 gradient 히스토그램임. <strong>윗줄은 세 번째 conv layer, 아랫줄은 첫 FC layer</strong>. 세로축이 학습 iteration(위에서 아래로 진행), 가로축이 gradient 값.</p>
+  <table>
+    <thead><tr><th>패널</th><th>뭘 보여주나</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">(a) original</td><td>원래 float gradient. 가운데가 뾰족하고 꼬리가 긴 종 모양</td></tr>
+      <tr><td class="hd">(b) clipped</td><td>clipping 후. 꼬리가 잘려서 가로축 범위가 확 좁아짐 (conv 기준 ±0.03 → ±0.015 근처)</td></tr>
+      <tr><td class="hd">(c) ternary</td><td>ternarize 후. 값이 −s, 0, +s 세 개의 막대로만 존재. 0 막대가 압도적</td></tr>
+      <tr><td class="hd">(d) final</td><td>두 worker의 ternary를 평균낸 것. scaler sharing 덕에 값이 <strong>5개</strong>(2N+1, N=2)의 격자에만 찍힘</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>실측으로 확인된 효과.</strong> AlexNet에서 두 기법을 다 쓰면 TernGrad가 표준 SGD와 같은 정확도로 수렴함. <strong>하나라도 빼면 정확도가 떨어짐</strong>. 예: gradient clipping을 빼면 top-1이 <span class="cCost">약 3% 손실</span> (<a href="#s9">09</a>의 Table 2, TernGrad-noclip 줄).
+  </div>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">ㅇㅇ(211.36)</span>gradient clipping은 RNN에서 폭주 막는 그거 아님?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>이름만 같고 목적이 다름. RNN 쪽 clipping은 보통 gradient 벡터 <strong>전체 norm</strong>이 임계값 넘으면 통째로 줄이는 거고 목적이 폭주 방지임. 여기 건 <strong>원소별로</strong> cσ 넘는 것만 자르는 거고 목적이 <strong>scaler s를 줄여서 ternary 분산을 줄이는 것</strong>임. 논문 읽을 때 헷갈리지 마셈.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head"><span class="sec-num">08</span><h2>실험 1: 작은 데이터</h2></div>
+  <p class="sec-sub">4절 도입 + 4.1절. 먼저 작은 데이터셋에서 여러 optimizer랑 붙여봄.</p>
+
+  <h3>공통 세팅 (4절 도입)</h3>
+  <ul>
+    <li>구현: <strong>TensorFlow</strong></li>
+    <li>parameter의 exponential moving average 유지 (decay 0.9999). 정확도는 이 평균 parameter로 잼. 약간 더 좋게 나왔다고 함</li>
+    <li>공정 비교: float vs ternary 쌍마다 <strong>다른 하이퍼파라미터는 명시 안 하면 전부 동일</strong></li>
+    <li>momentum 쓸 땐 0.9. polynomial LR decay는 power 0.5로 base LR에서 0까지</li>
+  </ul>
+
+  <h3>LeNet on MNIST (Figure 3)</h3>
+  <p>그래프 읽는 법: 가로축이 worker 수 N(2, 4, 8, 16, 32, 64), 세로축 정확도(98~100%), 파란 점선이 baseline(float), 주황 실선이 TernGrad. (a)는 momentum SGD, (b)는 vanilla SGD.</p>
+  <ul>
+    <li><strong>total mini-batch 64로 고정</strong>, 최대 10K iteration. 그래서 worker당 batch는 <span class="m">64/<i>N</i></span></li>
+    <li>base LR: momentum 0.01, vanilla 0.1. weight decay 0.0005. data augmentation 없음</li>
+    <li>결과: 같은 iteration 안에 비슷한 정확도로 수렴. <span class="cGain">최대 이득 0.15%</span>, <span class="cCost">최대 손실 0.22%</span></li>
+    <li><strong>N = 64에서도 안 무너짐.</strong> 이건 worker 한 명이 iteration당 <strong>샘플 1개</strong>만 보는 극단 상황임</li>
+  </ul>
+
+  <h3>CifarNet on CIFAR-10 (Table 1)</h3>
+  <p>augmentation: 24×24 랜덤 crop, 좌우 반전, 밝기와 대비 랜덤 조정. 테스트는 가운데 crop만. optimizer는 <strong>Adam</strong>. 여기선 04와 반대로 <strong>worker당 batch를 고정</strong>하고 worker 수를 늘려서 total batch가 선형으로 커짐.</p>
+  <table>
+    <thead><tr><th>SGD</th><th>base LR</th><th>total batch</th><th>iterations</th><th>workers</th><th>floating</th><th>TernGrad</th></tr></thead>
+    <tbody>
+      <tr><td>Adam</td><td>0.0002</td><td>128</td><td>300K</td><td>2</td><td>86.56%</td><td>85.64% <span class="cCost">(−0.92%)</span></td></tr>
+      <tr><td>Adam</td><td>0.0002</td><td>2048</td><td>18.75K</td><td>16</td><td>83.19%</td><td>82.80% <span class="cCost">(−0.39%)</span></td></tr>
+    </tbody>
+  </table>
+  <p>관찰 포인트 셋:</p>
+  <ol>
+    <li>둘 다 <strong>1% 미만 손실</strong></li>
+    <li>batch가 커지면 baseline이든 TernGrad든 둘 다 정확도가 떨어짐. 이유: parameter 갱신이 덜 자주 일어나고, large-batch 학습은 <strong>sharp minima</strong>로 빠지는 경향이 있어서 ([38], Keskar et al.)</li>
+    <li>근데 batch 2048에선 격차가 오히려 <strong>줄어듦</strong>(0.92 → 0.39). 논문 해석: TernGrad의 노이즈가 <strong>flat minima</strong> 쪽으로 가게 도와준 것일 수 있음</li>
+  </ol>
+  <p>base LR 0.0002가 작아 보이지만 baseline에서 0.001 같은 큰 값보다 정확도가 더 좋았다고 해명도 붙어 있음.</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · sharp minima vs flat minima</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>한 줄</td><td>loss 지형에서 좁고 뾰족한 골짜기(sharp) vs 넓고 평평한 분지(flat)</td></tr>
+        <tr><td>왜 중요</td><td>flat 쪽이 테스트 데이터에서 일반화가 잘 된다는 관찰이 있음. 조금 흔들려도 loss가 크게 안 변하니까</td></tr>
+        <tr><td>언제</td><td>large-batch 학습 얘기 나오면 무조건 나옴. batch 키우면 gradient 노이즈가 줄어서 sharp로 빠지기 쉬움</td></tr>
+        <tr><td>누가</td><td>Keskar et al., ICLR 2017 ([38])</td></tr>
+        <tr><td>헷갈리는 것</td><td>이 논문은 "노이즈가 flat 쪽을 도왔을 수 있다"고 <strong>해석</strong>한 거지 지형을 직접 측정한 건 아님. 문장이 "could explain"임</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head"><span class="sec-num">09</span><h2>실험 2: ImageNet</h2></div>
+  <p class="sec-sub">4.2절. 본게임. AlexNet이랑 GoogLeNet.</p>
+
+  <h3>그냥 바꿔 끼우면 안 됐다: 수정 세 가지</h3>
+  <p>논문이 솔직하게 적음: 큰 DNN에서 float을 ternary로 <strong>그냥 바꾸고 나머지 하이퍼파라미터 그대로</strong> 두면 정확도 손실이 좀 생길 수 있음. 그래서 아래 중 일부나 전부를 적용함:</p>
+  <ol>
+    <li><strong>dropout 비율 낮추기</strong> (더 많은 뉴런 유지). 이유: dropout도 랜덤성으로 규제하고 TernGrad도 랜덤성을 넣으니까, 둘 다 세면 <strong>"과한 랜덤"</strong>이 됨</li>
+    <li><strong>weight decay 줄이기</strong>. 같은 이유. TernGrad 랜덤성이 이미 규제 역할을 함</li>
+    <li><strong>마지막 분류 layer는 ternarize 안 함</strong>. 레이블 one-hot 때문에 마지막 layer gradient 분포가 한쪽으로 쏠리는데(skew), 대칭인 {−1, 0, 1}은 이런 분포에 안 맞음. 비대칭 ternary도 방법이지만 단순하게 그냥 float로 보냄. 비용은 작음: 마지막 layer는 전체 parameter의 <strong>AlexNet 6.7%, ResNet-152 3.99%</strong></li>
+  </ol>
+  <p>그 외 세팅: 전부 momentum SGD, conv layer에 Batch Normalization. AlexNet은 Caffe 하이퍼파라미터와 augmentation, GoogLeNet은 polynomial LR decay와 [41]의 augmentation. GoogLeNet 구현은 <strong>auxiliary classifier 없음</strong>. 검증 정확도는 가운데 crop만으로 평가.</p>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>"같은 하이퍼파라미터로 비교했다"가 ImageNet에선 반만 맞음</h4>
+    <p>4절 도입에서 "쌍마다 다른 하이퍼파라미터는 명시 안 하면 동일"이라고 했음. 그리고 Table 2, 3은 <strong>dropout(DR)과 weight decay가 다르다고 명시</strong>해둠. 그러니 규칙 위반은 아님. 다만 표 읽을 때 <strong>TernGrad 줄은 DR이 0.5 → 0.2(AlexNet), 0.2 → 0.08(GoogLeNet)으로 바뀐 상태</strong>라는 걸 꼭 같이 봐야 함. 이 차이를 어떻게 받아들일지는 리뷰어 판단 영역임.</p>
+  </div>
+
+  <h3>AlexNet 결과 (Table 2)</h3>
+  <p>worker당 mini-batch 128로 고정, <strong>모두 같은 epoch 수</strong>만큼 학습. 그래서 worker가 늘면 iteration 수는 줄어듦. 이걸 보완하려고 large-batch일 때 LR을 키움 ([10]).</p>
+  <table>
+    <thead><tr><th>base LR</th><th>batch</th><th>workers</th><th>iter</th><th>gradients</th><th>wd</th><th>DR</th><th>top-1</th><th>top-5</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3">0.01</td><td rowspan="3">256</td><td rowspan="3">2</td><td rowspan="3">370K</td><td>floating</td><td>0.0005</td><td>0.5</td><td>57.33%</td><td>80.56%</td></tr>
+      <tr><td>TernGrad</td><td>0.0005</td><td>0.2</td><td><span class="cGain">57.61%</span></td><td>80.47%</td></tr>
+      <tr><td>TernGrad-noclip</td><td>0.0005</td><td>0.2</td><td><span class="cCost">54.63%</span></td><td>78.16%</td></tr>
+      <tr><td rowspan="2">0.02</td><td rowspan="2">512</td><td rowspan="2">4</td><td rowspan="2">185K</td><td>floating</td><td>0.0005</td><td>0.5</td><td>57.32%</td><td>80.73%</td></tr>
+      <tr><td>TernGrad</td><td>0.0005</td><td>0.2</td><td>57.28%</td><td>80.23%</td></tr>
+      <tr><td rowspan="2">0.04</td><td rowspan="2">1024</td><td rowspan="2">8</td><td rowspan="2">92.5K</td><td>floating</td><td>0.0005</td><td>0.5</td><td>56.62%</td><td>80.28%</td></tr>
+      <tr><td>TernGrad</td><td>0.0005</td><td>0.2</td><td><span class="cGain">57.54%</span></td><td>80.25%</td></tr>
+    </tbody>
+  </table>
+  <p>읽는 법:</p>
+  <ul>
+    <li><strong>AlexNet은 weight decay를 안 바꿈</strong>(둘 다 0.0005). DR만 0.5 → 0.2</li>
+    <li>batch 256, 512: float도 TernGrad도 비슷</li>
+    <li>batch 1024: float은 top-1이 <span class="cCost">0.71% 떨어짐</span>(57.33 → 56.62, 08에서 본 large-batch 문제). TernGrad는 57.54%로 <span class="cGain">float보다 0.92% 높음</span>. 03에서 QSGD랑 비교한 "0.92% 향상"이 이 숫자임</li>
+    <li>noclip 줄: clipping 빼면 57.61 → 54.63, <span class="cCost">약 3% 손실</span></li>
+  </ul>
+
+  <h3>Figure 4 (AlexNet, 4 workers, batch 512)</h3>
+  <ul>
+    <li><strong>(a) top-1 정확도 vs iteration</strong>: 두 곡선이 거의 겹침. TernGrad 수렴 곡선이 baseline이랑 매치됨</li>
+    <li><strong>(b) training loss vs iteration</strong>: TernGrad가 <strong>살짝 더 낮은</strong> loss로 수렴. 논문: ternary로도 목표 함수를 최소화할 수 있다는 추가 근거. 다만 dropout이 작은 것도 원인일 수 있다고 스스로 단서 담</li>
+    <li><strong>(c) fc6 gradient sparsity</strong>: 첫 FC layer(fc6)의 gradient 중 평균 <strong>71.32%가 0으로</strong> ternarize됨. 학습 내내 70% 근처로 일정</li>
+  </ul>
+  <p>그리고 "학습 효율은 통신 시간을 줄이면 더 좋아진다(5절)"는 말로 넘어감. 즉 Figure 4는 <strong>iteration 기준</strong>이지 <strong>시간 기준</strong>이 아님.</p>
+
+  <h3>GoogLeNet 결과 (Table 3, top-5)</h3>
+  <table>
+    <thead><tr><th>base LR</th><th>batch</th><th>workers</th><th>iter</th><th>gradients</th><th>wd</th><th>DR</th><th>top-5</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="2">0.04</td><td rowspan="2">128</td><td rowspan="2">2</td><td rowspan="2">600K</td><td>floating</td><td>4e-5</td><td>0.2</td><td>88.30%</td></tr>
+      <tr><td>TernGrad</td><td>1e-5</td><td>0.08</td><td>86.77% <span class="cCost">(−1.53)</span></td></tr>
+      <tr><td rowspan="2">0.08</td><td rowspan="2">256</td><td rowspan="2">4</td><td rowspan="2">300K</td><td>floating</td><td>4e-5</td><td>0.2</td><td>87.82%</td></tr>
+      <tr><td>TernGrad</td><td>1e-5</td><td>0.08</td><td>85.96% <span class="cCost">(−1.86)</span></td></tr>
+      <tr><td rowspan="2">0.10</td><td rowspan="2">512</td><td rowspan="2">8</td><td rowspan="2">300K</td><td>floating</td><td>4e-5</td><td>0.2</td><td>89.00%</td></tr>
+      <tr><td>TernGrad</td><td>2e-5</td><td>0.08</td><td>86.47% <span class="cCost">(−2.53)</span></td></tr>
+    </tbody>
+  </table>
+  <p>괄호 안 차이는 내가 뺀 것(보충). 평균 1.97%로 논문의 "평균 2% 미만"과 맞음. 다만 <strong>worker가 늘수록 손실이 커지는 추세</strong>는 표에서 그대로 보임. 논문 해명: dropout과 weight decay 빼고는 전부 <strong>baseline용으로 튜닝된 값</strong>([42])을 그대로 썼으니, TernGrad용으로 따로 튜닝하면 더 오를 수 있다.</p>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">핑프(1.1)</span>AlexNet은 top-1이랑 top-5 둘 다 주고 GoogLeNet은 왜 top-5만 줌?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>논문에 이유는 안 적혀 있음. 사실만 말하면 Table 3엔 top-5 열만 있음. 이런 거 눈치채는 게 리뷰 쓸 때 쓸모 있는 관찰력이니까 메모해두셈.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head"><span class="sec-num">10</span><h2>성능 모델</h2></div>
+  <p class="sec-sub">5절. "그래서 실제로 얼마나 빨라지냐"의 답. 근데 여기 중요한 단서가 있음.</p>
+
+  <h3>왜 측정 대신 모델을 썼나</h3>
+  <p>논문이 직접 적음: <strong>자원과 시간 제약 때문에</strong> VggNet-A 같은 모델 학습과 <strong>8 worker 넘는 분산학습은 못 돌렸음</strong>. 앞으로 할 계획이라고. 그래서 최대 512 GPU까지의 확장성은 <strong>성능 모델</strong>로 추정함.</p>
+  <ul>
+    <li>원래 CPU 기반 딥러닝 시스템용으로 만든 성능 모델([44], 3저자 Feng Yan 참여)을 GPU 분산으로 확장</li>
+    <li>핵심 아이디어: <strong>단일 머신에서 가볍게 profiling</strong> + <strong>해석적 모델링</strong>을 합쳐서 추정</li>
+    <li>세부 내용은 Supplementary Material로 넘김</li>
+    <li>여기서 "performance"는 <strong>학습 속도</strong>(images/sec)를 뜻함</li>
+  </ul>
+
+  <h3>Figure 5 읽는 법</h3>
+  <p>가로축 GPU 수(1~512, 2배씩), 세로축 학습 throughput(images/sec). 모델 셋(AlexNet, GoogLeNet, VggNet-A) × FP32/TernGrad 막대 여섯 개. GPU 16개 이하 구간은 막대가 너무 작아서 확대 박스를 따로 넣어둠.</p>
+  <table>
+    <thead><tr><th></th><th>(a) 싼 클러스터</th><th>(b) 비싼 HPC 클러스터</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">노드</td><td>128 노드, 노드당 GTX 1080 ×4 + PCI switch</td><td>128 노드, 노드당 Tesla P100 ×4 + NVLink</td></tr>
+      <tr><td class="hd">네트워크</td><td><span class="cMem">1 Gbps Ethernet</span></td><td><span class="cMem">100 Gbps InfiniBand</span></td></tr>
+      <tr><td class="hd">y축 최대</td><td>100,000 images/s</td><td>240,000 images/s</td></tr>
+      <tr><td class="hd">대표 결과</td><td>AlexNet, 8 GPU에서 <span class="cGain">3.04×</span></td><td>VggNet-A, 128 노드에서 <span class="cGain">약 2×</span></td></tr>
+    </tbody>
+  </table>
+  <p>GPU당 mini-batch: AlexNet 128, GoogLeNet 64, VggNet-A 32.</p>
+
+  <p>논문의 결론 요약:</p>
+  <ul>
+    <li>세 DNN 모두 throughput이 오름</li>
+    <li>속도 향상은 <strong>통신/계산 비율, GPU 수, 통신 대역폭</strong> 세 개에 달려 있음</li>
+    <li><strong>통신/계산 비율이 큰</strong> 모델(AlexNet, VggNet-A: FC layer가 커서 parameter가 많음)이 GoogLeNet보다 이득이 큼</li>
+    <li>대역폭이 작을수록(1 Gbps Ethernet) TernGrad가 더 효과적</li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>Figure 5는 측정값이 아니라 모델 예측값</h4>
+    <p>Figure 5 캡션만 보면 실측처럼 보이는데, 본문이 "performance model로 분석한다"고 밝혀둠. 그리고 정확도 실험은 <strong>최대 8 worker</strong>까지만 했음. 그러니 "512 GPU에서 TernGrad가 정확도 유지하면서 몇 배 빠르다"는 <strong>두 개의 다른 근거</strong>(정확도는 ≤8 실측, 속도는 모델)를 이어붙인 주장임. 이걸 어떻게 평가할지는 리뷰어 몫이지만, 읽는 사람이 <strong>이 구분을 놓치면 안 됨</strong>.</p>
+  </div>
+
+  <div class="callout">
+    <strong>(보충) 왜 AlexNet과 VggNet-A가 이득이 큰가를 강의 언어로.</strong> <a href="L04-dnns.html#s13">Lecture 4-5</a>에서 본 대로 AlexNet은 <strong>시간은 conv가, parameter는 FC가</strong> 먹음. gradient 크기는 parameter 수에 비례하니까, FC가 큰 모델은 <strong>계산은 적은데 보낼 gradient는 많음</strong> = 통신/계산 비율이 큼. GoogLeNet은 FC를 거의 없애서 parameter가 적음. 그래서 애초에 통신이 덜 문제라 TernGrad로 얻을 게 적음. Figure 4(c)에서 굳이 <strong>fc6</strong>의 sparsity를 보여준 것도 같은 맥락으로 읽힘.
+  </div>
+</section>
+
+<div class="part"><div class="k">Part 2</div><div class="t">Attention Is All You Need: RNN 버리고 attention만 쓰기</div></div>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head"><span class="sec-num">11</span><h2>이 논문 뭐임</h2></div>
+
+  <div class="def">
+    <span class="tag">서지</span>
+    <p>Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin. <strong>"Attention Is All You Need."</strong> <em>31st Conference on Neural Information Processing Systems (NIPS 2017)</em>, Long Beach, CA.<br>
+    소속: Google Brain, Google Research, University of Toronto. 코드: <code>github.com/tensorflow/tensor2tensor</code></p>
+  </div>
+
+  <div class="def">
+    <span class="tag">초록을 핑프어로</span>
+    <p>지금 잘나가는 <strong>sequence transduction</strong>(시퀀스 → 시퀀스 변환, 예: 번역) 모델은 RNN이나 CNN 기반 encoder-decoder고, 제일 잘하는 애들은 encoder랑 decoder를 attention으로 이어줌. 우리는 <strong>attention만으로</strong> 된 <strong>Transformer</strong>를 제안함. recurrence랑 convolution은 <strong>완전히 버림</strong>. 번역 두 개에서 품질은 더 좋고, 병렬화는 더 잘 되고, 학습 시간은 훨씬 짧음. WMT 2014 영→독 <strong>28.4 BLEU</strong>(앙상블 포함 기존 최고보다 2 BLEU 이상 높음), 영→불 <strong>41.0 BLEU</strong>(단일 모델 최고). 영→불은 <strong>GPU 8장으로 3.5일</strong>, 기존 최고 모델들 학습 비용의 극히 일부.</p>
+  </div>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · BLEU</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>풀네임</td><td>BiLingual Evaluation Understudy</td></tr>
+        <tr><td>한 줄</td><td>기계 번역 결과가 사람 정답 번역과 <strong>단어 묶음(n-gram)이 얼마나 겹치는지</strong> 재는 점수. 0~100, 높을수록 좋음</td></tr>
+        <tr><td>언제</td><td>번역 논문의 결과표는 거의 무조건 BLEU</td></tr>
+        <tr><td>누가</td><td>Papineni et al., 2002. WMT(Workshop on Machine Translation) 벤치마크에서 표준</td></tr>
+        <tr><td>헷갈리는 것</td><td>정확도(%)가 아님. 41 BLEU가 "41% 맞음"이 아님. <strong>1~2 BLEU 차이가 이 분야에선 큰 차이</strong>로 취급됨. 그래서 초록이 "2 BLEU 이상"을 강조함</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3>각주가 레전드임</h3>
+  <p>1쪽 각주를 보면 저자 순서가 <strong>랜덤</strong>이고 전원 equal contribution임. 누가 뭘 했는지까지 적혀 있음:</p>
+  <ul>
+    <li><strong>Jakob</strong>: RNN을 self-attention으로 바꾸자고 제안하고 평가를 시작함</li>
+    <li><strong>Ashish</strong> (Illia와 함께): 첫 Transformer 모델을 설계하고 구현함</li>
+    <li><strong>Noam</strong>: <strong>scaled dot-product attention, multi-head attention, parameter 없는 위치 표현</strong>을 제안함. 이 논문의 핵심 부품 셋이 이 사람한테서 나옴</li>
+    <li><strong>Niki</strong>: 수많은 변형 모델을 설계, 구현, 튜닝, 평가</li>
+    <li><strong>Llion</strong>: 새 변형 실험, 초기 코드베이스, 효율적 inference와 시각화</li>
+    <li><strong>Łukasz, Aidan</strong>: tensor2tensor 설계와 구현. 기존 코드베이스를 갈아엎어서 결과와 연구 속도를 크게 올림</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head"><span class="sec-num">12</span><h2>RNN이 왜 답답한가</h2></div>
+  <p class="sec-sub">1절 + 2절. "왜 RNN을 버렸냐"를 이해하면 이 논문 동기가 다 이해됨.</p>
+
+  <h3>RNN의 태생적 한계: 한 줄로 서서 기다림</h3>
+  <p>RNN(LSTM, GRU 포함)은 hidden state <span class="m"><i>h</i><sub><i>t</i></sub></span>를 <strong>이전 hidden state <span class="m"><i>h</i><sub><i>t</i>−1</sub></span>와 <i>t</i>번째 입력의 함수</strong>로 만듦. 즉 <span class="m"><i>h</i><sub>5</sub></span>를 계산하려면 <span class="m"><i>h</i><sub>4</sub></span>가 있어야 하고, 그건 <span class="m"><i>h</i><sub>3</sub></span>이 있어야 하고... 50단어 문장이면 50번을 <strong>순서대로</strong> 해야 함.</p>
+  <p>논문이 짚는 문제:</p>
+  <ul>
+    <li>이 순차성 때문에 <strong>한 학습 예제 안에서 병렬화가 안 됨</strong></li>
+    <li>문장이 길수록 치명적임. 메모리 제약 때문에 <strong>여러 예제를 batch로 묶는 것도 한계가 있어서</strong></li>
+    <li>factorization trick([18])이나 conditional computation([26]) 같은 개선이 있었지만 <strong>순차 계산이라는 근본 제약은 그대로</strong></li>
+  </ul>
+
+  <div class="callout">
+    <strong>하드웨어 관점 번역 (보충).</strong> GPU는 수천 개 연산기를 <strong>동시에</strong> 돌려야 제값을 함. RNN은 한 스텝에서 하는 일이 "d차원 벡터 × d×d 행렬" 하나뿐이라 연산기 대부분이 놀고, 다음 스텝은 이번 스텝 끝나야 시작함. 연산기를 채울 방법이 batch를 키우는 것뿐인데 그건 메모리가 막음. <strong>알고리즘의 데이터 의존성이 하드웨어 활용률의 상한을 정하는 전형적인 예</strong>임. <a href="L04-dnns.html#s7">Lecture 4-5의 DNN 계산 관점</a>에서 본 "데이터 의존성" 얘기가 바로 이거.
+  </div>
+
+  <h3>attention은 원래 RNN의 보조였음</h3>
+  <p>attention 자체는 새로운 게 아님. 입력이나 출력 안에서 <strong>거리에 상관없이 의존성을 모델링</strong>할 수 있어서 이미 필수 부품이었음([2] Bahdanau, [16]). 근데 거의 항상 <strong>RNN이랑 같이</strong> 씀. 이 논문의 한 수는 <strong>"보조였던 attention을 본체로 올리고 RNN을 빼버리자"</strong>임. 그래서 제목이 "Attention Is All You Need".</p>
+
+  <h3>CNN 계열도 같은 목표였음 (2절)</h3>
+  <p>순차 계산 줄이기는 Extended Neural GPU([20]), ByteNet([15]), ConvS2S([8])의 목표이기도 했음. 전부 CNN으로 모든 위치를 병렬 계산함. 근데 <strong>멀리 떨어진 두 위치를 연결하는 데 필요한 연산 수</strong>가 거리에 따라 늘어남:</p>
+  <ul>
+    <li>ConvS2S: 거리에 <strong>선형</strong>으로</li>
+    <li>ByteNet: <strong>로그</strong>로</li>
+    <li>Transformer: <strong>상수</strong>. 대신 attention 가중 평균 때문에 <strong>"유효 해상도"가 떨어지는</strong> 비용이 있고, 그걸 multi-head attention으로 상쇄함 (<a href="#s15">15</a>)</li>
+  </ul>
+  <p>2절 마지막 주장: 저자들이 아는 한 Transformer는 <strong>self-attention만으로</strong> 입출력 표현을 계산하는 <strong>최초의 transduction 모델</strong>임.</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · self-attention</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>다른 이름</td><td>intra-attention</td></tr>
+        <tr><td>한 줄</td><td><strong>한 시퀀스 안의</strong> 서로 다른 위치끼리 attention 하는 것. 문장이 자기 자신을 봄</td></tr>
+        <tr><td>언제</td><td>독해, 요약, 문장 표현 학습 등에서 이미 쓰였음 ([4], [22], [23], [19])</td></tr>
+        <tr><td>누가</td><td>이 논문 이후로는 BERT, GPT 등 전부</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>encoder-decoder attention</strong>은 decoder가 <strong>다른 시퀀스(encoder 출력)</strong>를 보는 것. Q가 어디서 오고 K, V가 어디서 오는지로 구별함 (<a href="#s15">15</a>)</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 13 -->
+<section id="s13">
+  <div class="sec-head"><span class="sec-num">13</span><h2>전체 구조 한 장</h2></div>
+  <p class="sec-sub">3절 도입 + 3.1절. 논문 Figure 1. 인터넷에서 백만 번 본 그 그림임.</p>
+
+  <p>큰 틀은 기존 번역 모델과 같은 <strong>encoder-decoder</strong>임.</p>
+  <ul>
+    <li><strong>encoder</strong>: 입력 기호 시퀀스 <span class="m">(<i>x</i><sub>1</sub>, …, <i>x</i><sub><i>n</i></sub>)</span>을 연속 표현 <span class="m"><b>z</b> = (<i>z</i><sub>1</sub>, …, <i>z</i><sub><i>n</i></sub>)</span>로 바꿈</li>
+    <li><strong>decoder</strong>: <span class="m"><b>z</b></span>를 보고 출력 <span class="m">(<i>y</i><sub>1</sub>, …, <i>y</i><sub><i>m</i></sub>)</span>을 <strong>한 번에 하나씩</strong> 생성함</li>
+    <li><strong>auto-regressive</strong>: 다음 기호를 만들 때 <strong>자기가 이전에 만든 기호들</strong>을 추가 입력으로 씀</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 700 470" role="img" aria-label="Transformer 구조: 왼쪽 encoder 6층, 오른쪽 decoder 6층, encoder 출력이 decoder의 encoder-decoder attention으로 들어감">
+      <defs>
+        <marker id="arT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink2)"/></marker>
+      </defs>
+      <!-- encoder -->
+      <rect x="80" y="170" width="230" height="182" rx="10" fill="none" stroke="var(--ink3)" stroke-width="1.3"/>
+      <text class="svglab" x="70" y="266" text-anchor="end" style="font-size:12px">×6</text>
+      <text class="svgtxt" x="195" y="163" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--blue)">Encoder</text>
+      <rect x="100" y="300" width="190" height="34" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="195" y="322" text-anchor="middle" style="font-size:12px">Multi-head self-attention</text>
+      <rect x="100" y="270" width="190" height="22" rx="5" fill="var(--chip)" stroke="var(--rule)"/>
+      <text class="svglab" x="195" y="285" text-anchor="middle" style="font-size:10.5px">Add &amp; Norm</text>
+      <rect x="100" y="222" width="190" height="34" rx="6" fill="rgba(var(--blue-rgb),.05)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="195" y="244" text-anchor="middle" style="font-size:12px">Feed-forward</text>
+      <rect x="100" y="192" width="190" height="22" rx="5" fill="var(--chip)" stroke="var(--rule)"/>
+      <text class="svglab" x="195" y="207" text-anchor="middle" style="font-size:10.5px">Add &amp; Norm</text>
+      <rect x="120" y="386" width="150" height="30" rx="6" fill="var(--card)" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="195" y="406" text-anchor="middle" style="font-size:12px">Input embedding</text>
+      <text class="svglab" x="195" y="373" text-anchor="middle" style="font-size:10.5px">+ positional encoding</text>
+      <line x1="195" y1="386" x2="195" y2="336" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arT)"/>
+      <text class="svglab" x="195" y="448" text-anchor="middle" style="font-size:11px">Inputs</text>
+      <line x1="195" y1="436" x2="195" y2="419" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arT)"/>
+
+      <!-- decoder -->
+      <rect x="390" y="96" width="230" height="256" rx="10" fill="none" stroke="var(--ink3)" stroke-width="1.3"/>
+      <text class="svglab" x="630" y="226" style="font-size:12px">×6</text>
+      <rect x="410" y="300" width="190" height="34" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="505" y="322" text-anchor="middle" style="font-size:12px">Masked self-attention</text>
+      <rect x="410" y="270" width="190" height="22" rx="5" fill="var(--chip)" stroke="var(--rule)"/>
+      <text class="svglab" x="505" y="285" text-anchor="middle" style="font-size:10.5px">Add &amp; Norm</text>
+      <rect x="410" y="222" width="190" height="34" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="505" y="244" text-anchor="middle" style="font-size:12px">Enc-dec attention</text>
+      <rect x="410" y="192" width="190" height="22" rx="5" fill="var(--chip)" stroke="var(--rule)"/>
+      <text class="svglab" x="505" y="207" text-anchor="middle" style="font-size:10.5px">Add &amp; Norm</text>
+      <rect x="410" y="146" width="190" height="34" rx="6" fill="rgba(var(--blue-rgb),.05)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="505" y="168" text-anchor="middle" style="font-size:12px">Feed-forward</text>
+      <rect x="410" y="116" width="190" height="22" rx="5" fill="var(--chip)" stroke="var(--rule)"/>
+      <text class="svglab" x="505" y="131" text-anchor="middle" style="font-size:10.5px">Add &amp; Norm</text>
+      <text class="svgtxt" x="392" y="89" style="font-size:12px;font-weight:700" fill="var(--blue)">Decoder</text>
+      <line x1="505" y1="96" x2="505" y2="73" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arT)"/>
+      <line x1="505" y1="46" x2="505" y2="39" stroke="var(--ink2)" stroke-width="1.3"/>
+      <rect x="430" y="386" width="150" height="30" rx="6" fill="var(--card)" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="505" y="406" text-anchor="middle" style="font-size:12px">Output embedding</text>
+      <text class="svglab" x="505" y="373" text-anchor="middle" style="font-size:10.5px">+ positional encoding</text>
+      <line x1="505" y1="386" x2="505" y2="336" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arT)"/>
+      <text class="svglab" x="505" y="448" text-anchor="middle" style="font-size:11px">Outputs (shifted right)</text>
+      <line x1="505" y1="436" x2="505" y2="419" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arT)"/>
+
+      <!-- top of decoder -->
+      <rect x="455" y="46" width="100" height="24" rx="5" fill="var(--card)" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="505" y="63" text-anchor="middle" style="font-size:11.5px">Linear</text>
+      <rect x="455" y="12" width="100" height="24" rx="5" fill="var(--card)" stroke="var(--ink3)"/>
+      <text class="svgtxt" x="505" y="29" text-anchor="middle" style="font-size:11.5px">Softmax</text>
+      <text class="svglab" x="570" y="29" style="font-size:10.5px">다음 토큰 확률</text>
+
+      <!-- encoder output to decoder -->
+      <path d="M270,170 L270,140 L360,140 L360,239 L406,239" fill="none" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#arT)"/>
+      <text class="svglab" x="92" y="132" style="font-size:10.5px" fill="var(--brown)">encoder 출력 z → K, V로 들어감</text>
+    </svg>
+    <figcaption>논문 Figure 1의 구조만 다시 그린 것. 파란 진한 칸이 attention, 옅은 칸이 feed-forward. 각 sub-layer마다 <strong>residual 연결</strong>(입력을 출력에 더해주는 우회로)이 있는데 그림에선 생략하고 "Add &amp; Norm" 칸으로만 표시함. <span class="cMem">갈색 선</span>이 encoder에서 decoder로 넘어가는 데이터.</figcaption>
+  </figure>
+
+  <h3>Encoder (N = 6층)</h3>
+  <p>똑같은 층 6개를 쌓음. 층마다 sub-layer 둘:</p>
+  <ol>
+    <li>multi-head self-attention</li>
+    <li>position-wise fully connected feed-forward network</li>
+  </ol>
+  <p>각 sub-layer 출력은 <span class="m">LayerNorm(<i>x</i> + Sublayer(<i>x</i>))</span>임. 즉 <strong>residual connection</strong>([10], ResNet) 후 <strong>layer normalization</strong>([1]). residual을 하려면 더하는 두 개 크기가 같아야 하니까 embedding 포함 <strong>모든 sub-layer 출력 차원을 <span class="m"><i>d</i><sub>model</sub> = 512</span>로 통일</strong>함.</p>
+
+  <h3>Decoder (N = 6층)</h3>
+  <p>encoder의 sub-layer 둘에 <strong>하나를 더 끼움</strong>: encoder 출력을 대상으로 하는 multi-head attention. residual + LayerNorm은 똑같음. 그리고 decoder의 self-attention은 <strong>뒤쪽 위치를 못 보게 mask</strong>를 씌움. 여기에 출력 embedding을 <strong>한 칸 밀어서(shifted right)</strong> 넣는 것까지 합치면, 위치 <i>i</i>의 예측은 <strong><i>i</i>보다 앞의 알려진 출력에만</strong> 의존하게 됨. 미래 컨닝 금지 장치임.</p>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">ㅇㅇ(175.223)</span>shifted right가 뭔 소리임</div>
+    <div class="cmt op"><span class="who">글쓴이</span>학습할 때 정답 문장 "I love you"를 decoder 입력으로 넣되 앞에 시작 토큰 붙여서 "&lt;s&gt; I love"로 한 칸 밀어 넣음. 그러면 위치 1은 "&lt;s&gt;"만 보고 "I"를 맞춰야 하고, 위치 2는 "&lt;s&gt; I"를 보고 "love"를 맞춰야 함. mask는 위치 2가 위치 3 이후를 못 보게 막는 거고. 이 둘이 합쳐져서 "지금까지 나온 것만 보고 다음 거 맞히기"를 <strong>모든 위치에서 한 번에 병렬로</strong> 학습할 수 있게 됨. RNN이면 이걸 순서대로 했어야 함.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 14 -->
+<section id="s14">
+  <div class="sec-head"><span class="sec-num">14</span><h2>Scaled dot-product attention</h2></div>
+  <p class="sec-sub">3.2절, 3.2.1절. 이 논문의 심장. Q, K, V가 뭔지 여기서 끝장냄.</p>
+
+  <h3>attention의 정의</h3>
+  <p>논문 정의: attention은 <strong>query 하나와 key-value 쌍 여러 개를 출력 하나로 매핑</strong>하는 함수. 전부 벡터임. 출력은 <strong>value들의 가중합</strong>이고, 각 value의 가중치는 <strong>query와 그 value에 대응하는 key의 궁합(compatibility)</strong>으로 정함.</p>
+
+  <div class="def">
+    <span class="tag">핑프용 비유: 도서관 검색</span>
+    <p><strong>Query</strong> = 내가 검색창에 친 검색어. <strong>Key</strong> = 책마다 붙은 태그. <strong>Value</strong> = 책 내용. 검색어랑 태그가 잘 맞을수록 그 책 내용을 많이 가져옴. 결과물은 "관련도 비율대로 책 내용을 섞은 것"임. 다만 진짜 검색이랑 다른 건, <strong>딱 한 권만 고르는 게 아니라 전부 조금씩 섞는다</strong>는 것. 그래서 미분이 되고 학습이 됨.</p>
+  </div>
+
+  <h3>식 (1)</h3>
+  <div class="eq"><span class="m">Attention(<i>Q</i>, <i>K</i>, <i>V</i>) = softmax(<i>QK</i><sup>T</sup> / √<i>d</i><sub><i>k</i></sub>) <i>V</i></span><span class="note">식 (1)</span></div>
+
+  <details class="nota" open>
+    <summary>기호 뜯어보기</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>n</i></td><td>토큰 개수 (문장 길이)</td></tr>
+        <tr><td class="m"><i>Q</i></td><td>query 행렬. <strong><i>n</i> × <i>d</i><sub><i>k</i></sub></strong>. 토큰마다 query 벡터 하나씩, 한 줄에 하나</td></tr>
+        <tr><td class="m"><i>K</i></td><td>key 행렬. <strong><i>n</i> × <i>d</i><sub><i>k</i></sub></strong>. query랑 내적해야 하니까 차원이 같아야 함</td></tr>
+        <tr><td class="m"><i>V</i></td><td>value 행렬. <strong><i>n</i> × <i>d</i><sub><i>v</i></sub></strong>. 실제로 섞여서 나갈 내용</td></tr>
+        <tr><td class="m"><i>QK</i><sup>T</sup></td><td><strong><i>n</i> × <i>n</i></strong> 점수 행렬. (<i>i</i>, <i>j</i>) 칸 = 토큰 <i>i</i>의 query와 토큰 <i>j</i>의 key 내적</td></tr>
+        <tr><td class="m">√<i>d</i><sub><i>k</i></sub></td><td>스케일 인자. base 모델에서 <i>d</i><sub><i>k</i></sub> = 64라 √64 = 8로 나눔</td></tr>
+        <tr><td class="m">softmax</td><td><strong>행마다</strong> 적용. 한 행의 점수들을 합이 1인 양수 비율로 바꿈</td></tr>
+        <tr><td class="m">출력</td><td><strong><i>n</i> × <i>d</i><sub><i>v</i></sub></strong>. 토큰마다 "다른 토큰 value들을 관련도대로 섞은 것"</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <figure>
+    <svg viewBox="0 0 700 230" role="img" aria-label="Q 곱하기 K 전치가 n×n 점수 행렬이 되고 softmax 후 V와 곱해져 n×dv 출력이 되는 행렬 모양 흐름">
+      <defs>
+        <marker id="arS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink2)"/></marker>
+      </defs>
+      <text class="svglab" x="37" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">Q</text>
+      <rect x="15" y="60" width="44" height="100" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)"/>
+      <text class="svglab" x="37" y="180" text-anchor="middle" style="font-size:10.5px">n×dk</text>
+      <text class="svgtxt" x="75" y="115" text-anchor="middle" style="font-size:16px">×</text>
+      <text class="svglab" x="140" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">K^T</text>
+      <rect x="90" y="88" width="100" height="44" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)"/>
+      <text class="svglab" x="140" y="180" text-anchor="middle" style="font-size:10.5px">dk×n</text>
+      <text class="svgtxt" x="205" y="115" text-anchor="middle" style="font-size:16px">=</text>
+      <text class="svglab" x="270" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--brown)">QK^T / √dk</text>
+      <rect x="220" y="60" width="100" height="100" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)"/>
+      <text class="svglab" x="270" y="180" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">n×n 점수</text>
+      <line x1="330" y1="110" x2="383" y2="110" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#arS)"/>
+      <text class="svglab" x="357" y="100" text-anchor="middle" style="font-size:10px">softmax</text>
+      <text class="svglab" x="445" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--brown)">A (행마다 합 1)</text>
+      <rect x="395" y="60" width="100" height="100" fill="rgba(var(--brown-rgb),.08)" stroke="var(--brown)"/>
+      <text class="svglab" x="445" y="180" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">n×n</text>
+      <text class="svgtxt" x="510" y="115" text-anchor="middle" style="font-size:16px">×</text>
+      <text class="svglab" x="547" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--blue)">V</text>
+      <rect x="525" y="60" width="44" height="100" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)"/>
+      <text class="svglab" x="547" y="180" text-anchor="middle" style="font-size:10.5px">n×dv</text>
+      <text class="svgtxt" x="585" y="115" text-anchor="middle" style="font-size:16px">=</text>
+      <text class="svglab" x="622" y="48" text-anchor="middle" style="font-size:11.5px" fill="var(--green)">출력</text>
+      <rect x="600" y="60" width="44" height="100" fill="rgba(var(--green-rgb),.12)" stroke="var(--green)"/>
+      <text class="svglab" x="622" y="180" text-anchor="middle" style="font-size:10.5px">n×dv</text>
+      <text class="svgtxt" x="350" y="214" text-anchor="middle" style="font-size:12.5px" fill="var(--amber)">가운데 두 칸이 n×n. 문장 길이가 2배면 이 행렬은 4배가 됨</text>
+    </svg>
+    <figcaption>식 (1)의 모양만 그린 것 (보충). 연산은 행렬곱 두 번 + softmax 한 번이 전부임. 행렬곱이라는 게 핵심인데, GPU가 제일 잘하는 연산이라서. 대신 <span class="cMem">n×n 중간 행렬</span>이 문장 길이의 제곱으로 커짐.</figcaption>
+  </figure>
+
+  <div class="ex">
+    <span class="tag">손으로 한 번 돌려보기 (보충)</span>
+    <p>토큰 3개, <span class="m"><i>d</i><sub><i>k</i></sub> = 4</span>라서 <span class="m">√<i>d</i><sub><i>k</i></sub> = 2</span>. 토큰 1의 query로 계산해봄.</p>
+    <ul>
+      <li><span class="m"><i>q</i> = [1, 1, 0, 0]</span></li>
+      <li><span class="m"><i>k</i><sub>1</sub> = [1, 1, 0, 0]</span>, <span class="m"><i>k</i><sub>2</sub> = [1, 0, 1, 0]</span>, <span class="m"><i>k</i><sub>3</sub> = [0, 0, 1, 1]</span></li>
+      <li><span class="m"><i>v</i><sub>1</sub> = [10, 0]</span>, <span class="m"><i>v</i><sub>2</sub> = [0, 10]</span>, <span class="m"><i>v</i><sub>3</sub> = [0, 0]</span></li>
+    </ul>
+    <p>출력 벡터는?</p>
+    <details>
+      <summary>풀이 보기</summary>
+      <div class="body">
+        <ol>
+          <li><strong>내적</strong>: <span class="m"><i>q</i>·<i>k</i><sub>1</sub> = 2</span>, <span class="m"><i>q</i>·<i>k</i><sub>2</sub> = 1</span>, <span class="m"><i>q</i>·<i>k</i><sub>3</sub> = 0</span></li>
+          <li><strong>√<i>d</i><sub><i>k</i></sub>로 나누기</strong>: 1, 0.5, 0</li>
+          <li><strong>softmax</strong>: <span class="m"><i>e</i><sup>1</sup> = 2.718</span>, <span class="m"><i>e</i><sup>0.5</sup> = 1.649</span>, <span class="m"><i>e</i><sup>0</sup> = 1</span>. 합 5.367. 비율 <strong>0.506, 0.307, 0.186</strong></li>
+          <li><strong>value 가중합</strong>: <span class="m">0.506·[10, 0] + 0.307·[0, 10] + 0.186·[0, 0] = [5.06, 3.07]</span></li>
+        </ol>
+        <p>query랑 제일 비슷한 key 1의 value를 제일 많이(50.6%) 가져옴. 근데 나머지도 조금씩 섞임. 이게 "soft"한 검색임.</p>
+        <p>만약 √<i>d</i><sub><i>k</i></sub>로 안 나눴으면? 점수 2, 1, 0 → softmax <strong>0.665, 0.245, 0.090</strong>. 제일 큰 쪽으로 더 쏠림. 이 쏠림이 <i>d</i><sub><i>k</i></sub>가 커질수록 극단적으로 심해진다는 게 다음 얘기임.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3>왜 √d<sub>k</sub>로 나눔? (시험 단골)</h3>
+  <p>흔한 attention 함수는 둘임:</p>
+  <ul>
+    <li><strong>additive attention</strong>([2]): 궁합을 hidden layer 하나짜리 feed-forward network로 계산</li>
+    <li><strong>dot-product (multiplicative) attention</strong>: 이 논문 거랑 똑같은데 <span class="m">1/√<i>d</i><sub><i>k</i></sub></span> 스케일만 없음</li>
+  </ul>
+  <p>이론상 복잡도는 비슷한데 dot-product가 <strong>실제로는 훨씬 빠르고 메모리도 덜 먹음</strong>. 고도로 최적화된 행렬곱 코드로 구현할 수 있어서.</p>
+  <p>문제는: <span class="m"><i>d</i><sub><i>k</i></sub></span>가 작을 땐 둘이 비슷한데, <strong><span class="m"><i>d</i><sub><i>k</i></sub></span>가 크면 스케일 없는 dot-product가 additive보다 못함</strong>([3]). 저자들의 추측(“We suspect”): <span class="m"><i>d</i><sub><i>k</i></sub></span>가 크면 내적 값이 커져서 softmax가 <strong>gradient가 극도로 작은 영역</strong>으로 밀려남. 그래서 <span class="m">1/√<i>d</i><sub><i>k</i></sub></span>로 줄임.</p>
+  <p>각주 4의 설명: <span class="m"><i>q</i></span>, <span class="m"><i>k</i></span>의 원소가 평균 0, 분산 1인 독립 확률변수라면 <span class="m"><i>q</i>·<i>k</i> = Σ<sub><i>i</i>=1</sub><sup><i>d</i><sub><i>k</i></sub></sup> <i>q</i><sub><i>i</i></sub><i>k</i><sub><i>i</i></sub></span>는 <strong>평균 0, 분산 <span class="m"><i>d</i><sub><i>k</i></sub></span></strong>. 분산 1짜리 곱 <span class="m"><i>d</i><sub><i>k</i></sub></span>개를 더했으니까. 표준편차는 <span class="m">√<i>d</i><sub><i>k</i></sub></span>임. 그러니까 <span class="m">√<i>d</i><sub><i>k</i></sub></span>로 나누면 분산이 다시 1로 돌아옴.</p>
+
+  <div class="play" id="attPlay">
+    <div class="plab">직접 만져보기 · d<sub>k</sub>가 커지면 softmax가 어떻게 되나 (보충)</div>
+    <p style="font-size:14px;color:var(--ink2);margin:0 0 10px">query 하나와 key 6개를 원소 평균 0, 분산 1로 랜덤하게 뽑고 softmax 가중치를 봄. 위 줄은 <strong>안 나눈 것</strong>, 아래 줄은 <strong>√d<sub>k</sub>로 나눈 것</strong>.</p>
+    <div class="presets" id="attDk"></div>
+    <div class="presets" style="margin-top:8px"><button type="button" id="attRe">다시 뽑기</button></div>
+    <svg id="attSvg" viewBox="0 0 700 200" role="img" aria-label="key 6개에 대한 softmax 가중치 막대. 위는 스케일 없음, 아래는 루트 dk로 나눔"></svg>
+    <div class="readout" id="attOut"></div>
+    <div class="hintline">d<sub>k</sub> = 64나 256으로 올리면 위 줄은 거의 항상 <strong>막대 하나가 1 근처, 나머지는 0</strong>이 됨(one-hot). softmax 출력이 이렇게 한쪽에 몰리면 그 미분값이 0에 가까워져서 gradient가 안 흐름. 아래 줄은 d<sub>k</sub>를 바꿔도 퍼진 정도가 비슷하게 유지됨.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 15 -->
+<section id="s15">
+  <div class="sec-head"><span class="sec-num">15</span><h2>Multi-head와 mask</h2></div>
+  <p class="sec-sub">3.2.2절, 3.2.3절.</p>
+
+  <h3>Multi-head attention: 여러 개 동시에 돌리기</h3>
+  <p><span class="m"><i>d</i><sub>model</sub></span>차원짜리 Q, K, V로 attention을 <strong>한 번</strong> 하는 대신, Q, K, V를 각각 <strong>서로 다른 학습된 선형 사영(projection)</strong>으로 <span class="m"><i>d</i><sub><i>k</i></sub>, <i>d</i><sub><i>k</i></sub>, <i>d</i><sub><i>v</i></sub></span>차원으로 줄이는 걸 <strong><span class="m"><i>h</i></span>번</strong> 하고, 각각 attention을 <strong>병렬로</strong> 돌린 뒤 이어붙이고(concat) 한 번 더 사영함.</p>
+  <div class="eq"><span class="m">MultiHead(<i>Q</i>, <i>K</i>, <i>V</i>) = Concat(head<sub>1</sub>, …, head<sub><i>h</i></sub>) <i>W</i><sup><i>O</i></sup></span><br><span class="m">head<sub><i>i</i></sub> = Attention(<i>QW</i><sub><i>i</i></sub><sup><i>Q</i></sup>, <i>KW</i><sub><i>i</i></sub><sup><i>K</i></sup>, <i>VW</i><sub><i>i</i></sub><sup><i>V</i></sup>)</span></div>
+
+  <details class="nota" open>
+    <summary>기호 뜯어보기 · 행렬 모양</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>W</i><sub><i>i</i></sub><sup><i>Q</i></sup></td><td><span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub><i>k</i></sub></span> = 512 × 64. head마다 따로 있음</td></tr>
+        <tr><td class="m"><i>W</i><sub><i>i</i></sub><sup><i>K</i></sup></td><td><span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub><i>k</i></sub></span> = 512 × 64</td></tr>
+        <tr><td class="m"><i>W</i><sub><i>i</i></sub><sup><i>V</i></sup></td><td><span class="m"><i>d</i><sub>model</sub> × <i>d</i><sub><i>v</i></sub></span> = 512 × 64</td></tr>
+        <tr><td class="m"><i>W</i><sup><i>O</i></sup></td><td><span class="m"><i>hd</i><sub><i>v</i></sub> × <i>d</i><sub>model</sub></span> = 512 × 512. 이어붙인 걸 다시 512차원으로</td></tr>
+        <tr><td class="m"><i>h</i></td><td>head 개수 = 8</td></tr>
+        <tr><td class="m"><i>d</i><sub><i>k</i></sub> = <i>d</i><sub><i>v</i></sub></td><td><span class="m"><i>d</i><sub>model</sub> / <i>h</i> = 512 / 8 = 64</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p>head마다 차원을 1/8로 줄였으니 <strong>전체 계산량은 full 차원 single-head attention이랑 비슷</strong>함. 즉 공짜에 가까운 업그레이드임.</p>
+  <p><strong>왜 여러 개?</strong> 논문 설명: multi-head는 <strong>서로 다른 위치의, 서로 다른 표현 부분공간(representation subspace)</strong> 정보를 동시에 볼 수 있게 해줌. head가 하나면 <strong>평균을 내는 것 때문에 이게 막힘</strong>. 12에서 말한 "유효 해상도 저하"를 상쇄하는 장치가 이거임.</p>
+
+  <div class="def">
+    <span class="tag">핑프용 비유</span>
+    <p>attention 하나 = 한 번에 한 가지 기준으로만 "누가 중요한지" 고르는 것. "먹었다"라는 단어 입장에서 <strong>주어가 누군지</strong> 보는 head, <strong>목적어가 뭔지</strong> 보는 head, <strong>시제</strong> 보는 head를 따로 두면 좋잖음. head 하나로 이걸 다 하려고 하면 전부 평균 내서 흐릿해짐. 실제로 논문도 부록에서 head마다 <strong>문장의 구문, 의미 구조와 관련된 다른 행동</strong>을 보인다고 함(4절 끝).</p>
+  </div>
+
+  <h3>attention을 쓰는 세 군데 (3.2.3절)</h3>
+  <table>
+    <thead><tr><th>어디</th><th>Q는 어디서</th><th>K, V는 어디서</th><th>뭘 하나</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">encoder-decoder attention</td><td>decoder 이전 층</td><td><strong>encoder 출력</strong></td><td>decoder의 모든 위치가 입력 문장 전체를 봄. 기존 seq2seq attention([31], [2], [8]) 흉내</td></tr>
+      <tr><td class="hd">encoder self-attention</td><td colspan="2">셋 다 같은 곳: encoder 이전 층 출력</td><td>encoder의 각 위치가 이전 층의 모든 위치를 봄</td></tr>
+      <tr><td class="hd">decoder self-attention</td><td colspan="2">셋 다 같은 곳: decoder 이전 층 출력</td><td>각 위치가 <strong>자기 자신까지의</strong> 위치만 봄 (mask)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>mask 구현법</h3>
+  <p>decoder에서 왼쪽으로 정보가 거꾸로 흐르는 걸 막아야 auto-regressive 성질이 유지됨. 구현: softmax 들어가기 직전에 <strong>불법 연결에 해당하는 값을 −∞로</strong> 바꿈. <span class="m"><i>e</i><sup>−∞</sup> = 0</span>이라 softmax 후 가중치가 정확히 0이 됨. <span class="m"><i>n</i>×<i>n</i></span> 점수 행렬의 <strong>대각선 위쪽 삼각형</strong>을 전부 −∞로 칠하는 거라고 생각하면 됨. Figure 2 왼쪽 그림의 "Mask (opt.)" 칸이 이거임.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 16 -->
+<section id="s16">
+  <div class="sec-head"><span class="sec-num">16</span><h2>FFN, embedding, 위치</h2></div>
+  <p class="sec-sub">3.3 ~ 3.5절. 나머지 부품 셋.</p>
+
+  <h3>3.3 · Position-wise feed-forward network</h3>
+  <div class="eq"><span class="m">FFN(<i>x</i>) = max(0, <i>xW</i><sub>1</sub> + <i>b</i><sub>1</sub>)<i>W</i><sub>2</sub> + <i>b</i><sub>2</sub></span><span class="note">식 (2)</span></div>
+  <ul>
+    <li>선형 변환 두 개 사이에 ReLU 하나. 끝</li>
+    <li><strong>위치(토큰)마다 따로, 똑같이</strong> 적용함. 토큰끼리 섞는 건 attention이 하고, FFN은 각 토큰을 혼자 가공함</li>
+    <li>위치끼리는 같은 가중치, <strong>층끼리는 다른 가중치</strong></li>
+    <li>다른 표현: <strong>kernel 크기 1짜리 convolution 두 개</strong></li>
+    <li>입출력 <span class="m"><i>d</i><sub>model</sub> = 512</span>, 안쪽 <span class="m"><i>d</i><sub><i>ff</i></sub> = 2048</span> (4배로 부풀렸다가 다시 줄임)</li>
+  </ul>
+
+  <h3>3.4 · Embedding과 softmax</h3>
+  <ul>
+    <li>입력 토큰과 출력 토큰을 <span class="m"><i>d</i><sub>model</sub></span>차원 벡터로 바꾸는 <strong>학습된 embedding</strong> 사용</li>
+    <li>decoder 출력을 다음 토큰 확률로 바꾸는 건 평범한 linear + softmax</li>
+    <li><strong>가중치 공유</strong>: 두 embedding layer와 softmax 직전 linear가 <strong>같은 행렬 하나</strong>를 씀([24])</li>
+    <li>embedding layer에서는 그 가중치에 <span class="m">√<i>d</i><sub>model</sub></span>을 곱함</li>
+  </ul>
+
+  <h3>3.5 · Positional encoding: 순서 정보 주입</h3>
+  <p>여기가 핑프들이 제일 "??" 하는 곳임. recurrence도 convolution도 없으니 <strong>모델이 단어 순서를 알 방법이 없음</strong>. attention은 집합 연산이라 "나 밥 먹음"이랑 "밥 나 먹음"을 구별 못 함. 그래서 embedding에 <strong>위치 정보를 더해줌</strong>. 더하려면 같은 차원이어야 해서 이것도 <span class="m"><i>d</i><sub>model</sub></span>차원임.</p>
+  <div class="eq"><span class="m"><i>PE</i><sub>(<i>pos</i>, 2<i>i</i>)</sub> = sin(<i>pos</i> / 10000<sup>2<i>i</i>/<i>d</i><sub>model</sub></sup>)</span><br><span class="m"><i>PE</i><sub>(<i>pos</i>, 2<i>i</i>+1)</sub> = cos(<i>pos</i> / 10000<sup>2<i>i</i>/<i>d</i><sub>model</sub></sup>)</span></div>
+
+  <details class="nota" open>
+    <summary>기호 뜯어보기</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>pos</i></td><td>토큰 위치. 0, 1, 2, …</td></tr>
+        <tr><td class="m"><i>i</i></td><td>차원 번호의 절반. 짝수 차원 2<i>i</i>엔 sin, 홀수 차원 2<i>i</i>+1엔 cos</td></tr>
+        <tr><td class="m">10000<sup>2<i>i</i>/<i>d</i><sub>model</sub></sup></td><td>차원마다 다른 파장을 만드는 인자. <i>i</i> = 0이면 1 (파장 2π), 마지막 차원 근처면 10000 근처 (파장 10000·2π)</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p>즉 차원 하나하나가 <strong>서로 다른 주파수의 사인파</strong>임. 파장이 2π부터 10000·2π까지 <strong>등비수열</strong>로 늘어남.</p>
+  <div class="def">
+    <span class="tag">핑프용 비유: 시계 바늘</span>
+    <p>초침, 분침, 시침을 동시에 보면 지금 시각을 정확히 알 수 있음. 초침은 빨리 돌아서 가까운 차이를 구별하고, 시침은 느려서 먼 차이를 구별함. positional encoding은 <strong>빠르기가 다른 바늘 256쌍</strong>(sin, cos 쌍이니까 512 / 2)의 각도를 벡터로 적어둔 거임.</p>
+  </div>
+  <p>왜 이 함수를 골랐냐: 어떤 고정 offset <span class="m"><i>k</i></span>에 대해서든 <span class="m"><i>PE</i><sub><i>pos</i>+<i>k</i></sub></span>가 <span class="m"><i>PE</i><sub><i>pos</i></sub></span>의 <strong>선형 함수</strong>로 표현되니까, 모델이 <strong>상대 위치</strong>로 attend하는 걸 쉽게 배울 거라고 <strong>가설</strong>을 세움. (보충: sin(a+b), cos(a+b) 덧셈정리 때문에 회전 행렬 하나로 옮겨짐.)</p>
+  <p>학습된 positional embedding([8])도 해봤는데 <strong>거의 똑같은 결과</strong>(Table 3의 (E) 줄). 그래도 sin을 고른 이유: <strong>학습 때 본 것보다 긴 문장으로 외삽(extrapolate)</strong>할 수 있을지도 몰라서. 이것도 "may allow"라는 가능성 표현임.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 17 -->
+<section id="s17">
+  <div class="sec-head"><span class="sec-num">17</span><h2>왜 self-attention인가</h2></div>
+  <p class="sec-sub">4절. 이 수업 입장에선 여기가 제일 중요함. 계산량과 병렬성을 비교하는 절이라서.</p>
+
+  <p>비교 기준 세 개 (desiderata):</p>
+  <ol>
+    <li><strong>층당 총 계산 복잡도</strong></li>
+    <li><strong>병렬화 가능한 계산량</strong>. 최소 순차 연산 수로 잼</li>
+    <li>네트워크 안에서 <strong>먼 거리 의존성 사이의 경로 길이</strong>. 신호가 앞뒤로 지나가야 하는 경로가 짧을수록 먼 의존성을 배우기 쉬움([11])</li>
+  </ol>
+
+  <h3>Table 1 한 칸씩 풀기</h3>
+  <p>기호: <span class="m"><i>n</i></span> = 시퀀스 길이, <span class="m"><i>d</i></span> = 표현 차원, <span class="m"><i>k</i></span> = conv kernel 크기, <span class="m"><i>r</i></span> = restricted attention의 이웃 크기.</p>
+  <table>
+    <thead><tr><th>Layer</th><th>층당 복잡도</th><th>순차 연산</th><th>최대 경로 길이</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">Self-Attention</td><td><span class="m">O(<i>n</i>² · <i>d</i>)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(1)</span></td></tr>
+      <tr><td class="hd">Recurrent</td><td><span class="m">O(<i>n</i> · <i>d</i>²)</span></td><td><span class="m">O(<i>n</i>)</span></td><td><span class="m">O(<i>n</i>)</span></td></tr>
+      <tr><td class="hd">Convolutional</td><td><span class="m">O(<i>k</i> · <i>n</i> · <i>d</i>²)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(log<sub><i>k</i></sub>(<i>n</i>))</span></td></tr>
+      <tr><td class="hd">Self-Attention (restricted)</td><td><span class="m">O(<i>r</i> · <i>n</i> · <i>d</i>)</span></td><td><span class="m">O(1)</span></td><td><span class="m">O(<i>n</i>/<i>r</i>)</span></td></tr>
+    </tbody>
+  </table>
+
+  <ul>
+    <li><strong>Self-attention <span class="m"><i>n</i>²<i>d</i></span></strong>: 토큰 쌍이 <span class="m"><i>n</i>²</span>개고 쌍마다 <span class="m"><i>d</i></span>차원 내적 한 번. 근데 쌍들이 서로 독립이라 <strong>한 방에 병렬</strong>(순차 O(1)). 어떤 두 토큰이든 <strong>한 번에</strong> 직접 연결됨(경로 O(1))</li>
+    <li><strong>Recurrent <span class="m"><i>nd</i>²</span></strong>: 스텝이 <span class="m"><i>n</i></span>번이고 스텝마다 <span class="m"><i>d</i>×<i>d</i></span> 행렬 × 벡터. 스텝끼리 의존해서 <strong>순차 O(n)</strong>. 첫 토큰 정보가 마지막까지 가려면 <span class="m"><i>n</i></span>칸을 지나야 함(경로 O(n))</li>
+    <li><strong>Conv</strong>: kernel 폭 <span class="m"><i>k</i> &lt; <i>n</i></span>짜리 층 하나로는 모든 쌍을 못 이음. 연속 kernel이면 <span class="m">O(<i>n</i>/<i>k</i>)</span>층, dilated conv면 <span class="m">O(log<sub><i>k</i></sub>(<i>n</i>))</span>층을 쌓아야 함. 보통 recurrent보다 <span class="m"><i>k</i></span>배 비쌈. separable conv([6])는 <span class="m">O(<i>k</i>·<i>n</i>·<i>d</i> + <i>n</i>·<i>d</i>²)</span>까지 줄이는데, <span class="m"><i>k</i> = <i>n</i></span>이어도 그 복잡도는 <strong>self-attention 층 + FFN 층을 합친 것</strong>과 같음. 즉 Transformer가 택한 조합임</li>
+    <li><strong>Restricted</strong>: 아주 긴 시퀀스용으로, 각 출력 위치 주변 <span class="m"><i>r</i></span>개만 봄. 경로가 <span class="m">O(<i>n</i>/<i>r</i>)</span>로 늘어남. <strong>향후 연구로 남김</strong></li>
+  </ul>
+
+  <p>핵심 문장: self-attention은 <strong><span class="m"><i>n</i></span>이 <span class="m"><i>d</i></span>보다 작을 때</strong> recurrent보다 빠름. 그리고 SOTA 번역 모델이 쓰는 문장 표현(word-piece, byte-pair)에선 <strong>대부분 그 경우</strong>임.</p>
+
+  <div class="scale">
+    <div class="cap">숫자 감각 (보충) · n과 d가 뒤집히면 무슨 일이</div>
+    <table>
+      <tr><td class="what">번역 문장, n = 50, d = 512</td><td class="num">n²d ≈ 1.3M</td><td>nd² ≈ 13.1M. <strong>self-attention이 10배 쌈</strong></td></tr>
+      <tr><td class="what">n = d = 512</td><td class="num">n²d ≈ 134M</td><td>nd² ≈ 134M. 동점</td></tr>
+      <tr><td class="what">긴 문서, n = 4096, d = 512</td><td class="num">n²d ≈ 8.6G</td><td>nd² ≈ 1.07G. <strong>self-attention이 8배 비쌈</strong></td></tr>
+    </table>
+    <div class="foot">2017년 번역 문장 기준으론 n &lt; d가 당연했음. 이후 문맥 길이가 수천~수십만 토큰으로 늘면서 이 n² 항이 병목이 됐고, 논문이 향후 과제로 남긴 restricted attention 계열 연구가 그 대응임. 이 칸은 논문에 없는 계산이고 상수 계수는 무시함.</div>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 190" role="img" aria-label="RNN은 첫 토큰에서 마지막 토큰까지 다섯 칸을 거치고 self-attention은 한 번에 연결됨">
+      <defs>
+        <marker id="arP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/></marker>
+        <marker id="arQ" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+      </defs>
+      <text class="svgtxt" x="165" y="30" text-anchor="middle" style="font-size:13px;font-weight:700">Recurrent</text>
+      <circle cx="40" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="90" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="140" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="190" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="240" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="290" cy="110" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <line x1="54" y1="110" x2="75" y2="110" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#arP)"/>
+      <line x1="104" y1="110" x2="125" y2="110" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#arP)"/>
+      <line x1="154" y1="110" x2="175" y2="110" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#arP)"/>
+      <line x1="204" y1="110" x2="225" y2="110" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#arP)"/>
+      <line x1="254" y1="110" x2="275" y2="110" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#arP)"/>
+      <text class="svglab" x="165" y="160" text-anchor="middle" style="font-size:11px" fill="var(--amber)">1번 → 6번: 5칸, 차례대로 = O(n)</text>
+
+      <line x1="350" y1="20" x2="350" y2="175" stroke="var(--rule)" stroke-width="1"/>
+
+      <text class="svgtxt" x="525" y="30" text-anchor="middle" style="font-size:13px;font-weight:700">Self-attention</text>
+      <circle cx="400" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="450" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="500" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="550" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="600" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <circle cx="650" cy="120" r="13" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/>
+      <path d="M400,106 Q425,82 447,106" fill="none" stroke="var(--green)" stroke-width="1.4" marker-end="url(#arQ)"/>
+      <path d="M400,106 Q450,68 497,106" fill="none" stroke="var(--green)" stroke-width="1.4" marker-end="url(#arQ)"/>
+      <path d="M400,106 Q475,58 547,106" fill="none" stroke="var(--green)" stroke-width="1.4" marker-end="url(#arQ)"/>
+      <path d="M400,106 Q500,50 597,106" fill="none" stroke="var(--green)" stroke-width="1.4" marker-end="url(#arQ)"/>
+      <path d="M400,106 Q525,42 647,106" fill="none" stroke="var(--green)" stroke-width="1.4" marker-end="url(#arQ)"/>
+      <text class="svglab" x="525" y="160" text-anchor="middle" style="font-size:11px" fill="var(--green)">어느 쌍이든 1칸, 동시에 = O(1)</text>
+    </svg>
+    <figcaption>Table 1의 "순차 연산"과 "경로 길이" 두 열을 그린 것 (보충). 오른쪽은 1번 토큰에서 나가는 연결만 그렸지만 실제로는 <strong>모든 쌍</strong>이 다 연결됨. 그 대가가 <span class="m"><i>n</i>²</span>임.</figcaption>
+  </figure>
+
+  <p>곁다리 이점도 하나 적어둠: self-attention은 <strong>해석하기 더 쉬운 모델</strong>이 될 수 있음. attention 분포를 들여다보면 head마다 다른 일을 하고, 문장의 구문, 의미 구조와 관련된 행동을 보이는 게 많다고 함 (예시는 부록).</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 18 -->
+<section id="s18">
+  <div class="sec-head"><span class="sec-num">18</span><h2>학습 세팅</h2></div>
+  <p class="sec-sub">5절. 레시피 전부. 재현하려면 여기가 제일 중요함.</p>
+
+  <table>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">영→독 데이터</td><td>WMT 2014 English-German, 약 <strong>450만</strong> 문장 쌍. byte-pair encoding, source-target <strong>공유 vocab 약 37000</strong> 토큰</td></tr>
+      <tr><td class="hd">영→불 데이터</td><td>WMT 2014 English-French, <strong>3600만</strong> 문장. <strong>32000</strong> word-piece vocab</td></tr>
+      <tr><td class="hd">batch</td><td>문장 길이가 비슷한 것끼리 묶음. batch 하나에 source 토큰 약 <strong>25000</strong> + target 토큰 약 <strong>25000</strong></td></tr>
+      <tr><td class="hd">하드웨어</td><td>머신 <strong>1대</strong>, <span class="cHw">NVIDIA P100 GPU 8장</span></td></tr>
+      <tr><td class="hd">base 모델</td><td>step당 약 0.4초, <strong>10만 step = 12시간</strong></td></tr>
+      <tr><td class="hd">big 모델</td><td>step당 1.0초, <strong>30만 step = 3.5일</strong></td></tr>
+      <tr><td class="hd">optimizer</td><td>Adam, <span class="m">β<sub>1</sub> = 0.9, β<sub>2</sub> = 0.98, ε = 10<sup>−9</sup></span></td></tr>
+      <tr><td class="hd">regularization 1</td><td><strong>Residual dropout</strong>: 각 sub-layer 출력에 dropout을 건 뒤 residual에 더하고 normalize. embedding + positional encoding 합에도 dropout. base는 <span class="m"><i>P</i><sub>drop</sub> = 0.1</span></td></tr>
+      <tr><td class="hd">regularization 2</td><td><strong>Label smoothing</strong> <span class="m">ε<sub><i>ls</i></sub> = 0.1</span> ([30])</td></tr>
+    </tbody>
+  </table>
+
+  <h3>learning rate 스케줄 (식 3)</h3>
+  <div class="eq"><span class="m"><i>lrate</i> = <i>d</i><sub>model</sub><sup>−0.5</sup> · min(<i>step</i>_<i>num</i><sup>−0.5</sup>, <i>step</i>_<i>num</i> · <i>warmup</i>_<i>steps</i><sup>−1.5</sup>)</span><span class="note">식 (3), warmup_steps = 4000</span></div>
+  <p>풀면: 처음 <strong>4000 step 동안은 선형으로 올리고</strong>, 그 뒤로는 <strong>step 수의 역제곱근에 비례해서</strong> 내림. min 안의 두 항이 딱 4000 step에서 만남(둘 다 <span class="m">4000<sup>−0.5</sup></span>). 그래서 최고점은 <span class="m">512<sup>−0.5</sup> × 4000<sup>−0.5</sup> ≈ 0.0007</span> (보충 계산).</p>
+  <p>이게 유명한 <strong>warmup</strong>임. 학습 초반 Adam 통계가 불안정할 때 큰 LR로 날뛰는 걸 막는 용도로 널리 퍼짐. (warmup이 왜 필요한지 이유는 논문에 안 적혀 있음. 이 괄호는 보충.)</p>
+
+  <details class="jargon" open>
+    <summary>용어 뜯어보기 · label smoothing</summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td>한 줄</td><td>정답 레이블을 [0, 0, 1, 0] 같은 one-hot 대신 정답에 0.9, 나머지에 0.1을 나눠준 부드러운 분포로 바꿈</td></tr>
+        <tr><td>효과</td><td>모델이 "100% 확신"하는 걸 막음</td></tr>
+        <tr><td>논문 관찰</td><td><strong>perplexity는 나빠짐</strong>(모델이 덜 확신하도록 배우니까). 대신 <strong>정확도와 BLEU는 좋아짐</strong></td></tr>
+        <tr><td>누가</td><td>Szegedy et al., Inception v3 논문([30])에서 나옴</td></tr>
+        <tr><td>헷갈리는 것</td><td>평가 지표 두 개가 반대로 움직일 수 있다는 예시임. Table 3의 (D) 줄에서 직접 보임 (<a href="#s20">20</a>)</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 19 -->
+<section id="s19">
+  <div class="sec-head"><span class="sec-num">19</span><h2>결과와 FLOPs 검산</h2></div>
+  <p class="sec-sub">6.1절 + Table 2.</p>
+
+  <table>
+    <thead><tr><th>Model</th><th>BLEU EN-DE</th><th>BLEU EN-FR</th><th>학습 FLOPs EN-DE</th><th>학습 FLOPs EN-FR</th></tr></thead>
+    <tbody>
+      <tr><td>ByteNet [15]</td><td>23.75</td><td></td><td></td><td></td></tr>
+      <tr><td>Deep-Att + PosUnk [32]</td><td></td><td>39.2</td><td></td><td>1.0·10<sup>20</sup></td></tr>
+      <tr><td>GNMT + RL [31]</td><td>24.6</td><td>39.92</td><td>2.3·10<sup>19</sup></td><td>1.4·10<sup>20</sup></td></tr>
+      <tr><td>ConvS2S [8]</td><td>25.16</td><td>40.46</td><td>9.6·10<sup>18</sup></td><td>1.5·10<sup>20</sup></td></tr>
+      <tr><td>MoE [26]</td><td>26.03</td><td>40.56</td><td>2.0·10<sup>19</sup></td><td>1.2·10<sup>20</sup></td></tr>
+      <tr><td>Deep-Att + PosUnk Ensemble [32]</td><td></td><td>40.4</td><td></td><td>8.0·10<sup>20</sup></td></tr>
+      <tr><td>GNMT + RL Ensemble [31]</td><td>26.30</td><td>41.16</td><td>1.8·10<sup>20</sup></td><td>1.1·10<sup>21</sup></td></tr>
+      <tr><td>ConvS2S Ensemble [8]</td><td>26.36</td><td><strong>41.29</strong></td><td>7.7·10<sup>19</sup></td><td>1.2·10<sup>21</sup></td></tr>
+      <tr><td class="hd">Transformer (base)</td><td>27.3</td><td>38.1</td><td colspan="2"><span class="cGain"><strong>3.3·10<sup>18</sup></strong></span></td></tr>
+      <tr><td class="hd">Transformer (big)</td><td><span class="cGain"><strong>28.4</strong></span></td><td><strong>41.0</strong></td><td colspan="2">2.3·10<sup>19</sup></td></tr>
+    </tbody>
+  </table>
+  <p>(Transformer 두 줄은 논문 표에서 FLOPs가 EN-DE, EN-FR 두 열에 걸쳐 하나만 적혀 있음.)</p>
+
+  <h3>논문이 주장하는 것</h3>
+  <ul>
+    <li><strong>영→독</strong>: big 모델이 앙상블 포함 기존 최고보다 <strong>2.0 BLEU 이상</strong> 높은 28.4로 새 SOTA. <strong>base 모델도</strong> 기존 모든 모델과 앙상블을 이기는데 학습 비용은 그들의 일부</li>
+    <li><strong>영→불</strong>: big 모델이 41.0으로 기존 <strong>모든 단일 모델</strong>을 이김. 이전 SOTA 학습 비용의 <strong>1/4 미만</strong>. 이때 dropout은 0.3이 아니라 <strong>0.1</strong>을 씀</li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>영→불 41.0은 "전체 1등"이 아님</h4>
+    <p>표를 보면 <strong>ConvS2S Ensemble이 41.29</strong>로 41.0보다 높음. 그래서 논문은 영→불에선 정확히 <strong>"single-model state-of-the-art"</strong>라고 씀. 반면 영→독은 "including ensembles"라고 씀. 이 두 표현 차이를 놓치면 "Transformer가 두 과제 다 압살"이라고 잘못 요약하게 됨. 리뷰 요약에 쓸 때 단어 조심.</p>
+  </div>
+
+  <h3>inference 세팅</h3>
+  <ul>
+    <li>base: 10분 간격으로 저장한 <strong>마지막 checkpoint 5개를 평균</strong>한 단일 모델. big: 마지막 <strong>20개</strong> 평균</li>
+    <li><strong>beam search</strong>, beam 크기 4, length penalty <span class="m">α = 0.6</span> ([31]). 개발셋 실험으로 정함</li>
+    <li>최대 출력 길이 = 입력 길이 + 50, 가능하면 조기 종료</li>
+  </ul>
+
+  <h3>FLOPs는 어떻게 셌냐 (검산 가능)</h3>
+  <p>논문 방법: <strong>학습 시간 × GPU 수 × GPU 한 장의 지속 단정밀도 성능 추정치</strong>. 각주 5에 GPU별 값: K80 2.8, K40 3.7, M40 6.0, <strong>P100 9.5 TFLOPS</strong>.</p>
+
+  <div class="ex">
+    <span class="tag">검산해보기 (보충)</span>
+    <p>base 모델은 P100 8장으로 12시간. big 모델은 3.5일. Table 2의 3.3·10<sup>18</sup>, 2.3·10<sup>19</sup>이 나오는지 확인해보셈.</p>
+    <details>
+      <summary>풀이 보기</summary>
+      <div class="body">
+        <p><strong>base</strong>: 12 h = 43,200 s. <span class="m">43,200 × 8 × 9.5·10<sup>12</sup> = 3.28·10<sup>18</sup></span> → 표의 <strong>3.3·10<sup>18</sup></strong> ✓</p>
+        <p><strong>big</strong>: 3.5 d = 302,400 s. <span class="m">302,400 × 8 × 9.5·10<sup>12</sup> = 2.30·10<sup>19</sup></span> → 표의 <strong>2.3·10<sup>19</sup></strong> ✓</p>
+        <p>포인트: 이건 <strong>실제로 실행한 연산 수를 센 게 아니라</strong> "GPU가 그 시간 동안 풀가동했다면" 가정한 추정임. 다른 모델 줄도 같은 방식이면 GPU 종류와 시간으로 계산한 값이고. <a href="L04-dnns.html#s7">Lecture 4-5</a>에서 연산량을 FLOP <strong>개수</strong>로 셌던 것과 단위를 맞추려고, 여기선 FLOP/s(<strong>속도</strong>) × 시간으로 개수를 환산한 거임.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 20 -->
+<section id="s20">
+  <div class="sec-head"><span class="sec-num">20</span><h2>Ablation 표 읽기</h2></div>
+  <p class="sec-sub">6.2절 + Table 3. 부품 하나씩 바꿔보고 성능 변화 보기.</p>
+
+  <p>조건: 영→독 <strong>개발셋 newstest2013</strong>. beam search는 위와 같지만 <strong>checkpoint averaging 없음</strong>. 표에 안 적힌 값은 base와 같음. perplexity(PPL)는 <strong>word-piece 단위</strong>라 단어 단위 perplexity랑 비교하면 안 됨.</p>
+
+  <div class="trap">
+    <span class="tag">함정</span>
+    <h4>Table 3의 base BLEU 25.8 ≠ Table 2의 base 27.3</h4>
+    <p>같은 base 모델인데 숫자가 다른 이유: Table 2는 <strong>테스트셋 newstest2014 + checkpoint 평균</strong>, Table 3은 <strong>개발셋 newstest2013 + 평균 없음</strong>. 표끼리 숫자 섞으면 안 됨.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>줄</th><th>바꾼 것</th><th>PPL</th><th>BLEU</th><th>params</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">base</td><td>N=6, d<sub>model</sub>=512, d<sub>ff</sub>=2048, h=8, d<sub>k</sub>=d<sub>v</sub>=64, P<sub>drop</sub>=0.1, ε<sub>ls</sub>=0.1, 100K step</td><td>4.92</td><td>25.8</td><td>65M</td></tr>
+      <tr><td rowspan="4">(A)</td><td>h=1, d<sub>k</sub>=d<sub>v</sub>=512</td><td>5.29</td><td><span class="cCost">24.9</span></td><td></td></tr>
+      <tr><td>h=4, d<sub>k</sub>=d<sub>v</sub>=128</td><td>5.00</td><td>25.5</td><td></td></tr>
+      <tr><td>h=16, d<sub>k</sub>=d<sub>v</sub>=32</td><td>4.91</td><td>25.8</td><td></td></tr>
+      <tr><td>h=32, d<sub>k</sub>=d<sub>v</sub>=16</td><td>5.01</td><td>25.4</td><td></td></tr>
+      <tr><td rowspan="2">(B)</td><td>d<sub>k</sub>=16</td><td>5.16</td><td>25.1</td><td>58M</td></tr>
+      <tr><td>d<sub>k</sub>=32</td><td>5.01</td><td>25.4</td><td>60M</td></tr>
+      <tr><td rowspan="7">(C)</td><td>N=2</td><td>6.11</td><td>23.7</td><td>36M</td></tr>
+      <tr><td>N=4</td><td>5.19</td><td>25.3</td><td>50M</td></tr>
+      <tr><td>N=8</td><td>4.88</td><td>25.5</td><td>80M</td></tr>
+      <tr><td>d<sub>model</sub>=256, d<sub>k</sub>=d<sub>v</sub>=32</td><td>5.75</td><td>24.5</td><td>28M</td></tr>
+      <tr><td>d<sub>model</sub>=1024, d<sub>k</sub>=d<sub>v</sub>=128</td><td>4.66</td><td>26.0</td><td>168M</td></tr>
+      <tr><td>d<sub>ff</sub>=1024</td><td>5.12</td><td>25.4</td><td>53M</td></tr>
+      <tr><td>d<sub>ff</sub>=4096</td><td>4.75</td><td>26.2</td><td>90M</td></tr>
+      <tr><td rowspan="4">(D)</td><td>P<sub>drop</sub>=0.0</td><td>5.77</td><td><span class="cCost">24.6</span></td><td></td></tr>
+      <tr><td>P<sub>drop</sub>=0.2</td><td>4.95</td><td>25.5</td><td></td></tr>
+      <tr><td>ε<sub>ls</sub>=0.0</td><td><span class="cGain">4.67</span></td><td>25.3</td><td></td></tr>
+      <tr><td>ε<sub>ls</sub>=0.2</td><td>5.47</td><td>25.7</td><td></td></tr>
+      <tr><td class="hd">(E)</td><td>sinusoid 대신 학습된 positional embedding</td><td>4.92</td><td>25.7</td><td></td></tr>
+      <tr><td class="hd">big</td><td>N=6, d<sub>model</sub>=1024, d<sub>ff</sub>=4096, h=16, P<sub>drop</sub>=0.3, 300K step</td><td><strong>4.33</strong></td><td><strong>26.4</strong></td><td>213M</td></tr>
+    </tbody>
+  </table>
+
+  <h3>논문이 뽑은 결론</h3>
+  <ul>
+    <li><strong>(A) head 수</strong>: 계산량을 일정하게 유지하면서 head 수를 바꿈. single-head는 최고 설정보다 <span class="cCost">0.9 BLEU 나쁨</span>. 근데 head가 <strong>너무 많아도</strong> 떨어짐 (32개에서 25.4)</li>
+    <li><strong>(B) key 크기 <span class="m"><i>d</i><sub><i>k</i></sub></span></strong>: 줄이면 품질이 떨어짐. 논문 해석: 궁합 판정이 쉽지 않다는 뜻이고, <strong>dot product보다 정교한 궁합 함수</strong>가 도움 될 수도 있음</li>
+    <li><strong>(C) 크기</strong>: 예상대로 <strong>클수록 좋음</strong></li>
+    <li><strong>(D) dropout</strong>: 과적합 막는 데 <strong>매우</strong> 도움 됨 (0.0이면 24.6)</li>
+    <li><strong>(E)</strong>: 학습된 positional embedding이랑 sinusoid가 <strong>거의 같음</strong></li>
+  </ul>
+  <p>(D)의 label smoothing 두 줄 보면 18에서 말한 게 그대로 보임: <strong>ε<sub>ls</sub> = 0.0</strong>이면 PPL은 4.67로 base(4.92)보다 <strong>좋은데</strong> BLEU는 25.3으로 <strong>나쁨</strong>. 지표 두 개가 반대로 움직임.</p>
+
+  <div class="ex">
+    <span class="tag">감각 문제 (보충) · base 65M은 어디서 나오나</span>
+    <p>d<sub>model</sub> = 512, d<sub>ff</sub> = 2048, 공유 vocab 약 37000, encoder 6층, decoder 6층. bias와 LayerNorm은 무시하고 대충 세보셈.</p>
+    <details>
+      <summary>풀이 보기</summary>
+      <div class="body">
+        <ul>
+          <li><strong>embedding</strong> (세 곳이 공유하니 한 벌): 37000 × 512 ≈ <strong>18.9M</strong></li>
+          <li><strong>attention 한 블록</strong>: W<sup>Q</sup>, W<sup>K</sup>, W<sup>V</sup>(head 8개 합치면 각각 512×512) + W<sup>O</sup>(512×512) = 4 × 262,144 ≈ <strong>1.05M</strong></li>
+          <li><strong>FFN 한 블록</strong>: 512×2048 + 2048×512 ≈ <strong>2.10M</strong></li>
+          <li><strong>encoder 층</strong>: attention 1 + FFN 1 ≈ 3.15M, ×6 = <strong>18.9M</strong></li>
+          <li><strong>decoder 층</strong>: attention 2 + FFN 1 ≈ 4.19M, ×6 = <strong>25.2M</strong></li>
+          <li>합계 ≈ <strong>63M</strong></li>
+        </ul>
+        <p>표의 65M에 꽤 근접함. 남는 차이는 bias, LayerNorm, 정확한 vocab 크기처럼 논문이 다 안 밝힌 세부에서 옴. 눈여겨볼 점: <strong>FFN이 attention보다 parameter가 2배</strong> 많음. "attention 논문"인데 parameter는 FFN이 더 먹음.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3>7절 결론과 향후 과제</h3>
+  <ul>
+    <li>Transformer = encoder-decoder의 recurrent layer를 multi-head self-attention으로 바꾼 <strong>최초의 attention 전용 transduction 모델</strong></li>
+    <li>번역에서 recurrent, conv 기반보다 <strong>훨씬 빨리 학습</strong>되고 두 과제 모두 새 SOTA. 영→독은 기존 모든 앙상블도 이김</li>
+    <li>향후: 텍스트 말고 <strong>이미지, 오디오, 비디오</strong> 같은 다른 입출력으로 확장. 큰 입출력을 효율적으로 다루는 <strong>local, restricted attention</strong> 연구. 그리고 <strong>생성을 덜 순차적으로 만들기</strong></li>
+  </ul>
+  <div class="callout">
+    <strong>마지막 향후 과제에 주목.</strong> Transformer가 병렬화한 건 <strong>학습</strong>임. 학습 땐 정답 문장을 통째로 넣고 mask로 가리면 되니까 모든 위치를 동시에 계산함. 근데 <strong>실제로 번역을 생성할 때</strong>(inference)는 여전히 auto-regressive라서 <strong>한 토큰씩 순서대로</strong> 만들어야 함. 논문이 이걸 스스로 남은 숙제로 적어둠. <a href="L04-dnns.html#s5">Lecture 4-5의 training vs inference</a> 구분이 여기서 그대로 살아남.
+  </div>
+</section>
+
+<div class="part"><div class="k">Part 3</div><div class="t">엮기: 두 편을 이 수업 눈으로 보기</div></div>
+
+<!-- ══════════════════════════════════════════════════════ 21 -->
+<section id="s21">
+  <div class="sec-head"><span class="sec-num">21</span><h2>두 편을 같이 보면</h2></div>
+  <p class="sec-sub">이 절은 전부 보충임. 두 논문 어디에도 서로 언급은 없음. 같은 해 같은 학회라는 것 말고는.</p>
+
+  <h3>공통점: 하드웨어가 잘하는 모양으로 문제를 바꿈</h3>
+  <table>
+    <thead><tr><th></th><th>TernGrad</th><th>Transformer</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">병목으로 지목한 것</td><td><span class="cMem">네트워크로 옮기는 gradient 바이트</span></td><td><span class="cHw">RNN의 순차 의존성</span> (GPU가 놀게 됨)</td></tr>
+      <tr><td class="hd">바꾼 것</td><td>FP32 → 원소당 2 bit + scaler</td><td>recurrence → 행렬곱 덩어리 attention</td></tr>
+      <tr><td class="hd">대가</td><td>gradient에 분산(노이즈) 추가, 수렴 조건이 더 까다로워짐</td><td><span class="cMem">n×n 중간 행렬</span>, 문장 길이 제곱으로 연산과 메모리 증가</td></tr>
+      <tr><td class="hd">대가를 줄인 장치</td><td>stochastic rounding(unbiased), layer-wise scaler, gradient clipping</td><td>√d<sub>k</sub> 스케일, multi-head, (향후 과제로) restricted attention</td></tr>
+      <tr><td class="hd">건드린 단계</td><td><strong>training만</strong>. inference는 그대로</td><td>training을 병렬화. inference 생성은 여전히 순차</td></tr>
+      <tr><td class="hd">쓴 GPU</td><td>실험: GTX 1080 / 성능 모델 (b): Tesla P100 + NVLink</td><td>Tesla P100 8장, 머신 1대</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>이 수업 전체의 한 줄과 연결.</strong> 이 과목은 결국 <strong>"연산보다 데이터 이동이 비싸다"</strong>로 수렴함. TernGrad는 그걸 <strong>칩 밖(네트워크)</strong>에서 정면으로 다룬 논문이고, Transformer는 연산을 <strong>GPU가 좋아하는 모양(큰 행렬곱)</strong>으로 바꾼 대신 <strong>n×n이라는 새로운 데이터 덩어리</strong>를 만든 논문임. 둘 다 <a href="L04-dnns.html#s8">memory-bound vs compute-bound</a> 틀로 다시 읽을 수 있음.
+  </div>
+
+  <h3>핑프용: 이 두 논문이 지금 어디서 살아 있나</h3>
+  <p>논문 밖 얘기라 방향만 적음.</p>
+  <ul>
+    <li><strong>TernGrad 쪽</strong>: gradient를 저정밀로 압축하거나 일부만 보내서 통신을 줄이는 연구 줄기(gradient compression)의 초기 대표작 중 하나임. 분산학습 구조가 parameter server에서 all-reduce로 넘어간 뒤에도 "보내는 비트를 줄인다"는 발상 자체는 계속 이어짐</li>
+    <li><strong>Transformer 쪽</strong>: encoder만 쓰면 BERT 계열, decoder만 쓰면 GPT 계열로 갈라짐. 지금 LLM은 decoder 계열임. 그리고 논문이 향후 과제로 남긴 두 개, <strong>긴 입력 효율화</strong>와 <strong>생성의 순차성</strong>이 LLM 하드웨어/시스템 연구의 핵심 주제가 됨. 이 과목 후반 LLM 파트에서 다시 만날 거임</li>
+  </ul>
+
+  <div class="cmts">
+    <div class="hd">댓글</div>
+    <div class="cmt"><span class="who">ㅇㅇ(121.88)</span>그럼 Transformer 학습할 때도 TernGrad 쓰면 됨?</div>
+    <div class="cmt op"><span class="who">글쓴이</span>원리상으론 둘이 안 부딪힘. TernGrad는 "gradient를 어떻게 보내냐" 문제고 모델 구조랑 무관하니까. 근데 TernGrad 논문은 CNN(LeNet, AlexNet, GoogLeNet 등)에서만 검증했고, 마지막 layer 분포가 치우쳐서 예외 처리한 것처럼 <strong>모델마다 gradient 분포가 다르면 조정이 필요했음</strong>. Transformer에서도 그대로 되는지는 이 논문이 답하지 않음. 리뷰의 질문 거리로 딱 좋은 종류임.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 22 -->
+<section id="s22">
+  <div class="sec-head"><span class="sec-num">22</span><h2>최종 3줄요약 &amp; 퀴즈</h2></div>
+
+  <div class="tldr">
+    <span class="tag">TernGrad 3줄요약</span>
+    <ol>
+      <li>분산학습에서 worker가 매번 보내는 FP32 gradient가 병목. 그래서 <strong>원소마다 {−1, 0, +1} + layer마다 float scaler 하나</strong>로 보냄 (2 bit 기준 16배 감소)</li>
+      <li>그냥 반올림이 아니라 <strong>|g|/s 확률로 동전 던지기</strong>라서 평균이 원래 gradient와 같음(unbiased). gradient bound 가정 하나만 바꿔서 <strong>SGD 수렴 증명을 그대로 가져옴</strong></li>
+      <li>이론이 "최댓값 s가 크면 불리"라고 알려줘서 <strong>layer-wise scaler + 2.5σ clipping</strong>을 만듦. AlexNet 정확도 유지(batch 1024에선 +0.92%), GoogLeNet 평균 2% 미만 손실, 속도는 성능 모델로 AlexNet 8 GPU 3.04× 추정</li>
+    </ol>
+  </div>
+  <div class="tldr">
+    <span class="tag">Transformer 3줄요약</span>
+    <ol>
+      <li>RNN은 순서대로 돌아서 병렬화가 안 됨. 그래서 <strong>RNN 버리고 attention만</strong>: softmax(QK<sup>T</sup>/√d<sub>k</sub>)V. √d<sub>k</sub>는 내적 분산이 d<sub>k</sub>라서 softmax 포화 막으려고 나눔</li>
+      <li><strong>multi-head(8개) + FFN + residual/LayerNorm</strong>을 6층씩 쌓은 encoder-decoder. 순서 정보는 <strong>sin/cos positional encoding</strong>으로 더해줌. decoder는 mask로 미래를 못 봄</li>
+      <li>self-attention은 순차 연산 O(1), 경로 O(1), 대신 계산 O(n²d). 번역 문장처럼 n &lt; d면 이득. 결과는 영→독 28.4, 영→불 41.0(단일 모델 최고), base 모델 학습 비용 3.3·10<sup>18</sup> FLOPs</li>
+    </ol>
+  </div>
+
+  <div class="play" id="quiz">
+    <div class="plab">핑프 탈출 퀴즈</div>
+    <div class="score"><span id="qScore"></span><button type="button" id="qReset">다시 풀기</button></div>
+    <div id="qList"></div>
+  </div>
+
+  <div class="callout">
+    <strong>다음 Reading에 가져갈 습관.</strong> ① 표 숫자가 <strong>어느 데이터셋, 어느 조건</strong>에서 나왔는지 먼저 봄 (Transformer Table 2와 3이 다른 셋). ② 그래프가 <strong>측정인지 모델 추정인지</strong> 본문에서 확인함 (TernGrad Figure 5). ③ 논문의 <strong>단어 선택</strong>을 그대로 옮김 ("single-model", "we suspect", "could explain", "may allow"). 이 셋만 지켜도 리뷰에서 사실 오류 날 일이 확 줆.
+  </div>
+</section>
+
+<footer>
+  EEE / CEN 598 Hardware and Systems for Machine Learning · Paper Reading #2 개인 학습 노트<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  다룬 논문: Wen, Xu, Yan, Wu, Wang, Chen &amp; Li, <em>TernGrad: Ternary Gradients to Reduce Communication in Distributed Deep Learning</em>, NIPS 2017 · Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser &amp; Polosukhin, <em>Attention Is All You Need</em>, NIPS 2017<br>
+  논문 본문의 저작권은 각 저자와 NeurIPS에 있습니다. 이 저장소는 논문 파일을 배포하지 않습니다. 표의 숫자는 논문에서 옮겼고, "(보충)" 표시가 붙은 계산과 설명은 이 노트가 덧붙인 것입니다. 댓글 닉네임은 전부 지어낸 것입니다.
+</footer>
+
+</main>
+</div>
+
+<script>
+// 공용: 시드 고정 난수. 새로고침해도 같은 그림이 나오게 한다.
+function mkRand(seed) {
+  var s = seed >>> 0;
+  return function () {
+    s = (s + 0x6D2B79F5) >>> 0;
+    var t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function gauss(r) {
+  var u = 1 - r(), v = r();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function svgEl(tag, attrs, text) {
+  var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (var k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+}
+</script>
+
+<script>
+// ternarize 시뮬레이터. 04절.
+(function () {
+  var svg = document.getElementById('ternSvg');
+  if (!svg) return;
+  var out = document.getElementById('ternOut');
+  var preHost = document.getElementById('ternPre');
+  var actHost = document.getElementById('ternAct');
+  var rand = mkRand(7);
+
+  var PRESETS = [
+    { key: '고른 분포', g: [0.42, -0.31, 0.18, -0.55, 0.07, 0.36, -0.12, 0.60, -0.25, 0.03, 0.47, -0.40, 0.15, -0.08, 0.29, -0.51] },
+    { key: 'outlier 하나', g: [0.12, -0.09, 0.06, -0.14, 0.03, 0.10, -0.05, 0.13, -0.11, 0.02, 0.08, -0.07, 0.04, -0.12, 0.09, 2.40] }
+  ];
+  var preset = PRESETS[0], clip = false;
+  var g, s, last, sum, count;
+
+  function prep() {
+    var raw = preset.g.slice();
+    if (clip) {
+      var n = raw.length, m = 0, v = 0, i;
+      for (i = 0; i < n; i++) m += raw[i];
+      m /= n;
+      for (i = 0; i < n; i++) v += (raw[i] - m) * (raw[i] - m);
+      var lim = 2.5 * Math.sqrt(v / n);
+      raw = raw.map(function (x) { return Math.abs(x) > lim ? Math.sign(x) * lim : x; });
+    }
+    g = raw;
+    s = Math.max.apply(null, g.map(Math.abs));
+    last = null; sum = g.map(function () { return 0; }); count = 0;
+  }
+
+  function roll(times) {
+    for (var t = 0; t < times; t++) {
+      last = g.map(function (x) { return rand() < Math.abs(x) / s ? Math.sign(x) * s : 0; });
+      for (var i = 0; i < g.length; i++) sum[i] += last[i];
+      count++;
+    }
+  }
+
+  function draw() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var W = 700, mid = 125, half = 100, n = g.length, step = (W - 60) / n;
+    var scale = half / Math.max(s, 0.001);
+    svg.appendChild(svgEl('line', { x1: 30, y1: mid, x2: W - 30, y2: mid, stroke: 'var(--ink3)', 'stroke-width': 1 }));
+    svg.appendChild(svgEl('line', { x1: 30, y1: mid - half, x2: W - 30, y2: mid - half, stroke: 'var(--rule)', 'stroke-dasharray': '4 4' }));
+    svg.appendChild(svgEl('line', { x1: 30, y1: mid + half, x2: W - 30, y2: mid + half, stroke: 'var(--rule)', 'stroke-dasharray': '4 4' }));
+    svg.appendChild(svgEl('text', { class: 'svglab', x: 26, y: mid - half + 4, 'text-anchor': 'end', style: 'font-size:10px' }, '+s'));
+    svg.appendChild(svgEl('text', { class: 'svglab', x: 26, y: mid + half + 4, 'text-anchor': 'end', style: 'font-size:10px' }, '−s'));
+    for (var i = 0; i < n; i++) {
+      var x = 30 + step * i + step * 0.12, w = step * 0.36;
+      var h = g[i] * scale;
+      svg.appendChild(svgEl('rect', { x: x, y: h >= 0 ? mid - h : mid, width: w, height: Math.max(Math.abs(h), 1), fill: 'var(--blue)', opacity: 0.85 }));
+      if (last) {
+        var h2 = last[i] * scale;
+        svg.appendChild(svgEl('rect', { x: x + w + 2, y: h2 >= 0 ? mid - h2 : mid, width: w, height: Math.max(Math.abs(h2), 1), fill: 'var(--ink3)', opacity: 0.55 }));
+      }
+      if (count) {
+        var a = sum[i] / count * scale;
+        svg.appendChild(svgEl('circle', { cx: x + w, cy: mid - a, r: 3.6, fill: 'var(--green)' }));
+      }
+    }
+  }
+
+  function paint() {
+    draw();
+    var zeros = 1 - g.reduce(function (a, x) { return a + Math.abs(x); }, 0) / (g.length * s);
+    var err = 0;
+    if (count) for (var i = 0; i < g.length; i++) err = Math.max(err, Math.abs(sum[i] / count - g[i]));
+    out.innerHTML =
+      'scaler s = max|g| = <strong>' + s.toFixed(3) + '</strong>' + (clip ? ' (clipping 적용)' : '') + '<br>' +
+      '0이 될 기대 비율 = <strong>' + (zeros * 100).toFixed(1) + '%</strong><br>' +
+      '굴린 횟수 = <strong>' + count + '</strong>' +
+      (count ? ' · 평균과 원래 값의 최대 오차 = <strong>' + err.toFixed(3) + '</strong>' : '') + '<br>' +
+      '보낼 비트: FP32 ' + (g.length * 32) + ' bit → ternary ' + (g.length * 2) + ' bit + scaler 32 bit';
+  }
+
+  function btn(host, label, on, fn) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = label;
+    if (on) b.className = 'act';
+    b.addEventListener('click', fn);
+    host.appendChild(b);
+  }
+
+  function build() {
+    preHost.textContent = ''; actHost.textContent = '';
+    PRESETS.forEach(function (p) {
+      btn(preHost, p.key, p === preset, function () { preset = p; prep(); build(); });
+    });
+    btn(preHost, clip ? 'clipping 켜짐 (c = 2.5)' : 'clipping 꺼짐', clip, function () { clip = !clip; prep(); build(); });
+    btn(actHost, '1번 굴리기', false, function () { roll(1); paint(); });
+    btn(actHost, '100번 더', false, function () { roll(100); paint(); });
+    btn(actHost, '1000번 더', false, function () { roll(1000); paint(); });
+    btn(actHost, '평균 초기화', false, function () { prep(); paint(); });
+    paint();
+  }
+
+  prep();
+  build();
+})();
+</script>
+
+<script>
+// 통신량 계산기. 05절. 논문의 성능 모델이 아니라 방향만 보는 장난감이다.
+(function () {
+  var P = document.getElementById('cmP');
+  if (!P) return;
+  var N = document.getElementById('cmN');
+  var bwHost = document.getElementById('cmBw');
+  var out = document.getElementById('cmOut');
+  var LINKS = [
+    { key: '1 Gbps Ethernet', bps: 1e9 },
+    { key: '10 Gbps', bps: 1e10 },
+    { key: '100 Gbps InfiniBand', bps: 1e11 }
+  ];
+  var link = LINKS[0];
+
+  function fmtB(bits) {
+    var B = bits / 8;
+    if (B >= 1e9) return (B / 1e9).toFixed(2) + ' GB';
+    if (B >= 1e6) return (B / 1e6).toFixed(1) + ' MB';
+    return (B / 1e3).toFixed(1) + ' kB';
+  }
+  function fmtT(s) { return s >= 1 ? s.toFixed(2) + ' s' : (s * 1000).toFixed(1) + ' ms'; }
+
+  function paint() {
+    var p = +P.value * 1e6, n = Math.pow(2, +N.value);
+    document.getElementById('cmPv').textContent = P.value + 'M';
+    document.getElementById('cmNv').textContent = n;
+    var up32 = p * 32, dn32 = p * 32;
+    var upT = p * 2 + 32, dnBits = Math.log2(2 * n + 1), dnT = p * dnBits + 2 * 32;
+    var t32 = (up32 + dn32) / link.bps, tT = (upT + dnT) / link.bps;
+    out.innerHTML =
+      'FP32 · push ' + fmtB(up32) + ' + pull ' + fmtB(dn32) + ' → <strong>' + fmtT(t32) + '</strong><br>' +
+      'TernGrad · push ' + fmtB(upT) + ' (2 bit) + pull ' + fmtB(dnT) + ' (' + dnBits.toFixed(2) + ' bit) → <strong>' + fmtT(tT) + '</strong><br>' +
+      'push 감소 <strong>' + (up32 / upT).toFixed(1) + '×</strong> · pull 감소 <strong>' + (dn32 / dnT).toFixed(1) + '×</strong> · 합계 <strong>' + (t32 / tT).toFixed(1) + '×</strong>';
+  }
+
+  function build() {
+    bwHost.textContent = '';
+    LINKS.forEach(function (l) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = l.key;
+      if (l === link) b.className = 'act';
+      b.addEventListener('click', function () { link = l; build(); });
+      bwHost.appendChild(b);
+    });
+    paint();
+  }
+  P.addEventListener('input', paint);
+  N.addEventListener('input', paint);
+  build();
+})();
+</script>
+
+<script>
+// √d_k 체험. 14절.
+(function () {
+  var svg = document.getElementById('attSvg');
+  if (!svg) return;
+  var dkHost = document.getElementById('attDk');
+  var out = document.getElementById('attOut');
+  var DKS = [4, 16, 64, 256, 1024];
+  var dk = 64, seed = 3;
+
+  function softmax(a) {
+    var m = Math.max.apply(null, a), e = a.map(function (x) { return Math.exp(x - m); });
+    var z = e.reduce(function (p, q) { return p + q; }, 0);
+    return e.map(function (x) { return x / z; });
+  }
+
+  function paint() {
+    var r = mkRand(seed * 1000 + dk), q = [], i, j;
+    for (i = 0; i < dk; i++) q.push(gauss(r));
+    var sc = [];
+    for (j = 0; j < 6; j++) {
+      var d = 0;
+      for (i = 0; i < dk; i++) d += q[i] * gauss(r);
+      sc.push(d);
+    }
+    var raw = softmax(sc), scl = softmax(sc.map(function (x) { return x / Math.sqrt(dk); }));
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    function row(ws, y, label, col) {
+      svg.appendChild(svgEl('text', { class: 'svglab', x: 10, y: y + 40, style: 'font-size:11px' }, label));
+      for (var k = 0; k < ws.length; k++) {
+        var x = 190 + k * 82, h = ws[k] * 70;
+        svg.appendChild(svgEl('rect', { x: x, y: y, width: 60, height: 70, fill: 'var(--chip)', stroke: 'var(--rule)' }));
+        svg.appendChild(svgEl('rect', { x: x, y: y + 70 - h, width: 60, height: Math.max(h, 0.5), fill: col }));
+        svg.appendChild(svgEl('text', { class: 'svgnum', x: x + 30, y: y + 86, 'text-anchor': 'middle', style: 'font-size:10.5px' }, ws[k].toFixed(2)));
+      }
+    }
+    row(raw, 6, '스케일 없음', 'var(--amber)');
+    row(scl, 106, '÷ √dk', 'var(--green)');
+    var sd = Math.sqrt(sc.reduce(function (a, x) { return a + x * x; }, 0) / sc.length);
+    out.innerHTML =
+      'd<sub>k</sub> = <strong>' + dk + '</strong> · 내적 점수의 크기(RMS) ≈ <strong>' + sd.toFixed(1) + '</strong> (이론상 √d<sub>k</sub> = ' + Math.sqrt(dk).toFixed(1) + ')<br>' +
+      '최대 가중치: 스케일 없음 <strong>' + Math.max.apply(null, raw).toFixed(3) + '</strong> · ÷√d<sub>k</sub> <strong>' + Math.max.apply(null, scl).toFixed(3) + '</strong>';
+  }
+
+  function build() {
+    dkHost.textContent = '';
+    DKS.forEach(function (v) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = 'dk = ' + v;
+      if (v === dk) b.className = 'act';
+      b.addEventListener('click', function () { dk = v; build(); });
+      dkHost.appendChild(b);
+    });
+    paint();
+  }
+  document.getElementById('attRe').addEventListener('click', function () { seed++; paint(); });
+  build();
+})();
+</script>
+
+<script>
+// 퀴즈. 22절.
+(function () {
+  var host = document.getElementById('qList');
+  if (!host) return;
+  var score = document.getElementById('qScore');
+  var QS = [
+    { q: 'TernGrad에서 원소 g = 0.2, scaler s = 0.8이면 이 원소가 +s로 보내질 확률은?',
+      o: ['0.2', '0.25', '0.8', '0.5'], a: 1,
+      w: '|g|/s = 0.2/0.8 = 0.25. 나머지 0.75 확률로 0이 됨. 기댓값 0.25 × 0.8 = 0.2로 원래 값과 같음.' },
+    { q: 'worker 4명이 scaler sharing을 하면, server가 합친 gradient 원소가 가질 수 있는 값은 최대 몇 가지?',
+      o: ['3', '5', '9', '81'], a: 2,
+      w: '각자 {−1, 0, +1}이니 합은 −4부터 +4까지 정수, 2N+1 = 9가지. scaler가 다 같아서 가능한 일.' },
+    { q: 'AlexNet(batch 256)에서 TernGrad에 gradient clipping을 빼면 top-1은?',
+      o: ['조금 오른다', '약 3% 떨어진다', '변화 없다'], a: 1,
+      w: 'Table 2: TernGrad 57.61% → noclip 54.63%. 약 3% 손실.' },
+    { q: 'TernGrad Figure 5의 512 GPU throughput 막대는?',
+      o: ['실제 클러스터에서 측정한 값', '성능 모델로 추정한 값'], a: 1,
+      w: '논문이 자원과 시간 제약으로 8 worker 넘는 분산학습은 못 돌렸다고 밝히고 성능 모델로 분석함.' },
+    { q: 'Transformer가 QKᵀ를 √d_k로 나누는 이유는?',
+      o: ['계산을 빠르게 하려고', '내적의 분산이 d_k라서 softmax가 포화되는 걸 막으려고', 'parameter 수를 줄이려고'], a: 1,
+      w: '원소 분산이 1이면 내적은 분산 d_k. 값이 커지면 softmax가 one-hot에 가까워지고 gradient가 극도로 작아짐.' },
+    { q: 'self-attention 층이 recurrent 층보다 층당 계산이 싼 조건은?',
+      o: ['n < d', 'n > d', '항상'], a: 0,
+      w: 'n²d < nd² ⇔ n < d. 번역 문장(word-piece, BPE)에선 대부분 이 경우라고 논문이 말함.' },
+    { q: 'Table 2 base BLEU 27.3과 Table 3 base BLEU 25.8이 다른 이유는?',
+      o: ['다른 모델이라서', '평가셋(newstest2014 vs 2013)과 checkpoint 평균 여부가 달라서', '오타'], a: 1,
+      w: 'Table 3은 개발셋 newstest2013에서 checkpoint averaging 없이 잰 값.' },
+    { q: 'WMT 영→불에서 Transformer (big) 41.0 BLEU에 대한 올바른 표현은?',
+      o: ['앙상블 포함 전체 최고', '단일 모델 최고'], a: 1,
+      w: 'ConvS2S Ensemble이 41.29로 더 높음. 논문도 "single-model state-of-the-art"라고 씀.' }
+  ];
+  var state;
+
+  function paintScore() {
+    var done = state.filter(function (x) { return x !== null; }).length;
+    var ok = state.filter(function (x, i) { return x === QS[i].a; }).length;
+    score.textContent = '맞힘 ' + ok + ' / ' + QS.length + (done === QS.length ? (ok === QS.length ? ' · 핑프 탈출 ㅊㅊ' : ' · 틀린 거 해설 읽고 가셈') : '');
+  }
+
+  function build() {
+    state = QS.map(function () { return null; });
+    host.textContent = '';
+    QS.forEach(function (it, qi) {
+      var row = document.createElement('div');
+      row.className = 'qrow';
+      var q = document.createElement('div'); q.className = 'q'; q.textContent = (qi + 1) + '. ' + it.q;
+      var opts = document.createElement('div'); opts.className = 'opts';
+      var why = document.createElement('div'); why.className = 'why'; why.textContent = it.w;
+      it.o.forEach(function (label, oi) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = label;
+        b.addEventListener('click', function () {
+          if (state[qi] !== null) return;
+          state[qi] = oi;
+          row.classList.add('done', oi === it.a ? 'ok' : 'no');
+          Array.prototype.forEach.call(opts.children, function (c, ci) {
+            c.disabled = true;
+            if (ci === it.a) c.classList.add('right');
+            else if (ci === oi) c.classList.add('wrong');
+          });
+          paintScore();
+        });
+        opts.appendChild(b);
+      });
+      row.appendChild(q); row.appendChild(opts); row.appendChild(why);
+      host.appendChild(row);
+    });
+    paintScore();
+  }
+  document.getElementById('qReset').addEventListener('click', build);
+  build();
+})();
+</script>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+</body>
+</html>
+
+

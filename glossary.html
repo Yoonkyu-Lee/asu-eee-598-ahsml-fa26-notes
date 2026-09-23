@@ -520,6 +520,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">BLEU</div>
+  <div class="f">BiLingual Evaluation Understudy</div>
+  <div class="d" lang="ko">기계 번역 결과와 사람 정답 번역이 <strong>n-gram이 얼마나 겹치는지</strong> 재는 점수. 0~100. 정확도(%)가 아니고, <strong>1~2 BLEU 차이도 큰 차이</strong>로 취급된다.</div>
+  <div class="d" lang="en">A machine-translation score measuring <strong>n-gram overlap</strong> with a human reference, 0 to 100. It is not a percentage accuracy, and <strong>one or two BLEU points count as a big gap</strong>.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
+</div>
+
 <h2 class="gletter" id="gC">C</h2>
 
 <div class="gterm">
@@ -559,6 +567,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">TDP 한계 때문에 <strong>칩에 있는 트랜지스터를 동시에 다 켤 수 없는</strong> 상태. 프로세서가 과열을 막으려고 <strong>클럭을 낮추고 노는 코어를 끈다.</strong> 다르게 보면 <strong>노는 코어의 전력을 활성 코어로 재배분</strong>하는 것이다. <a href="#gD">Dennard scaling</a>이 끝난 결과이고, <a href="#gD">DSA</a>가 등장한 직접적인 이유다.</div>
   <div class="d" lang="en">The condition where the TDP limit means <strong>not all transistors on a chip can be switched on at once.</strong> Processors <strong>slow the clock and turn off idle cores</strong> to avoid overheating, or seen another way, <strong>reallocate power from idle cores to active ones.</strong> A consequence of the end of <a href="#gD">Dennard scaling</a> and the direct reason <a href="#gD">DSAs</a> appeared.</div>
   <div class="src"><a href="PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">data parallelism</div>
+  <div class="d" lang="ko">모든 worker가 <strong>모델 전체 사본</strong>을 들고 <strong>데이터만 나눠서</strong> gradient를 계산하는 분산학습. worker가 매 iteration 모델 크기만큼의 gradient를 주고받아서 <strong>통신이 병목</strong>이 된다. 반대는 모델을 쪼개는 model parallelism.</div>
+  <div class="d" lang="en">Distributed training where every worker holds <strong>a full copy of the model</strong> and only <strong>the data is split</strong>. Each iteration every worker exchanges a model-sized gradient, which makes <strong>communication the bottleneck</strong>. The opposite is model parallelism, which splits the model.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -719,6 +734,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">label smoothing</div>
+  <div class="d" lang="ko">정답 레이블을 one-hot 대신 정답에 1−ε, 나머지에 ε를 나눈 분포로 바꾸는 regularization. Transformer는 ε = 0.1. <strong>perplexity는 나빠지지만 BLEU는 좋아진다.</strong></div>
+  <div class="d" lang="en">A regularizer that replaces one-hot labels with 1−ε on the target and ε spread over the rest. The Transformer uses ε = 0.1. <strong>Perplexity gets worse while BLEU gets better.</strong></div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s18">Paper Reading 2 &middot; 18</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">LRN</div>
   <div class="f">Local Response Normalization</div>
   <div class="d" lang="ko">AlexNet이 쓴 정규화. 같은 공간 위치에서 <strong>인접한 kernel map <span class="m"><i>n</i></span>개</strong>에 걸쳐 활성을 정규화해서, 서로 다른 커널의 큰 활성끼리 <strong>경쟁</strong>하게 만든다. 하이퍼파라미터는 <span class="m"><i>k</i>=2, <i>n</i>=5, <i>&alpha;</i>=10<sup>&minus;4</sup>, <i>&beta;</i>=0.75</span>이고 <strong>전부 validation set으로 정했다.</strong> top-1을 1.4%, top-5를 1.2% 낮췄다.</div>
@@ -789,6 +811,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">multi-head attention</div>
+  <div class="d" lang="ko">Q, K, V를 서로 다른 학습된 사영으로 <strong>h번 줄여서 attention을 병렬로</strong> 돌리고 이어붙이는 것. Transformer base는 h = 8, d<sub>k</sub> = 64. head마다 차원이 1/h라 <strong>계산량은 single-head와 비슷</strong>하다.</div>
+  <div class="d" lang="en">Projecting Q, K and V <strong>h times with different learned projections, running attention on each in parallel</strong>, and concatenating. The Transformer base uses h = 8, d<sub>k</sub> = 64. Each head is 1/h the width, so <strong>the cost is about that of one full-width head</strong>.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s15">Paper Reading 2 &middot; 15</a></div>
+</div>
+
 <h2 class="gletter" id="gN">N</h2>
 
 <div class="gterm">
@@ -819,6 +848,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gP">P</h2>
 
 <div class="gterm">
+  <div class="t">parameter server</div>
+  <div class="f">PS</div>
+  <div class="d" lang="ko">분산학습에서 worker들의 gradient를 모아 평균 내고 공유 parameter를 들고 있는 중앙 서버. 2012~2017년 대세 구조. 지금은 worker끼리 직접 주고받는 all-reduce가 더 흔하다.</div>
+  <div class="d" lang="en">The central server in distributed training that collects and averages workers' gradients and holds the shared parameters. The dominant design from 2012 to 2017; worker-to-worker all-reduce is more common now.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">PDK</div>
   <div class="f">Process Design Kit</div>
   <div class="d" lang="ko">특정 공정에서 설계할 때 EDA 도구가 읽는 자료 묶음. 표준 셀 라이브러리, 타이밍 모델, 설계 규칙, 기생 모델. 이 수업은 <strong>ASU와 ARM의 7nm 교육용 PDK</strong>를 권한다. <strong>교육용 PDK의 숫자는 실제 파운드리 7nm와 같지 않다.</strong> 논문에 쓸 때 반드시 밝힌다.</div>
@@ -832,6 +869,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">가속기 배열의 한 칸. 보통 <a href="#gM">MAC</a> 하나와 작은 레지스터를 갖는다. "PE 배열이 96×96"처럼 가속기의 규모를 말하는 단위다.</div>
   <div class="d" lang="en">One cell of an accelerator array, usually a <a href="#gM">MAC</a> plus a little local storage. The unit in which accelerator size gets quoted, as in a 96×96 PE array.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">positional encoding</div>
+  <div class="d" lang="ko">recurrence도 convolution도 없는 Transformer에 <strong>토큰 순서 정보</strong>를 주려고 embedding에 더하는 벡터. 원 논문은 파장이 2π부터 10000·2π까지인 <strong>sin/cos</strong>를 쓴다. 학습된 embedding도 결과는 거의 같았다.</div>
+  <div class="d" lang="en">A vector added to the embeddings to give the Transformer, which has no recurrence or convolution, <strong>the order of the tokens</strong>. The original uses <strong>sines and cosines</strong> with wavelengths from 2π to 10000·2π; learned embeddings did about as well.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s16">Paper Reading 2 &middot; 16</a></div>
 </div>
 
 <h2 class="gletter" id="gR">R</h2>
@@ -853,6 +897,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gS">S</h2>
+
+<div class="gterm">
+  <div class="t">self-attention</div>
+  <div class="f">intra-attention</div>
+  <div class="d" lang="ko"><strong>한 시퀀스 안의</strong> 위치끼리 attention 하는 것. 어떤 두 위치든 한 번에 연결되고(경로 O(1)) 순차 연산이 없지만, 층당 계산이 <strong>O(n²·d)</strong>라 시퀀스가 길면 비싸다.</div>
+  <div class="d" lang="en">Attention between positions <strong>within one sequence</strong>. Any two positions connect in one step (path O(1)) with no sequential operations, but each layer costs <strong>O(n²·d)</strong>, so long sequences get expensive.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s12">Paper Reading 2 &middot; 12</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">SGD</div>
@@ -877,6 +929,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">stochastic rounding</div>
+  <div class="d" lang="ko">값을 가까운 격자점으로 그냥 반올림하지 않고, <strong>거리에 비례한 확률로</strong> 위아래 격자점 중 하나를 고르는 것. 한 번 한 번은 틀려도 <strong>기댓값이 원래 값과 같다(unbiased).</strong> TernGrad와 QSGD가 쓴다.</div>
+  <div class="d" lang="en">Rounding to one of the two neighbouring grid points <strong>with probability proportional to distance</strong> instead of always to the nearest. Each result is off, but <strong>the expectation equals the original value (unbiased)</strong>. Used by TernGrad and QSGD.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">systolic array</div>
   <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. <strong>이 수업에서 내부를 제대로 파는 것은 뒤쪽 강의다.</strong> L01에서는 이름만 나온다.</div>
   <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. <strong>The internals get opened up in a later lecture</strong>; lecture 1 only names it.</div>
@@ -890,6 +949,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">NVIDIA GPU 안에 들어 있는 행렬 곱셈 전용 유닛. <span class="m">D = A·B + C</span> 형태만 하고, 입력은 낮은 정밀도로 받아 FP32로 누산한다. V100의 <strong>15.7 TFLOP/s(FP32)와 125 Tensor TFLOP/s의 8배 차이</strong>가 이 유닛에서 나온다. <strong>범용 칩 안에 전용 가속기가 들어 있는 예다.</strong></div>
   <div class="d" lang="en">A matrix-multiply unit inside NVIDIA GPUs. It only does <span class="m">D = A·B + C</span>, taking reduced-precision inputs and accumulating in FP32. The <strong>eightfold gap between the V100's 15.7 FP32 TFLOP/s and its 125 Tensor TFLOP/s</strong> comes from this unit. <strong>An example of a dedicated accelerator living inside a general-purpose chip.</strong></div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TernGrad</div>
+  <div class="f">Ternary Gradients</div>
+  <div class="d" lang="ko">분산학습에서 gradient를 원소마다 <strong>{−1, 0, +1} × scaler</strong>로 stochastic rounding 해서 보내는 기법 (Wen et al., NIPS 2017). 2 bit 기준 worker→server 통신 16배 감소. layer-wise scaler와 2.5σ gradient clipping을 같이 쓴다.</div>
+  <div class="d" lang="en">Sending gradients in distributed training as <strong>{−1, 0, +1} times a scaler</strong> per element via stochastic rounding (Wen et al., NIPS 2017). Worker-to-server traffic drops 16× at 2 bits. Paired with layer-wise scalers and 2.5σ gradient clipping.</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -920,6 +987,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Google의 ML 가속기. <a href="#gS">systolic array</a> 기반이다. V1은 추론 전용, V2는 <a href="#gB">bfloat</a>으로 학습까지, V3는 V2의 2배. <strong>Edge TPU</strong>는 별개 제품으로 Coral 보드에 들어가고 4 TOPS / 2 TOPS/W다.</div>
   <div class="d" lang="en">Google's ML accelerator, built on a <a href="#gS">systolic array</a>. V1 is inference only, V2 trains using <a href="#gB">bfloat</a>, V3 is twice V2. The <strong>Edge TPU</strong> is a separate product on the Coral board at 4 TOPS and 2 TOPS/W.</div>
   <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Transformer</div>
+  <div class="d" lang="ko">recurrence와 convolution 없이 <strong>attention만으로</strong> 만든 encoder-decoder (Vaswani et al., NIPS 2017). 학습이 행렬곱 위주라 병렬화가 잘 된다. BERT(encoder 쪽)와 GPT(decoder 쪽)의 조상.</div>
+  <div class="d" lang="en">An encoder-decoder built <strong>from attention alone</strong>, with no recurrence or convolution (Vaswani et al., NIPS 2017). Training is mostly matrix multiplies, so it parallelizes well. The ancestor of BERT (encoder side) and GPT (decoder side).</div>
+  <div class="src"><a href="PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
 </div>
 
 <h2 class="gletter" id="gV">V</h2>
