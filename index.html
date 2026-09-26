@@ -469,8 +469,8 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt from the lecture deck <strong>without skipping a single slide</strong>. Whichever half you arrive with, ML or hardware, the other half is missing. Filling that half is the point here, down to telling you whether a number is big or small.</p>
 
   <div class="facts">
-    <span class="chip" lang="ko">3 / 3 강 정리</span>
-    <span class="chip" lang="en">3 of 3 lectures written</span>
+    <span class="chip" lang="ko">5 / 5 강 정리</span>
+    <span class="chip" lang="en">5 of 5 lectures written</span>
     <span class="chip">Tue/Thu 10:30-11:45 · LSEB04</span>
     <span class="chip hot" lang="ko">Project 50%</span>
     <span class="chip hot" lang="en">Project is 50%</span>
@@ -544,6 +544,46 @@ a.mod:hover .num{color:var(--blue)}
       <span class="tag t">double buffering</span>
       <span class="tag v">checkpointing</span>
       <span class="tag">MAC &middot; backprop 2:1</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="L06-kernel-computation.html">
+  <span class="num">06</span>
+  <div>
+    <h3 lang="ko">DNN Kernel Computation</h3>
+    <h3 lang="en">DNN Kernel Computation</h3>
+    <div class="when">42 slides &middot; Lecture 6 &middot; Jeff Zhang</div>
+    <p lang="ko">DNN의 모든 층은 결국 MAC의 일곱 겹 loop nest다. 같은 convolution을 direct, im2col + GEMM, FFT, Winograd 네 가지로 계산할 수 있고, 각각이 메모리와 곱셈 수를 다르게 맞바꾼다. FC는 행렬 × 벡터라 batch 1에서 memory-bound이고, batching이 그것을 행렬 × 행렬로 바꾼다.</p>
+    <p lang="en">Every DNN layer is ultimately a seven-deep loop nest of MACs. The same convolution can be computed four ways (direct, im2col + GEMM, FFT, Winograd), each trading memory against multiplies differently. FC is matrix × vector and memory-bound at batch 1; batching turns it into matrix × matrix.</p>
+    <div class="tags">
+      <span class="tag d">loop nest</span>
+      <span class="tag p">im2col &middot; GEMM</span>
+      <span class="tag t">Winograd &middot; FFT</span>
+      <span class="tag v">depthwise</span>
+      <span class="tag">FC batching &middot; BatchNorm</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="L07-hardware-metrics.html">
+  <span class="num">07</span>
+  <div>
+    <h3 lang="ko">Hardware Metrics</h3>
+    <h3 lang="en">Hardware Metrics</h3>
+    <div class="when">62 slides &middot; Lecture 7-8-9 &middot; Jeff Zhang</div>
+    <p lang="ko">칩의 성적은 FLOPs/s와 bytes/s 둘로 정해지고, latency ≈ max(연산, 메모리)를 뒤집으면 roofline의 min(peak, AI × BW)가 된다. TPUv1 실측과 계층적 roofline, 보고해야 할 여섯 지표와 Eyeriss 스펙 카드를 거쳐, DRAM 한 번이 곱셈 200번이라는 에너지 표와 reuse distance로 끝난다. 가중치를 51.8배 줄인 SqueezeNet이 에너지는 1.3배 더 쓴다.</p>
+    <p lang="en">A chip's scorecard is FLOPs/s and bytes/s, and flipping latency ≈ max(compute, memory) gives the roofline's min(peak, AI × BW). Through TPUv1 measurements, hierarchical rooflines, the six metrics to report and the Eyeriss spec card, it ends on an energy table where one DRAM read costs 200 multiplies, and on reuse distance. SqueezeNet cuts weights 51.8x yet uses 1.3x the energy.</p>
+    <div class="tags">
+      <span class="tag d">roofline</span>
+      <span class="tag p">hierarchical roofline</span>
+      <span class="tag t">TOPS/W &middot; Eyeriss</span>
+      <span class="tag v">energy per op</span>
+      <span class="tag">reuse distance</span>
     </div>
   </div>
   <span class="status done" lang="ko">읽기</span>
