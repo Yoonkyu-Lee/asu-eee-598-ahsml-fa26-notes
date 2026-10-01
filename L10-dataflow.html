@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · Lecture 10 — Data Flow</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Jeff (Jun) Zhang</div>
+  <h1 class="title">Lecture 10<br>Data Flow</h1>
+  <p class="subtitle" lang="ko">계산은 하나도 안 바꾸고 <strong>순서만</strong> 바꾼다. 그런데 그 순서가 <strong>어느 데이터가 PE 안에 붙어 있고 어느 데이터가 메모리에서 계속 끌려오는지</strong>를 정하고, 그게 곧 에너지다. 이 강의는 그 순서에 <strong>dataflow</strong>라는 이름을 붙이고, <strong>output stationary</strong>와 <strong>weight stationary</strong>를 PE 하나부터 3D conv, NVDLA까지 따라간다.</p>
+  <p class="subtitle" lang="en">Not one operation changes, <strong>only the order.</strong> Yet that order decides <strong>which data stays pinned inside a PE and which keeps getting dragged in from memory</strong>, and that is the energy bill. This lecture names the order a <strong>dataflow</strong> and follows <strong>output stationary</strong> and <strong>weight stationary</strong> from a single PE through 3D convolution to NVDLA.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">슬라이드 38쪽</span>
+    <span class="chip">Lecture 10 · 9/29/2026</span>
+    <span class="chip hot">dataflow 블록의 첫 강의</span>
+    <span class="chip dim">systolic array는 ECE 479에서 개념만 봤다. 여기서부터가 새것</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">38 slides</span>
+    <span class="chip">Lecture 10 · 9/29/2026</span>
+    <span class="chip hot">first lecture of the dataflow block</span>
+    <span class="chip dim">ECE 479 showed systolic arrays only as a concept; this is where the new material starts</span>
+  </div>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <div class="mod">Lecture 10</div>
+    <div class="name">Data Flow</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 강의가 하는 일</span><span lang="en">What this lecture does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">loop nest 다시</span><span lang="en">The loop nest again</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">데이터 이동의 값</span><span lang="en">The price of moving data</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">Temporal reuse와 메모리 계층</span><span lang="en">Temporal reuse and the hierarchy</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">병렬 MAC과 spatial reuse</span><span lang="en">Parallel MACs and spatial reuse</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">DNN 안의 재사용 기회</span><span lang="en">Reuse opportunities in a DNN</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">Dataflow의 정의와 1D conv</span><span lang="en">Dataflow, defined, on a 1D conv</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">PE 하나의 OS</span><span lang="en">Output stationary on one PE</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">3D conv 위의 OS</span><span lang="en">Output stationary on a 3D conv</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">PE 하나의 WS</span><span lang="en">Weight stationary on one PE</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">3D conv 위의 WS</span><span lang="en">Weight stationary on a 3D conv</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">loop를 바꿔 WS 만들기, NVDLA</span><span lang="en">Rewriting loops into WS, and NVDLA</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">무엇을 붙잡아 둘 것인가</span><span lang="en">What to keep stationary</span></a>
+  <a href="#s13"><span class="n">13</span><span lang="ko">정리 &amp; 다음 강의</span><span lang="en">Recap &amp; next lecture</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head" data-slide="1"><span class="sec-num">00</span><h2 lang="ko">이 강의가 하는 일</h2><h2 lang="en">What this lecture does</h2></div>
+  <p class="sec-sub" lang="ko">표지에 <code>Lecture 10: Data Flow</code>, 날짜 <code>9/29/2026</code>. footer는 여전히 <code>2025 Fall</code>이다. 인쇄된 쪽 번호와 PDF 쪽 번호는 2쪽부터 38쪽까지 <strong>전부 같다.</strong></p>
+  <p class="sec-sub" lang="en">The title page reads <code>Lecture 10: Data Flow</code>, dated <code>9/29/2026</code>; the footer still says <code>2025 Fall</code>. Printed page numbers match the PDF pages <strong>all the way from 2 to 38.</strong></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">한 줄로</span><span class="tag" lang="en">In one line</span>
+    <p lang="ko">L06은 conv를 <strong>일곱 겹 loop</strong>로 적었고, L07-8-9는 <strong>DRAM 한 번이 MAC 200번</strong>이라는 값과 <strong>reuse distance</strong>를 남기고 끝났다. 이 강의는 둘을 잇는다. <strong>loop의 순서와 병렬화 방식(dataflow)을 고르면</strong>, 어느 텐서가 <span class="cMem">PE 옆 작은 레지스터</span>에 붙어서 재사용되고 어느 텐서가 <span class="cMem">버퍼에서 매번 다시 읽히는지</span>가 정해진다. 그 선택지의 이름이 <strong>output stationary(OS), weight stationary(WS), input stationary(IS)</strong>다.</p>
+    <p lang="en">Lecture 6 wrote conv as <strong>seven nested loops</strong>; lecture 7-8-9 ended on <strong>one DRAM read costing 200 MACs</strong> and on <strong>reuse distance.</strong> This lecture joins them. <strong>Choose the loop order and how it is parallelised (the dataflow)</strong> and you decide which tensor sits in <span class="cMem">a small register beside the PE</span> getting reused, and which is <span class="cMem">re-read from the buffer every time.</span> The menu of choices is called <strong>output stationary (OS), weight stationary (WS) and input stationary (IS).</strong></p>
+  </div>
+
+  <h4 lang="ko">덱의 네 덩어리</h4>
+  <h4 lang="en">The deck in four parts</h4>
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">덩어리</th><th lang="ko">핵심 질문</th>
+      <th lang="en">Pages</th><th lang="en">Part</th><th lang="en">Core question</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>2-12</td><td lang="ko">Locality와 reuse</td><td lang="ko">왜 데이터를 옮기는 게 문제이고, DNN에는 재사용 기회가 얼마나 있는가</td>
+          <td lang="en">Locality and reuse</td><td lang="en">Why is moving data the problem, and how much reuse does a DNN offer?</td></tr>
+      <tr><td>13-14</td><td lang="ko">Dataflow 정의</td><td lang="ko">loop nest로 실행 순서를 적는 법. <code>for</code>와 <code>spatial_for</code></td>
+          <td lang="en">Defining dataflow</td><td lang="en">Writing execution order as a loop nest: <code>for</code> and <code>spatial_for</code></td></tr>
+      <tr><td>15-32</td><td lang="ko">OS와 WS</td><td lang="ko">PE 하나의 버퍼 접근 무늬 → 3D conv 그림 → loop 변환 → NVDLA</td>
+          <td lang="en">OS and WS</td><td lang="en">One PE's buffer access pattern → 3D conv pictures → loop rewrites → NVDLA</td></tr>
+      <tr><td>33-38</td><td lang="ko">무엇을 붙잡아 둘 것인가</td><td lang="ko">PE 8개짜리 배열에서 OS, WS, IS가 각각 무엇을 움직이는가</td>
+          <td lang="en">What to keep stationary</td><td lang="en">On an 8-PE array, what does each of OS, WS and IS move?</td></tr>
+    </tbody>
+  </table>
+
+  <h4 lang="ko">이미 아는 것과 새로 나오는 것</h4>
+  <h4 lang="en">What you already know, and what is new</h4>
+  <table>
+    <thead><tr>
+      <th lang="ko">슬라이드</th><th lang="ko">상태</th><th lang="ko">이 노트가 하는 일</th>
+      <th lang="en">Slides</th><th lang="en">Status</th><th lang="en">What the note does</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">loop nest (2)</td><td lang="ko">안다 (L06)</td><td lang="ko">L06 5번 절로 보낸다. "어느 텐서가 어느 loop와 무관한가"만 다시 꺼낸다</td>
+          <td lang="en">Loop nest (2)</td><td lang="en">known (lecture 6)</td><td lang="en">points to lecture 6 section 5, and reuses only "which tensor ignores which loop"</td></tr>
+      <tr><td lang="ko">에너지 사다리 (3)</td><td lang="ko"><strong>반쯤 새것</strong></td><td lang="ko">200×는 L07에서 봤다. <strong>RF 1×, PE 2×, 버퍼 6×</strong>라는 중간 칸이 새것이다</td>
+          <td lang="en">Energy ladder (3)</td><td lang="en"><strong>half new</strong></td><td lang="en">200x was in lecture 7-8-9. The middle rungs, <strong>RF 1x, PE 2x, buffer 6x</strong>, are new</td></tr>
+      <tr><td lang="ko">temporal/spatial reuse 예 (6-11)</td><td lang="ko">안다 (L07 61-62쪽과 같은 그림)</td><td lang="ko">L07 20번 절로 보낸다. 새로 나온 병렬 MAC 그림(9-10)만 푼다</td>
+          <td lang="en">Temporal/spatial reuse examples (6-11)</td><td lang="en">known (same figures as lecture 7-8-9 pages 61-62)</td><td lang="en">points to lecture 7-8-9 section 20; only the new parallel-MAC figures (9-10) get unpacked</td></tr>
+      <tr><td lang="ko">텐서별 재사용 횟수 (12)</td><td lang="ko"><strong>새것</strong></td><td lang="ko"><strong>크기 × 재사용 = MAC 수</strong>라는 항등식으로 읽는다</td>
+          <td lang="en">Reuse per tensor (12)</td><td lang="en"><strong>new</strong></td><td lang="en">read as the identity <strong>size × reuse = MAC count</strong></td></tr>
+      <tr><td lang="ko">OS, WS, loop 변환, NVDLA (13-32)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">이 노트의 본론. <code>spatial_for</code>가 ECE 479 Lec19의 Tm·Tn unroll이라는 것까지 잇는다</td>
+          <td lang="en">OS, WS, loop rewrites, NVDLA (13-32)</td><td lang="en"><strong>new</strong></td><td lang="en">the heart of the note, tied back to ECE 479 lecture 19's Tm·Tn unroll, which is what <code>spatial_for</code> is</td></tr>
+      <tr><td lang="ko">OS/WS/IS 배열 그림 (33-38)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">각 방식이 <strong>어떤 배선</strong>(broadcast, unicast, 이웃 전달)을 요구하는지로 정리</td>
+          <td lang="en">OS/WS/IS array figures (33-38)</td><td lang="en"><strong>new</strong></td><td lang="en">organised by <strong>which wiring</strong> each needs: broadcast, unicast, neighbour forwarding</td></tr>
+    </tbody>
+  </table>
+
+  <h4 lang="ko">오늘 나오는 약어</h4>
+  <h4 lang="en">Acronyms in today's lecture</h4>
+  <p lang="ko"><strong>MAC, ALU, RF(register file), PE, DRAM, OS, WS, IS, IA/W/OA, psum(partial sum), NVDLA.</strong> 하나만 고르라면 <strong>OS/WS</strong>, 즉 "stationary"라는 말이다. 이 단어가 <strong>무엇이 움직이지 않는가</strong>를 말한다는 것만 잡으면 덱 절반이 풀린다. 가장 헷갈리는 짝은 <strong>dataflow와 dataflow architecture</strong>다. 6번 절에서 짚는다.</p>
+  <p lang="en"><strong>MAC, ALU, RF (register file), PE, DRAM, OS, WS, IS, IA/W/OA, psum (partial sum), NVDLA.</strong> If you keep one, keep <strong>OS/WS</strong>, the word "stationary." Once you see that it names <strong>what does not move</strong>, half the deck falls open. The most confusable pair is <strong>dataflow versus dataflow architecture</strong>; section 6 separates them.</p>
+
+  <h4 lang="ko">오늘 나오는 기호</h4>
+  <h4 lang="en">Notation in today's lecture</h4>
+  <p lang="ko">L06의 일곱 글자 <span class="m"><i>N, K, C, P, Q, R, S</i></span>와 <span class="m"><i>H, W</i></span>가 그대로 나온다. 새 기호는 둘이다. <code>spatial_for</code>(병렬로 펼친 loop, 13쪽)와 <code>c_t</code>·<code>c_s</code> 같은 <strong>타일 첨자</strong>(바깥 시간 loop와 안쪽 공간 loop로 쪼갠 같은 차원, 31쪽). <strong>제일 중요한 식</strong>은 12쪽의 <span class="m">MAC = <i>RSCPQK</i></span>이고, 각 텐서의 "크기 × 재사용"이 전부 이 값과 같다는 것이 5번 절의 요지다.</p>
+  <p lang="en">Lecture 6's seven letters <span class="m"><i>N, K, C, P, Q, R, S</i></span> plus <span class="m"><i>H, W</i></span> return unchanged. Two new pieces of notation: <code>spatial_for</code> (a loop unrolled in parallel, page 13) and <strong>tile subscripts</strong> like <code>c_t</code> and <code>c_s</code> (one dimension split into an outer time loop and an inner space loop, page 31). <strong>The key equation</strong> is page 12's <span class="m">MACs = <i>RSCPQK</i></span>; section 5's point is that each tensor's "size × reuse" equals exactly that.</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 강의는 어느 층이고 어느 지표를 움직이나.</strong> L01 42쪽 지도에서 <strong>하드웨어 층과 소프트웨어(mapping) 층의 경계</strong>에 있다. dataflow는 하드웨어가 <strong>지원하는</strong> 순서(배선과 레지스터 위치로 박힌다)이면서, 컴파일러가 <strong>고르는</strong> 순서(loop를 어떻게 쌓고 쪼갤지)이기 때문이다. 움직이는 지표는 <strong>Efficiency</strong>(에너지)가 첫째다. 정확도는 한 비트도 안 바뀐다. 덧셈 순서만 바뀌므로 부동소수점 반올림 차이를 빼면 결과가 같다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Which layer is this, and which metric does it move.</strong> On lecture 1's page-42 map it sits <strong>on the border between the hardware layer and the software (mapping) layer</strong>: a dataflow is an order the hardware <strong>supports</strong> (baked into wiring and register placement) and an order the compiler <strong>chooses</strong> (how loops are stacked and split). The metric it moves is <strong>efficiency</strong> (energy) first. Accuracy does not change by a single bit; only the order of additions changes, so apart from floating-point rounding the results are identical.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head" data-slide="2"><span class="sec-num">01</span><h2 lang="ko">loop nest 다시</h2><h2 lang="en">The loop nest again</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Convolution Loop Nest</em>. 왼쪽 그림과 오른쪽 코드가 <strong>L06 18쪽과 같은 슬라이드</strong>다. 강의 첫 장으로 다시 꺼낸 이유는 하나다. <strong>이 강의는 이 코드의 loop 순서를 바꾸는 이야기</strong>이기 때문이다.</p>
+  <p class="sec-sub" lang="en">Titled <em>Convolution loop nest</em>. The figure on the left and the code on the right are <strong>the same slide as lecture 6's page 18.</strong> It opens this lecture for one reason: <strong>this lecture is about reordering exactly these loops.</strong></p>
+
+  <p lang="ko">그림은 파란 입력 <span class="m"><i>H</i>×<i>W</i>×<i>C</i></span> 덩어리 <span class="m"><i>N</i></span>개, 초록 filter <span class="m"><i>R</i>×<i>S</i>×<i>C</i></span> <span class="m"><i>K</i></span>개, 빨간 출력 <span class="m"><i>P</i>×<i>Q</i>×<i>K</i></span> <span class="m"><i>N</i></span>개다. 코드에는 괄호 두 개가 붙어 있다. 바깥 네 loop(<code>n, k, p, q</code>)에 <em>for each output activation</em>, 안쪽 세 loop(<code>r, s, c</code>)에 <em>convolution window</em>. 출력 원소 하나를 고르고, 그 창 안을 다 돌며 누적한 뒤, <code>Activation()</code>을 건다.</p>
+  <p lang="en">The figure shows <span class="m"><i>N</i></span> blue inputs of <span class="m"><i>H</i>×<i>W</i>×<i>C</i></span>, <span class="m"><i>K</i></span> green filters of <span class="m"><i>R</i>×<i>S</i>×<i>C</i></span>, and <span class="m"><i>N</i></span> red outputs of <span class="m"><i>P</i>×<i>Q</i>×<i>K</i></span>. The code carries two braces: the outer four loops (<code>n, k, p, q</code>) are labelled <em>for each output activation</em>, the inner three (<code>r, s, c</code>) <em>convolution window.</em> Pick one output element, sweep its window accumulating, then apply <code>Activation()</code>.</p>
+
+  <div class="callout" lang="ko">
+    <strong>L06 5번 절의 표가 이 강의 전체의 열쇠다.</strong> <a href="L06-kernel-computation.html#s5">일곱 겹 loop nest</a>에서 정리했듯, weight는 <code>n, p, q</code>와 무관하고, 입력은 <code>k</code>와 무관하고, 출력은 <code>r, s, c</code>와 무관하다. <strong>어떤 텐서와 무관한 loop를 가장 안쪽에 두면, 그 loop가 도는 동안 그 텐서는 가만히 있다.</strong> 이 문장이 "stationary"의 정의 전부다. 슬라이드 2쪽의 순서는 <code>r, s, c</code>가 안쪽이므로 <strong>출력이 가만히 있는 순서, 즉 OS</strong>다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The table in lecture 6 section 5 is the key to this whole lecture.</strong> As <a href="L06-kernel-computation.html#s5">the seven-deep loop nest</a> laid out, weights ignore <code>n, p, q</code>, inputs ignore <code>k</code>, and outputs ignore <code>r, s, c</code>. <strong>Put the loops a tensor ignores innermost, and that tensor holds still while they spin.</strong> That sentence is the whole definition of "stationary." Page 2's order has <code>r, s, c</code> innermost, so <strong>the output holds still: it is OS.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head" data-slide="3-5"><span class="sec-num">02</span><h2 lang="ko">데이터 이동의 값</h2><h2 lang="en">The price of moving data</h2></div>
+  <p class="sec-sub" lang="ko">세 장이 한 논증이다. 3쪽은 <strong>어디서 가져오느냐에 따른 가격표</strong>, 4쪽은 <strong>MAC 하나가 메모리를 몇 번 건드리는가</strong>, 5쪽은 <strong>그 둘을 곱한 최악의 경우</strong>다.</p>
+  <p class="sec-sub" lang="en">Three slides, one argument: page 3 is <strong>the price list by where data comes from</strong>, page 4 is <strong>how many memory touches one MAC makes</strong>, and page 5 <strong>multiplies the two for the worst case.</strong></p>
+
+  <h3 data-slide="3"><span lang="ko">Locality: Data Movement Cost</span><span lang="en">Locality: data movement cost</span></h3>
+  <p lang="ko">출처 <em>Eyeriss Tutorial</em>. 오른쪽 <em>Normalized Energy Cost*</em> 막대 그래프, 각주 <em>*measured from a commercial 65nm process</em>. 왼쪽에 데이터가 어디서 ALU로 오는지 다섯 줄이 있다.</p>
+  <p lang="en">Source: <em>Eyeriss Tutorial.</em> On the right, a bar chart of <em>Normalized Energy Cost*</em>, footnoted <em>*measured from a commercial 65nm process.</em> On the left, five rows showing where the data reaches the ALU from.</p>
+  <table>
+    <thead><tr>
+      <th lang="ko">데이터 출처</th><th lang="ko">크기 (슬라이드)</th><th lang="ko">상대 에너지</th>
+      <th lang="en">Source</th><th lang="en">Size (slide)</th><th lang="en">Relative energy</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">ALU 연산 자체</td><td>-</td><td lang="ko"><strong>1×</strong> (기준)</td>
+          <td lang="en">the ALU operation itself</td><td lang="en">-</td><td lang="en"><strong>1x</strong> (reference)</td></tr>
+      <tr><td lang="ko"><span class="cMem">RF</span> → ALU</td><td>0.5 – 1.0 kB</td><td>1×</td>
+          <td lang="en"><span class="cMem">RF</span> → ALU</td><td lang="en">0.5 – 1.0 kB</td><td lang="en">1x</td></tr>
+      <tr><td lang="ko">이웃 <span class="cHw">PE</span> → ALU</td><td>-</td><td>2×</td>
+          <td lang="en">neighbouring <span class="cHw">PE</span> → ALU</td><td lang="en">-</td><td lang="en">2x</td></tr>
+      <tr><td lang="ko"><span class="cMem">Buffer</span> → ALU</td><td>100 – 500 kB</td><td>6×</td>
+          <td lang="en"><span class="cMem">buffer</span> → ALU</td><td lang="en">100 – 500 kB</td><td lang="en">6x</td></tr>
+      <tr><td lang="ko"><span class="cMem">DRAM</span> → ALU</td><td>-</td><td><strong class="cCost">200×</strong></td>
+          <td lang="en"><span class="cMem">DRAM</span> → ALU</td><td lang="en">-</td><td lang="en"><strong class="cCost">200x</strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">막대는 1×, 1×, 2×, 6×까지 짧다가 DRAM에서 중간에 물결선(축 생략)을 넣고 길게 뻗는다. <strong>그림으로도 그릴 수 없을 만큼 차이가 커서 축을 끊었다는 것</strong>이 이 막대의 메시지다.</p>
+  <p lang="en">The bars stay short through 1x, 1x, 2x and 6x, then the DRAM bar gets a wavy break (an elided axis) and stretches far out. <strong>The gap is too large to draw without breaking the axis</strong>, and that is the bar's message.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 230" role="img" aria-label="DRAM, 버퍼, 이웃 PE, 레지스터 파일에서 ALU까지 데이터가 오는 경로와 상대 에너지를 나타낸 도해">
+      <rect x="20" y="40" width="110" height="60" rx="6" fill="rgba(var(--brown-rgb),.22)" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="75" y="68" text-anchor="middle" style="font-size:14px;font-weight:700" fill="var(--brown)">DRAM</text>
+      <text class="svglab" x="75" y="88" text-anchor="middle" style="font-size:10px" fill="var(--ink2)">off-chip</text>
+
+      <rect x="190" y="40" width="120" height="60" rx="6" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="250" y="66" text-anchor="middle" style="font-size:13px;font-weight:700" fill="var(--brown)">Buffer</text>
+      <text class="svgnum" x="250" y="86" text-anchor="middle" style="font-size:10px" fill="var(--ink2)">100–500 kB</text>
+
+      <rect x="370" y="30" width="290" height="160" rx="8" fill="rgba(var(--violet-rgb),.06)" stroke="var(--violet)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text class="svglab" x="384" y="50" style="font-size:11px;font-weight:600" fill="var(--violet)">PE</text>
+      <rect x="400" y="62" width="90" height="46" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svglab" x="445" y="83" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--brown)">RF</text>
+      <text class="svgnum" x="445" y="99" text-anchor="middle" style="font-size:9.5px" fill="var(--ink2)">0.5–1 kB</text>
+      <circle cx="590" cy="85" r="30" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.6"/>
+      <text class="svglab" x="590" y="89" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--violet)">ALU</text>
+
+      <line x1="130" y1="70" x2="186" y2="70" stroke="var(--brown)" stroke-width="2.2"/>
+      <polygon points="186,65 192,70 186,75" fill="var(--brown)"/>
+      <line x1="310" y1="70" x2="396" y2="80" stroke="var(--brown)" stroke-width="2"/>
+      <polygon points="395,75 401,80 394,85" fill="var(--brown)"/>
+      <line x1="490" y1="85" x2="554" y2="85" stroke="var(--brown)" stroke-width="1.6"/>
+      <polygon points="554,80 560,85 554,90" fill="var(--brown)"/>
+
+      <rect x="400" y="132" width="90" height="40" rx="5" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)" stroke-width="1.2"/>
+      <text class="svglab" x="445" y="156" text-anchor="middle" style="font-size:11px" fill="var(--violet)" lang="ko">이웃 PE</text>
+      <text class="svglab" x="445" y="156" text-anchor="middle" style="font-size:11px" fill="var(--violet)" lang="en">neighbour PE</text>
+      <path d="M490,152 Q560,152 580,116" fill="none" stroke="var(--violet)" stroke-width="1.6"/>
+      <polygon points="575,118 582,112 584,121" fill="var(--violet)"/>
+
+      <text class="svgnum" x="158" y="60" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--amber)">200×</text>
+      <text class="svgnum" x="350" y="64" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--amber)">6×</text>
+      <text class="svgnum" x="522" y="76" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--green)">1×</text>
+      <text class="svgnum" x="545" y="170" text-anchor="middle" style="font-size:12px;font-weight:700" fill="var(--green)">2×</text>
+
+      <text class="svglab" x="20" y="214" style="font-size:10.5px" fill="var(--ink3)" lang="ko">피연산자 하나를 그 길로 ALU에 대는 상대 에너지. ALU 연산 = 1× (65nm)</text>
+      <text class="svglab" x="20" y="214" style="font-size:10.5px" fill="var(--ink3)" lang="en">Relative energy to bring one operand to the ALU that way. ALU op = 1x (65nm)</text>
+    </svg>
+    <figcaption lang="ko">3쪽 막대를 "데이터가 어느 길로 오는가"로 다시 그렸다. <span class="cMem">갈색</span>이 메모리, <span class="cHw">보라</span>가 연산기다. <strong>PE 바깥으로 한 칸 나갈 때마다 값이 뛴다.</strong> 이 강의의 모든 dataflow는 "자주 쓰는 데이터를 오른쪽(RF)에 두고 왼쪽에 덜 가기"의 서로 다른 방법이다.</figcaption>
+    <figcaption lang="en">Page 3's bars redrawn as "which path does the data take." <span class="cMem">Brown</span> is memory, <span class="cHw">violet</span> is compute. <strong>Every step outward from the PE jumps the price.</strong> Every dataflow in this lecture is a different way of keeping frequently used data on the right (the RF) and going left less often.</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>L07-8-9 56쪽의 "DRAM 한 번 = MAC 200번"과 같은 200이다.</strong> 그쪽은 Horowitz 계열 45nm 숫자로 <a href="L07-hardware-metrics.html#s18">명령어 에너지</a>를 쟀고, 이쪽은 Eyeriss가 65nm로 잰 값이다. 공정이 달라도 비율이 같은 자리수로 나온다는 게 요점이다. <strong>새로운 것은 사이의 칸</strong>이다. 버퍼가 6×라는 건 "on-chip이면 싸다"가 반만 맞다는 뜻이다. <strong>수백 kB짜리 SRAM은 RF의 여섯 배</strong>다. 그래서 dataflow는 DRAM뿐 아니라 <strong>버퍼 접근까지 줄이는 것</strong>을 목표로 한다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The same 200 as lecture 7-8-9's page 56, "one DRAM access = 200 MACs."</strong> That page measured <a href="L07-hardware-metrics.html#s18">instruction energy</a> with Horowitz-style 45nm numbers; this one is Eyeriss measuring in 65nm. Different processes, same order of magnitude, and that is the point. <strong>What is new is the middle rungs.</strong> A buffer at 6x means "on-chip is cheap" is only half true: <strong>a few hundred kB of SRAM costs six times the RF.</strong> So a dataflow aims to cut <strong>buffer accesses too</strong>, not only DRAM ones.
+  </div>
+
+  <h3 data-slide="4"><span lang="ko">Memory Access in DNNs: MAC 하나에 접근 넷</span><span lang="en">Memory access in DNNs: four touches per MAC</span></h3>
+  <p lang="ko">가운데 <strong>ALU</strong> 상자 안에 곱셈(⊗) 다음 덧셈(⊕). 왼쪽 <em>Memory Read</em> 칸에서 세 화살표가 들어온다. 초록 <em>filter weight</em>, 파랑 <em>fmap activation</em>, 빨강 <em>partial sum</em>. 오른쪽 <em>Memory Write</em> 칸으로 빨강 <em>updated partial sum</em> 하나가 나간다. 각주 <em>*multiply-and-accumulate</em>.</p>
+  <p lang="en">An <strong>ALU</strong> box in the middle: multiply (⊗) then add (⊕). Three arrows enter from the <em>Memory Read</em> column: green <em>filter weight</em>, blue <em>fmap activation</em>, red <em>partial sum</em>. One red arrow leaves into <em>Memory Write</em>: <em>updated partial sum.</em> Footnote: <em>*multiply-and-accumulate.</em></p>
+  <p lang="ko"><strong>읽기 셋, 쓰기 하나.</strong> 여기서 눈여겨볼 것은 <strong>partial sum(부분합)이 읽기와 쓰기에 두 번 나온다</strong>는 것이다. 누적 중인 값은 MAC 한 번마다 꺼냈다가 다시 넣어야 한다. 나중에 OS가 왜 강한지(부분합을 PE 안에 붙잡아 두면 이 두 화살표가 통째로 사라진다)의 복선이다.</p>
+  <p lang="en"><strong>Three reads, one write.</strong> Note that <strong>the partial sum appears twice, once as a read and once as a write.</strong> A value under accumulation has to come out and go back in on every MAC. This foreshadows why OS is strong: pin the partial sum inside the PE and both arrows vanish.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · partial sum (psum)</span><span lang="en">Unpacking the jargon · partial sum (psum)</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>partial sum <span lang="ko">(줄여서 psum)</span><span lang="en">(psum for short)</span></td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">출력 원소 하나를 만드는 <span class="m"><i>RSC</i></span>번의 곱 중 <strong>일부만 더한 중간값</strong>. 마지막 곱까지 더하면 출력 activation이 된다</span><span lang="en">the <strong>running total of some</strong> of the <span class="m"><i>RSC</i></span> products that make one output element. Add the last product and it becomes the output activation</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">누적이 끝나기 전까지. dataflow를 비교할 때 "psum이 어디 사는가"가 핵심 질문이다</span><span lang="en">until accumulation finishes. "Where does the psum live?" is a core question when comparing dataflows</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">Eyeriss, Sze 교재 계열 문헌. 슬라이드 33-38쪽 그림에도 <em>Psum</em>으로 적혀 있다</span><span lang="en">the Eyeriss and Sze-textbook literature; pages 33-38 label it <em>Psum</em></span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>출력 activation과 같은 저장 공간을 쓰지만 같은 값이 아니다.</strong> activation 함수는 psum이 다 끝난 뒤에만 건다(L06 5번 절 감각 문제). 그리고 보통 <strong>입력보다 비트가 넓다.</strong> INT8 곱을 수백 번 더하면 32비트 누적기가 필요하다 (보충)</span><span lang="en"><strong>Shares storage with the output activation but is not the same value.</strong> The activation function applies only to a finished psum (lecture 6 section 5's exercise). It is also usually <strong>wider than the inputs</strong>: summing hundreds of INT8 products needs a 32-bit accumulator (supplementary)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3 data-slide="5"><span lang="ko">최악의 경우: 전부 DRAM</span><span lang="en">Worst case: everything from DRAM</span></h3>
+  <p lang="ko">4쪽 그림 양옆에 검은 <strong>DRAM</strong> 상자를 붙였다. 읽기 셋이 DRAM에서 오고 쓰기 하나가 DRAM으로 간다. 아래 두 줄이 이렇다.</p>
+  <p lang="en">Page 4's figure with a black <strong>DRAM</strong> box on each side: three reads come from DRAM and one write goes back. Two bullets below:</p>
+  <ul lang="ko">
+    <li><em>Worst case: all memory R/W are DRAM accesses</em></li>
+    <li><em>Example: AlexNet [NIPS 2012] has 724M MACs -&gt; 2896M DRAM accesses required.</em></li>
+  </ul>
+  <ul lang="en">
+    <li><em>Worst case: all memory R/W are DRAM accesses</em></li>
+    <li><em>Example: AlexNet [NIPS 2012] has 724M MACs -&gt; 2896M DRAM accesses required.</em></li>
+  </ul>
+  <p lang="ko">2896 = 724 × 4. MAC 하나에 접근 넷을 그대로 곱한 것이다. 3쪽 가격표를 붙이면 아래 숫자 감각이 나온다.</p>
+  <p lang="en">2896 = 724 × 4: four accesses per MAC, multiplied straight through. Attach page 3's prices and you get the sense of scale below.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · AlexNet 한 장을 3쪽 단위로</div>
+    <div class="cap" lang="en">Sense of scale · one AlexNet image in page-3 units</div>
+    <table>
+      <tr class="base"><td class="what"><span lang="ko">연산 (ALU 1×)</span><span lang="en">arithmetic (ALU 1x)</span></td>
+          <td class="num">724M × 1 = 724M</td>
+          <td><span lang="ko">기준점. 실제로 해야 하는 일</span><span lang="en">the reference: the work that actually has to happen</span></td></tr>
+      <tr><td class="what"><span lang="ko">전부 DRAM (200×)</span><span lang="en">all from DRAM (200x)</span></td>
+          <td class="num">2896M × 200 ≈ 579G</td>
+          <td><span lang="ko">연산의 <strong>800배</strong>. 에너지의 99.9%가 데이터 이동이다</span><span lang="en"><strong>800x</strong> the arithmetic: 99.9% of the energy is data movement</span></td></tr>
+      <tr><td class="what"><span lang="ko">전부 버퍼 (6×)</span><span lang="en">all from the buffer (6x)</span></td>
+          <td class="num">2896M × 6 ≈ 17.4G</td>
+          <td><span lang="ko">연산의 <strong>24배</strong>. on-chip이어도 여전히 연산보다 비싸다</span><span lang="en"><strong>24x</strong> the arithmetic. On-chip is still dearer than computing</span></td></tr>
+      <tr><td class="what"><span lang="ko">전부 RF (1×)</span><span lang="en">all from the RF (1x)</span></td>
+          <td class="num">2896M × 1 ≈ 2.9G</td>
+          <td><span lang="ko">연산의 <strong>4배</strong>. 하한에 가깝다. 하지만 0.5 kB RF에 AlexNet이 들어갈 리 없다</span><span lang="en"><strong>4x</strong> the arithmetic, close to the floor. But AlexNet will never fit in a 0.5 kB RF</span></td></tr>
+    </table>
+  </div>
+  <p lang="ko">맨 아래 줄과 맨 위 둘째 줄 사이 <strong>200배의 공간</strong>이 dataflow가 노는 운동장이다. 데이터를 <strong>한 번 DRAM에서 가져와서 RF나 이웃 PE에서 여러 번 쓰는 비율</strong>을 높일수록 아래 줄에 가까워진다. 그 "여러 번"이 다음 절의 reuse다.</p>
+  <p lang="en">The <strong>200x of room</strong> between the second row and the last is the playing field for dataflows. The higher the share of data that is <strong>fetched once from DRAM and then used many times from the RF or a neighbouring PE</strong>, the closer you get to the bottom row. That "many times" is the next section's reuse.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"접근 넷"은 최악의 경우이자 단순화다</h4>
+    <h4 lang="en">"Four accesses" is a worst case and a simplification</h4>
+    <p lang="ko">5쪽 계산은 <strong>MAC마다 psum을 읽고 쓴다</strong>고 가정한다. 실제로 첫 번째 MAC은 psum을 읽을 필요가 없고(0에서 시작), 마지막 MAC 뒤에만 써도 된다. 그래도 슬라이드가 4를 쓰는 건 <strong>"아무 재사용도 안 할 때의 상한"</strong>을 보여주려는 것이다. 이 숫자를 실제 AlexNet 칩의 DRAM 접근으로 인용하면 안 된다. 실제 칩은 이보다 <strong>두세 자리수 적게</strong> 접근하려고 만든다.</p>
+    <p lang="en">Page 5's arithmetic assumes <strong>the psum is read and written on every MAC.</strong> In reality the first MAC needs no psum read (it starts from zero) and you only need to write after the last. The slide still uses 4 to show <strong>the ceiling with zero reuse.</strong> Don't quote it as a real AlexNet chip's DRAM traffic: real chips are built to touch DRAM <strong>two or three orders of magnitude less.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head" data-slide="6-8"><span class="sec-num">03</span><h2 lang="ko">Temporal reuse와 메모리 계층</h2><h2 lang="en">Temporal reuse and the hierarchy</h2></div>
+  <p class="sec-sub" lang="ko">재사용의 두 종류를 정의하고(6쪽), 그중 temporal reuse를 <strong>메모리 계층</strong>으로 받아낸다(7쪽). 8쪽 예제는 <strong>L07-8-9 61쪽과 같은 그림</strong>이다.</p>
+  <p class="sec-sub" lang="en">Defines the two kinds of reuse (page 6) and catches temporal reuse with <strong>a memory hierarchy</strong> (page 7). Page 8's example is <strong>the same figure as lecture 7-8-9's page 61.</strong></p>
+
+  <h3 data-slide="6"><span lang="ko">Temporal and Spatial Reuse</span><span lang="en">Temporal and spatial reuse</span></h3>
+  <div class="def">
+    <span class="tag" lang="ko">슬라이드의 정의</span><span class="tag" lang="en">The slide's definitions</span>
+    <p lang="ko"><strong>Temporal reuse</strong>: <em>the same data is used more than once over time by the same consumer.</em> 같은 소비자가 <strong>시간을 두고</strong> 여러 번 쓴다.<br><strong>Spatial reuse</strong>: <em>the same data is used by more than one consumer at different spatial locations of the hardware.</em> 하드웨어의 <strong>다른 위치에 있는 여러 소비자</strong>가 쓴다.</p>
+    <p lang="en"><strong>Temporal reuse</strong>: <em>the same data is used more than once over time by the same consumer.</em><br><strong>Spatial reuse</strong>: <em>the same data is used by more than one consumer at different spatial locations of the hardware.</em></p>
+  </div>
+  <p lang="ko">아래 두 그림. 왼쪽 <em>Temporal</em>은 초록 <strong>DRAM → Buf → RF → ✱</strong>(빨간 원, 연산기)로 한 줄로 흐른다. 계층을 따라 내려오며 <strong>가까운 곳에 남겨 두고 다시 쓴다</strong>는 그림이다. 오른쪽 <em>Spatial</em>은 상자 하나에서 양방향 화살표 뒤로 파란 화살표 다섯 개가 부채꼴로 퍼져 작은 상자 다섯 개로 간다. <strong>한 번 읽어서 다섯 곳에 뿌린다.</strong></p>
+  <p lang="en">Two pictures below. On the left, <em>Temporal</em>: a single green chain <strong>DRAM → Buf → RF → ✱</strong> (a red circle, the arithmetic unit), descending the hierarchy and <strong>keeping data close to use it again.</strong> On the right, <em>Spatial</em>: one box, a two-way arrow, then five blue arrows fanning out to five small boxes: <strong>read once, deliver to five.</strong></p>
+  <div class="callout" lang="ko">
+    <strong>이 정의와 두 예제는 L07-8-9 60~62쪽에서 이미 다뤘다.</strong> <a href="L07-hardware-metrics.html#s20">Data reuse</a> 절에 temporal/spatial reuse의 차이(저장 공간이 필요한가, 배선이 필요한가)와 reuse distance의 용어 뜯어보기가 있다. 여기서는 반복하지 않고, 이 강의가 새로 덧붙인 그림만 본다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Lecture 7-8-9 already covered this definition and both examples on pages 60 to 62.</strong> Its <a href="L07-hardware-metrics.html#s20">Data reuse</a> section has the temporal/spatial difference (storage versus wiring) and the jargon breakdown of reuse distance. This note won't repeat them and looks only at the figures this lecture adds.
+  </div>
+
+  <h3 data-slide="7"><span lang="ko">Memory Hierarchy: 사이에 작은 메모리를 끼운다</span><span lang="en">Memory hierarchy: slip small memories in between</span></h3>
+  <p lang="ko">5쪽 그림의 DRAM과 ALU 사이에 회색 <strong>Mem</strong> 상자를 양쪽에 하나씩 끼웠다. 읽기 쪽 Mem은 초록·파랑을 DRAM에서 받아 ALU로 넘기고, 빨강(psum)은 <strong>DRAM까지 가지 않고 Mem에서</strong> ALU로 간다. 쓰기 쪽도 ALU → Mem → DRAM이다. 두 Mem에서 빨간 굵은 화살표가 아래 상자를 가리킨다. <em>Extra levels of local memory hierarchy</em> / <strong><em>Smaller, but Faster and more Energy-Efficient</em></strong>. 맨 아래에 6쪽의 temporal reuse 정의가 반복된다.</p>
+  <p lang="en">Page 5's figure with a grey <strong>Mem</strong> box inserted on each side between DRAM and the ALU. The read-side Mem receives green and blue from DRAM and passes them on, while red (the psum) comes to the ALU <strong>from Mem, not from DRAM.</strong> The write side runs ALU → Mem → DRAM. Bold red arrows from both Mems point to a box: <em>Extra levels of local memory hierarchy</em> / <strong><em>Smaller, but Faster and more Energy-Efficient.</em></strong> Page 6's temporal-reuse definition is repeated at the bottom.</p>
+  <p lang="ko">그림에서 화살표 굵기를 보면 의도가 보인다. DRAM ↔ Mem 화살표는 짧고, Mem ↔ ALU 화살표가 셋이다. <strong>DRAM에서는 가끔, Mem에서는 자주.</strong> temporal reuse를 하드웨어로 받는 장치가 계층이다. 다만 <strong>Mem을 끼웠다고 저절로 재사용되지는 않는다.</strong> 재사용될 데이터가 <strong>Mem에서 쫓겨나기 전에 다시 쓰여야</strong> 한다. 그 조건이 8쪽의 reuse distance다.</p>
+  <p lang="en">The arrows tell the intent: DRAM ↔ Mem is short, Mem ↔ ALU carries three. <strong>Rarely from DRAM, often from Mem.</strong> The hierarchy is the hardware that catches temporal reuse. But <strong>inserting a Mem does not make reuse happen by itself.</strong> The data has to be <strong>used again before it is evicted from Mem.</strong> That condition is page 8's reuse distance.</p>
+
+  <h3 data-slide="8"><span lang="ko">Temporal Reuse Example: reuse distance</span><span lang="en">Temporal reuse example: reuse distance</span></h3>
+  <p lang="ko">출처 <em>V. Sze et al., "Efficient Processing of Deep Neural Networks", 2020</em>. 빨간 제목 <strong>Reuse Distance</strong> 아래 세 줄: <em>Number of memory accesses</em>, <em>Size of your on-chip memory</em>, <em>Smaller is better</em>. 오른쪽은 1D conv(입력 7 • 가중치 4 = 출력 4)를 두 순서로 늘어놓은 그림이다.</p>
+  <p lang="en">Source: <em>V. Sze et al., "Efficient Processing of Deep Neural Networks", 2020.</em> Under a red heading <strong>Reuse Distance</strong>: <em>Number of memory accesses</em>, <em>Size of your on-chip memory</em>, <em>Smaller is better.</em> On the right, a 1D conv (7 inputs • 4 weights = 4 outputs) laid out in two orders.</p>
+  <p lang="ko">순서 1은 가중치가 0 1 2 3 0 1 2 3…으로 돌아 <strong>weight reuse distance = 4</strong>, 순서 2는 0 0 0 0 1 1 1 1…로 <strong>weight reuse distance = 1</strong>. (d)의 메모리 계층에서 Intermediate L1 Mem은 <strong>칸 하나</strong>뿐이다. 순서 2라면 그 한 칸으로 재사용을 다 받고, 순서 1이라면 네 칸이 필요하다.</p>
+  <p lang="en">Ordering 1 cycles the weights 0 1 2 3 0 1 2 3…, a <strong>weight reuse distance of 4</strong>; ordering 2 runs 0 0 0 0 1 1 1 1…, a <strong>weight reuse distance of 1.</strong> In (d), the intermediate L1 Mem has <strong>a single slot.</strong> Ordering 2 catches all the reuse with that one slot; ordering 1 would need four.</p>
+  <div class="callout" lang="ko">
+    <strong>이 그림이 오늘 강의의 예고편이다.</strong> <a href="L07-hardware-metrics.html#s20">L07-8-9 20번 절의 함정</a>이 짚었듯, 순서 1은 출력이 0 0 0 0 1 1 1 1…로 <strong>psum의 거리가 1</strong>(= OS), 순서 2는 가중치의 거리가 1(= WS)이다. 14쪽에서 이 두 순서가 정확히 그 이름으로 다시 나온다. 그리고 <strong>8쪽의 "Smaller is better" 세 줄 중 첫 줄(메모리 접근 수)은 재사용 거리가 버퍼 크기 안에 들 때만 성립</strong>한다. 거리가 버퍼보다 길면 다시 바깥에서 읽어야 한다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>This figure is the trailer for today.</strong> As <a href="L07-hardware-metrics.html#s20">lecture 7-8-9 section 20's trap</a> pointed out, ordering 1 runs the outputs 0 0 0 0 1 1 1 1…, <strong>psum distance 1</strong> (= OS), while ordering 2 gives the weights distance 1 (= WS). Page 14 brings back these exact two orders under those names. And of page 8's three "smaller is better" lines, <strong>the first (number of memory accesses) holds only when the reuse distance fits inside the buffer.</strong> If the distance exceeds the buffer, you read from further out again.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head" data-slide="9-11"><span class="sec-num">04</span><h2 lang="ko">병렬 MAC과 spatial reuse</h2><h2 lang="en">Parallel MACs and spatial reuse</h2></div>
+  <p class="sec-sub" lang="ko">7쪽 그림의 ALU를 <strong>여러 개로 늘린다.</strong> 늘리는 순간 새 문제가 생기고(9쪽), 그 문제를 spatial reuse가 푼다(10~11쪽).</p>
+  <p class="sec-sub" lang="en">Page 7's ALU <strong>multiplied into many.</strong> The moment you do, a new problem appears (page 9), and spatial reuse solves it (pages 10-11).</p>
+
+  <h3 data-slide="9"><span lang="ko">Parallelism: Parallel MAC Units</span><span lang="en">Parallelism: parallel MAC units</span></h3>
+  <p lang="ko">DRAM → 키 큰 <strong>Mem</strong> 하나 → ALU 세 개(가운데 ⋮로 더 많다는 표시) → 키 큰 Mem → DRAM. <strong>ALU마다 초록·파랑·빨강 세 줄이 따로 들어간다.</strong> ALU가 <span class="m"><i>n</i></span>개면 Mem의 읽기 선이 <span class="m">3<i>n</i></span>개다.</p>
+  <p lang="en">DRAM → one tall <strong>Mem</strong> → three ALUs (with a ⋮ for more) → a tall Mem → DRAM. <strong>Every ALU gets its own green, blue and red line.</strong> With <span class="m"><i>n</i></span> ALUs, Mem needs <span class="m">3<i>n</i></span> read lines.</p>
+  <p lang="ko">이게 문제다. SRAM의 <strong>읽기 포트</strong>는 공짜가 아니다. 포트를 늘리면 면적이 늘고, 접근당 에너지도 는다(보충). ALU를 100개 붙이면서 각자 독립적으로 버퍼를 읽게 하면 <strong>버퍼가 ALU를 따라가지 못한다.</strong></p>
+  <p lang="en">That is the problem. SRAM <strong>read ports</strong> aren't free: more ports cost area and raise energy per access (supplementary). Attach 100 ALUs that each read the buffer independently and <strong>the buffer can't keep up with them.</strong></p>
+
+  <h3 data-slide="10"><span lang="ko">Parallelism: Spatial Data Reuse</span><span lang="en">Parallelism: spatial data reuse</span></h3>
+  <p lang="ko">같은 그림인데 하나가 바뀌었다. <strong>초록 선(filter weight)이 Mem에서 한 번만 나와서</strong> 세로로 내려가며 점마다 갈라져 세 ALU 모두로 들어간다. 파랑과 빨강은 여전히 ALU마다 따로다. 위에 6쪽의 spatial reuse 정의가 반복된다.</p>
+  <p lang="en">The same figure with one change: <strong>the green line (filter weight) leaves Mem only once</strong>, runs down, and branches at each dot into all three ALUs. Blue and red are still separate per ALU. Page 6's spatial-reuse definition sits on top.</p>
+  <p lang="ko">즉 <strong>세 ALU가 같은 순간에 같은 weight를 원하도록 일을 나눴다.</strong> 각 ALU는 다른 출력 위치를 맡고(파랑 입력과 빨강 psum이 다르다), weight는 공유한다. 이렇게 되면 Mem의 weight 읽기가 <span class="m"><i>n</i></span>번에서 1번으로 준다. 이 그림 하나가 33쪽의 <strong>OS 배열</strong>(weight broadcast)과 같은 구조다.</p>
+  <p lang="en">In other words, <strong>the work was split so all three ALUs want the same weight at the same moment.</strong> Each ALU owns a different output position (its blue input and red psum differ) while the weight is shared, which cuts Mem's weight reads from <span class="m"><i>n</i></span> to 1. This one figure has the same structure as page 33's <strong>OS array</strong> with its weight broadcast.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · broadcast · multicast · unicast</span><span lang="en">Unpacking the jargon · broadcast · multicast · unicast</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>broadcast / multicast / unicast</td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">한 번 읽은 값을 <strong>모든 PE</strong>에 / <strong>일부 PE</strong>에 / <strong>한 PE</strong>에만 보내는 것. 10쪽의 초록 선이 broadcast다</span><span lang="en">sending one read value to <strong>every PE</strong> / <strong>some PEs</strong> / <strong>one PE</strong>. Page 10's green line is a broadcast</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">spatial reuse를 하드웨어로 구현할 때. 어느 텐서를 broadcast하느냐가 dataflow마다 다르다(12번 절 표)</span><span lang="en">when implementing spatial reuse in hardware; which tensor gets broadcast differs by dataflow (table in section 12)</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">네트워크 용어를 가속기 설계자가 빌려 쓴다. Eyeriss 논문은 PE 사이 배선망(NoC)을 이 말로 설명한다 (보충)</span><span lang="en">networking terms borrowed by accelerator designers; the Eyeriss paper describes its on-chip network (NoC) this way (supplementary)</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>broadcast는 읽기를 줄이지만 선은 길어진다.</strong> PE가 수천 개면 한 선이 칩을 가로지르고, 그 배선의 에너지와 지연이 다시 문제가 된다. 그래서 큰 배열은 broadcast 대신 <strong>이웃에게 넘겨주기</strong>(35쪽의 빨간 화살표, systolic array의 발상)를 쓴다</span><span lang="en"><strong>Broadcast cuts reads but lengthens wires.</strong> With thousands of PEs, one wire crosses the chip and its energy and delay become the new problem. So large arrays replace broadcast with <strong>passing to the neighbour</strong> (page 35's red arrows, the systolic-array idea)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3 data-slide="11"><span lang="ko">Spatial Reuse Example</span><span lang="en">Spatial reuse example</span></h3>
+  <p lang="ko">L07-8-9 62쪽과 같은 그림이다(Sze 교재). Source Mem [0 1 2 3]이 Consumer C0~C3에 갈라져 들어가고, 아래 세 격자가 소비자별로 언제 어느 weight를 쓰는지 보여준다. 순서 1은 같은 시점에 넷이 다 weight 0, 순서 2는 둘씩, 순서 3은 대각선으로 흩어진다. 오른쪽 빨간 질문 <em>Why a smaller reuse distance with spatial reuse?</em>와 답 <em>Fewer memory read ports → Less area</em>, <em>Fewer reads → Less power</em>.</p>
+  <p lang="en">The same figure as lecture 7-8-9's page 62 (from the Sze text). Source Mem [0 1 2 3] splits into consumers C0 to C3, and three grids show which consumer uses which weight when: ordering 1 gives all four weight 0 at once, ordering 2 pairs them, ordering 3 scatters them diagonally. The red question at right, <em>Why a smaller reuse distance with spatial reuse?</em>, with answers <em>Fewer memory read ports → Less area</em> and <em>Fewer reads → Less power.</em></p>
+  <p lang="ko"><strong>9쪽과 10쪽을 나란히 놓으면 11쪽의 답이 그림으로 보인다.</strong> 9쪽(순서 3에 해당)은 포트가 ALU 수만큼 필요하고, 10쪽(순서 1)은 weight 포트 하나로 끝난다. 격자 세 개의 자세한 풀이는 <a href="L07-hardware-metrics.html#s20">L07-8-9 20번 절</a>에 있다.</p>
+  <p lang="en"><strong>Put pages 9 and 10 side by side and page 11's answer becomes a picture.</strong> Page 9 (ordering 3) needs as many ports as ALUs; page 10 (ordering 1) gets by with one weight port. The full walk-through of the three grids is in <a href="L07-hardware-metrics.html#s20">lecture 7-8-9 section 20.</a></p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head" data-slide="12"><span class="sec-num">05</span><h2 lang="ko">DNN 안의 재사용 기회</h2><h2 lang="en">Reuse opportunities in a DNN</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Data Reuse in DNN</em>. 왼쪽은 2쪽의 입력 × weight = 출력 그림(<span class="m"><i>N</i></span> = 1), 오른쪽에 숫자 일곱 줄. <strong>재사용이 얼마나 있는지를 텐서마다 센다.</strong></p>
+  <p class="sec-sub" lang="en">Titled <em>Data reuse in DNN</em>: page 2's input × weight = output figure on the left (with <span class="m"><i>N</i></span> = 1), seven lines of numbers on the right. <strong>It counts how much reuse each tensor offers.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">항목</th><th lang="ko">크기 (원소 수)</th><th lang="ko">재사용 (원소 하나가 쓰이는 MAC 수)</th>
+      <th lang="en">Item</th><th lang="en">Size (elements)</th><th lang="en">Reuse (MACs each element feeds)</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko"><strong>Total # of MACs</strong></td><td lang="ko" colspan="2"><span class="m"><i>RSCPQK</i></span></td>
+          <td lang="en"><strong>Total # of MACs</strong></td><td lang="en" colspan="2"><span class="m"><i>RSCPQK</i></span></td></tr>
+      <tr><td lang="ko">Input Activation</td><td><span class="m"><i>HWC</i></span></td><td><span class="m">~<i>RSK</i></span></td>
+          <td lang="en">Input activation</td><td lang="en"><span class="m"><i>HWC</i></span></td><td lang="en"><span class="m">~<i>RSK</i></span></td></tr>
+      <tr><td lang="ko">Weight</td><td><span class="m"><i>RSCK</i></span></td><td><span class="m"><i>PQ</i></span></td>
+          <td lang="en">Weight</td><td lang="en"><span class="m"><i>RSCK</i></span></td><td lang="en"><span class="m"><i>PQ</i></span></td></tr>
+      <tr><td lang="ko">Output Activation</td><td><span class="m"><i>PQK</i></span></td><td><span class="m"><i>RSC</i></span></td>
+          <td lang="en">Output activation</td><td lang="en"><span class="m"><i>PQK</i></span></td><td lang="en"><span class="m"><i>RSC</i></span></td></tr>
+    </tbody>
+  </table>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · 크기 × 재사용 = MAC</span><span lang="en">Unpacking the notation · size × reuse = MACs</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m">RSCK × PQ</td><td><span lang="ko">weight 원소 하나는 <strong>출력 위치마다 한 번</strong> 쓰인다. 출력 위치가 <span class="m"><i>PQ</i></span>개이므로 정확히 <span class="m"><i>PQ</i></span>번. 곱하면 <span class="m"><i>RSCPQK</i></span>로 MAC 수와 같다. <strong>근사가 없다</strong></span><span lang="en">each weight is used <strong>once per output position</strong>, exactly <span class="m"><i>PQ</i></span> times. The product is <span class="m"><i>RSCPQK</i></span>, the MAC count. <strong>No approximation</strong></span></td></tr>
+        <tr><td class="m">PQK × RSC</td><td><span lang="ko">출력 원소 하나에 <strong>곱 <span class="m"><i>RSC</i></span>개가 더해진다.</strong> 이건 "읽어서 쓴다"는 재사용이 아니라 <strong>누적</strong>이다. psum을 <span class="m"><i>RSC</i></span>번 갱신한다는 뜻. 곱하면 역시 MAC 수</span><span lang="en">each output element <strong>accumulates <span class="m"><i>RSC</i></span> products.</strong> That is not "read and use" reuse but <strong>accumulation</strong>: the psum is updated <span class="m"><i>RSC</i></span> times. The product is again the MAC count</span></td></tr>
+        <tr><td class="m">HWC × ~RSK</td><td><span lang="ko">입력 원소 하나는 <strong>filter <span class="m"><i>K</i></span>개 각각에서, 자기를 덮는 창 <span class="m"><i>RS</i></span>개마다</strong> 쓰인다. 물결표(~)인 이유는 <strong>가장자리 원소는 덮는 창이 적고</strong>, stride가 1보다 크면 창이 덜 겹치기 때문이다. stride 1, 적절한 padding이면 <span class="m"><i>HW</i> ≈ <i>PQ</i></span>라 곱이 MAC 수에 가깝다</span><span lang="en">each input element is used <strong>by each of the <span class="m"><i>K</i></span> filters, once for every one of the <span class="m"><i>RS</i></span> windows covering it.</strong> The tilde is there because <strong>edge elements are covered by fewer windows</strong>, and stride above 1 means less overlap. At stride 1 with suitable padding, <span class="m"><i>HW</i> ≈ <i>PQ</i></span>, so the product is close to the MAC count</span></td></tr>
+        <tr><td class="m">N</td><td><span lang="ko">슬라이드는 <span class="m"><i>N</i></span> = 1로 썼다. batch가 있으면 <strong>weight 재사용이 <span class="m"><i>NPQ</i></span>로 늘고</strong> 나머지 둘은 그대로다 (보충, L06 5번 절 표에서 weight가 <code>n</code>과 무관한 것과 같은 이야기)</span><span lang="en">the slide uses <span class="m"><i>N</i></span> = 1. With a batch, <strong>weight reuse grows to <span class="m"><i>NPQ</i></span></strong> and the other two stay put (supplementary; the same fact as weights ignoring <code>n</code> in lecture 6 section 5's table)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p lang="ko">이 표를 이렇게 읽으면 된다. <strong>세 텐서 모두 재사용 기회가 수백~수천 배다.</strong> 문제는 그 기회를 <strong>세 텐서가 동시에 다 누릴 수 없다</strong>는 것이다. loop는 한 순서로만 쌓을 수 있고, 가장 안쪽에 놓인 loop와 무관한 텐서 하나만 "가만히" 있을 수 있다. <strong>어느 텐서의 재사용을 RF에서 받고, 나머지를 어느 계층에서 받을지 고르는 것이 dataflow다.</strong></p>
+  <p lang="en">Read the table like this: <strong>all three tensors offer reuse in the hundreds or thousands.</strong> The catch is that <strong>they can't all cash it in at once.</strong> Loops stack in only one order, and only the tensor that ignores the innermost loop gets to sit still. <strong>A dataflow is the choice of which tensor's reuse is caught in the RF and at which level the rest is caught.</strong></p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · VGG 계열 3×3 층 하나 (보충 예시, <span class="m"><i>H</i>=<i>W</i>=<i>P</i>=<i>Q</i>=56, <i>C</i>=<i>K</i>=256, pad 1</span>)</div>
+    <div class="cap" lang="en">Sense of scale · one VGG-style 3×3 layer (supplementary example, <span class="m"><i>H</i>=<i>W</i>=<i>P</i>=<i>Q</i>=56, <i>C</i>=<i>K</i>=256, pad 1</span>)</div>
+    <table>
+      <tr class="base"><td class="what">MACs</td>
+          <td class="num">9·256·56·56·256 ≈ 1.85G</td>
+          <td><span lang="ko">기준점</span><span lang="en">the reference</span></td></tr>
+      <tr><td class="what"><span lang="ko">weight: 크기 / 재사용</span><span lang="en">weight: size / reuse</span></td>
+          <td class="num">589,824 / 3,136</td>
+          <td><span lang="ko">INT8이면 576 KiB. <strong>Coral의 8 MiB SRAM에는 들어가지만 0.5 kB RF에는 1,000분의 1도 안 들어간다</strong></span><span lang="en">576 KiB at INT8: <strong>fits Coral's 8 MiB SRAM, but under a thousandth of it fits a 0.5 kB RF</strong></span></td></tr>
+      <tr><td class="what"><span lang="ko">input: 크기 / 재사용</span><span lang="en">input: size / reuse</span></td>
+          <td class="num">802,816 / ~2,304</td>
+          <td><span lang="ko"><span class="m"><i>RSK</i></span> = 9 × 256</span><span lang="en"><span class="m"><i>RSK</i></span> = 9 × 256</span></td></tr>
+      <tr><td class="what"><span lang="ko">output: 크기 / 누적</span><span lang="en">output: size / accumulations</span></td>
+          <td class="num">802,816 / 2,304</td>
+          <td><span lang="ko"><span class="m"><i>RSC</i></span> = 9 × 256. psum 하나가 2,304번 갱신된다</span><span lang="en"><span class="m"><i>RSC</i></span> = 9 × 256: each psum is updated 2,304 times</span></td></tr>
+    </table>
+  </div>
+  <p lang="ko">세 줄 모두 "크기 × 재사용 ≈ 1.85G"다. 그리고 <strong>재사용 숫자가 셋 다 비슷한 크기</strong>라는 게 흥미롭다. 이 층에서는 "누가 압도적으로 재사용이 많다"가 없으니 어느 텐서를 붙잡아도 비슷한 이득이고, 결국 <strong>어느 텐서가 RF에 들어갈 만큼 작게 쪼개지느냐</strong>가 승부를 낸다. 층 모양이 바뀌면 이 균형이 깨진다. FC 층은 <span class="m"><i>PQ</i></span> = 1이라 <strong>weight 재사용이 1</strong>이다(batch가 없으면). L06 8번 절에서 FC가 memory-bound였던 이유가 이 표의 둘째 줄이다.</p>
+  <p lang="en">All three rows satisfy "size × reuse ≈ 1.85G." What's interesting is that <strong>the three reuse figures are of similar size.</strong> No tensor dominates in this layer, so pinning any of them pays about the same, and the winner is <strong>whichever tensor tiles small enough to fit the RF.</strong> Change the layer's shape and the balance breaks: an FC layer has <span class="m"><i>PQ</i></span> = 1, so <strong>weight reuse is 1</strong> without batching. The reason FC was memory-bound in lecture 6 section 8 is this table's second row.</p>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">MobileNet의 depthwise 3×3 층(<a href="L06-kernel-computation.html#s6">L06 6번 절</a>)은 filter 하나가 채널 하나만 본다. 12쪽 표의 세 재사용 숫자 중 무엇이 무너지는가?</p>
+    <p lang="en">A MobileNet depthwise 3×3 layer (<a href="L06-kernel-computation.html#s6">lecture 6 section 6</a>) has each filter see only one channel. Which of page 12's three reuse figures collapses?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <p lang="ko">depthwise에서는 출력 채널 <span class="m"><i>k</i></span>가 입력 채널 <span class="m"><i>k</i></span> 하나만 쓰므로 식에서 <strong><span class="m"><i>C</i></span>와 <span class="m"><i>K</i></span>가 하나로 묶인다.</strong> weight 재사용은 여전히 <span class="m"><i>PQ</i></span>다. 하지만 <strong>입력 재사용은 <span class="m"><i>RSK</i></span> → <span class="m"><i>RS</i></span></strong>(filter <span class="m"><i>K</i></span>개가 공유하지 않으니), <strong>출력 누적은 <span class="m"><i>RSC</i></span> → <span class="m"><i>RS</i></span></strong>(채널 방향 합이 없으니)로 둘 다 9가 된다. 2,304에서 9로 250배 이상 떨어진다. <span class="cCost">입력과 psum은 거의 재사용이 없는 데이터</span>가 되고, L06이 depthwise를 바이트당 연산이 낮은 층으로 분류한 이유가 이것이다.</p>
+      <p lang="en">In depthwise conv, output channel <span class="m"><i>k</i></span> uses only input channel <span class="m"><i>k</i></span>, so <strong><span class="m"><i>C</i></span> and <span class="m"><i>K</i></span> merge into one.</strong> Weight reuse is still <span class="m"><i>PQ</i></span>. But <strong>input reuse drops from <span class="m"><i>RSK</i></span> to <span class="m"><i>RS</i></span></strong> (the <span class="m"><i>K</i></span> filters no longer share it) and <strong>output accumulation from <span class="m"><i>RSC</i></span> to <span class="m"><i>RS</i></span></strong> (no sum across channels), both 9. That's a fall of more than 250x from 2,304. <span class="cCost">Inputs and psums become nearly reuse-free data</span>, which is why lecture 6 filed depthwise as a low-intensity layer.</p>
+    </details>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">12쪽 숫자는 "기회"이지 "달성"이 아니다</h4>
+    <h4 lang="en">Page 12's figures are opportunities, not achievements</h4>
+    <p lang="ko">weight 재사용 <span class="m"><i>PQ</i></span>는 <strong>weight 하나를 DRAM에서 딱 한 번 읽을 수 있다면</strong>의 상한이다. 실제로 얼마나 받아내는지는 <strong>버퍼 크기와 loop 순서(reuse distance)</strong>가 정한다. weight 589,824개를 다 들고 있을 버퍼가 없으면 한 번 쓰고 쫓겨났다가 다시 읽힌다. "이 층은 재사용이 3,136"이라는 말을 "DRAM 트래픽이 3,136분의 1"로 옮기면 틀린다.</p>
+    <p lang="en">A weight reuse of <span class="m"><i>PQ</i></span> is the ceiling <strong>if each weight could be read from DRAM exactly once.</strong> How much you actually collect is set by <strong>buffer size and loop order (reuse distance).</strong> Without a buffer big enough for all 589,824 weights, each is used, evicted, and read again. Translating "this layer has reuse 3,136" into "DRAM traffic falls by 3,136x" is wrong.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head" data-slide="13-14"><span class="sec-num">06</span><h2 lang="ko">Dataflow의 정의와 1D conv</h2><h2 lang="en">Dataflow, defined, on a 1D conv</h2></div>
+  <p class="sec-sub" lang="ko">이 강의 제목의 정의가 나오는 곳이다. 그리고 가장 작은 예제인 1D conv로 <strong>OS와 WS가 loop 두 줄의 순서 차이</strong>라는 걸 보인다.</p>
+  <p class="sec-sub" lang="en">Where the lecture's title gets defined, followed by the smallest possible example, a 1D conv, showing that <strong>OS and WS differ by the order of two loop lines.</strong></p>
+
+  <h3 data-slide="13"><span lang="ko">Dataflow</span><span lang="en">Dataflow</span></h3>
+  <div class="def">
+    <span class="tag" lang="ko">슬라이드의 정의</span><span class="tag" lang="en">The slide's definition</span>
+    <p lang="ko"><strong><em>Defines the execution order of the DNN operations in hardware.</em></strong> 하위 항목 둘: <em>Computation order</em>, <em>Data movement order</em>.<br><strong><em>Loop nest is a compact way to describe the execution order, i.e., dataflow, supported in hardware.</em></strong> 하위 항목 둘: <code>for</code>는 <em>temporal for, describes the temporal execution order</em>. <code>spatial_for</code>는 <em>describes parallel execution</em>.</p>
+    <p lang="en"><strong><em>Defines the execution order of the DNN operations in hardware</em></strong>, with two sub-points: <em>computation order</em> and <em>data movement order.</em><br><strong><em>Loop nest is a compact way to describe the execution order, i.e., dataflow, supported in hardware</em></strong>, with two sub-points: <code>for</code> is a <em>temporal for, describes the temporal execution order</em>; <code>spatial_for</code> <em>describes parallel execution.</em></p>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · dataflow</span><span lang="en">Unpacking the jargon · dataflow</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>dataflow <span lang="ko">(슬라이드 제목은 띄어서 Data Flow)</span><span lang="en">(the slide title spells it Data Flow)</span></td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">DNN 연산을 하드웨어에서 <strong>어떤 순서로, 무엇을 병렬로</strong> 실행하는지. 계산 순서와 데이터 이동 순서가 한 묶음이다</span><span lang="en"><strong>in what order, and with what in parallel</strong>, hardware executes a DNN's operations. Computation order and data-movement order come as one package</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">가속기를 설계할 때(어떤 순서를 지원하게 배선할지), 그리고 층을 하드웨어에 매핑할 때(지원되는 순서 안에서 타일 크기를 고를 때)</span><span lang="en">when designing an accelerator (which orders the wiring supports) and when mapping a layer onto it (choosing tile sizes within the supported orders)</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">Eyeriss 논문(Chen et al., ISCA 2016)과 Sze 교재가 이 뜻으로 정착시켰다. Timeloop의 mapping 기술도 같은 loop nest 표기다 (보충)</span><span lang="en">settled in this sense by the Eyeriss paper (Chen et al., ISCA 2016) and the Sze text; Timeloop's mapping description uses the same loop-nest notation (supplementary)</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko">아래 함정 참조. <strong>"dataflow architecture"(1970년대부터 연구된, 데이터가 준비되면 명령이 발화하는 컴퓨터)와 다른 말</strong>이고, TensorFlow의 "dataflow graph"와도 다르다 (보충)</span><span lang="en">see the trap below. <strong>Not the same as a "dataflow architecture"</strong> (computers, studied since the 1970s, where an instruction fires once its data is ready), nor TensorFlow's "dataflow graph" (supplementary)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p lang="ko"><strong>"supported in hardware"라는 세 단어가 중요하다.</strong> CPU에서는 loop 순서를 바꾸는 게 코드 수정이다. 가속기에서는 다르다. 어느 텐서가 PE 안 레지스터에 남아 있을지, 어느 선으로 broadcast할지가 <strong>실리콘에 이미 박혀 있다.</strong> 그래서 가속기마다 "이 칩은 WS다", "이 칩은 OS다"라고 부른다. 컴파일러가 할 수 있는 건 <strong>그 틀 안에서 타일 크기와 바깥 loop 순서를 고르는 것</strong>이다.</p>
+  <p lang="en"><strong>The three words "supported in hardware" matter.</strong> On a CPU, reordering loops is a code edit. On an accelerator it isn't: which tensor stays in a PE's register and which wire broadcasts what are <strong>already etched into silicon.</strong> That is why accelerators get called "a WS chip" or "an OS chip." What a compiler can do is <strong>choose tile sizes and the outer loop order within that frame.</strong></p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · spatial_for</span><span lang="en">Unpacking the jargon · spatial_for</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td><span lang="ko">spatial for loop (공간 loop). 짝은 temporal for</span><span lang="en">spatial for loop; its partner is the temporal for</span></td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">반복을 <strong>시간 순서로 돌리지 않고 PE 여러 개에 한 번에 펼친다</strong>는 표시. <code>spatial_for (k=0; k&lt;64; k++)</code>는 "PE 64개가 각자 다른 k를 같은 사이클에"</span><span lang="en">marks iterations <strong>spread across many PEs at once instead of run in time order.</strong> <code>spatial_for (k=0; k&lt;64; k++)</code> means "64 PEs, each a different k, in the same cycle"</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">loop nest로 하드웨어 매핑을 적을 때. 범위가 곧 그 차원에 배정된 PE 수다</span><span lang="en">when writing a hardware mapping as a loop nest; its bound is the number of PEs assigned to that dimension</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">이 수업과 Sze 교재의 표기. C 문법이 아니라 의사 코드다. HLS의 <code>#pragma HLS UNROLL</code>이 같은 뜻을 컴파일러에 전한다</span><span lang="en">this course's and the Sze text's notation: pseudo-code, not C. HLS's <code>#pragma HLS UNROLL</code> conveys the same meaning to a compiler</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>"spatial reuse"의 spatial과 같은 말이다.</strong> 어떤 텐서와 무관한 차원을 <code>spatial_for</code>로 펼치면 그 텐서는 여러 PE가 같은 값을 쓰므로 spatial reuse(broadcast)가 생긴다. 반대로 출력과 무관한 차원(<code>c</code>)을 펼치면 <strong>PE들의 결과를 더해야</strong> 한다(공간 누적)</span><span lang="en"><strong>The same "spatial" as in spatial reuse.</strong> Unroll a dimension some tensor ignores and many PEs use the same value of it: spatial reuse (broadcast). Unroll a dimension the output ignores (<code>c</code>) and <strong>the PEs' results must be summed</strong> (spatial accumulation)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">dataflow ≠ dataflow architecture</h4>
+    <h4 lang="en">Dataflow is not a dataflow architecture</h4>
+    <p lang="ko">컴퓨터 구조 교과서에서 "dataflow"를 찾으면 <strong>프로그램 카운터 없이, 피연산자가 다 도착한 명령부터 실행하는 기계</strong>(Dennis의 dataflow machine 등)가 나온다. 비순차 실행 CPU의 Tomasulo 알고리즘도 "제한된 dataflow"라고 부른다(보충). <strong>이 수업의 dataflow는 그 뜻이 아니다.</strong> 구별 기준은 <strong>순서를 누가 정하느냐</strong>다. dataflow architecture에서는 데이터 도착이 실행 순서를 정한다(동적). DNN 가속기의 dataflow에서는 설계자가 loop nest로 <strong>미리 고정한다</strong>(정적). DNN은 데이터 의존성이 실행 전에 다 알려져 있어서 정적으로 정할 수 있다. 그게 이 분야가 가능한 이유다.</p>
+    <p lang="en">Look up "dataflow" in an architecture textbook and you get <strong>machines with no program counter that execute whichever instruction has all its operands</strong> (Dennis's dataflow machine and others); Tomasulo's algorithm in out-of-order CPUs is called "restricted dataflow" too (supplementary). <strong>This course's dataflow is not that.</strong> The test is <strong>who fixes the order.</strong> In a dataflow architecture, data arrival decides the order (dynamic). In a DNN accelerator's dataflow, the designer <strong>fixes it in advance</strong> with a loop nest (static). DNN data dependencies are fully known before execution, so the order can be static, and that is what makes this whole field possible.</p>
+  </div>
+
+  <h3 data-slide="14"><span lang="ko">1D Convolution Example: OS와 WS는 loop 두 줄의 순서</span><span lang="en">1D convolution example: OS and WS are the order of two loop lines</span></h3>
+  <p lang="ko">위에 파란 입력 <code>a b c d e</code>(길이 <span class="m"><i>W</i></span>), × 청록 weight <code>1 2 3</code>(길이 <span class="m"><i>S</i></span>), = 빨간 출력 <code>A B C</code>(길이 <span class="m"><i>Q</i></span>). 5 − 3 + 1 = 3이다. 아래에 코드 두 개.</p>
+  <p lang="en">At the top: blue input <code>a b c d e</code> (length <span class="m"><i>W</i></span>) × teal weights <code>1 2 3</code> (length <span class="m"><i>S</i></span>) = red output <code>A B C</code> (length <span class="m"><i>Q</i></span>), since 5 − 3 + 1 = 3. Two pieces of code below.</p>
+  <div class="grid2">
+<pre class="code"><span class="c">// Output Stationary (OS)</span>
+<span class="k">for</span> (q=<span class="n">0</span>; q&lt;Q; q++) {
+  <span class="k">for</span> (s=<span class="n">0</span>; s&lt;S; s++) {
+    OA[q] += IA[q+s] * W[s];
+  }
+}</pre>
+<pre class="code"><span class="c">// Weight Stationary (WS)</span>
+<span class="k">for</span> (s=<span class="n">0</span>; s&lt;S; s++) {
+  <span class="k">for</span> (q=<span class="n">0</span>; q&lt;Q; q++) {
+    OA[q] += IA[q+s] * W[s];
+  }
+}</pre>
+  </div>
+  <p lang="ko"><strong>안쪽 loop와 무관한 텐서가 "stationary"다.</strong> OS 코드의 안쪽은 <code>s</code>인데 <code>OA[q]</code>에는 <code>s</code>가 없다. 그래서 안쪽 loop가 도는 <span class="m"><i>S</i></span>번 동안 <code>OA[q]</code>는 같은 자리다. WS 코드의 안쪽은 <code>q</code>인데 <code>W[s]</code>에는 <code>q</code>가 없다. <span class="m"><i>Q</i></span>번 동안 같은 weight다. <strong>입력 <code>IA[q+s]</code>는 두 인덱스에 다 걸려 있어서 어느 쪽에서도 가만히 있지 않는다.</strong> 1D에서 IS가 등장하지 않는 이유는 아래 감각 문제에서 본다.</p>
+  <p lang="en"><strong>The tensor that ignores the inner loop is the "stationary" one.</strong> OS's inner loop is <code>s</code>, and <code>OA[q]</code> has no <code>s</code>, so for the <span class="m"><i>S</i></span> inner iterations <code>OA[q]</code> stays at the same address. WS's inner loop is <code>q</code>, and <code>W[s]</code> has no <code>q</code>: the same weight for <span class="m"><i>Q</i></span> iterations. <strong>The input <code>IA[q+s]</code> depends on both indices, so it never sits still in either.</strong> The exercise below shows why IS doesn't appear in 1D.</p>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">1D conv를 <strong>input stationary</strong>로 쓰고 싶다. 바깥 loop를 입력 위치 <code>w</code>로 두면 안쪽 loop는 어떻게 써야 하나? 그리고 두 loop 순서만 바꾼 OS/WS 코드와 무엇이 다른가?</p>
+    <p lang="en">You want an <strong>input-stationary</strong> 1D conv. With the input position <code>w</code> as the outer loop, how must the inner loop look? And how does it differ from OS/WS, which only swap two loops?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+<pre class="code"><span class="k">for</span> (w=<span class="n">0</span>; w&lt;W; w++) {          <span class="c">// <span lang="ko">입력 하나를 붙잡고</span><span lang="en">pin one input</span></span>
+  <span class="k">for</span> (s=<span class="n">0</span>; s&lt;S; s++) {
+    q = w - s;                     <span class="c">// <span lang="ko">이 입력이 기여하는 출력</span><span lang="en">the output it feeds</span></span>
+    <span class="k">if</span> (q &gt;= <span class="n">0</span> &amp;&amp; q &lt; Q)
+      OA[q] += IA[w] * W[s];
+  }
+}</pre>
+      <p lang="ko">OS와 WS는 원래 코드의 두 loop(<code>q</code>, <code>s</code>)를 바꿔 쌓기만 하면 됐다. 입력은 <code>q+s</code>라는 <strong>합</strong>으로 인덱싱되므로, 입력을 붙잡으려면 <strong>loop 변수 자체를 바꿔야</strong> 한다(<code>q</code> 대신 <code>w = q + s</code>). 그 대가로 <strong>경계 검사(<code>if</code>)</strong>가 생기고, 가장자리 입력은 <span class="m"><i>S</i></span>번보다 적게 쓰인다. 12쪽의 "~<i>RSK</i>"에 물결표가 붙은 이유가 이 <code>if</code>다. 안쪽 <span class="m"><i>S</i></span>번 동안 <code>IA[w]</code>는 가만히 있고, weight는 매번 바뀌며, psum은 매번 다른 <code>OA[q]</code>를 읽고 쓴다.</p>
+      <p lang="en">OS and WS just restacked the original two loops (<code>q</code>, <code>s</code>). The input is indexed by a <strong>sum</strong>, <code>q+s</code>, so pinning it requires <strong>changing the loop variable itself</strong> (<code>w = q + s</code> instead of <code>q</code>). The price is <strong>a bounds check (<code>if</code>)</strong>, and edge inputs get used fewer than <span class="m"><i>S</i></span> times. That <code>if</code> is why page 12 writes "~<i>RSK</i>" with a tilde. For the <span class="m"><i>S</i></span> inner iterations <code>IA[w]</code> holds still, the weight changes every time, and the psum reads and writes a different <code>OA[q]</code> each time.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head" data-slide="15-17"><span class="sec-num">07</span><h2 lang="ko">PE 하나의 OS</h2><h2 lang="en">Output stationary on one PE</h2></div>
+  <p class="sec-sub" lang="ko">PE 하나와 버퍼 셋으로 시작한다(15쪽). OS 코드를 돌리면서 <strong>매 사이클 어느 주소를 읽는지 점을 찍으면</strong>(16쪽), 붙잡아 둘 데이터가 그림으로 보인다(17쪽).</p>
+  <p class="sec-sub" lang="en">Start with one PE and three buffers (page 15). Run the OS code and <strong>plot which address is read each cycle</strong> (page 16), and the data worth pinning shows up as a picture (page 17).</p>
+
+  <h3 data-slide="15"><span lang="ko">Single Processing Element (PE) Setup</span><span lang="en">Single processing element (PE) setup</span></h3>
+  <p lang="ko">왼쪽에 버퍼 셋, 위에서부터 청록 <strong>Weight Buffer</strong>, 연보라 <strong>Input Activation Buffer</strong>, 빨강 <strong>Output Activation Buffer</strong>. 오른쪽 점선 상자가 <strong>PE</strong>이고 안에 원 하나 <strong>MAC</strong>. weight와 input 버퍼가 MAC으로 들어가고, MAC 결과가 Output 버퍼로 나가며, <strong>Output 버퍼에서 다시 MAC으로 돌아오는 선</strong>이 아래로 크게 돈다. 이 되돌이 선이 4쪽의 "psum 읽기"다.</p>
+  <p lang="en">Three buffers on the left, from the top: teal <strong>weight buffer</strong>, lavender <strong>input activation buffer</strong>, red <strong>output activation buffer.</strong> A dashed box on the right is the <strong>PE</strong>, holding a single circle, the <strong>MAC.</strong> Weight and input buffers feed the MAC, the MAC writes to the output buffer, and <strong>a line loops from the output buffer back into the MAC</strong> along the bottom. That loop is page 4's "psum read."</p>
+  <p lang="ko"><strong>PE 안에 저장소가 하나도 없다.</strong> 이 상태가 출발점이다. 다음 두 장이 "PE 안에 레지스터 하나를 어느 텐서용으로 넣을까"를 데이터로 결정한다.</p>
+  <p lang="en"><strong>There is no storage inside the PE at all.</strong> That is the starting point. The next two slides use data to decide which tensor deserves the one register you'll add inside.</p>
+
+  <h3 data-slide="16"><span lang="ko">Buffer Access Pattern (OS): 점 그림 세 장</span><span lang="en">Buffer access pattern (OS): three dot plots</span></h3>
+  <p lang="ko">출처 <em>Eyeriss Tutorial</em>. 오른쪽 위에 OS 코드, 주석 <code>// Q =9</code>, <code>// S=4</code>. 아래에 산점도 셋, 가로축은 모두 <strong>Cycle</strong>(0~35), 세로축은 그 사이클에 접근한 <strong>인덱스</strong>.</p>
+  <p lang="en">Source: <em>Eyeriss Tutorial.</em> The OS code at top right, commented <code>// Q =9</code> and <code>// S=4.</code> Below, three scatter plots, all with <strong>cycle</strong> (0 to 35) on x and the <strong>index</strong> accessed that cycle on y.</p>
+  <table>
+    <thead><tr>
+      <th lang="ko">그림</th><th lang="ko">무늬</th><th lang="ko">의미</th>
+      <th lang="en">Plot</th><th lang="en">Pattern</th><th lang="en">Meaning</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">Outputs (빨강)</td><td lang="ko"><strong>가로 막대 계단</strong>. 같은 높이 점 4개씩, 0에서 8까지</td><td lang="ko">출력 하나를 <span class="m"><i>S</i></span> = 4 사이클 연속 건드린다. reuse distance 1</td>
+          <td lang="en">Outputs (red)</td><td lang="en"><strong>a staircase of flat runs</strong>: four dots at each height, 0 to 8</td><td lang="en">one output is touched for <span class="m"><i>S</i></span> = 4 consecutive cycles: reuse distance 1</td></tr>
+      <tr><td lang="ko">Inputs (파랑)</td><td lang="ko"><strong>톱니 모양 대각선</strong>. 0 1 2 3, 1 2 3 4, … 최대 11</td><td lang="ko">창이 한 칸씩 미끄러진다. 같은 입력이 몇 사이클 뒤에 다시 온다. 거리 3쯤</td>
+          <td lang="en">Inputs (blue)</td><td lang="en"><strong>a sawtooth diagonal</strong>: 0 1 2 3, 1 2 3 4, … up to 11</td><td lang="en">the window slides one step at a time; an input comes back a few cycles later, distance about 3</td></tr>
+      <tr><td lang="ko">Weights (초록)</td><td lang="ko"><strong>가로 줄 네 개</strong>(0, 1, 2, 3). 각 줄에 4사이클 간격으로 점</td><td lang="ko">weight 넷을 계속 돌려 쓴다. reuse distance 4</td>
+          <td lang="en">Weights (green)</td><td lang="en"><strong>four horizontal rows</strong> (0, 1, 2, 3), a dot every 4 cycles on each</td><td lang="en">the four weights are cycled endlessly: reuse distance 4</td></tr>
+    </tbody>
+  </table>
+
+  <h3 data-slide="17"><span lang="ko">관찰: 출력 하나가 S번 재사용된다 → OA REG</span><span lang="en">Observation: one output is reused S times → OA REG</span></h3>
+  <p lang="ko">같은 슬라이드에 두 가지가 더해졌다. 출력 그림의 가로 막대 하나를 돋보기로 확대해 <strong>빨간 점 네 개</strong>를 크게 보여주고, 아래에 <strong><em>Observation: Single output is reused S times.</em></strong> 왼쪽 PE 그림 안에 <strong>OA REG</strong>(빨간 상자)가 새로 생겼다. MAC 결과가 OA REG로 가고, OA REG에서 MAC으로 되돌아오며, 끝난 값만 Output Activation Buffer로 나간다. 코드 아래에는 짝 없는 닫는 괄호 <code>}</code>가 하나 더 찍혀 있다. 애니메이션을 겹쳐 인쇄한 흔적이고 의미는 없다.</p>
+  <p lang="en">Two additions to the same slide. A magnifier blows up one flat run in the output plot to show <strong>four red dots</strong>, captioned <strong><em>Observation: Single output is reused S times.</em></strong> Inside the PE on the left there is now an <strong>OA REG</strong> (red box): the MAC result goes to OA REG, OA REG loops back into the MAC, and only finished values go out to the output activation buffer. A stray extra <code>}</code> under the code is an artefact of a flattened animation and means nothing.</p>
+  <p lang="ko"><strong>이게 "output stationary"라는 이름의 하드웨어적 의미다.</strong> 출력(psum)이 PE 안 레지스터에 <strong>머무르고</strong>, 버퍼의 출력 쪽 접근은 <span class="m"><i>Q</i></span>·<span class="m"><i>S</i></span> = 36번 읽기 + 36번 쓰기에서 <strong>9번 쓰기</strong>로 줄어든다. 4쪽 그림의 빨간 화살표 두 개(psum 읽기, 쓰기)가 RF 안으로 들어간 것이다. 3쪽 단위로는 버퍼 6×짜리 접근 72번이 RF 1×짜리로 바뀌었다.</p>
+  <p lang="en"><strong>That is what "output stationary" means in hardware.</strong> The output (the psum) <strong>stays</strong> in a register inside the PE, and output-side buffer traffic falls from <span class="m"><i>Q</i></span>·<span class="m"><i>S</i></span> = 36 reads + 36 writes to <strong>9 writes.</strong> Page 4's two red arrows (psum read, psum write) moved inside the RF. In page 3's units, 72 accesses at buffer 6x became RF accesses at 1x.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">그림 속 예제와 점 그림의 크기가 다르다</h4>
+    <h4 lang="en">The pictured example and the plotted one are different sizes</h4>
+    <p lang="ko">16, 17쪽(그리고 23, 24쪽) 왼쪽 위의 그림은 14쪽 그대로 <strong>입력 5, weight 3, 출력 3</strong>이다. 그런데 코드 주석과 점 그림은 <strong><span class="m"><i>Q</i></span> = 9, <span class="m"><i>S</i></span> = 4</strong>로 그려졌다. 출력 인덱스 0~8, weight 0~3, 입력 0~11(= 9 + 4 − 1 − 1), 사이클 36(= 9 × 4)이 전부 그쪽 숫자다. <strong>슬라이드가 그림을 재활용하면서 크기를 안 맞춘 것</strong>이다. 점 그림을 읽을 때는 주석의 9와 4를 믿으면 된다.</p>
+    <p lang="en">The figure at the top left of pages 16 and 17 (and 23 and 24) is page 14's <strong>5 inputs, 3 weights, 3 outputs.</strong> But the code comments and the plots use <strong><span class="m"><i>Q</i></span> = 9, <span class="m"><i>S</i></span> = 4</strong>: output indices 0-8, weights 0-3, inputs 0-11 (= 9 + 4 − 1 − 1) and 36 cycles (= 9 × 4) all come from those numbers. <strong>The slide reused a figure without resizing it.</strong> Trust the comments' 9 and 4 when reading the plots.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head" data-slide="18-21"><span class="sec-num">08</span><h2 lang="ko">3D conv 위의 OS</h2><h2 lang="en">Output stationary on a 3D conv</h2></div>
+  <p class="sec-sub" lang="ko">같은 OS를 2쪽의 진짜 conv 그림 위에서 네 장에 걸쳐 움직인다. <strong>빨간 테두리</strong>가 그 사이클에 쓰이는 원소다.</p>
+  <p class="sec-sub" lang="en">The same OS animated over page 2's real conv figure across four slides. <strong>Red outlines</strong> mark the elements in use that cycle.</p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">입력</th><th lang="ko">weight</th><th lang="ko">출력</th>
+      <th lang="en">Page</th><th lang="en">Input</th><th lang="en">Weight</th><th lang="en">Output</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>18</td><td><code>a</code></td><td lang="ko">두 filter 모두 <code>1</code></td><td lang="ko"><code>A</code>, 뒤쪽 출력 채널들의 같은 자리까지 테두리</td>
+          <td lang="en"><code>a</code></td><td lang="en"><code>1</code> in both filters</td><td lang="en"><code>A</code>, outlined in the rear output channels too</td></tr>
+      <tr><td>19</td><td><code>b</code></td><td lang="ko"><code>2</code></td><td lang="ko">그대로 <code>A</code></td>
+          <td lang="en"><code>b</code></td><td lang="en"><code>2</code></td><td lang="en">still <code>A</code></td></tr>
+      <tr><td>20</td><td><code>m</code></td><td lang="ko"><code>9</code></td><td lang="ko">그대로 <code>A</code></td>
+          <td lang="en"><code>m</code></td><td lang="en"><code>9</code></td><td lang="en">still <code>A</code></td></tr>
+      <tr><td>21</td><td lang="ko"><code>a</code> 위로 채널 방향 괄호</td><td lang="ko"><code>1</code> 위로 채널 방향 괄호</td><td lang="ko">그대로 <code>A</code></td>
+          <td lang="en">a bracket along the channel axis above <code>a</code></td><td lang="en">a bracket along the channel axis above <code>1</code></td><td lang="en">still <code>A</code></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">읽는 법은 이렇다. 18~20쪽은 <strong>3×3 창을 다 돈다</strong>(<code>a·1</code> → <code>b·2</code> → … → <code>m·9</code>, 즉 <code>r, s</code> loop). 21쪽은 <strong>다음 입력 채널로 넘어간다</strong>(<code>c</code> loop). 네 장 내내 <strong>출력 쪽 테두리는 <code>A</code>에서 한 번도 움직이지 않는다.</strong> 2쪽 코드에서 <code>r, s, c</code>가 가장 안쪽이었으니 당연하다. 출력 하나가 <span class="m"><i>RSC</i></span>번 갱신되는 동안 PE의 OA REG에 붙어 있다. 12쪽 표의 "Output reuse: <i>RSC</i>"를 PE 안에서 다 받아내는 것이다.</p>
+  <p lang="en">How to read it: pages 18-20 <strong>sweep the 3×3 window</strong> (<code>a·1</code> → <code>b·2</code> → … → <code>m·9</code>, the <code>r, s</code> loops); page 21 <strong>moves to the next input channel</strong> (the <code>c</code> loop). Through all four slides, <strong>the output outline never leaves <code>A</code>.</strong> Naturally: page 2's code had <code>r, s, c</code> innermost. While one output is updated <span class="m"><i>RSC</i></span> times it stays in the PE's OA REG, catching page 12's "output reuse: <i>RSC</i>" entirely inside the PE.</p>
+  <p lang="ko"><strong>그리고 테두리가 출력 채널 여러 개에 동시에 걸려 있다</strong>(뒤쪽 빨간 판들의 같은 자리, 두 filter의 같은 weight). 이건 PE가 하나가 아니라 <strong><span class="m"><i>K</i></span> 방향으로 여러 개</strong>라는 뜻으로 읽힌다. 각 PE가 서로 다른 출력 채널의 <code>A</code>를 붙잡고, <strong>같은 입력 <code>a</code>를 모두 함께 받는다</strong>(입력은 <code>k</code>와 무관하니 broadcast할 수 있다). weight는 PE마다 자기 filter의 <code>1</code>이다. 슬라이드가 이걸 말로 하진 않는다. 테두리의 위치에서 읽어 낸 해석이다.</p>
+  <p lang="en"><strong>The outlines also span several output channels at once</strong> (the same spot on the rear red planes, the same weight in both filters). That reads as <strong>several PEs along <span class="m"><i>K</i></span></strong>, not one: each PE pins a different output channel's <code>A</code> and <strong>all receive the same input <code>a</code></strong> (the input ignores <code>k</code>, so it can be broadcast), while each gets its own filter's <code>1</code>. The slide doesn't say this in words; it's an interpretation of where the outlines sit.</p>
+
+  <div class="callout" lang="ko">
+    <strong>OS는 그래서 "출력 위치마다 PE 하나"인 배치와 잘 맞는다.</strong> PE 수가 <span class="m"><i>K</i></span>개라면 입력을 broadcast하고 weight는 PE별로 공급한다. PE를 출력 위치 <span class="m">(<i>p</i>, <i>q</i>)</span>로 펼치면 반대로 weight를 broadcast하고 입력을 PE별로 준다. 10쪽 그림과 33쪽 그림이 이쪽이다. <strong>무엇을 붙잡느냐(temporal)와 무엇을 펼치느냐(spatial)는 따로 고르는 축</strong>이고, 둘을 합쳐야 dataflow 하나가 완성된다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>So OS pairs naturally with "one PE per output."</strong> With <span class="m"><i>K</i></span> PEs, broadcast the input and feed each PE its own weights. Spread PEs over output positions <span class="m">(<i>p</i>, <i>q</i>)</span> instead and you broadcast the weight and give each PE its own input: that is pages 10 and 33. <strong>What you pin (temporal) and what you spread (spatial) are separate axes</strong>, and a dataflow is complete only once both are chosen.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head" data-slide="22-24"><span class="sec-num">09</span><h2 lang="ko">PE 하나의 WS</h2><h2 lang="en">Weight stationary on one PE</h2></div>
+  <p class="sec-sub" lang="ko">7번 절을 WS 코드로 반복한다. 22쪽은 15쪽과 <strong>같은 그림</strong>이다(버퍼 셋, 저장소 없는 PE). 출발점을 다시 깐 것이다.</p>
+  <p class="sec-sub" lang="en">Section 7 repeated with the WS code. Page 22 is <strong>the same figure as page 15</strong> (three buffers, a PE with no storage): the starting point laid down again.</p>
+
+  <h3 data-slide="23"><span lang="ko">Buffer Access Pattern (WS)</span><span lang="en">Buffer access pattern (WS)</span></h3>
+  <p lang="ko">출처 <em>Eyeriss Tutorial</em>. WS 코드, 주석 <code>// S=4</code>, <code>// Q =9</code>. 점 그림 셋의 무늬가 OS와 <strong>정확히 뒤바뀌었다.</strong></p>
+  <p lang="en">Source: <em>Eyeriss Tutorial.</em> The WS code, commented <code>// S=4</code> and <code>// Q =9.</code> The three plots have <strong>exactly swapped patterns</strong> compared with OS:</p>
+  <ul lang="ko">
+    <li><strong>Outputs</strong>: 0에서 8까지 오르는 <strong>대각선 네 줄</strong>. 출력 하나가 9사이클마다 돌아온다. reuse distance 9(= <span class="m"><i>Q</i></span>)</li>
+    <li><strong>Inputs</strong>: 대각선 네 줄이 0~8, 1~9, 2~10, 3~11로 한 칸씩 올라간다</li>
+    <li><strong>Weights</strong>: <strong>가로 막대 계단</strong>. 같은 높이 점 9개씩 0, 1, 2, 3. reuse distance 1</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Outputs</strong>: <strong>four diagonals</strong> rising 0 to 8. Each output returns every 9 cycles: reuse distance 9 (= <span class="m"><i>Q</i></span>)</li>
+    <li><strong>Inputs</strong>: four diagonals stepping up one each time: 0-8, 1-9, 2-10, 3-11</li>
+    <li><strong>Weights</strong>: <strong>a staircase of flat runs</strong>, nine dots each at 0, 1, 2, 3. Reuse distance 1</li>
+  </ul>
+
+  <h3 data-slide="24"><span lang="ko">관찰: weight 하나가 Q번 재사용된다 → W REG</span><span lang="en">Observation: one weight is reused Q times → W REG</span></h3>
+  <p lang="ko">weight 그림의 막대 하나(높이 1)에 빨간 상자. <strong><em>Observation: Single weight is reused Q times.</em></strong> PE 안에 초록 <strong>W REG</strong>가 생겨 Weight Buffer → W REG → MAC으로 흐른다. Output 버퍼의 되돌이 선은 <strong>그대로 남아 있다.</strong></p>
+  <p lang="en">A red box around one flat run (height 1) in the weight plot, captioned <strong><em>Observation: Single weight is reused Q times.</em></strong> A green <strong>W REG</strong> now sits in the PE, so data flows weight buffer → W REG → MAC. The output buffer's loop-back line <strong>is still there.</strong></p>
+  <p lang="ko"><strong>그 남은 선이 WS의 대가다.</strong> weight 버퍼 읽기는 36번에서 4번으로 줄었지만, psum은 이제 매 사이클 버퍼에서 읽고 다시 써야 한다. 출력 reuse distance가 9라서, 9칸짜리 레지스터를 두지 않는 한 PE 안에 붙잡을 수 없다. <strong>무엇을 붙잡을지 고르는 건 어느 쪽 비용을 감수할지 고르는 것</strong>이다. 아래 도구로 직접 세어 보자.</p>
+  <p lang="en"><strong>That remaining line is WS's price.</strong> Weight buffer reads fell from 36 to 4, but every cycle the psum must now be read from the buffer and written back. With an output reuse distance of 9, you can't pin it inside the PE short of a nine-entry register. <strong>Choosing what to pin is choosing which cost to accept.</strong> Count it yourself with the tool below.</p>
+
+  <div class="play">
+    <div class="plab" lang="ko">PE 하나 dataflow 비교기 · 1D conv의 버퍼 접근을 센다</div>
+    <div class="plab" lang="en">Single-PE dataflow comparator · counting a 1D conv's buffer accesses</div>
+    <div class="hintline" lang="ko" style="border-top:0;padding-top:0;margin-top:0">15쪽의 PE 하나, 버퍼 셋에 <strong>붙잡을 텐서용 레지스터 한 칸</strong>을 더했다. 점 그림은 16, 23쪽과 같은 방식(가로 사이클, 세로 인덱스)이다. 에너지는 <strong>3쪽 단위</strong>로 센다. 버퍼 접근 6, 레지스터 접근 1, MAC 1. psum은 첫 누적에서 읽지 않는다(0에서 시작)고 본다. IS는 6번 절 감각 문제의 코드다.</div>
+    <div class="hintline" lang="en" style="border-top:0;padding-top:0;margin-top:0">Page 15's single PE and three buffers, plus <strong>one register slot for the pinned tensor.</strong> The plots work like pages 16 and 23 (cycle across, index up). Energy is counted <strong>in page-3 units</strong>: buffer access 6, register access 1, MAC 1. The psum isn't read on its first accumulation (it starts from zero). IS is the code from section 6's exercise.</div>
+
+    <div class="plab" lang="ko">Dataflow</div>
+    <div class="plab" lang="en">Dataflow</div>
+    <div class="presets" id="dfD"></div>
+    <div class="plab" lang="ko">출력 길이 Q</div>
+    <div class="plab" lang="en">Output length Q</div>
+    <div class="presets" id="dfQ"></div>
+    <div class="plab" lang="ko">weight 길이 S</div>
+    <div class="plab" lang="en">Weight length S</div>
+    <div class="presets" id="dfS"></div>
+
+    <div id="dfSvg" style="margin-top:18px"></div>
+    <div id="dfOut" style="margin-top:14px"></div>
+    <div class="verdict" id="dfV" style="margin-top:14px"></div>
+
+    <div class="hintline" lang="ko"><strong>찾아볼 것 셋.</strong> 하나, Q = 9, S = 4에서 OS를 고르면 16쪽 그림이, WS를 고르면 23쪽 그림이 그대로 나온다. 둘, <strong>PE 하나에서는 OS가 이긴다.</strong> psum은 읽기와 쓰기 두 번이라 붙잡았을 때 아끼는 양이 weight나 입력보다 크다. 셋, S를 키워도 WS의 weight 버퍼 읽기는 S번뿐이다. 그런데 순위는 안 바뀐다. <strong>WS가 진짜로 이기는 곳은 PE가 여럿이고 psum을 버퍼가 아니라 이웃 PE로 넘길 때</strong>(35쪽)다. 이 도구는 그걸 일부러 빼고 셌다.</div>
+    <div class="hintline" lang="en"><strong>Three things to find.</strong> One, at Q = 9, S = 4, OS reproduces page 16's plots and WS page 23's. Two, <strong>on a single PE, OS wins</strong>: the psum costs a read and a write, so pinning it saves more than pinning a weight or an input. Three, raising S leaves WS's weight-buffer reads at just S, yet the ranking holds. <strong>WS really wins with many PEs, when psums pass to the neighbouring PE instead of the buffer</strong> (page 35). This tool leaves that out on purpose.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head" data-slide="25-27"><span class="sec-num">10</span><h2 lang="ko">3D conv 위의 WS</h2><h2 lang="en">Weight stationary on a 3D conv</h2></div>
+  <p class="sec-sub" lang="ko">8번 절의 그림 위에서 이번엔 WS를 움직인다. <strong>이번에는 weight 쪽 테두리가 움직이지 않는다.</strong></p>
+  <p class="sec-sub" lang="en">Section 8's figure again, now running WS. <strong>This time it is the weight outlines that never move.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">입력</th><th lang="ko">weight</th><th lang="ko">출력</th>
+      <th lang="en">Page</th><th lang="en">Input</th><th lang="en">Weight</th><th lang="en">Output</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>25</td><td lang="ko"><code>a</code>, 채널 방향으로 테두리 여럿</td><td lang="ko"><code>1</code>, 채널 방향 여럿, 두 filter 모두</td><td lang="ko"><code>A</code>, 출력 채널 방향 여럿</td>
+          <td lang="en"><code>a</code>, several outlines along channels</td><td lang="en"><code>1</code>, along channels, in both filters</td><td lang="en"><code>A</code>, along output channels</td></tr>
+      <tr><td>26</td><td><code>b</code></td><td lang="ko">그대로 <code>1</code></td><td><code>B</code></td>
+          <td lang="en"><code>b</code></td><td lang="en">still <code>1</code></td><td lang="en"><code>B</code></td></tr>
+      <tr><td>27</td><td><code>m</code></td><td lang="ko">그대로 <code>1</code></td><td lang="ko"><code>I</code> (마지막 출력)</td>
+          <td lang="en"><code>m</code></td><td lang="en">still <code>1</code></td><td lang="en"><code>I</code> (the last output)</td></tr>
+    </tbody>
+  </table>
+  <p lang="ko"><code>a</code>→<code>A</code>, <code>b</code>→<code>B</code>, …, <code>m</code>→<code>I</code>. weight <code>1</code>(창의 왼쪽 위 칸, <span class="m"><i>r</i></span> = <span class="m"><i>s</i></span> = 0)은 출력 <span class="m">(<i>p</i>, <i>q</i>)</span>에 입력 <span class="m">(<i>p</i>, <i>q</i>)</span>를 곱해 보탠다. 5×5 입력의 왼쪽 위 3×3(<code>a b c / f g h / k l m</code>)이 3×3 출력 <code>A~I</code>와 한 칸씩 짝지어진다. <strong>weight 하나가 <span class="m"><i>PQ</i></span> = 9개 출력 전부를 돌 동안 붙어 있다.</strong> 12쪽 "Weight reuse: <i>PQ</i>"를 PE 안에서 받는 것이다.</p>
+  <p lang="en"><code>a</code>→<code>A</code>, <code>b</code>→<code>B</code>, …, <code>m</code>→<code>I</code>. Weight <code>1</code> (the window's top-left cell, <span class="m"><i>r</i></span> = <span class="m"><i>s</i></span> = 0) adds input <span class="m">(<i>p</i>, <i>q</i>)</span> times itself into output <span class="m">(<i>p</i>, <i>q</i>)</span>, so the top-left 3×3 of the 5×5 input (<code>a b c / f g h / k l m</code>) pairs off cell by cell with the 3×3 output <code>A</code> to <code>I</code>. <strong>One weight stays pinned while it sweeps all <span class="m"><i>PQ</i></span> = 9 outputs</strong>, catching page 12's "weight reuse: <i>PQ</i>" inside the PE.</p>
+  <p lang="ko"><strong>테두리가 채널 방향(<span class="m"><i>C</i></span>)과 filter 방향(<span class="m"><i>K</i></span>)으로 동시에 여러 개</strong>인 것이 OS 때와 다르다. weight <code>1</code>이 <strong>모든 입력 채널, 모든 filter에서 한꺼번에</strong> 붙잡혀 있다. 즉 PE가 <span class="m"><i>C</i>×<i>K</i></span> 격자로 놓이고 각자 <span class="m"><i>W</i>[0][0][<i>c</i>][<i>k</i>]</span> 하나씩을 들고 있다. 30쪽의 <code>spatial_for c, k</code>가 바로 이 그림을 코드로 적은 것이다. 아래 11번 절에서 이 격자를 그린다.</p>
+  <p lang="en">What differs from OS is that <strong>the outlines multiply along both the channel axis (<span class="m"><i>C</i></span>) and the filter axis (<span class="m"><i>K</i></span>).</strong> Weight <code>1</code> is pinned <strong>for every input channel and every filter at once</strong>: the PEs form a <span class="m"><i>C</i>×<i>K</i></span> grid, each holding one <span class="m"><i>W</i>[0][0][<i>c</i>][<i>k</i>]</span>. Page 30's <code>spatial_for c, k</code> is this exact picture written as code; section 11 draws the grid.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head" data-slide="28-32"><span class="sec-num">11</span><h2 lang="ko">loop를 바꿔 WS 만들기, NVDLA</h2><h2 lang="en">Rewriting loops into WS, and NVDLA</h2></div>
+  <p class="sec-sub" lang="ko">이 강의의 클라이맥스다. 2쪽의 원래 loop nest에서 출발해 <strong>세 단계 변환</strong>(순서 바꾸기 → 공간 병렬화 → 시간 타일링)을 거치면 <strong>실제 칩(NVDLA)의 dataflow</strong>가 나온다. 다섯 장 모두 왼쪽에 25~27쪽의 WS 그림이 작게 붙어 있다.</p>
+  <p class="sec-sub" lang="en">The lecture's climax. Start from page 2's original loop nest, apply <strong>three rewrites</strong> (reorder → spatial parallelism → temporal tiling), and out comes <strong>a real chip's (NVDLA's) dataflow.</strong> All five slides carry a small copy of the WS figure from pages 25-27 on the left.</p>
+
+  <h3 data-slide="28"><span lang="ko">What we had before</span><span lang="en">What we had before</span></h3>
+  <p lang="ko">2쪽 코드를 그대로 다시 놓았다. 다만 <code>k, p, q</code> loop와 <code>OA[...] = 0;</code> 줄이 <strong>굵게</strong> 강조돼 있다. "바깥에 있는 출력 쪽 loop를 보라"는 표시다. 이 순서에서는 <code>W[k][c][r][s]</code>가 가장 안쪽에서 매번 바뀐다. <strong>weight가 가장 덜 stationary한 순서</strong>다.</p>
+  <p lang="en">Page 2's code placed again, except that the <code>k, p, q</code> loops and the <code>OA[...] = 0;</code> line are <strong>bold</strong>: look at the output-side loops on the outside. In this order <code>W[k][c][r][s]</code> changes at every innermost step. <strong>It is the order in which weights are least stationary.</strong></p>
+
+  <h3 data-slide="29"><span lang="ko">Change temporal ordering</span><span lang="en">Change temporal ordering</span></h3>
+<pre class="code"><span class="k">for</span> (n=<span class="n">0</span>; n&lt;N; n++) {
+  <span class="k">for</span> (r=<span class="n">0</span>; r&lt;R; r++) {                     <span class="c">// <span lang="ko">weight 쪽 네 loop를</span><span lang="en">the four weight loops</span></span>
+    <span class="k">for</span> (s=<span class="n">0</span>; s&lt;S; s++) {                   <span class="c">// <span lang="ko">바깥으로 끌어올렸다</span><span lang="en">hoisted outward</span></span>
+      <span class="k">for</span> (c=<span class="n">0</span>; c&lt;C; c++) {
+        <span class="k">for</span> (k=<span class="n">0</span>; k&lt;K; k++) {
+          <span class="k">float</span> curr_w = W[r][s][c][k];    <span class="c">// <span lang="ko">한 번 읽어서</span><span lang="en">read once</span></span>
+          <span class="k">for</span> (p=<span class="n">0</span>; p&lt;P; p++) {             <span class="c">// <span lang="ko">출력 위치를 다 돈다</span><span lang="en">sweep every output position</span></span>
+            <span class="k">for</span> (q=<span class="n">0</span>; q&lt;Q; q++) {
+              h = p * stride - pad + r;
+              w = q * stride - pad + s;
+              OA[n][k][p][q] += IA[n][c][h][w] * curr_w;
+}}}}}}}</pre>
+  <p lang="ko">빨간 점선 상자가 <code>r, s, c, k</code> 네 loop와 <code>curr_w</code> 줄을 감쌌다. 바뀐 건 <strong>weight가 쓰는 네 인덱스를 바깥으로, weight와 무관한 <code>p, q</code>를 안으로</strong> 보낸 것뿐이다. <code>curr_w</code>라는 지역 변수가 <strong>W REG</strong>(24쪽)의 코드판이다. 안쪽 <span class="m"><i>PQ</i></span>번 동안 레지스터에 그대로 있다. 결과는 원래 코드와 같다(덧셈 순서만 다르다).</p>
+  <p lang="en">A red dashed box wraps the <code>r, s, c, k</code> loops and the <code>curr_w</code> line. The only change: <strong>the four indices the weight uses move outward, and <code>p, q</code>, which the weight ignores, move inward.</strong> The local variable <code>curr_w</code> is the code version of the <strong>W REG</strong> (page 24), sitting in a register for the inner <span class="m"><i>PQ</i></span> iterations. The result equals the original code (only the order of additions differs).</p>
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko"><code>W[r][s][c][k]</code>와 <code>W[k][c][r][s]</code>: 같은 weight, 다른 배치</h4>
+    <h4 lang="en"><code>W[r][s][c][k]</code> versus <code>W[k][c][r][s]</code>: same weights, different layout</h4>
+    <p lang="ko">2쪽과 28쪽은 <code>W[k][c][r][s]</code>, 29쪽부터는 <code>W[r][s][c][k]</code>로 인덱스 순서가 바뀌었다. 수학적으로는 같은 원소를 가리키지만, C 배열에서 인덱스 순서는 <strong>메모리에 놓이는 순서</strong>다. 마지막 인덱스가 연속된 주소다. <code>W[r][s][c][k]</code>(RSCK 배치)이면 같은 <span class="m">(<i>r</i>, <i>s</i>, <i>c</i>)</span>의 <span class="m"><i>K</i></span>개 weight가 <strong>나란히</strong> 있어서, 30쪽처럼 <code>k</code>를 펼친 PE 64개에 <strong>연속된 한 덩어리</strong>를 읽어 나눠 줄 수 있다. 슬라이드가 말로 설명하진 않지만, <strong>dataflow를 바꾸면 메모리 배치도 따라 바꾸는 게 보통</strong>이다 (보충).</p>
+    <p lang="en">Pages 2 and 28 write <code>W[k][c][r][s]</code>; from page 29 it becomes <code>W[r][s][c][k]</code>. Mathematically the same elements, but in a C array the index order is <strong>the order in memory</strong>: the last index is contiguous. With <code>W[r][s][c][k]</code> (an RSCK layout) the <span class="m"><i>K</i></span> weights for one <span class="m">(<i>r</i>, <i>s</i>, <i>c</i>)</span> sit <strong>side by side</strong>, so page 30's 64 PEs unrolled over <code>k</code> can be fed by <strong>one contiguous read.</strong> The slide doesn't say it, but <strong>changing the dataflow usually means changing the memory layout with it</strong> (supplementary).</p>
+  </div>
+
+  <h3 data-slide="30"><span lang="ko">Apply spatial parallelism</span><span lang="en">Apply spatial parallelism</span></h3>
+  <p lang="ko">29쪽 코드에서 두 줄만 바뀌었다. <code>for (c...)</code>와 <code>for (k...)</code>가 <strong><code>spatial_for</code></strong>로. 빨간 점선이 그 두 줄을 감싼다. <strong>PE가 <span class="m"><i>C</i>×<i>K</i></span>개 있어서 각자 <code>W[r][s][c][k]</code> 하나를 붙잡는다.</strong> 25~27쪽에서 테두리가 채널과 filter 방향으로 여러 개였던 게 이것이다.</p>
+  <p lang="en">Only two lines change from page 29: <code>for (c...)</code> and <code>for (k...)</code> become <strong><code>spatial_for</code></strong>, boxed in red. <strong>There are <span class="m"><i>C</i>×<i>K</i></span> PEs, each pinning one <code>W[r][s][c][k]</code>.</strong> That is why pages 25-27 had outlines multiplied along channels and filters.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 330" role="img" aria-label="C 곱하기 K PE 격자에 weight를 하나씩 고정하고, 입력은 행 방향으로 broadcast하고 부분합은 열 방향으로 더해 출력으로 내보내는 weight stationary 배열 도해">
+      <text class="svglab" x="20" y="24" style="font-size:11px;font-weight:600" fill="var(--ink)" lang="ko">30쪽의 spatial_for c, k를 PE 격자로 (C = K = 4로 축소)</text>
+      <text class="svglab" x="20" y="24" style="font-size:11px;font-weight:600" fill="var(--ink)" lang="en">Page 30's spatial_for c, k as a PE grid (shrunk to C = K = 4)</text>
+
+      <text class="svglab" x="300" y="52" text-anchor="middle" style="font-size:10.5px" fill="var(--ink3)">k = 0 … 3 →</text>
+      <text class="svglab" x="44" y="190" text-anchor="middle" style="font-size:10.5px" fill="var(--ink3)" transform="rotate(-90 44 190)">c = 0 … 3 →</text>
+
+      <g>
+        <rect x="150" y="70" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="250" y="70" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="350" y="70" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="450" y="70" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="150" y="135" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="250" y="135" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="350" y="135" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="450" y="135" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="150" y="200" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="250" y="200" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="350" y="200" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="450" y="200" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="150" y="265" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="250" y="265" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="350" y="265" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+        <rect x="450" y="265" width="80" height="50" rx="6" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)"/>
+      </g>
+      <g>
+        <rect x="162" y="82" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="190" y="96" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[0][0]</text>
+        <rect x="262" y="82" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="290" y="96" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[0][1]</text>
+        <rect x="362" y="82" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="390" y="96" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[0][2]</text>
+        <rect x="462" y="82" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="490" y="96" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[0][3]</text>
+        <rect x="162" y="147" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="190" y="161" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[1][0]</text>
+        <rect x="262" y="147" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="290" y="161" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[1][1]</text>
+        <rect x="362" y="147" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="390" y="161" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[1][2]</text>
+        <rect x="462" y="147" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="490" y="161" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[1][3]</text>
+        <rect x="162" y="212" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="190" y="226" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[2][0]</text>
+        <rect x="262" y="212" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="290" y="226" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[2][1]</text>
+        <rect x="362" y="212" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="390" y="226" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[2][2]</text>
+        <rect x="462" y="212" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="490" y="226" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[2][3]</text>
+        <rect x="162" y="277" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="190" y="291" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[3][0]</text>
+        <rect x="262" y="277" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="290" y="291" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[3][1]</text>
+        <rect x="362" y="277" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="390" y="291" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[3][2]</text>
+        <rect x="462" y="277" width="56" height="20" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="490" y="291" text-anchor="middle" style="font-size:10px" fill="var(--blue)">w[3][3]</text>
+      </g>
+      <g>
+        <line x1="96" y1="112" x2="530" y2="112" stroke="var(--brown)" stroke-width="1.8"/>
+        <line x1="96" y1="177" x2="530" y2="177" stroke="var(--brown)" stroke-width="1.8"/>
+        <line x1="96" y1="242" x2="530" y2="242" stroke="var(--brown)" stroke-width="1.8"/>
+        <line x1="96" y1="307" x2="530" y2="307" stroke="var(--brown)" stroke-width="1.8"/>
+        <text class="svgnum" x="62" y="116" style="font-size:10px" fill="var(--brown)">IA[0]</text>
+        <text class="svgnum" x="62" y="181" style="font-size:10px" fill="var(--brown)">IA[1]</text>
+        <text class="svgnum" x="62" y="246" style="font-size:10px" fill="var(--brown)">IA[2]</text>
+        <text class="svgnum" x="62" y="311" style="font-size:10px" fill="var(--brown)">IA[3]</text>
+      </g>
+      <g>
+        <line x1="222" y1="120" x2="222" y2="135" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="322" y1="120" x2="322" y2="135" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="422" y1="120" x2="422" y2="135" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="522" y1="120" x2="522" y2="135" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="222" y1="185" x2="222" y2="200" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="322" y1="185" x2="322" y2="200" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="422" y1="185" x2="422" y2="200" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="522" y1="185" x2="522" y2="200" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="222" y1="250" x2="222" y2="265" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="322" y1="250" x2="322" y2="265" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="422" y1="250" x2="422" y2="265" stroke="var(--amber)" stroke-width="2"/>
+        <line x1="522" y1="250" x2="522" y2="265" stroke="var(--amber)" stroke-width="2"/>
+      </g>
+      <text class="svglab" x="548" y="100" style="font-size:10.5px" fill="var(--blue)" lang="ko">weight: 고정</text>
+      <text class="svglab" x="548" y="100" style="font-size:10.5px" fill="var(--blue)" lang="en">weight: pinned</text>
+      <text class="svglab" x="548" y="168" style="font-size:10.5px" fill="var(--brown)" lang="ko">입력: 행으로</text>
+      <text class="svglab" x="548" y="168" style="font-size:10.5px" fill="var(--brown)" lang="en">input: along</text>
+      <text class="svglab" x="548" y="182" style="font-size:10.5px" fill="var(--brown)" lang="ko">broadcast</text>
+      <text class="svglab" x="548" y="182" style="font-size:10.5px" fill="var(--brown)" lang="en">rows, broadcast</text>
+      <text class="svglab" x="548" y="236" style="font-size:10.5px" fill="var(--amber)" lang="ko">psum: 열로</text>
+      <text class="svglab" x="548" y="236" style="font-size:10.5px" fill="var(--amber)" lang="en">psum: summed</text>
+      <text class="svglab" x="548" y="250" style="font-size:10.5px" fill="var(--amber)" lang="ko">더해 아래로</text>
+      <text class="svglab" x="548" y="250" style="font-size:10.5px" fill="var(--amber)" lang="en">down columns</text>
+      <text class="svgnum" x="548" y="300" style="font-size:10.5px" fill="var(--amber)">→ OA[k]</text>
+    </svg>
+    <figcaption lang="ko">PE <span class="m">(<i>c</i>, <i>k</i>)</span>가 <span class="m"><i>W</i>[<i>r</i>][<i>s</i>][<i>c</i>][<i>k</i>]</span>를 붙잡는다(<span class="cAlg">파랑</span>). 매 사이클 출력 위치 하나 <span class="m">(<i>p</i>, <i>q</i>)</span>에 대해, 입력 채널 <span class="m"><i>c</i></span>의 값 하나가 <strong>그 행 전체에 broadcast</strong>된다(<span class="cMem">갈색</span>, 입력은 <code>k</code>와 무관하다). 각 열의 곱은 <strong>위에서 아래로 더해져</strong> 출력 채널 <span class="m"><i>k</i></span>의 psum이 된다(<span class="cCost">주황</span>, 출력은 <code>c</code>와 무관하므로 PE끼리 합쳐야 한다). <strong>spatial_for 두 개가 서로 다른 배선을 요구한다</strong>는 게 이 그림의 요점이다. 열 방향 덧셈을 이웃에게 넘기는 식으로 하면 systolic array가 된다(보충).</figcaption>
+    <figcaption lang="en">PE <span class="m">(<i>c</i>, <i>k</i>)</span> pins <span class="m"><i>W</i>[<i>r</i>][<i>s</i>][<i>c</i>][<i>k</i>]</span> (<span class="cAlg">blue</span>). Each cycle, for one output position <span class="m">(<i>p</i>, <i>q</i>)</span>, one value from input channel <span class="m"><i>c</i></span> is <strong>broadcast along its whole row</strong> (<span class="cMem">brown</span>; the input ignores <code>k</code>). Each column's products are <strong>summed top to bottom</strong> into output channel <span class="m"><i>k</i></span>'s psum (<span class="cCost">amber</span>; the output ignores <code>c</code>, so PEs must combine). <strong>The two spatial_for loops demand different wiring</strong>, and that is the figure's point. Pass the column sums neighbour to neighbour and you have a systolic array (supplementary).</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>ECE 479 Lec19에서 Tm·Tn으로 unroll한 그 두 loop다.</strong> FPGA conv 가속기를 만들 때 출력 채널(Tm)과 입력 채널(Tn) loop를 펼쳐 곱셈기 <span class="m">Tm×Tn</span>개에 올리고, 입력 채널 쪽은 adder tree로 합쳤다. <strong>그게 정확히 <code>spatial_for k</code>와 <code>spatial_for c</code></strong>이고, adder tree가 위 그림의 주황 세로선이다. 그때는 "loop를 펼치면 빨라진다"였다. 이 강의는 같은 선택을 <strong>"무엇이 broadcast되고 무엇이 공간에서 누적되는가"</strong>로 다시 읽게 한다. 그리고 ECE 479 Lec11의 Edge TPU 소개에서 "systolic array"라고만 들었던 것의 정체가 이 격자다. TPUv1의 행렬 유닛도 weight를 미리 올려 두는 방식이다 (보충, Jouppi et al., ISCA 2017).
+  </div>
+  <div class="callout" lang="en">
+    <strong>These are the two loops you unrolled by Tm and Tn in ECE 479 lecture 19.</strong> Building an FPGA conv accelerator, you unrolled the output-channel (Tm) and input-channel (Tn) loops onto <span class="m">Tm×Tn</span> multipliers and summed the input-channel side with an adder tree. <strong>That is exactly <code>spatial_for k</code> and <code>spatial_for c</code></strong>, and the adder tree is the amber vertical lines above. Back then it was "unrolling makes it faster." This lecture makes you reread the same choice as <strong>"what gets broadcast and what gets accumulated in space."</strong> And the "systolic array" you only heard named in ECE 479 lecture 11's Edge TPU intro is this grid. TPUv1's matrix unit also preloads its weights (supplementary, Jouppi et al., ISCA 2017).
+  </div>
+
+  <h3 data-slide="31"><span lang="ko">Apply temporal tiling: 16 × 64</span><span lang="en">Apply temporal tiling: 16 × 64</span></h3>
+<pre class="code"><span class="k">for</span> (n=<span class="n">0</span>; n&lt;N; n++) {
+ <span class="k">for</span> (r=<span class="n">0</span>; r&lt;R; r++) {
+  <span class="k">for</span> (s=<span class="n">0</span>; s&lt;S; s++) {
+   <span class="k">for</span> (c_t=<span class="n">0</span>; c_t&lt;C/<span class="n">16</span>; c_t++) {          <span class="c">// <span lang="ko">시간: C를 16씩 끊어서</span><span lang="en">time: C in chunks of 16</span></span>
+    <span class="k">for</span> (k_t=<span class="n">0</span>; k_t&lt;K/<span class="n">64</span>; k_t++) {         <span class="c">// <span lang="ko">시간: K를 64씩 끊어서</span><span lang="en">time: K in chunks of 64</span></span>
+     spatial_for (c_s=<span class="n">0</span>; c_s&lt;<span class="n">16</span>; c_s++) {   <span class="c">// <span lang="ko">공간: PE 16줄</span><span lang="en">space: 16 PE rows</span></span>
+      spatial_for (k_s=<span class="n">0</span>; k_s&lt;<span class="n">64</span>; k_s++) { <span class="c">// <span lang="ko">공간: PE 64열</span><span lang="en">space: 64 PE columns</span></span>
+       <span class="k">int</span> curr_c = c_t * <span class="n">16</span> + c_s;
+       <span class="k">int</span> curr_k = k_t * <span class="n">64</span> + k_s;
+       <span class="k">float</span> curr_w = W[r][s][curr_c][curr_k];
+       <span class="k">for</span> (p=<span class="n">0</span>; p&lt;P; p++) {
+        <span class="k">for</span> (q=<span class="n">0</span>; q&lt;Q; q++) {
+         h = p * stride - pad + r;
+         w = q * stride - pad + s;
+         OA[n][curr_k][p][q] += IA[n][curr_c][h][w] * curr_w;
+}}}}}}}}}</pre>
+  <p lang="ko">30쪽은 PE가 <span class="m"><i>C</i>×<i>K</i></span>개라고 가정했다. 실제 층은 <span class="m"><i>C</i></span> = 256, <span class="m"><i>K</i></span> = 256이면 PE 65,536개가 필요하다. 칩은 <strong>고정된 수</strong>의 PE를 가진다. 그래서 차원 하나를 <strong>둘로 쪼갠다.</strong> 안쪽 조각(<code>c_s</code> 16, <code>k_s</code> 64)은 PE 격자에 펼치고, 바깥 조각(<code>c_t</code>, <code>k_t</code>)은 시간 loop로 돌린다. <strong>16 × 64 = 1,024개 PE</strong>가 <span class="m">(<i>C</i>/16)·(<i>K</i>/64)</span>번 다시 쓰인다.</p>
+  <p lang="en">Page 30 assumed <span class="m"><i>C</i>×<i>K</i></span> PEs. A real layer with <span class="m"><i>C</i></span> = 256 and <span class="m"><i>K</i></span> = 256 would need 65,536. A chip has <strong>a fixed number</strong> of PEs, so each dimension is <strong>split in two</strong>: the inner piece (<code>c_s</code> 16, <code>k_s</code> 64) is spread across the PE grid, and the outer piece (<code>c_t</code>, <code>k_t</code>) runs as a time loop. <strong>16 × 64 = 1,024 PEs</strong> get reused <span class="m">(<i>C</i>/16)·(<i>K</i>/64)</span> times.</p>
+
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · 타일 첨자</span><span lang="en">Unpacking the notation · tile subscripts</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m">c_t, k_t</td><td><span lang="ko"><strong>t = temporal.</strong> 몇 번째 타일인가. 범위 <span class="m"><i>C</i>/16</span>, <span class="m"><i>K</i>/64</span>. 정수</span><span lang="en"><strong>t = temporal</strong>: which tile. Ranges <span class="m"><i>C</i>/16</span> and <span class="m"><i>K</i>/64</span>. Integers</span></td></tr>
+        <tr><td class="m">c_s, k_s</td><td><span lang="ko"><strong>s = spatial.</strong> 타일 안에서 몇 번째 PE 줄/열인가. 0~15, 0~63. 하드웨어 격자 좌표</span><span lang="en"><strong>s = spatial</strong>: which PE row/column within the tile, 0-15 and 0-63. Hardware grid coordinates</span></td></tr>
+        <tr><td class="m">curr_c = c_t·16 + c_s</td><td><span lang="ko">둘을 다시 합친 실제 채널 번호. <strong>나눗셈의 몫과 나머지</strong>로 쪼갠 것을 되돌리는 식</span><span lang="en">the real channel index, reassembled. It undoes the split into <strong>quotient and remainder</strong></span></td></tr>
+        <tr><td class="m">16, 64</td><td><span lang="ko">이 칩의 PE 격자 크기. 슬라이드의 숫자이고, <strong>NVDLA의 실제 구성 값으로 검증하지 않았다</strong>. NVDLA는 구성(full/small 등)에 따라 MAC 배열 크기가 다르다 (보충)</span><span lang="en">this chip's PE grid size. These are the slide's numbers, <strong>not checked against NVDLA's actual configurations</strong>; NVDLA's MAC array size varies by configuration (full, small and so on) (supplementary)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">이 16 × 64 배열에 <strong>RGB 이미지를 받는 첫 conv 층</strong>(<span class="m"><i>C</i></span> = 3, <span class="m"><i>K</i></span> = 64)을 올린다. PE 몇 개가 일하는가? <span class="m"><i>K</i></span> = 1000인 층이라면?</p>
+    <p lang="en">Map <strong>the first conv layer of an RGB network</strong> (<span class="m"><i>C</i></span> = 3, <span class="m"><i>K</i></span> = 64) onto this 16 × 64 array. How many PEs work? What about a layer with <span class="m"><i>K</i></span> = 1000?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <p lang="ko"><span class="m"><i>C</i></span> = 3이면 <code>c_s</code> 16줄 중 3줄만 쓴다. <span class="m"><i>K</i></span> = 64는 64열을 꽉 채운다. <strong>3 × 64 = 192 / 1,024 = 18.75%</strong>. 나머지 81%의 PE는 논다. 첫 층은 MAC 수가 많은 편인데도 이 배열에서는 <span class="cCost">peak의 5분의 1</span>로 돈다. <span class="m"><i>K</i></span> = 1000이면 <span class="m">⌈1000/64⌉</span> = 16 타일인데 마지막 타일은 1000 − 15·64 = 40열만 쓴다. 이 층의 열 이용률은 1000 / (16·64) ≈ 97.7%다. <strong>spatial_for의 범위를 하드웨어로 고정하는 순간, 그 범위와 안 맞는 층에서 이용률이 깎인다.</strong> L07-8-9의 "peak는 아무도 못 낸다"가 이런 데서 나온다. Eyeriss가 <span class="m"><i>C</i>, <i>K</i></span> 대신 다른 차원을 펼치는 dataflow를 고른 이유 중 하나다 (보충).</p>
+      <p lang="en">With <span class="m"><i>C</i></span> = 3, only 3 of the 16 <code>c_s</code> rows are used, while <span class="m"><i>K</i></span> = 64 fills all 64 columns: <strong>3 × 64 = 192 / 1,024 = 18.75%.</strong> The other 81% of PEs sit idle, so a layer with plenty of MACs runs at <span class="cCost">a fifth of peak</span> on this array. With <span class="m"><i>K</i></span> = 1000 there are <span class="m">⌈1000/64⌉</span> = 16 tiles, the last using only 1000 − 15·64 = 40 columns, for a column utilisation of 1000 / (16·64) ≈ 97.7%. <strong>The moment hardware fixes a spatial_for bound, layers that don't fit it lose utilisation.</strong> That is where lecture 7-8-9's "nobody hits peak" comes from, and one reason Eyeriss chose a dataflow that spreads dimensions other than <span class="m"><i>C</i>, <i>K</i></span> (supplementary).</p>
+    </details>
+  </div>
+
+  <h3 data-slide="32"><span lang="ko">NVDLA Dataflow (nvdla.org)</span><span lang="en">NVDLA dataflow (nvdla.org)</span></h3>
+  <p lang="ko">31쪽과 <strong>코드가 한 글자도 다르지 않다.</strong> 제목만 <em>NVDLA Dataflow (nvdla.org)</em>로 바뀌었다. 이게 이 슬라이드의 펀치라인이다. <strong>세 번의 기계적인 loop 변환으로 실제 오픈소스 가속기의 dataflow에 도착했다.</strong> 31쪽은 이론 연습이 아니라 실제 칩의 설계도였다.</p>
+  <p lang="en"><strong>The code is identical to page 31, character for character</strong>; only the title changes to <em>NVDLA Dataflow (nvdla.org).</em> That is the punchline: <strong>three mechanical loop rewrites landed on a real open-source accelerator's dataflow.</strong> Page 31 was not a theory exercise but a real chip's blueprint.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · NVDLA</span><span lang="en">Unpacking the jargon · NVDLA</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>NVIDIA Deep Learning Accelerator</td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">NVIDIA가 RTL까지 공개한 추론 가속기 IP. conv 코어가 위 코드처럼 <strong>입력 채널과 출력 채널 방향으로 펼친 WS 계열</strong>이다</span><span lang="en">an inference accelerator IP that NVIDIA open-sourced down to the RTL. Its conv core is the <strong>WS family unrolled over input and output channels</strong>, as in the code above</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">2017년 공개 (보충). Jetson Xavier 계열 SoC에 DLA라는 이름으로 들어갔다 (보충)</span><span lang="en">released in 2017 (supplementary); shipped as the "DLA" in Jetson Xavier-class SoCs (supplementary)</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">연구자들이 가속기 연구의 기준선으로 많이 쓴다. 이 수업 Project에서 비교 대상으로 만날 수 있다</span><span lang="en">widely used by researchers as an accelerator baseline; you may meet it as a comparison point in this course's project</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>GPU의 Tensor Core와 다른 물건이다.</strong> Tensor Core는 GPU 명령어로 부르는 행렬 유닛이고, NVDLA는 CPU가 레지스터로 설정해서 돌리는 <strong>별도의 고정 기능 가속기</strong>다</span><span lang="en"><strong>Not the GPU's Tensor Core.</strong> A Tensor Core is a matrix unit invoked by GPU instructions; NVDLA is <strong>a separate fixed-function accelerator</strong> configured by a CPU through registers</span></td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head" data-slide="33-38"><span class="sec-num">12</span><h2 lang="ko">무엇을 붙잡아 둘 것인가</h2><h2 lang="en">What to keep stationary</h2></div>
+  <p class="sec-sub" lang="ko">마지막 여섯 장은 세 쌍이다. 출처는 모두 Sze 교재. 각 쌍의 첫 장은 배열 그림 + 빈 회색 상자 여덟 개, 둘째 장은 그 상자에 <strong>무엇이 계산되는지</strong>를 채운다.</p>
+  <p class="sec-sub" lang="en">The last six slides form three pairs, all from the Sze text. In each pair the first slide shows the array and eight blank grey boxes; the second fills the boxes with <strong>what gets computed.</strong></p>
+
+  <h3 data-slide="33-34"><span lang="ko">Outputs: output stationary</span><span lang="en">Outputs: output stationary</span></h3>
+  <p lang="ko">검은 <strong>Global Buffer</strong> 아래 PE 여덟 개(각각 ⊗⊕), 안에 빨간 칸 <strong>P0~P7</strong>(Psum). 위에서 두 종류의 선이 내려온다. 파란 <em>Act</em> 화살표는 <strong>PE마다 하나씩 따로</strong>(색이 PE마다 조금씩 다르다, 즉 다른 값), 초록 <em>Weight</em>는 <strong>버퍼에서 한 선으로 나와 가로로 뻗어 여덟 PE 모두로</strong> 갈라진다. 캡션 <em>(b) Output stationary</em>.</p>
+  <p lang="en">Eight PEs (each ⊗⊕) under a black <strong>global buffer</strong>, with red cells <strong>P0 to P7</strong> inside (Psum). Two kinds of line come down: blue <em>Act</em> arrows, <strong>one per PE</strong> (each a slightly different shade, so different values), and green <em>Weight</em>, which <strong>leaves the buffer as one line, runs sideways and branches into all eight PEs.</strong> Caption: <em>(b) Output stationary.</em></p>
+  <p lang="ko">34쪽이 상자를 채운다. 윗줄 <code>a0w0 b0w0 c0w0 … h0w0</code>, 그 아래 <code>+</code>, 아랫줄 <code>a1w1 b1w1 c1w1 d1w1 …</code>. 세로로 읽는다. <strong>PE 0은 a0w0 + a1w1 + …를 누적하고, PE 1은 b0w0 + b1w1 + …</strong>. 같은 사이클에 모든 PE가 <strong>같은 weight</strong>(w0, 그다음 w1)를 쓰고 <strong>다른 입력</strong>(a, b, c, …)을 쓴다. 각자의 psum은 제자리.</p>
+  <p lang="en">Page 34 fills the boxes: top row <code>a0w0 b0w0 c0w0 … h0w0</code>, a row of <code>+</code>, then <code>a1w1 b1w1 c1w1 d1w1 …</code>. Read it in columns: <strong>PE 0 accumulates a0w0 + a1w1 + …, PE 1 accumulates b0w0 + b1w1 + …</strong> In a given cycle every PE uses <strong>the same weight</strong> (w0, then w1) with <strong>a different input</strong> (a, b, c, …), and each psum stays put.</p>
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">34쪽 아랫줄 뒤쪽 넷은 오타다</h4>
+    <h4 lang="en">The last four boxes on page 34's bottom row are typos</h4>
+    <p lang="ko">아랫줄이 <code>a1w1 b1w1 c1w1 d1w1</code> 다음에 <strong><code>e0w1 f0w1 g0w1 h0w1</code></strong>로 이어진다. 패턴대로라면 <code>e1w1 f1w1 g1w1 h1w1</code>이어야 한다. 입력 첨자 1은 "두 번째 입력"이고, PE 4~7만 첫 번째 입력을 두 번 쓸 이유가 없다. <strong>복사하면서 첨자를 덜 고친 것</strong>으로 읽으면 된다.</p>
+    <p lang="en">The bottom row runs <code>a1w1 b1w1 c1w1 d1w1</code> then <strong><code>e0w1 f0w1 g0w1 h0w1</code></strong>. By the pattern it should be <code>e1w1 f1w1 g1w1 h1w1</code>: subscript 1 means "the second input," and PEs 4-7 have no reason to reuse their first. <strong>Read it as a copy-paste with subscripts left unfixed.</strong></p>
+  </div>
+
+  <h3 data-slide="35-36"><span lang="ko">Weights: weight stationary</span><span lang="en">Weights: weight stationary</span></h3>
+  <p lang="ko">PE 안이 초록 <strong>W0~W7</strong>(Weight)이다. 파란 <em>Act</em>는 여전히 PE마다 따로 내려온다. 새로 생긴 건 빨간 <em>Psum</em>이다. <strong>버퍼에서 PE 0으로 내려와서, PE에서 PE로 오른쪽 화살표를 타고 흘러가고, PE 7에서 다시 버퍼로 올라간다.</strong> 캡션 <em>(a) Weight stationary</em>. 36쪽 상자: <code>a0w0 + a1w1 + a2w2 + … + a7w7</code>, <strong>한 줄로 이어진 하나의 합</strong>이다.</p>
+  <p lang="en">The PEs now hold green <strong>W0 to W7</strong> (Weight). Blue <em>Act</em> still comes down separately to each PE. What's new is red <em>Psum</em>: <strong>it comes down from the buffer into PE 0, rides rightward arrows from PE to PE, and goes back up to the buffer from PE 7.</strong> Caption: <em>(a) Weight stationary.</em> Page 36's boxes read <code>a0w0 + a1w1 + a2w2 + … + a7w7</code>: <strong>one sum strung along a single line.</strong></p>
+  <p lang="ko">즉 PE <span class="m"><i>i</i></span>가 <span class="m"><i>w</i><sub>i</sub></span>를 붙잡고, 입력 <span class="m"><i>a</i><sub>i</sub></span>를 받아 곱한 뒤, <strong>왼쪽에서 넘어온 psum에 더해 오른쪽으로 넘긴다.</strong> psum이 버퍼에 들르지 않고 <strong>이웃 PE로 직접 간다</strong>(3쪽 가격표의 "PE → ALU 2×" 칸). 9번 절 도구에서 WS가 졌던 이유(psum을 매번 버퍼에 읽고 썼다)가 <strong>여기서 사라진다.</strong> 30쪽 격자의 주황 세로선을 한 줄로 편 것과 같은 구조다.</p>
+  <p lang="en">So PE <span class="m"><i>i</i></span> pins <span class="m"><i>w</i><sub>i</sub></span>, takes input <span class="m"><i>a</i><sub>i</sub></span>, multiplies, <strong>adds the psum arriving from the left and passes it right.</strong> The psum skips the buffer and <strong>goes straight to the neighbouring PE</strong> (page 3's "PE → ALU 2x" rung). The reason WS lost in section 9's tool (reading and writing the psum to the buffer every time) <strong>disappears here.</strong> It's the same structure as the amber column in page 30's grid, laid out in one line.</p>
+
+  <h3 data-slide="37-38"><span lang="ko">Inputs: input stationary</span><span lang="en">Inputs: input stationary</span></h3>
+  <p lang="ko">PE 안이 파란 <strong>I0~I7</strong>(Act)이다. 이번엔 위에서 <strong>초록 <em>Weight</em>가 PE마다 따로</strong> 내려오고(색이 PE마다 다르다), 빨간 Psum은 WS와 똑같이 왼쪽에서 오른쪽으로 흘러 버퍼로 돌아간다. 캡션 <em>(c) Input stationary</em>. 38쪽 상자는 36쪽과 같은 <code>a0w0 + a1w1 + … + a7w7</code>. <strong>계산된 값은 WS와 똑같다. 누가 붙어 있고 누가 내려오느냐만 바뀌었다.</strong></p>
+  <p lang="en">The PEs hold blue <strong>I0 to I7</strong> (Act). This time <strong>green <em>Weight</em> comes down separately to each PE</strong> (a different shade per PE), and the red psum flows left to right back to the buffer exactly as in WS. Caption: <em>(c) Input stationary.</em> Page 38's boxes match page 36: <code>a0w0 + a1w1 + … + a7w7.</code> <strong>The values computed are identical to WS; only who stays and who comes down has changed.</strong></p>
+
+  <figure>
+    <svg viewBox="0 0 680 380" role="img" aria-label="출력, weight, 입력 stationary 세 배열에서 PE 안에 고정되는 데이터와 버퍼에서 내려오는 데이터, 부분합이 흐르는 방향을 나란히 비교한 도해">
+      <defs>
+        <marker id="dfArB" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--brown)"/></marker>
+        <marker id="dfArA" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--amber)"/></marker>
+      </defs>
+      <!-- OS -->
+      <text class="svglab" x="20" y="26" style="font-size:12px;font-weight:700" fill="var(--ink)">OS</text>
+      <rect x="70" y="14" width="440" height="16" rx="3" fill="rgba(var(--brown-rgb),.22)" stroke="var(--brown)"/>
+      <text class="svglab" x="290" y="26" text-anchor="middle" style="font-size:10px" fill="var(--brown)">Global Buffer</text>
+      <g>
+        <rect x="80" y="62" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="190" y="62" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="300" y="62" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="410" y="62" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="95" y="74" width="60" height="22" rx="3" fill="rgba(var(--amber-rgb),.25)" stroke="var(--amber)"/><text class="svgnum" x="125" y="89" text-anchor="middle" style="font-size:10.5px" fill="var(--amber)">P0</text>
+        <rect x="205" y="74" width="60" height="22" rx="3" fill="rgba(var(--amber-rgb),.25)" stroke="var(--amber)"/><text class="svgnum" x="235" y="89" text-anchor="middle" style="font-size:10.5px" fill="var(--amber)">P1</text>
+        <rect x="315" y="74" width="60" height="22" rx="3" fill="rgba(var(--amber-rgb),.25)" stroke="var(--amber)"/><text class="svgnum" x="345" y="89" text-anchor="middle" style="font-size:10.5px" fill="var(--amber)">P2</text>
+        <rect x="425" y="74" width="60" height="22" rx="3" fill="rgba(var(--amber-rgb),.25)" stroke="var(--amber)"/><text class="svgnum" x="455" y="89" text-anchor="middle" style="font-size:10.5px" fill="var(--amber)">P3</text>
+      </g>
+      <line x1="105" y1="30" x2="105" y2="58" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="215" y1="30" x2="215" y2="58" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="325" y1="30" x2="325" y2="58" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="435" y1="30" x2="435" y2="58" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="290" y1="30" x2="290" y2="42" stroke="var(--blue)" stroke-width="2.4"/>
+      <line x1="145" y1="42" x2="475" y2="42" stroke="var(--blue)" stroke-width="2.4"/>
+      <line x1="145" y1="42" x2="145" y2="60" stroke="var(--blue)" stroke-width="2"/>
+      <line x1="255" y1="42" x2="255" y2="60" stroke="var(--blue)" stroke-width="2"/>
+      <line x1="365" y1="42" x2="365" y2="60" stroke="var(--blue)" stroke-width="2"/>
+      <line x1="475" y1="42" x2="475" y2="60" stroke="var(--blue)" stroke-width="2"/>
+      <text class="svglab" x="520" y="52" style="font-size:10.5px" fill="var(--blue)" lang="ko">weight: broadcast</text>
+      <text class="svglab" x="520" y="52" style="font-size:10.5px" fill="var(--blue)" lang="en">weight: broadcast</text>
+      <text class="svglab" x="520" y="70" style="font-size:10.5px" fill="var(--brown)" lang="ko">입력: PE마다</text>
+      <text class="svglab" x="520" y="70" style="font-size:10.5px" fill="var(--brown)" lang="en">input: per PE</text>
+      <text class="svglab" x="520" y="88" style="font-size:10.5px" fill="var(--amber)" lang="ko">psum: 제자리</text>
+      <text class="svglab" x="520" y="88" style="font-size:10.5px" fill="var(--amber)" lang="en">psum: stays</text>
+
+      <!-- WS -->
+      <text class="svglab" x="20" y="146" style="font-size:12px;font-weight:700" fill="var(--ink)">WS</text>
+      <rect x="70" y="134" width="440" height="16" rx="3" fill="rgba(var(--brown-rgb),.22)" stroke="var(--brown)"/>
+      <text class="svglab" x="290" y="146" text-anchor="middle" style="font-size:10px" fill="var(--brown)">Global Buffer</text>
+      <g>
+        <rect x="80" y="182" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="190" y="182" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="300" y="182" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="410" y="182" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="95" y="194" width="60" height="22" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="125" y="209" text-anchor="middle" style="font-size:10.5px" fill="var(--blue)">W0</text>
+        <rect x="205" y="194" width="60" height="22" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="235" y="209" text-anchor="middle" style="font-size:10.5px" fill="var(--blue)">W1</text>
+        <rect x="315" y="194" width="60" height="22" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="345" y="209" text-anchor="middle" style="font-size:10.5px" fill="var(--blue)">W2</text>
+        <rect x="425" y="194" width="60" height="22" rx="3" fill="rgba(var(--blue-rgb),.25)" stroke="var(--blue)"/><text class="svgnum" x="455" y="209" text-anchor="middle" style="font-size:10.5px" fill="var(--blue)">W3</text>
+      </g>
+      <line x1="125" y1="150" x2="125" y2="178" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="235" y1="150" x2="235" y2="178" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="345" y1="150" x2="345" y2="178" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="455" y1="150" x2="455" y2="178" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#dfArB)"/>
+      <line x1="170" y1="212" x2="186" y2="212" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <line x1="280" y1="212" x2="296" y2="212" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <line x1="390" y1="212" x2="406" y2="212" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <path d="M500,204 Q512,204 512,170 L512,154" fill="none" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <text class="svglab" x="520" y="172" style="font-size:10.5px" fill="var(--blue)" lang="ko">weight: 고정</text>
+      <text class="svglab" x="520" y="172" style="font-size:10.5px" fill="var(--blue)" lang="en">weight: pinned</text>
+      <text class="svglab" x="520" y="190" style="font-size:10.5px" fill="var(--brown)" lang="ko">입력: PE마다</text>
+      <text class="svglab" x="520" y="190" style="font-size:10.5px" fill="var(--brown)" lang="en">input: per PE</text>
+      <text class="svglab" x="520" y="208" style="font-size:10.5px" fill="var(--amber)" lang="ko">psum: 이웃으로</text>
+      <text class="svglab" x="520" y="208" style="font-size:10.5px" fill="var(--amber)" lang="en">psum: to neighbour</text>
+
+      <!-- IS -->
+      <text class="svglab" x="20" y="266" style="font-size:12px;font-weight:700" fill="var(--ink)">IS</text>
+      <rect x="70" y="254" width="440" height="16" rx="3" fill="rgba(var(--brown-rgb),.22)" stroke="var(--brown)"/>
+      <text class="svglab" x="290" y="266" text-anchor="middle" style="font-size:10px" fill="var(--brown)">Global Buffer</text>
+      <g>
+        <rect x="80" y="302" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="190" y="302" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="300" y="302" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="410" y="302" width="90" height="44" rx="5" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)"/>
+        <rect x="95" y="314" width="60" height="22" rx="3" fill="rgba(var(--brown-rgb),.20)" stroke="var(--brown)"/><text class="svgnum" x="125" y="329" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">I0</text>
+        <rect x="205" y="314" width="60" height="22" rx="3" fill="rgba(var(--brown-rgb),.20)" stroke="var(--brown)"/><text class="svgnum" x="235" y="329" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">I1</text>
+        <rect x="315" y="314" width="60" height="22" rx="3" fill="rgba(var(--brown-rgb),.20)" stroke="var(--brown)"/><text class="svgnum" x="345" y="329" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">I2</text>
+        <rect x="425" y="314" width="60" height="22" rx="3" fill="rgba(var(--brown-rgb),.20)" stroke="var(--brown)"/><text class="svgnum" x="455" y="329" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">I3</text>
+      </g>
+      <line x1="125" y1="270" x2="125" y2="298" stroke="var(--blue)" stroke-width="1.6"/>
+      <line x1="235" y1="270" x2="235" y2="298" stroke="var(--blue)" stroke-width="1.6"/>
+      <line x1="345" y1="270" x2="345" y2="298" stroke="var(--blue)" stroke-width="1.6"/>
+      <line x1="455" y1="270" x2="455" y2="298" stroke="var(--blue)" stroke-width="1.6"/>
+      <line x1="170" y1="332" x2="186" y2="332" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <line x1="280" y1="332" x2="296" y2="332" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <line x1="390" y1="332" x2="406" y2="332" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <path d="M500,324 Q512,324 512,290 L512,274" fill="none" stroke="var(--amber)" stroke-width="2" marker-end="url(#dfArA)"/>
+      <text class="svglab" x="520" y="292" style="font-size:10.5px" fill="var(--brown)" lang="ko">입력: 고정</text>
+      <text class="svglab" x="520" y="292" style="font-size:10.5px" fill="var(--brown)" lang="en">input: pinned</text>
+      <text class="svglab" x="520" y="310" style="font-size:10.5px" fill="var(--blue)" lang="ko">weight: PE마다</text>
+      <text class="svglab" x="520" y="310" style="font-size:10.5px" fill="var(--blue)" lang="en">weight: per PE</text>
+      <text class="svglab" x="520" y="328" style="font-size:10.5px" fill="var(--amber)" lang="ko">psum: 이웃으로</text>
+      <text class="svglab" x="520" y="328" style="font-size:10.5px" fill="var(--amber)" lang="en">psum: to neighbour</text>
+      <text class="svglab" x="20" y="372" style="font-size:10px" fill="var(--ink3)" lang="ko">PE 여덟 개를 넷으로 줄였다. 가운데 칸이 PE 안에 고정된 데이터, 위 선이 버퍼에서 내려오는 데이터, 주황 화살표가 psum의 길</text>
+      <text class="svglab" x="20" y="372" style="font-size:10px" fill="var(--ink3)" lang="en">Eight PEs shrunk to four. The inner cell is data pinned in the PE, lines from above come from the buffer, amber arrows are the psum's path</text>
+    </svg>
+    <figcaption lang="ko">33, 35, 37쪽을 한 장에 겹쳤다. <strong>세 배열 모두 PE 안에 칸이 하나</strong>이고, 그 칸에 무엇을 넣느냐만 다르다. 그런데 그 선택이 <strong>위쪽 배선</strong>(무엇을 한 선으로 broadcast하고 무엇을 PE마다 따로 줄지)과 <strong>옆쪽 배선</strong>(psum이 PE 사이를 흐르는지)을 결정한다. 색은 <span class="cAlg">weight가 파랑</span>, <span class="cCost">psum이 주황</span>이고, <span class="cMem">입력</span>은 weight와 구별하려고 버퍼에서 오는 데이터의 갈색을 썼다.</figcaption>
+    <figcaption lang="en">Pages 33, 35 and 37 on one sheet. <strong>Every array has one cell per PE</strong>; only what goes in that cell differs. Yet that choice decides <strong>the wiring from above</strong> (what is broadcast on one line and what each PE gets separately) and <strong>the wiring alongside</strong> (whether psums flow between PEs). <span class="cAlg">Weights are blue</span> and <span class="cCost">psums amber</span>; <span class="cMem">inputs</span> borrow the brown of buffer-borne data so they stand apart from weights.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">Dataflow</th><th lang="ko">PE 안에 고정</th><th lang="ko">broadcast</th><th lang="ko">PE마다 따로</th><th lang="ko">psum</th>
+      <th lang="en">Dataflow</th><th lang="en">Pinned in PE</th><th lang="en">Broadcast</th><th lang="en">Per PE</th><th lang="en">Psum</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>OS (33-34)</td><td lang="ko">psum</td><td lang="ko">weight</td><td lang="ko">입력</td><td lang="ko">PE 안에서 끝까지 누적</td>
+          <td lang="en">psum</td><td lang="en">weight</td><td lang="en">input</td><td lang="en">fully accumulated in place</td></tr>
+      <tr><td>WS (35-36)</td><td lang="ko">weight</td><td lang="ko">-</td><td lang="ko">입력</td><td lang="ko">이웃 PE로 넘기며 누적</td>
+          <td lang="en">weight</td><td lang="en">-</td><td lang="en">input</td><td lang="en">accumulated while passed to neighbours</td></tr>
+      <tr><td>IS (37-38)</td><td lang="ko">입력</td><td lang="ko">-</td><td lang="ko">weight</td><td lang="ko">이웃 PE로 넘기며 누적</td>
+          <td lang="en">input</td><td lang="en">-</td><td lang="en">weight</td><td lang="en">accumulated while passed to neighbours</td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">이 표에서 보이는 것. <strong>OS만 psum이 PE 사이를 오가지 않는다.</strong> 대신 같은 weight를 모든 PE에 뿌려야 한다. WS와 IS는 psum을 이웃에게 넘기는 <strong>사슬</strong>이 필요하다. 하나의 출력을 여러 PE가 나눠 만드는 구조라서 그렇다. 어느 쪽이 좋은지는 슬라이드가 판정하지 않는다. 12쪽 표처럼 <strong>층 모양이 어느 텐서의 재사용을 크게 만드느냐</strong>에 달렸고, 다음 강의들이 그 비교를 한다.</p>
+  <p lang="en">What the table shows: <strong>only OS keeps psums from travelling between PEs</strong>, at the cost of broadcasting one weight to every PE. WS and IS need a <strong>chain</strong> passing psums to neighbours, because several PEs share in building a single output. The slides don't declare a winner. As page 12's table suggests, it depends on <strong>which tensor's reuse the layer's shape makes large</strong>, and the coming lectures make that comparison.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"stationary"는 "영원히 안 움직인다"가 아니다</h4>
+    <h4 lang="en">"Stationary" does not mean "never moves"</h4>
+    <p lang="ko">WS 칩도 weight를 바꾼다. 29쪽 코드에서 <code>curr_w</code>는 <strong>안쪽 <code>p, q</code> loop 동안만</strong> 고정이고, 바깥 <code>r, s, c, k</code>가 한 칸 돌 때마다 새로 읽힌다. "stationary"는 <strong>가장 안쪽 loop들이 도는 동안 RF에 머문다</strong>는 상대적인 말이다. 그래서 같은 WS라도 안쪽 loop가 얼마나 긴지(<span class="m"><i>PQ</i></span>가 크면 오래 머문다)에 따라 이득이 달라진다. FC 층(<span class="m"><i>PQ</i></span> = 1)에서 WS는 weight를 <strong>한 번 쓰고 바로 바꾼다.</strong> 이름만 WS다.</p>
+    <p lang="en">A WS chip changes weights too. In page 29's code, <code>curr_w</code> is fixed <strong>only during the inner <code>p, q</code> loops</strong> and is re-read whenever the outer <code>r, s, c, k</code> advance. "Stationary" is relative: it means <strong>staying in the RF while the innermost loops run.</strong> So the payoff of the same WS depends on how long the inner loops are; a big <span class="m"><i>PQ</i></span> keeps the weight longer. On an FC layer (<span class="m"><i>PQ</i></span> = 1), WS <strong>uses each weight once and swaps it straight away</strong>: WS in name only.</p>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">33쪽 OS 배열(PE 8개)에서 매 사이클 Global Buffer에서 <strong>몇 개의 값</strong>이 읽히는가? 35쪽 WS 배열은? (weight가 이미 올라가 있는 정상 상태 기준)</p>
+    <p lang="en">In page 33's OS array (8 PEs), <strong>how many values</strong> are read from the global buffer each cycle? And in page 35's WS array? (Steady state, with weights already loaded.)</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <p lang="ko"><strong>OS: 9개.</strong> 입력 8개(PE마다 다른 값) + weight 1개(broadcast). psum은 PE 안이라 0. <strong>WS: 입력 8개 + psum 읽기 1(PE 0 쪽) + psum 쓰기 1(PE 7 쪽) = 10개.</strong> weight는 0. 거의 같아 보이지만 <strong>한 사이클에 일어나는 MAC은 둘 다 8번</strong>이다. 차이는 WS가 <strong>8개짜리 합 하나</strong>를 만들고 OS가 <strong>8개의 서로 다른 합에 한 항씩</strong> 더한다는 데 있다. 그 결과 psum이 버퍼를 오가는 횟수는 WS 쪽이 MAC 8번당 2번, OS는 출력이 끝날 때 8개를 한 번에 쓴다. 9번 절 도구가 PE 하나로 셌던 것과 다른 결론이 나오는 이유가 <strong>이웃 전달</strong>이다.</p>
+      <p lang="en"><strong>OS: 9.</strong> Eight inputs (different per PE) plus one weight (broadcast); the psums stay inside, so 0. <strong>WS: 8 inputs + 1 psum read (at PE 0) + 1 psum write (at PE 7) = 10</strong>, and 0 weights. Nearly equal, but <strong>both perform 8 MACs per cycle.</strong> The difference is that WS builds <strong>one sum of eight terms</strong> while OS adds <strong>one term to eight different sums.</strong> So WS moves the psum through the buffer twice per 8 MACs, while OS writes its 8 finished outputs once at the end. <strong>Neighbour forwarding</strong> is why this differs from the single-PE count in section 9's tool.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 13 -->
+<section id="s13">
+  <div class="sec-head"><span class="sec-num">13</span><h2 lang="ko">정리 &amp; 다음 강의</h2><h2 lang="en">Recap &amp; next lecture</h2></div>
+
+  <h3><span lang="ko">한 장 요약</span><span lang="en">One-page recap</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">무엇을 말했나</th><th lang="ko">어디서 다시 쓰이나</th>
+      <th lang="en">Pages</th><th lang="en">What it said</th><th lang="en">Where it comes back</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>2</td>
+          <td lang="ko">conv는 일곱 겹 loop. <strong>어느 텐서가 어느 loop와 무관한가</strong>가 모든 것의 출발점</td>
+          <td lang="ko">이 강의 전체</td>
+          <td lang="en">Conv is seven nested loops; <strong>which tensor ignores which loop</strong> is where everything starts</td>
+          <td lang="en">this whole lecture</td></tr>
+      <tr><td>3-5</td>
+          <td lang="ko">RF 1×, PE 2×, 버퍼 6×, DRAM 200×. MAC 하나에 접근 넷. AlexNet 724M MAC → 2896M 접근</td>
+          <td lang="ko">모든 dataflow 비교의 단가표</td>
+          <td lang="en">RF 1x, PE 2x, buffer 6x, DRAM 200x. Four accesses per MAC. AlexNet's 724M MACs → 2896M accesses</td>
+          <td lang="en">the price list for every dataflow comparison</td></tr>
+      <tr><td>6-11</td>
+          <td lang="ko">temporal reuse는 계층으로, spatial reuse는 broadcast로 받는다. reuse distance는 순서가 정한다</td>
+          <td lang="ko">L07-8-9 20번 절과 같은 그림</td>
+          <td lang="en">Temporal reuse is caught by the hierarchy, spatial reuse by broadcast; ordering sets reuse distance</td>
+          <td lang="en">the same figures as lecture 7-8-9 section 20</td></tr>
+      <tr><td>12</td>
+          <td lang="ko">크기 × 재사용 = MAC. weight <span class="m"><i>PQ</i></span>, 입력 ~<span class="m"><i>RSK</i></span>, 출력 <span class="m"><i>RSC</i></span></td>
+          <td lang="ko">어느 dataflow가 어느 층에 맞는가</td>
+          <td lang="en">Size × reuse = MACs: weights <span class="m"><i>PQ</i></span>, inputs ~<span class="m"><i>RSK</i></span>, outputs <span class="m"><i>RSC</i></span></td>
+          <td lang="en">which dataflow suits which layer</td></tr>
+      <tr><td>13-14</td>
+          <td lang="ko">dataflow = 하드웨어가 지원하는 실행 순서. <code>for</code>와 <code>spatial_for</code>. OS와 WS는 loop 두 줄의 순서</td>
+          <td lang="ko">mapping, compilation 강의</td>
+          <td lang="en">Dataflow = execution order supported in hardware: <code>for</code> and <code>spatial_for</code>. OS and WS are the order of two loop lines</td>
+          <td lang="en">the mapping and compilation lectures</td></tr>
+      <tr><td>15-27</td>
+          <td lang="ko">PE 하나의 점 그림. 출력은 <span class="m"><i>S</i></span>번 → OA REG, weight는 <span class="m"><i>Q</i></span>번 → W REG. 3D conv 위의 OS, WS</td>
+          <td lang="ko">Eyeriss, Timeloop 분석</td>
+          <td lang="en">Single-PE dot plots: outputs reused <span class="m"><i>S</i></span> times → OA REG, weights <span class="m"><i>Q</i></span> times → W REG. OS and WS on a 3D conv</td>
+          <td lang="en">Eyeriss and Timeloop analyses</td></tr>
+      <tr><td>28-32</td>
+          <td lang="ko">순서 바꾸기 → <code>spatial_for c, k</code> → 16 × 64 타일링 = <strong>NVDLA</strong></td>
+          <td lang="ko">systolic array, tiling 강의</td>
+          <td lang="en">Reorder → <code>spatial_for c, k</code> → 16 × 64 tiling = <strong>NVDLA</strong></td>
+          <td lang="en">the systolic array and tiling lectures</td></tr>
+      <tr><td>33-38</td>
+          <td lang="ko">OS: weight broadcast, psum 제자리. WS/IS: psum을 이웃으로. 계산 결과는 같고 배선이 다르다</td>
+          <td lang="ko">다음 강의의 dataflow 분류</td>
+          <td lang="en">OS: weight broadcast, psum in place. WS/IS: psum to neighbours. Same results, different wiring</td>
+          <td lang="en">the dataflow taxonomy coming next</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span lang="ko">앞 강의들과의 대응</span><span lang="en">How earlier lectures map onto this one</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">앞 강의에서</th><th lang="ko">여기서</th>
+      <th lang="en">Earlier</th><th lang="en">Here</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">L04-5: 가중치는 program인가 data인가</td><td lang="ko">WS = 가중치를 PE에 심어 두기 (24, 35쪽)</td>
+          <td lang="en">Lecture 4-5: are weights program or data?</td><td lang="en">WS = planting weights in the PEs (pages 24, 35)</td></tr>
+      <tr><td lang="ko">L06 5번 절: 텐서별 무관한 loop</td><td lang="ko">stationary의 정의 (14쪽), 재사용 표 (12쪽)</td>
+          <td lang="en">Lecture 6 section 5: loops each tensor ignores</td><td lang="en">the definition of stationary (page 14) and the reuse table (page 12)</td></tr>
+      <tr><td lang="ko">L06 8번 절: FC는 batch 1에서 memory-bound</td><td lang="ko">FC는 <span class="m"><i>PQ</i></span> = 1이라 weight 재사용이 없다. WS가 이름만 남는다</td>
+          <td lang="en">Lecture 6 section 8: FC is memory-bound at batch 1</td><td lang="en">FC has <span class="m"><i>PQ</i></span> = 1, so no weight reuse; WS is WS in name only</td></tr>
+      <tr><td lang="ko">L07-8-9 56쪽: DRAM 한 번 = MAC 200번</td><td lang="ko">3쪽 사다리의 맨 아래 칸. 중간 칸(6×, 2×)이 새로 생김</td>
+          <td lang="en">Lecture 7-8-9 page 56: one DRAM access = 200 MACs</td><td lang="en">the bottom rung of page 3's ladder, now with middle rungs (6x, 2x)</td></tr>
+      <tr><td lang="ko">L07-8-9 61쪽: 두 순서와 reuse distance</td><td lang="ko">순서 1 = OS, 순서 2 = WS (8, 14쪽)</td>
+          <td lang="en">Lecture 7-8-9 page 61: two orders and reuse distance</td><td lang="en">ordering 1 = OS, ordering 2 = WS (pages 8, 14)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout" lang="ko">
+    <strong>이 강의를 한 문장으로 접으면 이렇다.</strong> 같은 <span class="m"><i>RSCPQK</i></span>번의 MAC을 어떤 순서로 하느냐가 <strong>어느 텐서가 <span class="cMem">RF(1×)</span>에 붙어 있고 어느 텐서가 <span class="cMem">버퍼(6×)나 DRAM(200×)</span>에서 다시 오는지</strong>를 정하고, 그 순서를 loop nest로 적은 것이 dataflow이며, <strong><code>for</code>로 무엇을 붙잡을지</strong>와 <strong><code>spatial_for</code>로 무엇을 펼칠지</strong>를 고르면 NVDLA 같은 실제 칩의 배선이 나온다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Folded into one sentence:</strong> the order in which you perform the same <span class="m"><i>RSCPQK</i></span> MACs decides <strong>which tensor sits in <span class="cMem">the RF (1x)</span> and which keeps coming back from <span class="cMem">the buffer (6x) or DRAM (200x)</span></strong>; writing that order as a loop nest is a dataflow; and choosing <strong>what to pin with <code>for</code></strong> and <strong>what to spread with <code>spatial_for</code></strong> yields the wiring of a real chip like NVDLA.
+  </div>
+
+  <h3><span lang="ko">다음 강의</span><span lang="en">Next lecture</span></h3>
+  <p lang="ko">덱이 OS, WS, IS 세 그림으로 끝났다. Sze 교재 5장은 이 셋 다음에 <strong>row stationary</strong>(Eyeriss)와 <strong>no local reuse</strong>를 이어서 다룬다(보충). 30쪽 격자가 systolic array의 출발점이기도 하다. 다음 덱이 그쪽으로 가는지는 <strong>Canvas의 Schedule과 실제 슬라이드가 정한다.</strong> 슬라이드가 올라오기 전에는 노트를 쓰지 않는다.</p>
+  <p lang="en">The deck ended on the three OS, WS and IS pictures. Chapter 5 of the Sze text continues from these three to <strong>row stationary</strong> (Eyeriss) and <strong>no local reuse</strong> (supplementary), and page 30's grid is also where systolic arrays begin. Whether the next deck goes there is <strong>decided by the Canvas schedule and the actual slides.</strong> No note gets written before they're posted.</p>
+</section>
+
+<footer>
+  <span lang="ko">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 10 개인 학습 노트<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  지정 교재: Sze, Chen, Yang, Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio, Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Jeff (Jun) Zhang 교수와 Arizona State University에 있습니다.</span><span lang="en">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 10 personal study notes<br>
+  Course: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  Assigned texts: Sze, Chen, Yang and Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio and Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Jeff (Jun) Zhang and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// PE 하나 dataflow 비교기. 1D conv OA[q] += IA[q+s] * W[s].
+// 붙잡는 텐서용 레지스터 한 칸. 에너지는 3쪽 단위: 버퍼 6, 레지스터 1, MAC 1.
+(function () {
+  var dHost = document.getElementById('dfD');
+  if (!dHost) return;
+  var qHost = document.getElementById('dfQ');
+  var sHost = document.getElementById('dfS');
+  var svgHost = document.getElementById('dfSvg');
+  var out = document.getElementById('dfOut');
+  var vd = document.getElementById('dfV');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var DF = [
+    { key: 'OS', ko: 'OS (16쪽)', en: 'OS (p. 16)' },
+    { key: 'WS', ko: 'WS (23쪽)', en: 'WS (p. 23)' },
+    { key: 'IS', ko: 'IS (6번 절)', en: 'IS (section 6)' }
+  ];
+  var QS = [3, 9, 16];
+  var SS = [3, 4, 8];
+  var df = DF[0], Q = 9, S = 4;
+
+  // 접근 순서를 만든다. 각 원소: { o, i, w }
+  function trace() {
+    var t = [], q, s, i;
+    if (df.key === 'OS') {
+      for (q = 0; q < Q; q++) for (s = 0; s < S; s++) t.push({ o: q, i: q + s, w: s });
+    } else if (df.key === 'WS') {
+      for (s = 0; s < S; s++) for (q = 0; q < Q; q++) t.push({ o: q, i: q + s, w: s });
+    } else {
+      for (i = 0; i < Q + S - 1; i++) for (s = 0; s < S; s++) {
+        q = i - s;
+        if (q >= 0 && q < Q) t.push({ o: q, i: i, w: s });
+      }
+    }
+    return t;
+  }
+
+  function count() {
+    var M = Q * S;
+    var c = { mac: M, wBuf: 0, iBuf: 0, oRd: 0, oWr: 0, reg: M };
+    if (df.key === 'OS') { c.wBuf = M; c.iBuf = M; c.oRd = 0; c.oWr = Q; }
+    else if (df.key === 'WS') { c.wBuf = S; c.iBuf = M; c.oRd = M - Q; c.oWr = M; }
+    else { c.wBuf = M; c.iBuf = Q + S - 1; c.oRd = M - Q; c.oWr = M; }
+    c.buf = c.wBuf + c.iBuf + c.oRd + c.oWr;
+    c.energy = 6 * c.buf + c.reg + c.mac;
+    return c;
+  }
+
+  function panel(t, key, x0, title, maxIdx, pinned) {
+    var W = 196, H = 150, top = 30;
+    var s = '';
+    s += '<rect x="' + x0 + '" y="' + top + '" width="' + W + '" height="' + H + '" rx="4" fill="' +
+         (pinned ? 'rgba(var(--brown-rgb),.08)' : 'var(--card)') + '" stroke="' + (pinned ? 'var(--brown)' : 'var(--rule)') +
+         '" stroke-width="' + (pinned ? 1.8 : 1) + '"/>';
+    s += '<text class="svglab" x="' + (x0 + 4) + '" y="20" style="font-size:11px;font-weight:700" fill="var(--ink)">' + title + '</text>';
+    if (pinned) s += '<text class="svglab" x="' + (x0 + W - 4) + '" y="20" text-anchor="end" style="font-size:10px;font-weight:700" fill="var(--brown)">REG</text>';
+    var n = t.length;
+    var dx = (W - 16) / Math.max(1, n - 1);
+    var dy = (H - 16) / Math.max(1, maxIdx);
+    var r = n > 80 ? 1.6 : 2.4;
+    for (var k = 0; k < n; k++) {
+      var cx = x0 + 8 + dx * k;
+      var cy = top + H - 8 - dy * t[k][key];
+      s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r + '" fill="var(--blue)"/>';
+    }
+    s += '<text class="svgnum" x="' + (x0 + 2) + '" y="' + (top + H + 14) + '" style="font-size:9.5px" fill="var(--ink3)">0</text>';
+    s += '<text class="svgnum" x="' + (x0 + W) + '" y="' + (top + H + 14) + '" text-anchor="end" style="font-size:9.5px" fill="var(--ink3)">' + (n - 1) + '</text>';
+    s += '<text class="svgnum" x="' + (x0 + W / 2) + '" y="' + (top + H + 14) + '" text-anchor="middle" style="font-size:9.5px" fill="var(--ink3)">cycle</text>';
+    return s;
+  }
+
+  function draw() {
+    var t = trace();
+    var s = '<svg viewBox="0 0 640 200" role="img" aria-label="' +
+            L('선택한 dataflow에서 사이클마다 접근하는 출력, 입력, weight 인덱스를 찍은 점 그림 세 개',
+              'three dot plots of the output, input and weight index accessed each cycle under the chosen dataflow') + '">';
+    s += panel(t, 'o', 8, L('출력 OA', 'Outputs OA'), Q - 1, df.key === 'OS');
+    s += panel(t, 'i', 222, L('입력 IA', 'Inputs IA'), Q + S - 2, df.key === 'IS');
+    s += panel(t, 'w', 436, L('weight W', 'Weights W'), S - 1, df.key === 'WS');
+    s += '</svg>';
+    svgHost.innerHTML = s;
+  }
+
+  function row(label, value, strong) {
+    return '<div style="display:flex;justify-content:space-between;gap:14px;font-size:14px">' +
+           '<span>' + label + '</span>' +
+           (strong ? '<strong>' + value + '</strong>' : '<span class="svgnum">' + value + '</span>') + '</div>';
+  }
+
+  function paint() {
+    draw();
+    var c = count();
+    out.innerHTML =
+      row(L('MAC', 'MACs'), String(c.mac)) +
+      row(L('weight 버퍼 읽기', 'weight buffer reads'), String(c.wBuf)) +
+      row(L('입력 버퍼 읽기', 'input buffer reads'), String(c.iBuf)) +
+      row(L('psum 버퍼 읽기 / 쓰기', 'psum buffer reads / writes'), c.oRd + ' / ' + c.oWr) +
+      row(L('레지스터 접근', 'register accesses'), String(c.reg)) +
+      row(L('버퍼 접근 합계', 'total buffer accesses'), String(c.buf), true) +
+      row(L('에너지 (3쪽 단위)', 'energy (page-3 units)'), String(c.energy), true);
+    // 세 방식 비교
+    var save = df, all = [];
+    DF.forEach(function (d) { df = d; all.push({ k: d.key, e: count().energy }); });
+    df = save;
+    all.sort(function (a, b) { return a.e - b.e; });
+    var best = all[0];
+    var mine = count().energy;
+    var win = best.k === df.key;
+    vd.className = 'verdict ' + (win ? 'ok' : 'bad');
+    var list = all.map(function (a) { return a.k + ' ' + a.e; }).join(' · ');
+    vd.innerHTML = '<div class="hd">' + df.key + ' · Q = ' + Q + ' · S = ' + S + '</div>' +
+      (win
+        ? L('<strong>이 크기에서는 ' + df.key + '가 가장 싸다.</strong> 세 방식: ' + list + '. ',
+            '<strong>At this size ' + df.key + ' is the cheapest.</strong> All three: ' + list + '. ')
+        : L('<strong>' + best.k + '보다 ' + Math.round((mine / best.e - 1) * 100) + '% 비싸다.</strong> 세 방식: ' + list + '. ',
+            '<strong>' + Math.round((mine / best.e - 1) * 100) + '% dearer than ' + best.k + '.</strong> All three: ' + list + '. ')) +
+      (df.key === 'OS'
+        ? L('psum이 레지스터에 있으니 출력 쪽 버퍼 접근은 <span class="cMem">끝난 값 ' + Q + '번 쓰기</span>뿐이다.',
+            'With the psum in the register, output-side buffer traffic is just <span class="cMem">' + Q + ' writes of finished values.</span>')
+        : df.key === 'WS'
+          ? L('weight는 ' + S + '번만 읽지만, psum을 <span class="cCost">매 MAC마다 버퍼에서 읽고 쓴다.</span> PE가 하나라 넘겨줄 이웃이 없다.',
+              'Weights are read only ' + S + ' times, but the psum is <span class="cCost">read and written to the buffer on every MAC</span>: one PE has no neighbour to pass it to.')
+          : L('입력은 ' + (Q + S - 1) + '번만 읽지만, weight와 psum이 둘 다 매번 버퍼를 오간다.',
+              'Inputs are read only ' + (Q + S - 1) + ' times, but weights and psums both go through the buffer every time.'));
+  }
+
+  function build(host, items, label, isOn, onPick) {
+    host.textContent = '';
+    items.forEach(function (it) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label(it);
+      if (isOn(it)) b.className = 'act';
+      b.addEventListener('click', function () { onPick(it); render(); });
+      host.appendChild(b);
+    });
+  }
+
+  function render() {
+    build(dHost, DF, function (d) { return L(d.ko, d.en); }, function (d) { return d === df; }, function (d) { df = d; });
+    build(qHost, QS, function (v) { return 'Q = ' + v; }, function (v) { return v === Q; }, function (v) { Q = v; });
+    build(sHost, SS, function (v) { return 'S = ' + v; }, function (v) { return v === S; }, function (v) { S = v; });
+    paint();
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="reader.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

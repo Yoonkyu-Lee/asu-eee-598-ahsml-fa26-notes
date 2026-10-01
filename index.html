@@ -469,8 +469,8 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt from the lecture deck <strong>without skipping a single slide</strong>. Whichever half you arrive with, ML or hardware, the other half is missing. Filling that half is the point here, down to telling you whether a number is big or small.</p>
 
   <div class="facts">
-    <span class="chip" lang="ko">5 / 5 강 정리</span>
-    <span class="chip" lang="en">5 of 5 lectures written</span>
+    <span class="chip" lang="ko">6 / 6 강 정리</span>
+    <span class="chip" lang="en">6 of 6 lectures written</span>
     <span class="chip">Tue/Thu 10:30-11:45 · LSEB04</span>
     <span class="chip hot" lang="ko">Project 50%</span>
     <span class="chip hot" lang="en">Project is 50%</span>
@@ -584,6 +584,26 @@ a.mod:hover .num{color:var(--blue)}
       <span class="tag t">TOPS/W &middot; Eyeriss</span>
       <span class="tag v">energy per op</span>
       <span class="tag">reuse distance</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="L10-dataflow.html">
+  <span class="num">10</span>
+  <div>
+    <h3 lang="ko">Data Flow</h3>
+    <h3 lang="en">Data Flow</h3>
+    <div class="when">38 slides &middot; Lecture 10 &middot; Jeff Zhang</div>
+    <p lang="ko">MAC은 하나도 안 바꾸고 순서만 바꾼다. 그 순서가 어느 텐서를 PE 안 레지스터(1×)에 붙잡고 어느 텐서를 버퍼(6×)나 DRAM(200×)에서 다시 끌어오는지를 정한다. PE 하나의 버퍼 접근 무늬에서 output stationary와 weight stationary가 나오고, loop 순서 바꾸기 → spatial_for → 16×64 타일링을 거치면 NVDLA의 dataflow가 된다.</p>
+    <p lang="en">Not one MAC changes, only the order. That order decides which tensor is pinned in a PE's register (1x) and which keeps coming back from the buffer (6x) or DRAM (200x). Output and weight stationary fall out of a single PE's buffer-access pattern, and reorder → spatial_for → 16×64 tiling lands on NVDLA's dataflow.</p>
+    <div class="tags">
+      <span class="tag d">dataflow</span>
+      <span class="tag p">output &middot; weight stationary</span>
+      <span class="tag t">spatial_for</span>
+      <span class="tag v">NVDLA</span>
+      <span class="tag">RF 1× &middot; DRAM 200×</span>
     </div>
   </div>
   <span class="status done" lang="ko">읽기</span>

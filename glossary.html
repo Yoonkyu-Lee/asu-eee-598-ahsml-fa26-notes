@@ -543,6 +543,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">broadcast &middot; multicast &middot; unicast</div>
+  <div class="d" lang="ko">한 번 읽은 값을 <strong>모든 PE</strong>에 / <strong>일부 PE</strong>에 / <strong>한 PE</strong>에만 보내는 것. spatial reuse를 하드웨어로 구현하는 방법이고, 어느 텐서를 broadcast하느냐가 dataflow마다 다르다(OS는 weight). <strong>읽기는 줄지만 선이 길어진다</strong>. 그래서 큰 배열은 이웃에게 넘겨주기(systolic)를 쓴다.</div>
+  <div class="d" lang="en">Sending one read value to <strong>every PE</strong> / <strong>some PEs</strong> / <strong>one PE</strong>. It is how spatial reuse is built in hardware, and which tensor gets broadcast differs by dataflow (OS broadcasts weights). <strong>Fewer reads, longer wires</strong>, which is why large arrays pass data to neighbours (systolic) instead.</div>
+  <div class="src"><a href="L10-dataflow.html#s4">Lecture 10 &middot; 04</a></div>
+</div>
+
 <h2 class="gletter" id="gC">C</h2>
 
 <div class="gterm">
@@ -589,6 +596,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">모든 worker가 <strong>모델 전체 사본</strong>을 들고 <strong>데이터만 나눠서</strong> gradient를 계산하는 분산학습. worker가 매 iteration 모델 크기만큼의 gradient를 주고받아서 <strong>통신이 병목</strong>이 된다. 반대는 모델을 쪼개는 model parallelism.</div>
   <div class="d" lang="en">Distributed training where every worker holds <strong>a full copy of the model</strong> and only <strong>the data is split</strong>. Each iteration every worker exchanges a model-sized gradient, which makes <strong>communication the bottleneck</strong>. The opposite is model parallelism, which splits the model.</div>
   <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">dataflow</div>
+  <div class="d" lang="ko">DNN 연산을 하드웨어에서 <strong>어떤 순서로, 무엇을 병렬로</strong> 실행하는지. loop nest로 적고, <code>for</code>는 시간 순서, <code>spatial_for</code>는 PE에 펼친 병렬이다. 순서가 <strong>어느 텐서가 PE 안 레지스터에 붙어 재사용되는지</strong>를 정하므로 곧 에너지다. <strong>"dataflow architecture"(데이터 도착이 실행을 발화하는 기계)와 다른 말</strong>이다.</div>
+  <div class="d" lang="en"><strong>In what order, and with what in parallel</strong>, hardware executes a DNN's operations. Written as a loop nest: <code>for</code> is time order, <code>spatial_for</code> is parallelism across PEs. The order decides <strong>which tensor stays in a PE's register to be reused</strong>, so it is the energy bill. <strong>Not a "dataflow architecture"</strong> (a machine where data arrival fires instructions).</div>
+  <div class="src"><a href="L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -949,7 +963,23 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">NVDLA</div>
+  <div class="f">NVIDIA Deep Learning Accelerator</div>
+  <div class="d" lang="ko">NVIDIA가 RTL까지 공개한 추론 가속기. conv 코어가 <strong>입력·출력 채널을 PE 격자에 펼친 weight stationary</strong>이고, 이 수업 L10 31~32쪽의 loop nest가 그 dataflow다. GPU의 Tensor Core와 다른, CPU가 설정해서 돌리는 별도의 고정 기능 가속기다.</div>
+  <div class="d" lang="en">An inference accelerator NVIDIA open-sourced down to the RTL. Its conv core is <strong>weight stationary with input and output channels spread across a PE grid</strong>; the loop nest on lecture 10 pages 31-32 is its dataflow. A separate fixed-function accelerator configured by a CPU, not the GPU's Tensor Core.</div>
+  <div class="src"><a href="L10-dataflow.html#s11">Lecture 10 &middot; 11</a></div>
+</div>
+
 <h2 class="gletter" id="gO">O</h2>
+
+<div class="gterm">
+  <div class="t">output &middot; weight &middot; input stationary</div>
+  <div class="f">OS, WS, IS</div>
+  <div class="d" lang="ko">가장 안쪽 loop들이 도는 동안 <strong>PE 안 레지스터에 붙잡아 두는 텐서</strong>로 dataflow를 부르는 이름. OS는 psum을 붙잡고 weight를 broadcast, WS와 IS는 weight나 입력을 붙잡고 psum을 이웃 PE로 넘긴다. <strong>"영원히 안 움직인다"가 아니라 안쪽 loop 동안만</strong>이다. FC 층(<span class="m"><i>PQ</i></span> = 1)의 WS는 weight를 한 번 쓰고 바로 바꾼다.</div>
+  <div class="d" lang="en">Dataflows named by <strong>the tensor pinned in the PE's register</strong> while the innermost loops run. OS pins the psum and broadcasts weights; WS and IS pin a weight or an input and pass psums to neighbouring PEs. <strong>Pinned only during the inner loops, not forever</strong>: on an FC layer (<span class="m"><i>PQ</i></span> = 1), WS uses each weight once and swaps it.</div>
+  <div class="src"><a href="L10-dataflow.html#s12">Lecture 10 &middot; 12</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">overfitting &middot; underfitting</div>
@@ -973,6 +1003,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">분산학습에서 worker들의 gradient를 모아 평균 내고 공유 parameter를 들고 있는 중앙 서버. 2012~2017년 대세 구조. 지금은 worker끼리 직접 주고받는 all-reduce가 더 흔하다.</div>
   <div class="d" lang="en">The central server in distributed training that collects and averages workers' gradients and holds the shared parameters. The dominant design from 2012 to 2017; worker-to-worker all-reduce is more common now.</div>
   <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">partial sum</div>
+  <div class="f">psum</div>
+  <div class="d" lang="ko">출력 원소 하나를 만드는 <span class="m"><i>RSC</i></span>개 곱 중 <strong>일부만 더한 중간값</strong>. MAC마다 읽고 다시 써야 해서 <strong>접근이 두 번</strong>이고, 그래서 PE 안에 붙잡으면(OS) 아끼는 양이 크다. activation 함수는 누적이 끝난 뒤에만 걸고, 보통 입력보다 비트가 넓다.</div>
+  <div class="d" lang="en">A <strong>running total of some</strong> of the <span class="m"><i>RSC</i></span> products that make one output element. It is read and written back on every MAC, <strong>two accesses</strong>, so pinning it in the PE (OS) saves a lot. The activation function applies only after accumulation ends, and a psum is usually wider than the inputs.</div>
+  <div class="src"><a href="L10-dataflow.html#s2">Lecture 10 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1076,6 +1114,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">텐서에서 <strong>0인 원소의 비율</strong>. 0은 곱셈도 저장도 건너뛸 수 있으므로 하드웨어 이득이 된다. 다만 <strong>0이 흩어져 있으면 건너뛰는 제어 논리가 오히려 더 비싸질 수 있다.</strong> 그래서 뒤에서 structured sparsity가 나온다. <a href="#gL">L1</a>은 sparsity를 만들고 L2와 <a href="#gD">dropout</a>은 만들지 않는다.</div>
   <div class="d" lang="en">The <strong>fraction of zero elements</strong> in a tensor. Zeros let you skip both the multiply and the storage, which is the hardware payoff. But <strong>when the zeros are scattered, the control logic for skipping them can cost more than it saves</strong>, which is why structured sparsity appears later. <a href="#gL">L1</a> produces sparsity; L2 and <a href="#gD">dropout</a> do not.</div>
   <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">spatial_for</div>
+  <div class="d" lang="ko">loop nest 표기에서 반복을 <strong>시간이 아니라 PE 여러 개에 한 번에 펼친다</strong>는 표시. 범위가 그 차원에 배정된 PE 수다. 어떤 텐서와 무관한 차원을 펼치면 그 텐서를 broadcast하고, 출력과 무관한 차원(<code>c</code>)을 펼치면 PE 결과를 공간에서 더해야 한다. HLS의 <code>UNROLL</code>과 같은 뜻이다.</div>
+  <div class="d" lang="en">Loop-nest notation marking iterations <strong>spread across many PEs at once rather than run in time.</strong> Its bound is the number of PEs given to that dimension. Unroll a dimension some tensor ignores and that tensor is broadcast; unroll one the output ignores (<code>c</code>) and PE results must be summed in space. Same idea as HLS's <code>UNROLL</code>.</div>
+  <div class="src"><a href="L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
