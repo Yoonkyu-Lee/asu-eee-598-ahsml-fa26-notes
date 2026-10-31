@@ -30,6 +30,21 @@
       "R1": true,
       "W_at_flood": 0.39935826098433247,
       "vs_cp7_estimate": 6.193353333333333
+    },
+    "W256": {
+      "W": 256,
+      "area_mm2": 1.0529905,
+      "fmax_MHz": 125.39436527880183,
+      "cycles_per_mul": 3,
+      "fp_mul_per_s": 41798121.75960061,
+      "nJ_per_mul": 4.2193984,
+      "proofs_per_s_one_unit": 4013.334062384763,
+      "copies_for_R2": 7,
+      "area_for_R2_mm2": 7.3709335,
+      "mJ_per_proof": 0.04763357951953599,
+      "R1": true,
+      "W_at_flood": 0.5814631051949758,
+      "vs_cp7_estimate": 9.376440888888888
     }
   }
 }

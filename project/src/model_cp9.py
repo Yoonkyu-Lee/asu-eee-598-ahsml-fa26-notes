@@ -15,9 +15,8 @@ ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / "results"
 
 
-def main() -> None:
-    syn = json.loads((RES / "cp9" / "cp9_synth.json").read_text(encoding="utf-8"))
-    cp8 = json.loads((RES / "cp8" / "cp8_alternatives.json").read_text(encoding="utf-8"))
+def evaluate(syn: dict, cp8: dict) -> dict:
+    """R1/R2 quantities for every finished synthesis run in `syn` (schema of cp9_synth.json)."""
     rules = cp8["rules"]
     work = cp8["work_per_proof"]
     fp_mul = work["total_fp_mul"]
@@ -40,6 +39,13 @@ def main() -> None:
             "mJ_per_proof": mj, "R1": mj <= rules["R1_mJ_per_proof"],
             "W_at_flood": rules["flood_per_s"] * mj * 1e-3,
             "vs_cp7_estimate": e_nj / 0.45}
+    return out
+
+
+def main() -> None:
+    syn = json.loads((RES / "cp9" / "cp9_synth.json").read_text(encoding="utf-8"))
+    cp8 = json.loads((RES / "cp8" / "cp8_alternatives.json").read_text(encoding="utf-8"))
+    out = evaluate(syn, cp8)
     (RES / "cp9" / "cp9_model.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(json.dumps(out, indent=1))
 

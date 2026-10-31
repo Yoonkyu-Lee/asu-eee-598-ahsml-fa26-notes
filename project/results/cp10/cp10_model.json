@@ -1,0 +1,73 @@
+{
+  "need_fp_mul_per_s": 254267232.375,
+  "units": {
+    "pipe_W64_S1": {
+      "W": 64,
+      "area_mm2": 0.28329340000000003,
+      "fmax_MHz": 300.3462992830734,
+      "cycles_per_mul": 4,
+      "fp_mul_per_s": 75086574.82076834,
+      "nJ_per_mul": 1.7581454399999998,
+      "proofs_per_s_one_unit": 7209.59449061309,
+      "copies_for_R2": 4,
+      "area_for_R2_mm2": 1.1331736000000001,
+      "mJ_per_proof": 0.02200009142606599,
+      "R1": true,
+      "W_at_flood": 0.26855511603798754,
+      "vs_cp7_estimate": 3.9069898666666663,
+      "area_vs_cp9_W64x6": 0.6478853300867417,
+      "clock_vs_cp9_W64": 1.0196276306581489
+    },
+    "pipe_W64_S2": {
+      "W": 64,
+      "area_mm2": 0.3017073,
+      "fmax_MHz": 359.35546004685995,
+      "cycles_per_mul": 4,
+      "fp_mul_per_s": 89838865.01171498,
+      "nJ_per_mul": 1.77205184,
+      "proofs_per_s_one_unit": 8626.066480958249,
+      "copies_for_R2": 3,
+      "area_for_R2_mm2": 0.9051218999999999,
+      "mJ_per_proof": 0.022144923974615992,
+      "R1": true,
+      "W_at_flood": 0.27032308695813745,
+      "vs_cp7_estimate": 3.9378929777777776,
+      "area_vs_cp9_W64x6": 0.5174981141020569,
+      "clock_vs_cp9_W64": 1.2199542899854818
+    },
+    "pipe_W64_S3": {
+      "W": 64,
+      "area_mm2": 0.31601440000000003,
+      "fmax_MHz": 360.2798653994423,
+      "cycles_per_mul": 4,
+      "fp_mul_per_s": 90069966.34986058,
+      "nJ_per_mul": 1.8474494258000003,
+      "proofs_per_s_one_unit": 8648.25615918295,
+      "copies_for_R2": 3,
+      "area_for_R2_mm2": 0.9480432000000001,
+      "mJ_per_proof": 0.02293017569367566,
+      "R1": true,
+      "W_at_flood": 0.27990865469269877,
+      "vs_cp7_estimate": 4.105443168444445,
+      "area_vs_cp9_W64x6": 0.5420381145205737,
+      "clock_vs_cp9_W64": 1.2230924982526428
+    },
+    "pipe_W64_S4": {
+      "W": 64,
+      "area_mm2": 0.3244205,
+      "fmax_MHz": 352.9702446083795,
+      "cycles_per_mul": 4,
+      "fp_mul_per_s": 88242561.15209489,
+      "nJ_per_mul": 1.9023858000000002,
+      "proofs_per_s_one_unit": 8472.794027938082,
+      "copies_for_R2": 3,
+      "area_for_R2_mm2": 0.9732615,
+      "mJ_per_proof": 0.023502327730398495,
+      "R1": true,
+      "W_at_flood": 0.2868929146049744,
+      "vs_cp7_estimate": 4.227524000000001,
+      "area_vs_cp9_W64x6": 0.5564565289803939,
+      "clock_vs_cp9_W64": 1.198277505206311
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "source": "Apporto ECEE CAD Desktop RHEL8, 2026-10-31. Same tools and library as CP9; mont_mul_pipe with set_optimize_registers + compile_ultra -retime. Numbers transcribed from summary.txt, area.rpt, power.rpt (rtl/run_pipe_W64_S<S>_P<period>/).",
+  "power_note": "as in CP9: total power from SAIF of the timed VCS run at sim_period_ns; tb_cycles_per_mul is the streamed cycles per multiplication (no handshake gap here).",
+  "runs": {
+    "pipe_W64_S1": {
+      "W": 64,
+      "S": 1,
+      "run": "run_pipe_W64_S1_P3.4",
+      "area_um2": 283293.4,
+      "fmax_path_ns": 3.32949,
+      "W_cycles_per_mul": 4,
+      "tb_cycles_per_mul": 4.0,
+      "sim_period_ns": 3.4,
+      "power_mW": 129.2754,
+      "dynamic_mW": 127.824,
+      "leakage_mW": 1.4514,
+      "sim": "1000 vectors, 0 errors",
+      "note": "timing met at 3.4 ns"
+    },
+    "pipe_W64_S2": {
+      "W": 64,
+      "S": 2,
+      "run": "run_pipe_W64_S2_P1.6",
+      "area_um2": 301707.3,
+      "fmax_path_ns": 2.78276,
+      "W_cycles_per_mul": 4,
+      "tb_cycles_per_mul": 4.0,
+      "sim_period_ns": 1.6,
+      "power_mW": 276.8831,
+      "dynamic_mW": 275.313,
+      "leakage_mW": 1.5701,
+      "sim": "1000 vectors, 0 errors",
+      "note": "1.6 ns target missed by 1.25 ns; critical path inside a retimed multiplier"
+    },
+    "pipe_W64_S3": {
+      "W": 64,
+      "S": 3,
+      "run": "run_pipe_W64_S3_P1.1",
+      "area_um2": 316014.4,
+      "fmax_path_ns": 2.77562,
+      "W_cycles_per_mul": 4,
+      "tb_cycles_per_mul": 4.01,
+      "sim_period_ns": 1.1,
+      "power_mW": 418.8278,
+      "dynamic_mW": 417.1461,
+      "leakage_mW": 1.6817,
+      "sim": "1000 vectors, 0 errors",
+      "note": "1.1 ns target missed by 1.75 ns"
+    },
+    "pipe_W64_S4": {
+      "W": 64,
+      "S": 4,
+      "run": "run_pipe_W64_S4_P0.9",
+      "area_um2": 324420.5,
+      "fmax_path_ns": 2.8331,
+      "W_cycles_per_mul": 4,
+      "tb_cycles_per_mul": 4.0,
+      "sim_period_ns": 0.9,
+      "power_mW": 528.4405,
+      "dynamic_mW": 526.6842,
+      "leakage_mW": 1.7563,
+      "sim": "1000 vectors, 0 errors",
+      "note": "0.9 ns target missed by 2.0 ns"
+    }
+  }
+}
