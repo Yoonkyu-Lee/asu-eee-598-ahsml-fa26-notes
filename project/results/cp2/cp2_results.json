@@ -1,0 +1,527 @@
+{
+  "cores": {
+    "p": [
+      0,
+      1,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "e": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "lp_e": [
+      20,
+      21
+    ]
+  },
+  "quality": {
+    "fp32": {
+      "recall_at_10_mean": 1.0
+    },
+    "int8_dyn_hf": {
+      "recall_at_10_mean": 0.8619000000000001,
+      "recall_at_10_p10": 0.7,
+      "frac_below_0.9": 0.397
+    },
+    "int8_dyn_perchannel": {
+      "recall_at_10_mean": 0.8776000000000002,
+      "recall_at_10_p10": 0.8,
+      "frac_below_0.9": 0.342
+    },
+    "int8_static_qdq": {
+      "recall_at_10_mean": 0.08020000000000001,
+      "recall_at_10_p10": 0.0,
+      "frac_below_0.9": 1.0
+    },
+    "fp16": {
+      "recall_at_10_mean": 0.9989,
+      "recall_at_10_p10": 1.0,
+      "frac_below_0.9": 0.0
+    }
+  },
+  "speed": {
+    "fp32": {
+      "p_core_1thread": {
+        "cpus": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 30.800833699991927,
+        "pkg_W": 22.835555779082185,
+        "idle_W": 7.742114446733994,
+        "J_per_post": 0.7033541559984,
+        "active_J_per_post": 0.4648905764382412,
+        "backlog_min": 171.11574277773292,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 30.7985971,
+          "p50_ms": 25.8108,
+          "p99_ms": 61.525962
+        }
+      },
+      "all_cores": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 9.36787370001548,
+        "pkg_W": 64.39796524983072,
+        "idle_W": 12.029950398799718,
+        "J_per_post": 0.6032720049984001,
+        "active_J_per_post": 0.4905769490449934,
+        "backlog_min": 52.04374277786378,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 9.3651942,
+          "p50_ms": 8.263950000000001,
+          "p99_ms": 17.507663
+        }
+      }
+    },
+    "int8_dyn_hf": {
+      "p_core_1thread": {
+        "cpus": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 24.633944600005634,
+        "pkg_W": 20.754044928780228,
+        "idle_W": 8.405196065290465,
+        "J_per_post": 0.5112539930016,
+        "active_J_per_post": 0.30420085877704933,
+        "backlog_min": 136.85524777780904,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 24.631995900000003,
+          "p50_ms": 20.149,
+          "p99_ms": 52.067344
+        }
+      },
+      "all_cores": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 8.782088300009491,
+        "pkg_W": 57.20167126976588,
+        "idle_W": 11.923431775755613,
+        "J_per_post": 0.5023501279992,
+        "active_J_per_post": 0.3976374973053752,
+        "backlog_min": 48.78937944449717,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 8.7795794,
+          "p50_ms": 7.705550000000001,
+          "p99_ms": 17.601969
+        }
+      }
+    },
+    "int8_dyn_perchannel": {
+      "p_core_1thread": {
+        "cpus": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 14.425197899981868,
+        "pkg_W": 21.773796115420698,
+        "idle_W": 7.3705020174972224,
+        "J_per_post": 0.31409131799879997,
+        "active_J_per_post": 0.20777036777418692,
+        "backlog_min": 80.1399883332326,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 14.423353500000001,
+          "p50_ms": 11.5537,
+          "p99_ms": 31.19868
+        }
+      },
+      "all_cores": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 5.994642400008161,
+        "pkg_W": 55.76784763620677,
+        "idle_W": 14.073528101945136,
+        "J_per_post": 0.33430830399719996,
+        "active_J_per_post": 0.2499425357195733,
+        "backlog_min": 33.30356888893422,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 5.992303,
+          "p50_ms": 5.2742,
+          "p99_ms": 11.290370999999999
+        }
+      }
+    },
+    "int8_static_qdq": {
+      "p_core_1thread": {
+        "cpus": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 17.623405999998795,
+        "pkg_W": 23.79029649551447,
+        "idle_W": 8.520407949183458,
+        "J_per_post": 0.4192660540008,
+        "active_J_per_post": 0.2691074454267228,
+        "backlog_min": 97.90781111110441,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 17.621582200000002,
+          "p50_ms": 13.706949999999999,
+          "p99_ms": 39.180119
+        }
+      },
+      "all_cores": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 9.731907600013074,
+        "pkg_W": 50.87294108716517,
+        "idle_W": 14.368822564583738,
+        "J_per_post": 0.4950907620012,
+        "active_J_per_post": 0.3552547084816882,
+        "backlog_min": 54.066153333405964,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 9.7290697,
+          "p50_ms": 8.74045,
+          "p99_ms": 19.976855
+        }
+      }
+    },
+    "fp16": {
+      "p_core_1thread": {
+        "cpus": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 32.44486770001822,
+        "pkg_W": 25.65159823413096,
+        "idle_W": 8.660219532888595,
+        "J_per_post": 0.8322627110004001,
+        "active_J_per_post": 0.551283034002716,
+        "backlog_min": 180.24926500010122,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 32.4426148,
+          "p50_ms": 26.69135,
+          "p99_ms": 66.154775
+        }
+      },
+      "all_cores": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 11.656430499977432,
+        "pkg_W": 58.701220669683124,
+        "idle_W": 14.364253072577512,
+        "J_per_post": 0.684246699,
+        "active_J_per_post": 0.5168107813754129,
+        "backlog_min": 64.75794722209685,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 11.6536128,
+          "p50_ms": 9.898,
+          "p99_ms": 21.877921999999998
+        }
+      }
+    }
+  },
+  "extra": {
+    "fp32": {
+      "batch32_unsorted": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 32,
+        "bucket": false,
+        "ms_per_post": 12.622682199988049,
+        "pkg_W": 73.45550456799727,
+        "idle_W": 12.52344521056686,
+        "J_per_post": 0.9272054900016,
+        "active_J_per_post": 0.7691260210596521,
+        "backlog_min": 70.12601222215582
+      },
+      "batch8_bucketed": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 8,
+        "bucket": true,
+        "ms_per_post": 7.149745300004724,
+        "pkg_W": 74.47106892034996,
+        "idle_W": 13.033393572014267,
+        "J_per_post": 0.5324491749996,
+        "active_J_per_post": 0.43926373056497925,
+        "backlog_min": 39.72080722224847
+      },
+      "batch32_bucketed": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 32,
+        "bucket": true,
+        "ms_per_post": 7.559593599988148,
+        "pkg_W": 72.72758511786428,
+        "idle_W": 13.155129862491831,
+        "J_per_post": 0.5497909869996,
+        "active_J_per_post": 0.45034355148409383,
+        "backlog_min": 41.997742222156376
+      },
+      "e_core_1thread": {
+        "cpus": [
+          2
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 73.83512569998857,
+        "pkg_W": 12.031646449783691,
+        "idle_W": 8.30497032227094,
+        "J_per_post": 0.8883581279976001,
+        "active_J_per_post": 0.2751596003180507,
+        "backlog_min": 410.19514277771424,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 73.8313598,
+          "p50_ms": 61.60075,
+          "p99_ms": 146.48767199999998
+        }
+      },
+      "e_cores_8threads": {
+        "cpus": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "threads": 8,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 21.520264099992346,
+        "pkg_W": 23.16267429081306,
+        "idle_W": 7.496918884476923,
+        "J_per_post": 0.49846686800039997,
+        "active_J_per_post": 0.3371311936702366,
+        "backlog_min": 119.55702277773526,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 21.5165007,
+          "p50_ms": 17.25065,
+          "p99_ms": 70.53357
+        }
+      },
+      "lp_e_core_1thread": {
+        "cpus": [
+          20
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 111.56831490001059,
+        "pkg_W": 10.69473926420562,
+        "idle_W": 7.4364830325415365,
+        "J_per_post": 1.1931940380024,
+        "active_J_per_post": 0.3635181572792202,
+        "backlog_min": 619.8239716667255,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 111.56356450000001,
+          "p50_ms": 92.78645,
+          "p99_ms": 218.087247
+        }
+      }
+    },
+    "int8_dyn_hf": {
+      "batch32_unsorted": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 32,
+        "bucket": false,
+        "ms_per_post": 11.304235799994785,
+        "pkg_W": 64.87297779141676,
+        "idle_W": 10.984344546363742,
+        "J_per_post": 0.733339438002,
+        "active_J_per_post": 0.6091698171415174,
+        "backlog_min": 62.80130999997103
+      },
+      "batch8_bucketed": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 8,
+        "bucket": true,
+        "ms_per_post": 6.364468699990539,
+        "pkg_W": 65.3971713306122,
+        "idle_W": 13.429322605729208,
+        "J_per_post": 0.4162182500016,
+        "active_J_per_post": 0.33074774661536105,
+        "backlog_min": 35.35815944439188
+      },
+      "batch32_bucketed": {
+        "cpus": "all",
+        "threads": 0,
+        "batch": 32,
+        "bucket": true,
+        "ms_per_post": 6.563348899973789,
+        "pkg_W": 65.69830334677499,
+        "idle_W": 13.630423867114114,
+        "J_per_post": 0.43120088700119996,
+        "active_J_per_post": 0.3417396595068001,
+        "backlog_min": 36.463049444298825
+      },
+      "e_core_1thread": {
+        "cpus": [
+          2
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 67.9226892000006,
+        "pkg_W": 11.633697919009853,
+        "idle_W": 9.365641478569723,
+        "J_per_post": 0.7901920479996001,
+        "active_J_per_post": 0.1540524926920747,
+        "backlog_min": 377.34827333333664,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 67.9189514,
+          "p50_ms": 55.9579,
+          "p99_ms": 138.681059
+        }
+      },
+      "e_cores_8threads": {
+        "cpus": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "threads": 8,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 21.73608719999902,
+        "pkg_W": 18.405901592004014,
+        "idle_W": 8.967626032140846,
+        "J_per_post": 0.4000722819984,
+        "active_J_per_post": 0.20515118058680537,
+        "backlog_min": 120.75603999999454,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 21.7328244,
+          "p50_ms": 17.978099999999998,
+          "p99_ms": 67.92641799999998
+        }
+      },
+      "lp_e_core_1thread": {
+        "cpus": [
+          20
+        ],
+        "threads": 1,
+        "batch": 1,
+        "bucket": false,
+        "ms_per_post": 104.86129050000454,
+        "pkg_W": 9.540000454199605,
+        "idle_W": 6.912725955555804,
+        "J_per_post": 1.000376758998,
+        "active_J_per_post": 0.2754993944255414,
+        "backlog_min": 582.5627250000252,
+        "latency": {
+          "n": 1000,
+          "mean_ms": 104.85638809999999,
+          "p50_ms": 85.50685,
+          "p99_ms": 210.159234
+        }
+      }
+    }
+  },
+  "cheapest_passing": "fp32"
+}

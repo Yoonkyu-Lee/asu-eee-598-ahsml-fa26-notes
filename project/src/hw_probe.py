@@ -13,6 +13,7 @@ from ctypes import wintypes
 pdh = ctypes.WinDLL("pdh")
 PDH_FMT_LARGE = 0x00000400
 PDH_FMT_DOUBLE = 0x00000200
+PWH = 3.6e-9  # the Energy counter counts picowatt-hours (calibrated 2026-10-30: 3.5998e-9 J/unit)
 
 
 class _FmtValue(ctypes.Structure):
@@ -50,7 +51,7 @@ class PackageEnergy:
 
     def __init__(self, domain: str = "RAPL_Package0_PKG", joules_per_unit: float | None = None):
         self.energy = _Counter(rf"\Energy Meter({domain})\Energy")
-        self.jpu = joules_per_unit
+        self.jpu = joules_per_unit if joules_per_unit is not None else PWH
 
     def start(self) -> None:
         self.t0, self.e0 = time.perf_counter(), self.energy.large()
@@ -84,8 +85,8 @@ class _CpuSet(ctypes.Structure):
     _fields_ = [("Size", wintypes.DWORD), ("Type", wintypes.DWORD), ("Id", wintypes.DWORD),
                 ("Group", wintypes.WORD), ("LogicalProcessorIndex", ctypes.c_ubyte), ("CoreIndex", ctypes.c_ubyte),
                 ("LastLevelCacheIndex", ctypes.c_ubyte), ("NumaNodeIndex", ctypes.c_ubyte),
-                ("EfficiencyClass", ctypes.c_ubyte), ("AllFlags", ctypes.c_ubyte), ("pad", ctypes.c_byte * 2),
-                ("SchedulingClass", wintypes.DWORD), ("AllocationTag", ctypes.c_ulonglong)]
+                ("EfficiencyClass", ctypes.c_ubyte), ("AllFlags", ctypes.c_ubyte),
+                ("Reserved", wintypes.DWORD), ("AllocationTag", ctypes.c_ulonglong)]  # 32 bytes, matches SYSTEM_CPU_SET_INFORMATION
 
 
 def core_classes() -> dict[int, list[int]]:

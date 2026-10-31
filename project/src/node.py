@@ -52,11 +52,13 @@ def decrypt(env: Envelope, room_key: bytes) -> str:
 
 class Encoder:
     def __init__(self, variant: str = "int8", threads: int = 1):
-        name = {"int8": "model_quint8_avx2.onnx", "fp32": "model.onnx"}[variant]
+        """variant: "int8" (HF dynamic INT8), "fp32", or a path to any ONNX export of the same model."""
+        known = {"int8": "model_quint8_avx2.onnx", "fp32": "model.onnx"}
+        path = MODEL_DIR / "onnx" / known[variant] if variant in known else Path(variant)
         opts = ort.SessionOptions()
         opts.intra_op_num_threads = threads  # 0 = let ORT use all cores
         opts.inter_op_num_threads = 1
-        self.session = ort.InferenceSession(str(MODEL_DIR / "onnx" / name), opts, providers=["CPUExecutionProvider"])
+        self.session = ort.InferenceSession(str(path), opts, providers=["CPUExecutionProvider"])
         self.tok = Tokenizer.from_file(str(MODEL_DIR / "tokenizer.json"))
         self.tok.enable_truncation(MAX_TOKENS)
         self.input_names = {i.name for i in self.session.get_inputs()}
