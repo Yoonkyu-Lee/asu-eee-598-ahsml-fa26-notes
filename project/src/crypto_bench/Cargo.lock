@@ -356,6 +356,7 @@ dependencies = [
  "ark-ff",
  "ark-groth16",
  "ark-relations",
+ "ark-serialize",
  "ark-snark",
  "ark-std",
  "chacha20poly1305",

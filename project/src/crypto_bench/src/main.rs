@@ -9,7 +9,8 @@
 //!   groth16      BN254 (the curve Semaphore and RLN use): verify with 5 public inputs,
 //!                and prove a synthetic circuit of 2^12..2^16 constraints (squaring chain);
 //!                batch-verify 64 proofs with random weights (per proof)
-//!   prims        (CP7) Fq / Fq2 / Fq12 multiplication, Miller loop, final exponentiation, G1 scalar mul
+//!   prims        (CP7) Fq / Fq2 / Fq12 multiplication, Miller loop, final exponentiation, G1 scalar mul;
+//!                (CP8) proof decoding with and without curve/subgroup checks
 //! Proof verification cost does not depend on circuit size, only on the number of public inputs.
 //! Proving cost scales with constraints; the synthetic circuit only stands in for the real one.
 
@@ -174,7 +175,28 @@ fn prims() {
     });
     let items: Vec<_> = (0..64).map(|_| (c.publics.clone(), proof.clone())).collect();
     let batch = time_us(3, 30, || assert!(batch_verify(&pvk, &items))) / 64.0;
+
+    // CP8: a proof arrives as bytes. Checked decoding = on-curve + subgroup checks for A, C (G1) and B (G2).
+    use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+    let mut bytes = Vec::new();
+    proof.serialize_compressed(&mut bytes).unwrap();
+    let checked = time_us(10, 200, || {
+        std::hint::black_box(ark_groth16::Proof::<Bn254>::deserialize_compressed(bytes.as_slice()).unwrap());
+    });
+    let unchecked = time_us(10, 200, || {
+        std::hint::black_box(ark_groth16::Proof::<Bn254>::deserialize_compressed_unchecked(bytes.as_slice()).unwrap());
+    });
+    let mut b2 = Vec::new();
+    proof.b.serialize_compressed(&mut b2).unwrap();
+    let g2_checked = time_us(10, 200, || {
+        let _ = std::hint::black_box(ark_bn254::G2Affine::deserialize_compressed(b2.as_slice()).unwrap());
+    });
+    let g2_unchecked = time_us(10, 200, || {
+        let _ = std::hint::black_box(ark_bn254::G2Affine::deserialize_compressed_unchecked(b2.as_slice()).unwrap());
+    });
     println!("{}", serde_json::to_string_pretty(&json!({
+        "proof_bytes": bytes.len(), "proof_decode_checked_us": checked, "proof_decode_unchecked_us": unchecked,
+        "g2_decode_checked_us": g2_checked, "g2_decode_unchecked_us": g2_unchecked,
         "fq_mul_ns": fq_mul, "fq_square_ns": fq_sqr, "fq_add_ns": fq_add, "fq2_mul_ns": fq2_mul, "fq12_mul_ns": fq12_mul,
         "miller_loop_1_us": ml1, "miller_loop_3_us": ml3, "final_exp_us": fe, "g1_scalar_mul_us": smul,
         "groth16_verify_us": verify, "groth16_batch64_per_proof_us": batch,

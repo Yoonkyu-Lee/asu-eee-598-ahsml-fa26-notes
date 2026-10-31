@@ -1,0 +1,114 @@
+{
+  "rules": {
+    "R1_mJ_per_proof": 0.08,
+    "R2_proofs_per_s": 24414,
+    "flood_per_s": 12207
+  },
+  "work_per_proof": {
+    "verify_batch64_fp_mul": 6642.8125,
+    "decode_checks_fp_mul": 3772.0,
+    "decode_parts": {
+      "g1_decompress_x2": 762,
+      "g2_decompress": 962,
+      "g2_subgroup": 2048.0
+    },
+    "total_fp_mul": 10414.8125,
+    "nJ_per_fp_mul_incl_traffic": 0.8042393413934235,
+    "cpu_check": {
+      "decode_checked_us": 114.0,
+      "decode_unchecked_us": 26.1,
+      "batch_verify_us": 321.5296875,
+      "decode_share_of_total": 0.26175023947133336,
+      "model_decode_share": 0.3621764674111992
+    }
+  },
+  "alternatives": {
+    "A64@0.5GHz": {
+      "what": "dedicated Fp unit, 64-bit rows",
+      "mult32_equiv": 32,
+      "cycles_per_fp_mul": 4.0,
+      "proofs_per_s": 12002.13638027569,
+      "mJ_per_proof": 0.008376001945735994,
+      "R3": true,
+      "note": "",
+      "R1": true,
+      "R2": false,
+      "pass": false
+    },
+    "A128@0.5GHz": {
+      "what": "dedicated Fp unit, 128-bit rows",
+      "mult32_equiv": 64,
+      "cycles_per_fp_mul": 2.0,
+      "proofs_per_s": 24004.27276055138,
+      "mJ_per_proof": 0.008376001945735994,
+      "R3": true,
+      "note": "",
+      "R1": true,
+      "R2": false,
+      "pass": false
+    },
+    "A256@0.5GHz": {
+      "what": "dedicated Fp unit, 256-bit rows",
+      "mult32_equiv": 128,
+      "cycles_per_fp_mul": 1.0,
+      "proofs_per_s": 48008.54552110276,
+      "mJ_per_proof": 0.008376001945735994,
+      "R3": true,
+      "note": "",
+      "R1": true,
+      "R2": true,
+      "pass": true
+    },
+    "A128@1.0GHz": {
+      "what": "dedicated Fp unit, 128-bit rows",
+      "mult32_equiv": 64,
+      "cycles_per_fp_mul": 2.0,
+      "proofs_per_s": 48008.54552110276,
+      "mJ_per_proof": 0.008376001945735994,
+      "R3": true,
+      "note": "1 GHz on a 254-bit datapath at 45 nm is unproven: CP9 synthesis decides",
+      "R1": true,
+      "R2": true,
+      "pass": true
+    },
+    "B int8 array": {
+      "what": "reuse the encoder's 16x16 INT8 array (8-bit limbs)",
+      "mult32_equiv": 0,
+      "cycles_per_fp_mul": 156.0,
+      "proofs_per_s": 615.4941733474712,
+      "mJ_per_proof": 0.052747269120736,
+      "R3": false,
+      "note": "needs integer carry handling the FP16 vector unit lacks; occupies the encoder during a flood",
+      "R1": true,
+      "R2": false,
+      "pass": false
+    },
+    "C cpu + bigint instr": {
+      "what": "host core + 254-bit multiply instruction (64-bit rows)",
+      "mult32_equiv": 32,
+      "cycles_per_fp_mul": 8.0,
+      "proofs_per_s": 12002.13638027569,
+      "mJ_per_proof": 0.012021186320735993,
+      "R3": false,
+      "note": "keeps the host core fully busy during a flood",
+      "R1": true,
+      "R2": false,
+      "pass": false
+    },
+    "D software (LP-E core)": {
+      "what": "batch verification on one low-power E-core (measured)",
+      "mult32_equiv": 0,
+      "proofs_per_s": 988.6765637310182,
+      "mJ_per_proof": 2.056141900586315,
+      "R3": false,
+      "note": "measured active energy, decoding not included",
+      "R1": false,
+      "R2": false,
+      "pass": false
+    }
+  },
+  "ranking": [
+    "A128@1.0GHz",
+    "A256@0.5GHz"
+  ]
+}

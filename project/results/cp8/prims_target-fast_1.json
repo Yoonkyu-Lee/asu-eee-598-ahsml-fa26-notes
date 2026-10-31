@@ -1,0 +1,18 @@
+{
+  "final_exp_us": 334.7,
+  "fq12_mul_ns": 1913.213,
+  "fq2_mul_ns": 57.9729,
+  "fq_add_ns": 2.139,
+  "fq_mul_ns": 14.8371,
+  "fq_square_ns": 13.344099999999997,
+  "g1_scalar_mul_us": 40.5,
+  "g2_decode_checked_us": 101.60000000000001,
+  "g2_decode_unchecked_us": 16.4,
+  "groth16_batch64_per_proof_us": 321.5296875,
+  "groth16_verify_us": 1234.1,
+  "miller_loop_1_us": 228.6,
+  "miller_loop_3_us": 647.9,
+  "proof_bytes": 128,
+  "proof_decode_checked_us": 114.0,
+  "proof_decode_unchecked_us": 26.1
+}
