@@ -9,6 +9,7 @@
 //!   groth16      BN254 (the curve Semaphore and RLN use): verify with 5 public inputs,
 //!                and prove a synthetic circuit of 2^12..2^16 constraints (squaring chain);
 //!                batch-verify 64 proofs with random weights (per proof)
+//!   prims        (CP7) Fq / Fq2 / Fq12 multiplication, Miller loop, final exponentiation, G1 scalar mul
 //! Proof verification cost does not depend on circuit size, only on the number of public inputs.
 //! Proving cost scales with constraints; the synthetic circuit only stands in for the real one.
 
@@ -129,7 +130,58 @@ fn pairing_costs<E: Pairing>(msm_sizes: &[usize]) -> Value {
     json!({"pairing_us": one, "multi_pairing3_us": three, "g1_msm_us": msm})
 }
 
-/// `loop <groth16|ed25519> <seconds>`: repeat one verification for a fixed time, so an outside
+/// `prims` (CP7): the building blocks of a BN254 pairing, to count how many base-field multiplications
+/// the CPU effectively spends per Miller loop / final exponentiation (time / Fq-mul time).
+fn prims() {
+    use ark_bn254::{Fq, Fq12, Fq2, G1Projective, G2Projective};
+    let rng = &mut OsRng;
+    let n = 1_000_000;
+    let chain_ns = |f: &mut dyn FnMut()| time_us(1, 5, || (0..n).for_each(|_| f())) * 1e3 / n as f64;
+    let (mut a, b) = (Fq::rand(rng), Fq::rand(rng));
+    let fq_mul = chain_ns(&mut || a *= b);
+    let fq_sqr = chain_ns(&mut || {
+        a.square_in_place();
+    });
+    let fq_add = chain_ns(&mut || a += b);
+    let (mut a2, b2) = (Fq2::rand(rng), Fq2::rand(rng));
+    let fq2_mul = chain_ns(&mut || a2 *= b2);
+    let (mut a12, b12) = (Fq12::rand(rng), Fq12::rand(rng));
+    let fq12_mul = time_us(1, 5, || (0..100_000).for_each(|_| a12 *= b12)) * 1e3 / 1e5;
+    std::hint::black_box((a, a2, a12));
+
+    let g1: Vec<_> = (0..3).map(|_| G1Projective::rand(rng).into_affine()).collect();
+    let g2: Vec<_> = (0..3).map(|_| G2Projective::rand(rng).into_affine()).collect();
+    let ml1 = time_us(5, 100, || {
+        let _ = std::hint::black_box(Bn254::multi_miller_loop([g1[0]], [g2[0]]));
+    });
+    let ml3 = time_us(5, 100, || {
+        let _ = std::hint::black_box(Bn254::multi_miller_loop(g1.clone(), g2.clone()));
+    });
+    let f = Bn254::multi_miller_loop([g1[0]], [g2[0]]);
+    let fe = time_us(5, 100, || {
+        let _ = std::hint::black_box(Bn254::final_exponentiation(f).unwrap());
+    });
+    let (p, k) = (G1Projective::rand(rng), Fr::rand(rng));
+    let smul = time_us(5, 200, || {
+        let _ = std::hint::black_box(p * k);
+    });
+    let c = Chain { publics: (0..5).map(|_| Fr::rand(rng)).collect(), x0: Fr::rand(rng), n: 1 << 12 };
+    let (pk, vk) = Groth16::<Bn254>::circuit_specific_setup(c.clone(), rng).unwrap();
+    let pvk = Groth16::<Bn254>::process_vk(&vk).unwrap();
+    let proof = Groth16::<Bn254>::prove(&pk, c.clone(), rng).unwrap();
+    let verify = time_us(10, 200, || {
+        assert!(Groth16::<Bn254>::verify_with_processed_vk(&pvk, &c.publics, &proof).unwrap());
+    });
+    let items: Vec<_> = (0..64).map(|_| (c.publics.clone(), proof.clone())).collect();
+    let batch = time_us(3, 30, || assert!(batch_verify(&pvk, &items))) / 64.0;
+    println!("{}", serde_json::to_string_pretty(&json!({
+        "fq_mul_ns": fq_mul, "fq_square_ns": fq_sqr, "fq_add_ns": fq_add, "fq2_mul_ns": fq2_mul, "fq12_mul_ns": fq12_mul,
+        "miller_loop_1_us": ml1, "miller_loop_3_us": ml3, "final_exp_us": fe, "g1_scalar_mul_us": smul,
+        "groth16_verify_us": verify, "groth16_batch64_per_proof_us": batch,
+    })).unwrap());
+}
+
+/// `loop <groth16|groth16batch|ed25519> <seconds>`: repeat one verification for a fixed time, so an outside
 /// meter (src/bench_cp6.py, package energy) can attribute joules per verification.
 fn verify_loop(what: &str, secs: f64) {
     let rng = &mut OsRng;
@@ -141,6 +193,14 @@ fn verify_loop(what: &str, secs: f64) {
             let pvk = Groth16::<Bn254>::process_vk(&vk).unwrap();
             let proof = Groth16::<Bn254>::prove(&pk, c.clone(), rng).unwrap();
             Box::new(move || assert!(Groth16::<Bn254>::verify_with_processed_vk(&pvk, &c.publics, &proof).unwrap()))
+        }
+        "groth16batch" => {  // 64 proofs per call; ops below counts proofs
+            let c = Chain { publics: (0..5).map(|_| Fr::rand(rng)).collect(), x0: Fr::rand(rng), n: 1 << 12 };
+            let (pk, vk) = Groth16::<Bn254>::circuit_specific_setup(c.clone(), rng).unwrap();
+            let pvk = Groth16::<Bn254>::process_vk(&vk).unwrap();
+            let proof = Groth16::<Bn254>::prove(&pk, c.clone(), rng).unwrap();
+            let items: Vec<_> = (0..64).map(|_| (c.publics.clone(), proof.clone())).collect();
+            Box::new(move || assert!(batch_verify(&pvk, &items)))
         }
         _ => {
             let k = SigningKey::generate(rng);
@@ -154,13 +214,17 @@ fn verify_loop(what: &str, secs: f64) {
         verify();
         n += 1;
     }
-    println!("{}", json!({"what": what, "ops": n, "secs": a.elapsed().as_secs_f64()}));
+    let per_call = if what == "groth16batch" { 64 } else { 1 };
+    println!("{}", json!({"what": what, "ops": n * per_call, "secs": a.elapsed().as_secs_f64()}));
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() == 4 && args[1] == "loop" {
         return verify_loop(&args[2], args[3].parse().unwrap());
+    }
+    if args.len() == 2 && args[1] == "prims" {
+        return prims();
     }
     let rng = &mut OsRng;
     let mut out = serde_json::Map::new();

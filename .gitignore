@@ -48,3 +48,4 @@ project/*.data
 project/*.onnx
 # CP6 Rust 벤치 빌드 산출물
 project/src/crypto_bench/target/
+project/src/crypto_bench/target-fast/

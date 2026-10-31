@@ -1,0 +1,78 @@
+{
+  "cores": {
+    "p_core": 0,
+    "lp_e_core": 20
+  },
+  "prims": {
+    "default/p_core": {
+      "final_exp_us": 373.7,
+      "fq12_mul_ns": 2202.1569999999997,
+      "fq2_mul_ns": 61.416,
+      "fq_add_ns": 2.4392,
+      "fq_mul_ns": 15.705899999999998,
+      "fq_square_ns": 16.5572,
+      "g1_scalar_mul_us": 37.2,
+      "groth16_batch64_per_proof_us": 348.853125,
+      "groth16_verify_us": 1376.2,
+      "miller_loop_1_us": 261.3,
+      "miller_loop_3_us": 709.3
+    },
+    "default/lp_e_core": {
+      "final_exp_us": 996.5,
+      "fq12_mul_ns": 5028.451000000001,
+      "fq2_mul_ns": 142.3347,
+      "fq_add_ns": 4.521599999999999,
+      "fq_mul_ns": 39.1339,
+      "fq_square_ns": 56.299,
+      "g1_scalar_mul_us": 145.5,
+      "groth16_batch64_per_proof_us": 887.8249999999999,
+      "groth16_verify_us": 3483.2000000000003,
+      "miller_loop_1_us": 647.9,
+      "miller_loop_3_us": 1672.2
+    },
+    "asm_native/p_core": {
+      "final_exp_us": 322.29999999999995,
+      "fq12_mul_ns": 1921.879,
+      "fq2_mul_ns": 57.164100000000005,
+      "fq_add_ns": 1.9892,
+      "fq_mul_ns": 14.781199999999998,
+      "fq_square_ns": 13.5312,
+      "g1_scalar_mul_us": 37.6,
+      "groth16_batch64_per_proof_us": 315.88906249999997,
+      "groth16_verify_us": 1218.3000000000002,
+      "miller_loop_1_us": 227.29999999999998,
+      "miller_loop_3_us": 640.4
+    },
+    "asm_native/lp_e_core": {
+      "final_exp_us": 639.8000000000001,
+      "fq12_mul_ns": 3755.516,
+      "fq2_mul_ns": 130.95940000000002,
+      "fq_add_ns": 3.6397000000000004,
+      "fq_mul_ns": 38.4048,
+      "fq_square_ns": 51.4698,
+      "g1_scalar_mul_us": 116.89999999999999,
+      "groth16_batch64_per_proof_us": 709.0921875,
+      "groth16_verify_us": 2645.3,
+      "miller_loop_1_us": 480.40000000000003,
+      "miller_loop_3_us": 1328.0
+    }
+  },
+  "energy": {
+    "p_core/groth16batch": {
+      "ops": 28864,
+      "us_per_op": 346.62058619733926,
+      "pkg_W": 16.648328727867295,
+      "idle_W": 5.833667104578631,
+      "J_per_op": 0.006119569706208425,
+      "active_J_per_op": 0.003975238399875718
+    },
+    "lp_e_core/groth16batch": {
+      "ops": 11264,
+      "us_per_op": 887.9606711647727,
+      "pkg_W": 8.268473960413289,
+      "idle_W": 6.266815587190438,
+      "J_per_op": 0.008493535156321022,
+      "active_J_per_op": 0.002056141900586315
+    }
+  }
+}

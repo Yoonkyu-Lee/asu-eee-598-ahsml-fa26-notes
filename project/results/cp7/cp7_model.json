@@ -1,0 +1,88 @@
+{
+  "pJ": {
+    "E_mu": 211.20000000000002,
+    "E_r": 237.60000000000002,
+    "E_add254": 1.6,
+    "sram_word": 5.0
+  },
+  "per_verify": {
+    "single": {
+      "fp_mul_equiv": 22011.5,
+      "uJ_compute_only": 9.779142400000003,
+      "uJ_with_8KB_sram_traffic": 17.703282400000003
+    },
+    "batch64_per_proof": {
+      "fp_mul_equiv": 6642.8125,
+      "uJ_compute_only": 2.9509986500000003,
+      "uJ_with_8KB_sram_traffic": 5.342411150000001
+    }
+  },
+  "cpu_check": {
+    "miller_loop_fq_mul_equiv": 15377.641869401672,
+    "final_exp_fq_mul_equiv": 21804.724920845398,
+    "model_miller_loop": [
+      4903.5,
+      9807
+    ],
+    "model_final_exp": [
+      2729.0,
+      5458
+    ]
+  },
+  "cpu_mJ_per_proof": {
+    "P-core single (측정)": {
+      "pkg": 24.490995032781456,
+      "active": 14.867104517163673
+    },
+    "LP-E single (측정)": {
+      "pkg": 34.846479844794956,
+      "active": 7.692462029144407
+    },
+    "P-core batch 64 (측정)": {
+      "pkg": 6.119569706208425,
+      "active": 3.9752383998757184
+    },
+    "LP-E batch 64 (측정)": {
+      "pkg": 8.493535156321022,
+      "active": 2.056141900586315
+    }
+  },
+  "unit_mJ_per_proof": {
+    "unit single": 0.017703282400000003,
+    "unit batch 64": 0.005342411150000001
+  },
+  "flood": {
+    "10Mbps": {
+      "msgs_per_s": 1220.703125,
+      "budget_mJ_per_proof_2W": 1.6383999999999999,
+      "unit": {
+        "single": {
+          "fp_mul_per_s": 26869506.8359375,
+          "units_at_500MHz": 0.053739013671875,
+          "W": 0.021610452148437504
+        },
+        "batch64": {
+          "fp_mul_per_s": 8108901.9775390625,
+          "units_at_500MHz": 0.016217803955078124,
+          "W": 0.006521497985839844
+        }
+      }
+    },
+    "100Mbps": {
+      "msgs_per_s": 12207.03125,
+      "budget_mJ_per_proof_2W": 0.16384,
+      "unit": {
+        "single": {
+          "fp_mul_per_s": 268695068.359375,
+          "units_at_500MHz": 0.53739013671875,
+          "W": 0.216104521484375
+        },
+        "batch64": {
+          "fp_mul_per_s": 81089019.77539062,
+          "units_at_500MHz": 0.16217803955078125,
+          "W": 0.06521497985839846
+        }
+      }
+    }
+  }
+}

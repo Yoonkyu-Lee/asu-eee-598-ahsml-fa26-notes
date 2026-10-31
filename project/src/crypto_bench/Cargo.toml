@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 description = "CP6: single-thread CPU cost of the crypto a community node box runs on every post"
 
+[features]
+# CP7: the x86-64 assembly field multiplication (build with RUSTFLAGS="-C target-cpu=native")
+fast = ["ark-ff/asm"]
+
 [dependencies]
 ark-bn254 = "0.5"
 ark-bls12-381 = "0.5"
