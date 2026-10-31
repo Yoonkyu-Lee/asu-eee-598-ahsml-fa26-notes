@@ -15,7 +15,7 @@ cd $here
 mkdir -p run_W${W}_P${PERIOD}
 cd run_W${W}_P${PERIOD}
 python3 ../gen_vectors.py 1000 vectors.hex > /dev/null
-vcs -full64 -sverilog +define+SAIF -pvalue+tb_mont_mul.W=$W ../mont_mul.sv ../tb_mont_mul.sv -o simv -l vcs.log > /dev/null
+vcs -full64 -sverilog -timescale=1ns/1ps +define+SAIF -pvalue+tb_mont_mul.W=$W ../mont_mul.sv ../tb_mont_mul.sv -o simv -l vcs.log > /dev/null
 ./simv +PERIOD=$PERIOD -l sim.log | grep -E "RESULT|MISMATCH"
 setenv W $W
 setenv PERIOD $PERIOD
