@@ -1,0 +1,109 @@
+{
+  "device": "Intel(R) AI Boost",
+  "openvino": "2026.4.1-22982-e213a147257-releases/2026/4",
+  "compile_s": 2.2365121841430664,
+  "npu_speed": {
+    "ms_per_post": 31.327914099994814,
+    "latency": {
+      "n": 1000,
+      "mean_ms": 31.325744399999998,
+      "p50_ms": 17.21855,
+      "p99_ms": 55.884725
+    },
+    "pkg_W": 8.33063130748444,
+    "idle_W": 7.028228376468364,
+    "J_per_post": 0.2609813019996,
+    "active_J_per_post": 0.0408015671464531,
+    "backlog_min": 174.0439672221934
+  },
+  "npu_quality": {
+    "recall_at_10": 0.9962,
+    "recall_p10": 1.0,
+    "top1_agree": 0.996,
+    "tolerant_recall_d0.005": 1.0,
+    "tolerant_recall_d0.01": 1.0,
+    "tolerant_recall_d0.02": 1.0,
+    "recall_10_at_20": 1.0,
+    "recall_10_at_50": 1.0,
+    "recall_10_at_100": 1.0,
+    "recall_asym_fp32_query": 0.9964,
+    "self_all": {
+      "hit1": 0.869,
+      "hit10": 0.943,
+      "mrr": 0.8961298436350137
+    },
+    "self_with_body": {
+      "hit1": 0.869,
+      "hit10": 0.943,
+      "mrr": 0.8961298436350137
+    }
+  },
+  "cpu_lp_e_int8": {
+    "cpus": [
+      20
+    ],
+    "threads": 1,
+    "batch": 1,
+    "bucket": false,
+    "ms_per_post": 51.39042720000725,
+    "pkg_W": 10.356638483027146,
+    "idle_W": 9.307439987709078,
+    "J_per_post": 0.5322320759988001,
+    "active_J_per_post": 0.05391875889200031,
+    "backlog_min": 285.5023733333736,
+    "latency": {
+      "n": 1000,
+      "mean_ms": 51.3853832,
+      "p50_ms": 40.88885,
+      "p99_ms": 106.33758300000001
+    }
+  },
+  "npu_async1_sorted": {
+    "jobs": 1,
+    "ms_per_post": 30.90643140001339,
+    "pkg_W": 9.554539836063768,
+    "idle_W": 8.067730044146447,
+    "J_per_post": 0.295296730002,
+    "active_J_per_post": 0.04595198483876083,
+    "backlog_min": 171.70239666674104
+  },
+  "npu_async4_sorted": {
+    "jobs": 4,
+    "ms_per_post": 30.108556399994995,
+    "pkg_W": 8.774161487159308,
+    "idle_W": 6.293053162320753,
+    "J_per_post": 0.2641773359988,
+    "active_J_per_post": 0.07470258993289874,
+    "backlog_min": 167.26975777774996
+  },
+  "npu_async8_sorted": {
+    "jobs": 8,
+    "ms_per_post": 30.024557900003856,
+    "pkg_W": 9.276902824909348,
+    "idle_W": 6.457388292970766,
+    "J_per_post": 0.2785349059992,
+    "active_J_per_post": 0.0846546773140922,
+    "backlog_min": 166.80309944446586
+  },
+  "npu_fixed_length_calls": {
+    "32": {
+      "ms": 4.050290000159293,
+      "effective_GOPS": 170.09014958753713
+    },
+    "64": {
+      "ms": 6.1947009997675195,
+      "effective_GOPS": 225.46741675706653
+    },
+    "128": {
+      "ms": 16.149088999954984,
+      "effective_GOPS": 177.6511316525655
+    },
+    "256": {
+      "ms": 53.5214500001166,
+      "effective_GOPS": 112.84817134040357
+    },
+    "mean_padded_len": 185.856,
+    "mean_len": 164.34595,
+    "pred_ms_per_post_from_bucket_times": 33.04139617202804
+  }
+}
