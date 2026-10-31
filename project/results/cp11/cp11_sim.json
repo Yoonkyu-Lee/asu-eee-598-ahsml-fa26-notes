@@ -1,0 +1,1085 @@
+{
+  "machine": {
+    "MHz": 300.0,
+    "mul_occupancy": 4,
+    "mul_latency": 4,
+    "nJ_mul": 1.758,
+    "pJ_add": 1.6,
+    "pJ_traffic_per_op": 120.0
+  },
+  "trace_s": 1.016101598739624,
+  "op_counts": {
+    "batch4": {
+      "ops": 381770,
+      "mul": 97158,
+      "add": 284612,
+      "decode_ops": 71061
+    },
+    "batch8": {
+      "ops": 582993,
+      "mul": 154629,
+      "add": 428364,
+      "decode_ops": 141419
+    },
+    "single": {
+      "ops": 197364,
+      "mul": 44175,
+      "add": 153189,
+      "decode_ops": 18112
+    }
+  },
+  "per_proof_marginal": {
+    "mul": 14367.75,
+    "add": 35938.0
+  },
+  "sweep": [
+    {
+      "mults": 1,
+      "adders": 1,
+      "batch8": {
+        "cycles": 636766,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9713395501644246,
+        "peak_live_values": 3735
+      },
+      "cycles_per_proof": 57471.0,
+      "proofs_per_s": 5220.024012110455,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 116.71875
+    },
+    {
+      "mults": 1,
+      "adders": 2,
+      "batch8": {
+        "cycles": 618524,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9999870659828883,
+        "peak_live_values": 3764
+      },
+      "cycles_per_proof": 57471.0,
+      "proofs_per_s": 5220.024012110455,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.625
+    },
+    {
+      "mults": 1,
+      "adders": 3,
+      "batch8": {
+        "cycles": 618524,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9999870659828883,
+        "peak_live_values": 3766
+      },
+      "cycles_per_proof": 57471.0,
+      "proofs_per_s": 5220.024012110455,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.6875
+    },
+    {
+      "mults": 1,
+      "adders": 4,
+      "batch8": {
+        "cycles": 618524,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9999870659828883,
+        "peak_live_values": 3766
+      },
+      "cycles_per_proof": 57471.0,
+      "proofs_per_s": 5220.024012110455,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.6875
+    },
+    {
+      "mults": 1,
+      "adders": 6,
+      "batch8": {
+        "cycles": 618524,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9999870659828883,
+        "peak_live_values": 3766
+      },
+      "cycles_per_proof": 57471.0,
+      "proofs_per_s": 5220.024012110455,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.6875
+    },
+    {
+      "mults": 2,
+      "adders": 1,
+      "batch8": {
+        "cycles": 468520,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.6600742764449756,
+        "peak_live_values": 3652
+      },
+      "cycles_per_proof": 39894.75,
+      "proofs_per_s": 7519.786438065159,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 114.125
+    },
+    {
+      "mults": 2,
+      "adders": 2,
+      "batch8": {
+        "cycles": 319118,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9691023383199945,
+        "peak_live_values": 3745
+      },
+      "cycles_per_proof": 28735.75,
+      "proofs_per_s": 10439.957196175495,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.03125
+    },
+    {
+      "mults": 2,
+      "adders": 3,
+      "batch8": {
+        "cycles": 310134,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9971754144982491,
+        "peak_live_values": 3768
+      },
+      "cycles_per_proof": 28735.25,
+      "proofs_per_s": 10440.138853846756,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.75
+    },
+    {
+      "mults": 2,
+      "adders": 4,
+      "batch8": {
+        "cycles": 309997,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9976161059623158,
+        "peak_live_values": 3773
+      },
+      "cycles_per_proof": 28735.5,
+      "proofs_per_s": 10440.04802422091,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 117.90625
+    },
+    {
+      "mults": 2,
+      "adders": 6,
+      "batch8": {
+        "cycles": 309997,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9976161059623158,
+        "peak_live_values": 3776
+      },
+      "cycles_per_proof": 28735.5,
+      "proofs_per_s": 10440.04802422091,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 118.0
+    },
+    {
+      "mults": 4,
+      "adders": 1,
+      "batch8": {
+        "cycles": 439983,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.35144312393887944,
+        "peak_live_values": 3351
+      },
+      "cycles_per_proof": 37468.25,
+      "proofs_per_s": 8006.7790729484295,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 104.71875
+    },
+    {
+      "mults": 4,
+      "adders": 2,
+      "batch8": {
+        "cycles": 234123,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.6604605271588011,
+        "peak_live_values": 4572
+      },
+      "cycles_per_proof": 20017.25,
+      "proofs_per_s": 14987.073648977757,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 142.875
+    },
+    {
+      "mults": 4,
+      "adders": 3,
+      "batch8": {
+        "cycles": 174301,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.887137767425316,
+        "peak_live_values": 4373
+      },
+      "cycles_per_proof": 14637.75,
+      "proofs_per_s": 20494.953117794743,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 136.65625
+    },
+    {
+      "mults": 4,
+      "adders": 4,
+      "batch8": {
+        "cycles": 160307,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9645804612399957,
+        "peak_live_values": 4367
+      },
+      "cycles_per_proof": 14368.0,
+      "proofs_per_s": 20879.732739420935,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 136.46875
+    },
+    {
+      "mults": 4,
+      "adders": 6,
+      "batch8": {
+        "cycles": 156683,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9868907284134207,
+        "peak_live_values": 4367
+      },
+      "cycles_per_proof": 14367.5,
+      "proofs_per_s": 20880.459370106142,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 136.46875
+    },
+    {
+      "mults": 5,
+      "adders": 1,
+      "batch8": {
+        "cycles": 437072,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.2830270527510342,
+        "peak_live_values": 3365
+      },
+      "cycles_per_proof": 37102.75,
+      "proofs_per_s": 8085.654028340217,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 105.15625
+    },
+    {
+      "mults": 5,
+      "adders": 2,
+      "batch8": {
+        "cycles": 225563,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.5484197319595856,
+        "peak_live_values": 4894
+      },
+      "cycles_per_proof": 19248.5,
+      "proofs_per_s": 15585.630049094734,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 152.9375
+    },
+    {
+      "mults": 5,
+      "adders": 3,
+      "batch8": {
+        "cycles": 163174,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.7581060708201062,
+        "peak_live_values": 4853
+      },
+      "cycles_per_proof": 13833.0,
+      "proofs_per_s": 21687.26957276079,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 151.65625
+    },
+    {
+      "mults": 5,
+      "adders": 4,
+      "batch8": {
+        "cycles": 136094,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9089541052507826,
+        "peak_live_values": 5564
+      },
+      "cycles_per_proof": 11039.75,
+      "proofs_per_s": 27174.528408704908,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 173.875
+    },
+    {
+      "mults": 5,
+      "adders": 6,
+      "batch8": {
+        "cycles": 126363,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9789511170200138,
+        "peak_live_values": 5565
+      },
+      "cycles_per_proof": 11104.5,
+      "proofs_per_s": 27016.074564365797,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 173.90625
+    },
+    {
+      "mults": 6,
+      "adders": 1,
+      "batch8": {
+        "cycles": 434913,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.23702671568796518,
+        "peak_live_values": 3384
+      },
+      "cycles_per_proof": 36809.75,
+      "proofs_per_s": 8150.014602109495,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 105.75
+    },
+    {
+      "mults": 6,
+      "adders": 2,
+      "batch8": {
+        "cycles": 222800,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.46268402154398564,
+        "peak_live_values": 4559
+      },
+      "cycles_per_proof": 18950.0,
+      "proofs_per_s": 15831.1345646438,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 142.46875
+    },
+    {
+      "mults": 6,
+      "adders": 3,
+      "batch8": {
+        "cycles": 155870,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.6613588246615769,
+        "peak_live_values": 5864
+      },
+      "cycles_per_proof": 12984.5,
+      "proofs_per_s": 23104.470715083367,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 183.25
+    },
+    {
+      "mults": 6,
+      "adders": 4,
+      "batch8": {
+        "cycles": 126367,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.8157667745534831,
+        "peak_live_values": 5495
+      },
+      "cycles_per_proof": 10218.0,
+      "proofs_per_s": 29359.953024075163,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 171.71875
+    },
+    {
+      "mults": 6,
+      "adders": 6,
+      "batch8": {
+        "cycles": 107374,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.9600648201613053,
+        "peak_live_values": 6670
+      },
+      "cycles_per_proof": 8619.25,
+      "proofs_per_s": 34805.81257069931,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 208.4375
+    },
+    {
+      "mults": 8,
+      "adders": 1,
+      "batch8": {
+        "cycles": 432666,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.17869326455048468,
+        "peak_live_values": 3411
+      },
+      "cycles_per_proof": 36672.75,
+      "proofs_per_s": 8180.460968975602,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 106.59375
+    },
+    {
+      "mults": 8,
+      "adders": 2,
+      "batch8": {
+        "cycles": 220252,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.35102745945553276,
+        "peak_live_values": 4461
+      },
+      "cycles_per_proof": 18738.0,
+      "proofs_per_s": 16010.24655779699,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 139.40625
+    },
+    {
+      "mults": 8,
+      "adders": 3,
+      "batch8": {
+        "cycles": 149777,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.5161974134880523,
+        "peak_live_values": 6088
+      },
+      "cycles_per_proof": 12327.25,
+      "proofs_per_s": 24336.328053702164,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": false,
+      "buffer_KB": 190.25
+    },
+    {
+      "mults": 8,
+      "adders": 4,
+      "batch8": {
+        "cycles": 116878,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.6614974588887558,
+        "peak_live_values": 7401
+      },
+      "cycles_per_proof": 8697.0,
+      "proofs_per_s": 34494.65332873404,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 231.28125
+    },
+    {
+      "mults": 8,
+      "adders": 6,
+      "batch8": {
+        "cycles": 90935,
+        "mul_ops": 154629,
+        "add_ops": 428364,
+        "mul_util": 0.8502171881013911,
+        "peak_live_values": 8689
+      },
+      "cycles_per_proof": 6372.75,
+      "proofs_per_s": 47075.438390020005,
+      "mJ_per_proof": 0.031352695300000004,
+      "R1": true,
+      "R2": true,
+      "buffer_KB": 271.53125
+    }
+  ],
+  "window_sweep": [
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 18517.5,
+      "proofs_per_s": 16200.891049007696,
+      "mul_util": 0.7088293673532068,
+      "peak_live_values": 167,
+      "buffer_KB": 5.21875
+    },
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 15573.5,
+      "proofs_per_s": 19263.492471185025,
+      "mul_util": 0.825075235310439,
+      "peak_live_values": 172,
+      "buffer_KB": 5.375
+    },
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 14711.0,
+      "proofs_per_s": 20392.903269662158,
+      "mul_util": 0.8681072523326708,
+      "peak_live_values": 183,
+      "buffer_KB": 5.71875
+    },
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 14539.5,
+      "proofs_per_s": 20633.446817290827,
+      "mul_util": 0.8752865657955067,
+      "peak_live_values": 197,
+      "buffer_KB": 6.15625
+    },
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 14527.0,
+      "proofs_per_s": 20651.201211537136,
+      "mul_util": 0.8878559944878273,
+      "peak_live_values": 227,
+      "buffer_KB": 7.09375
+    },
+    {
+      "order": "program",
+      "mults": 4,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 14504.0,
+      "proofs_per_s": 20683.949255377825,
+      "mul_util": 0.9082093540941047,
+      "peak_live_values": 302,
+      "buffer_KB": 9.4375
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 16601.25,
+      "proofs_per_s": 18070.92839394624,
+      "mul_util": 0.6111818181818182,
+      "peak_live_values": 167,
+      "buffer_KB": 5.21875
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 13947.5,
+      "proofs_per_s": 21509.23104499014,
+      "mul_util": 0.7103459760544374,
+      "peak_live_values": 173,
+      "buffer_KB": 5.40625
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 12595.25,
+      "proofs_per_s": 23818.503007086005,
+      "mul_util": 0.7676848415643734,
+      "peak_live_values": 179,
+      "buffer_KB": 5.59375
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 12066.5,
+      "proofs_per_s": 24862.22185389301,
+      "mul_util": 0.7873267225906644,
+      "peak_live_values": 194,
+      "buffer_KB": 6.0625
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 11841.0,
+      "proofs_per_s": 25335.697998479856,
+      "mul_util": 0.8087502288239755,
+      "peak_live_values": 225,
+      "buffer_KB": 7.03125
+    },
+    {
+      "order": "program",
+      "mults": 5,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 11851.0,
+      "proofs_per_s": 25314.31946671167,
+      "mul_util": 0.8373657169546941,
+      "peak_live_values": 332,
+      "buffer_KB": 10.375
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 15803.0,
+      "proofs_per_s": 18983.73726507625,
+      "mul_util": 0.5254476596308624,
+      "peak_live_values": 168,
+      "buffer_KB": 5.25
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 12953.5,
+      "proofs_per_s": 23159.763770409543,
+      "mul_util": 0.6182402648418805,
+      "peak_live_values": 173,
+      "buffer_KB": 5.40625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 11532.5,
+      "proofs_per_s": 26013.440277476697,
+      "mul_util": 0.6708925840356643,
+      "peak_live_values": 178,
+      "buffer_KB": 5.5625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 11021.0,
+      "proofs_per_s": 27220.760366572908,
+      "mul_util": 0.6913419623097042,
+      "peak_live_values": 194,
+      "buffer_KB": 6.0625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 11109.25,
+      "proofs_per_s": 27004.523257645655,
+      "mul_util": 0.7015325566202091,
+      "peak_live_values": 216,
+      "buffer_KB": 6.75
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 11244.25,
+      "proofs_per_s": 26680.30326611379,
+      "mul_util": 0.7257430900719506,
+      "peak_live_values": 279,
+      "buffer_KB": 8.71875
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 32,
+      "cycles_per_proof": 15451.5,
+      "proofs_per_s": 19415.590719347638,
+      "mul_util": 0.5372504260541909,
+      "peak_live_values": 169,
+      "buffer_KB": 5.28125
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 64,
+      "cycles_per_proof": 11816.75,
+      "proofs_per_s": 25387.691201049358,
+      "mul_util": 0.6774397055924295,
+      "peak_live_values": 173,
+      "buffer_KB": 5.40625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 128,
+      "cycles_per_proof": 10507.0,
+      "proofs_per_s": 28552.39364233368,
+      "mul_util": 0.7583031123338458,
+      "peak_live_values": 178,
+      "buffer_KB": 5.5625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 256,
+      "cycles_per_proof": 9877.25,
+      "proofs_per_s": 30372.82644460756,
+      "mul_util": 0.7889395701953101,
+      "peak_live_values": 205,
+      "buffer_KB": 6.40625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 1024,
+      "cycles_per_proof": 9997.25,
+      "proofs_per_s": 30008.25226937408,
+      "mul_util": 0.8075359367043986,
+      "peak_live_values": 245,
+      "buffer_KB": 7.65625
+    },
+    {
+      "order": "program",
+      "mults": 6,
+      "adders": 6,
+      "window": 4096,
+      "cycles_per_proof": 10125.5,
+      "proofs_per_s": 29628.16651029579,
+      "mul_util": 0.8396471536901436,
+      "peak_live_values": 333,
+      "buffer_KB": 10.40625
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 14611.75,
+      "proofs_per_s": 20531.421629852688,
+      "mul_util": 0.8926431367115791,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 14336.0,
+      "proofs_per_s": 20926.339285714286,
+      "mul_util": 0.911840499118405,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 14176.75,
+      "proofs_per_s": 21161.408644435433,
+      "mul_util": 0.9227946003365838,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 14160.5,
+      "proofs_per_s": 21185.692595600438,
+      "mul_util": 0.9237869355860108,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 14221.25,
+      "proofs_per_s": 21095.192054144325,
+      "mul_util": 0.9263326264332699,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 4,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 14271.0,
+      "proofs_per_s": 21021.652301870927,
+      "mul_util": 0.9284350457525758,
+      "peak_live_values": 23711,
+      "buffer_KB": 740.96875
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 12030.0,
+      "proofs_per_s": 24937.65586034913,
+      "mul_util": 0.8324464004522146,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 11817.5,
+      "proofs_per_s": 25386.079966151894,
+      "mul_util": 0.846389424853237,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 11729.5,
+      "proofs_per_s": 25576.537789334583,
+      "mul_util": 0.8508370589449068,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 11715.0,
+      "proofs_per_s": 25608.19462227913,
+      "mul_util": 0.8517157807766456,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 11785.0,
+      "proofs_per_s": 25456.088247772594,
+      "mul_util": 0.8540443511640109,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 5,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 11773.5,
+      "proofs_per_s": 25480.952987641736,
+      "mul_util": 0.8571274155886449,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 32,
+      "cycles_per_proof": 10390.0,
+      "proofs_per_s": 28873.917228103946,
+      "mul_util": 0.7732455219178493,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 64,
+      "cycles_per_proof": 10249.0,
+      "proofs_per_s": 29271.14840472241,
+      "mul_util": 0.781256394516063,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 128,
+      "cycles_per_proof": 10226.25,
+      "proofs_per_s": 29336.266960029337,
+      "mul_util": 0.7822701816691708,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 256,
+      "cycles_per_proof": 10220.25,
+      "proofs_per_s": 29353.489396051955,
+      "mul_util": 0.7829177710774746,
+      "peak_live_values": 23711,
+      "buffer_KB": 740.96875
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 1024,
+      "cycles_per_proof": 10294.5,
+      "proofs_per_s": 29141.774734081304,
+      "mul_util": 0.7851479492745345,
+      "peak_live_values": 23711,
+      "buffer_KB": 740.96875
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 4,
+      "window": 4096,
+      "cycles_per_proof": 10240.25,
+      "proofs_per_s": 29296.159761724568,
+      "mul_util": 0.7882759569945096,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 32,
+      "cycles_per_proof": 9744.5,
+      "proofs_per_s": 30786.597567858793,
+      "mul_util": 0.8523237451114951,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 64,
+      "cycles_per_proof": 9594.75,
+      "proofs_per_s": 31267.099194872197,
+      "mul_util": 0.8690366798458957,
+      "peak_live_values": 23708,
+      "buffer_KB": 740.875
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 128,
+      "cycles_per_proof": 9529.75,
+      "proofs_per_s": 31480.364122878356,
+      "mul_util": 0.8768053074763971,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 256,
+      "cycles_per_proof": 9518.25,
+      "proofs_per_s": 31518.39886533764,
+      "mul_util": 0.8780300836413812,
+      "peak_live_values": 23709,
+      "buffer_KB": 740.90625
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 1024,
+      "cycles_per_proof": 9587.5,
+      "proofs_per_s": 31290.743155149936,
+      "mul_util": 0.8807833286340451,
+      "peak_live_values": 23710,
+      "buffer_KB": 740.9375
+    },
+    {
+      "order": "level",
+      "mults": 6,
+      "adders": 6,
+      "window": 4096,
+      "cycles_per_proof": 9548.25,
+      "proofs_per_s": 31419.370041630664,
+      "mul_util": 0.885732697512566,
+      "peak_live_values": 23711,
+      "buffer_KB": 740.96875
+    }
+  ],
+  "single_proof_M4_A2": {
+    "cycles": 84510,
+    "mul_ops": 44175,
+    "add_ops": 153189,
+    "mul_util": 0.5227192048278311,
+    "peak_live_values": 4827,
+    "us": 281.7
+  }
+}
