@@ -1,0 +1,16 @@
+{
+  "source": "Apporto ECEE CAD Desktop RHEL8, 2026-10-31. VCS W-2024.09-SP2-3, Design Compiler V-2023.12-SP5-1 compile_ultra, FreePDK45 OSU gscl45nm.db + dw_foundation.sldb. Numbers transcribed from summary.txt, area.rpt, timing.rpt, power.rpt (rtl/run_W<W>_P<period>/).",
+  "power_note": "power_mW = total (dynamic + leakage) from report_power with SAIF from vcd2saif of the timed VCS run at sim_period_ns (ports 100% and registers annotated, other nets propagated by DC). tb_cycles_per_mul counts the testbench handshake (K + 3); energy per multiply = power x tb cycles x period.",
+  "runs": {
+    "W64": {"W": 64, "run": "run_W64_P1.0 (speed push, 1.0 ns target)", "area_um2": 291505.7, "fmax_path_ns": 3.39484,
+            "W_cycles_per_mul": 6, "tb_cycles_per_mul": 7, "sim_period_ns": 1.0, "power_mW": 271.7466,
+            "dynamic_mW": 270.3047, "leakage_mW": 1.442, "sim": "1000 vectors, 0 errors",
+            "also": "run_W64_P4.0 (no SAIF): area 273154.2 um2, met 4.0 ns with arrival 3.93 ns, default-activity power 34.6 mW + 1.36 mW leakage"},
+    "W128": {"W": 128, "run": "run_W128_P6.0", "area_um2": 523148.4, "fmax_path_ns": 5.9293,
+             "W_cycles_per_mul": 4, "tb_cycles_per_mul": 5, "sim_period_ns": 6.0, "power_mW": 92.9003,
+             "dynamic_mW": 90.3154, "leakage_mW": 2.5849, "sim": "1000 vectors, 0 errors",
+             "note": "timing met at 6.0 ns; the true fmax may be somewhat higher (not pushed)"},
+    "W256": {"W": 256, "run": "run_W256_P8.0", "pending": true, "sim": "1000 vectors, 0 errors",
+             "note": "synthesis still running; log shows mapped area 1043759.8 um2 with zero worst negative slack at 8.0 ns"}
+  }
+}

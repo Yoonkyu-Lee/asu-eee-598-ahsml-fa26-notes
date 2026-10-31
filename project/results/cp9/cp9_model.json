@@ -1,0 +1,35 @@
+{
+  "need_fp_mul_per_s": 254267232.375,
+  "units": {
+    "W64": {
+      "W": 64,
+      "area_mm2": 0.29150570000000003,
+      "fmax_MHz": 294.56469229772244,
+      "cycles_per_mul": 6,
+      "fp_mul_per_s": 49094115.38295374,
+      "nJ_per_mul": 1.9022262,
+      "proofs_per_s_one_unit": 4713.874146361612,
+      "copies_for_R2": 6,
+      "area_for_R2_mm2": 1.7490342,
+      "mJ_per_proof": 0.023500665526323492,
+      "R1": true,
+      "W_at_flood": 0.2868726240798309,
+      "vs_cp7_estimate": 4.227169333333333
+    },
+    "W128": {
+      "W": 128,
+      "area_mm2": 0.5231484000000001,
+      "fmax_MHz": 168.65397264432565,
+      "cycles_per_mul": 4,
+      "fp_mul_per_s": 42163493.16108141,
+      "nJ_per_mul": 2.787009,
+      "proofs_per_s_one_unit": 4048.4159615049634,
+      "copies_for_R2": 7,
+      "area_for_R2_mm2": 3.6620388000000004,
+      "mJ_per_proof": 0.03271551249154849,
+      "R1": true,
+      "W_at_flood": 0.39935826098433247,
+      "vs_cp7_estimate": 6.193353333333333
+    }
+  }
+}
