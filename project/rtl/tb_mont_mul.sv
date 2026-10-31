@@ -1,6 +1,7 @@
 // CP9 testbench: feeds vectors.hex (from gen_vectors.py) through mont_mul back to back and compares.
 // Prints one summary line: "RESULT W=.. vectors=.. errors=.. cycles_per_mul=..".
-// With +define+SAIF (VCS) it records switching activity of the timed run for Design Compiler's power report.
+// With +define+SAIF it dumps the DUT's switching during the timed run to dut.vcd; run_cp9.csh turns that
+// into a SAIF file (vcd2saif) for Design Compiler's power report.
 `timescale 1ns/1ps
 module tb_mont_mul;
   parameter int W = 128;
@@ -28,8 +29,8 @@ module tb_mont_mul;
     repeat (3) @(posedge clk);
     rst_n = 1;
 `ifdef SAIF
-    $set_toggle_region(tb_mont_mul.dut);
-    $toggle_start();
+    $dumpfile("dut.vcd");
+    $dumpvars(0, tb_mont_mul.dut);
 `endif
     cycles = 0;
     for (int i = 0; i < n; i++) begin
@@ -43,8 +44,7 @@ module tb_mont_mul;
       @(posedge clk);
     end
 `ifdef SAIF
-    $toggle_stop();
-    $toggle_report("mont_mul.saif", 1.0e-9, "tb_mont_mul.dut");
+    $dumpflush;
 `endif
     $display("RESULT W=%0d vectors=%0d errors=%0d cycles_per_mul=%0.2f", W, n, errors, real'(cycles) / n);
     $finish;

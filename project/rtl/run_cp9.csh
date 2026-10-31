@@ -17,6 +17,8 @@ cd run_W${W}_P${PERIOD}
 python3 ../gen_vectors.py 1000 vectors.hex > /dev/null
 vcs -full64 -sverilog -timescale=1ns/1ps +define+SAIF -pvalue+tb_mont_mul.W=$W ../mont_mul.sv ../tb_mont_mul.sv -o simv -l vcs.log > /dev/null
 ./simv +PERIOD=$PERIOD -l sim.log | grep -E "RESULT|MISMATCH"
+vcd2saif -input dut.vcd -output mont_mul.saif > vcd2saif.log
+rm -f dut.vcd
 setenv W $W
 setenv PERIOD $PERIOD
 dc_shell -f ../syn.tcl -output_log_file dc.log > /dev/null
