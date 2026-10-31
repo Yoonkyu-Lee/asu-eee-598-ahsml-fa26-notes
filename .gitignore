@@ -49,3 +49,5 @@ project/*.onnx
 # CP6 Rust 벤치 빌드 산출물
 project/src/crypto_bench/target/
 project/src/crypto_bench/target-fast/
+# CP9 Apporto 실행 산출물 (시뮬레이션·합성 작업 폴더)
+project/rtl/run_*/
