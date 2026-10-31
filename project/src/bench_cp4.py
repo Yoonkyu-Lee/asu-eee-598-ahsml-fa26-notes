@@ -47,14 +47,15 @@ def mask_bias_model() -> Path:
 
 
 class NpuEncoder:
-    def __init__(self, device: str = "NPU", batch: int = 1, config: dict | None = None):
-        self.batch = batch
+    def __init__(self, device: str = "NPU", batch: int = 1, config: dict | None = None, model: Path | None = None,
+                 heads_mask: bool = False):
+        self.batch, self.heads_mask = batch, heads_mask  # heads_mask (CP5): give the mask as (B, 12, L, L), no broadcast
         self.tok = Encoder("fp32", threads=1)  # only for its tokenizer
         core = ov.Core()
         self.models = {}
         for L in BUCKETS:
-            m = core.read_model(str(mask_bias_model()))
-            m.reshape({i.get_any_name(): [batch, 1, 1, L] if i.get_any_name() == "mask_bias" else [batch, L]
+            m = core.read_model(str(model or mask_bias_model()))
+            m.reshape({i.get_any_name(): ([batch, 12, L, L] if heads_mask else [batch, 1, 1, L]) if i.get_any_name() == "mask_bias" else [batch, L]
                        for i in m.inputs})
             ppp = ov.preprocess.PrePostProcessor(m)
             for i in m.inputs:  # this NPU driver's compiler rejects I64 inputs
@@ -74,6 +75,8 @@ class NpuEncoder:
         feed = {k: np.pad(v, ((0, self.batch - b), (0, L - n))) for k, v in feed.items()}
         mask = feed["attention_mask"][..., None].astype(np.float32)
         bias = ((1 - mask[..., 0]) * -1e4)[:, None, None, :].astype(np.float32)  # -1e4: safe in FP16
+        if self.heads_mask:
+            bias = np.ascontiguousarray(np.broadcast_to(bias, (bias.shape[0], 12, L, L)))
         return L, {k: bias if k == "mask_bias" else feed[k].astype(np.int32) for k in self.names}, mask
 
     def encode(self, texts: list[str]) -> np.ndarray:
