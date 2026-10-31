@@ -1,5 +1,5 @@
 // scripts/verify.mjs
-// 사용법: node scripts/verify.mjs L03-conditional-probability.html
+// 사용법: node scripts/verify.mjs docs/lectures/L03-conditional-probability.html
 //
 // 잡는 것: JS 콘솔 에러, SVG 텍스트가 viewBox를 벗어남, 중복 id,
 //          해결되지 않는 url(#...) 참조, 모바일 가로 오버플로우,

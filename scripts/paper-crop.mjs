@@ -38,8 +38,8 @@ const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 await page.route('**/__host', r => r.fulfill({ contentType: 'text/html', body: '<body style="margin:0;background:#fff"><canvas id="c"></canvas></body>' }));
 await page.goto(origin + '/__host');
 await page.evaluate(async origin => {
-  const pdfjs = await import(origin + '/vendor/pdf.js/pdf.min.mjs');
-  pdfjs.GlobalWorkerOptions.workerSrc = origin + '/vendor/pdf.js/pdf.worker.min.mjs';
+  const pdfjs = await import(origin + '/docs/assets/vendor/pdf.js/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc = origin + '/docs/assets/vendor/pdf.js/pdf.worker.min.mjs';
   window.__pdfjs = pdfjs;
   window.__docs = {};
 }, origin);

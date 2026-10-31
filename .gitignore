@@ -1,4 +1,11 @@
 node_modules/
+
+# 수업 공용 파이썬 가상환경 (ENVIRONMENT.md 참고). 이 PC 전용이라 올리지 않는다.
+.venv/
+
+# 학습한 모델 가중치. AlexNet 하나가 228MB라 GitHub 100MB 제한에 걸린다.
+*.pt
+*.pth
 shots/
 package-lock.json
 .DS_Store
@@ -10,7 +17,7 @@ Thumbs.db
 # PDF 는 기본적으로 전부 막고 강의 슬라이드만 되살린다.
 # Drive 미러에서 아무 PDF 나 루트로 복사해도 딸려 들어가지 않게 하는 방어다.
 *.pdf
-!slides/*.pdf
+!docs/slides/*.pdf
 
 # PPTX 원본은 올리지 않는다. 발표자 노트가 딸려 들어간다.
 *.pptx

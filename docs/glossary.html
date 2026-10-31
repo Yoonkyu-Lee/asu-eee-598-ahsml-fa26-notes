@@ -445,14 +445,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Accelergy &middot; Timeloop</div>
   <div class="d" lang="ko">MIT·NVIDIA의 DNN 가속기 평가 도구 체인. <strong>Timeloop</strong>이 워크로드를 아키텍처에 mapping해서 부품별 <strong>action count</strong>(MAC 몇 번, 버퍼 읽기 몇 번, DRAM 읽기 몇 번)를 세고, <strong>Accelergy</strong>가 거기에 기술별 에너지 단가를 곱해 더한다. RTL 시뮬레이션이 아니라 아키텍처 수준 추정이다. 이 수업 Lab과 최종 프로젝트 도구다.</div>
   <div class="d" lang="en">An MIT/NVIDIA toolchain for evaluating DNN accelerators. <strong>Timeloop</strong> maps a workload onto an architecture and counts per-component <strong>actions</strong> (MACs, buffer reads, DRAM reads); <strong>Accelergy</strong> multiplies them by per-technology unit energies and sums. An architecture-level estimate, not RTL simulation. The tools for this course's labs and final project.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s16">Lecture 7-8-9 &middot; 16</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s16">Lecture 7-8-9 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">activation</div>
   <div class="d" lang="ko"><strong>층이 내놓은 값들</strong>, 즉 텐서다. <strong>ReLU 같은 activation <em>function</em>과 다른 물건이다.</strong> 구별 기준은 <strong>바이트를 차지하는가</strong>이고, 하드웨어 논문에서 activation이라고 하면 거의 항상 텐서 쪽이다. 가중치와 달리 <strong>크기가 batch와 입력 해상도에 따라 변한다.</strong></div>
   <div class="d" lang="en">The <strong>values a layer produced</strong>, that is, a tensor. <strong>A different object from an activation <em>function</em> like ReLU.</strong> The test is <strong>whether it occupies bytes</strong>, and in a hardware paper the word almost always means the tensor. Unlike weights, <strong>its size varies with batch and input resolution.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s1">Lecture 4-5 &middot; 01</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s1">Lecture 4-5 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
@@ -460,7 +460,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">gradient checkpointing, rematerialization</div>
   <div class="d" lang="ko">forward의 중간 activation 일부를 <strong>일부러 버리고</strong>, backward에서 필요해지면 <strong>그 자리에서 다시 계산</strong>해 메모리를 아끼는 기법. <strong>연산은 늘고 메모리는 준다.</strong> 학습에만 쓴다. <strong>정확도가 비트 단위로 그대로</strong>라는 것이 pruning이나 quantization과 결정적으로 다른 점이다. 모델 가중치를 디스크에 저장하는 <code>.ckpt</code> 체크포인트와는 <strong>완전히 다른 말</strong>이다.</div>
   <div class="d" lang="en">Deliberately <strong>discarding</strong> some forward activations and <strong>recomputing them on demand</strong> in the backward pass to save memory: <strong>more compute, less memory.</strong> Training only. Unlike pruning or quantization, <strong>accuracy stays bit-for-bit identical.</strong> <strong>Not the same thing at all</strong> as a <code>.ckpt</code> model checkpoint written to disk.</div>
-  <div class="src"><a href="L04-dnns.html#s12">Lecture 4-5 &middot; 12</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s12">Lecture 4-5 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -468,7 +468,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Adaptive Moment Estimation</div>
   <div class="d" lang="ko">가장 널리 쓰이는 optimizer. 1차 모멘트와 2차 모멘트 <strong>두 개의 버퍼</strong>를 파라미터마다 들고 있다. 그래서 학습 메모리가 <strong>가중치의 4배</strong>가 된다 (가중치 + gradient + 버퍼 둘). <a href="#gM">momentum</a>은 3배, 순수 <a href="#gS">SGD</a>는 2배다.</div>
   <div class="d" lang="en">The most widely used optimizer. It keeps <strong>two buffers</strong> per parameter, a first and a second moment, which makes training memory <strong>four times the weights</strong> (weights, gradients and two buffers). <a href="#gM">Momentum</a> costs three times and plain <a href="#gS">SGD</a> twice.</div>
-  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -476,7 +476,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Automatic Place and Route</div>
   <div class="d" lang="ko">합성이 만든 netlist의 게이트를 칩 위 어디에 놓고 어떻게 배선할지 도구가 정하는 단계. 이 수업 Project에서는 Cadence Innovus를 쓴다. <strong>합성 직후의 면적·지연 숫자는 배선을 모르는 추정치</strong>이므로, 논문에 넣는 값은 post-APR이어야 한다.</div>
   <div class="d" lang="en">The stage where the tool decides where each gate from the netlist sits on the die and how the wires run. This course suggests Cadence Innovus. <strong>Area and delay straight out of synthesis are estimates made without wires</strong>, so numbers in a paper should be post-APR.</div>
-  <div class="src"><a href="L01-introduction.html#s6">Lecture 1 · 06</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s6">Lecture 1 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -484,7 +484,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">operational intensity, OI</div>
   <div class="d" lang="ko"><strong>메모리에서 1바이트 가져올 때마다 연산을 몇 번 하는가.</strong> 단위는 FLOP/byte 또는 MAC/byte이고, roofline의 가로축이다. <strong>모델의 성질이 아니라 실행의 성질</strong>이라서 같은 층이라도 <a href="#gB">batch</a>를 키우면 값이 올라간다. 가중치 바이트는 그대로인데 <a href="#gM">MAC</a>만 늘기 때문이다. 그래서 "이 층은 memory-bound다"는 <strong>batch와 하드웨어를 같이 말해야 완성되는 문장</strong>이다.</div>
   <div class="d" lang="en"><strong>How much arithmetic you do per byte fetched from memory</strong>, in FLOP/byte or MAC/byte. It is the roofline's x axis. <strong>A property of the execution, not of the model</strong>: the same layer's intensity rises with <a href="#gB">batch</a>, because the weight bytes stay fixed while the <a href="#gM">MACs</a> grow. So "this layer is memory-bound" is <strong>only finished as a sentence once you name the batch and the hardware.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -492,7 +492,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Application-Specific Integrated Circuit</div>
   <div class="d" lang="ko">특정 용도에 맞춰 <strong>회로를 고정해서 만든 칩</strong>. <a href="#gC">CGRA</a>나 FPGA처럼 나중에 바꿀 수 없는 대신 면적과 전력에서 가장 효율적이다. <strong>용도를 말하는 이름이 아니라 구현 방식을 말하는 이름</strong>이라, <a href="#gT">TPU</a>도 <a href="#gN">NPU</a>도 대부분 ASIC이다. 나란히 놓고 비교할 수 있는 상대는 FPGA뿐이다.</div>
   <div class="d" lang="en">A chip whose <strong>circuit is fixed for one purpose</strong>. It cannot be changed afterwards, unlike an FPGA or a <a href="#gC">CGRA</a>, and in exchange it is the most efficient option in area and power. <strong>The name describes how it was built, not what it does</strong>, so a <a href="#gT">TPU</a> and an <a href="#gN">NPU</a> are both usually ASICs. The only label it is genuinely comparable against is FPGA.</div>
-  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -500,7 +500,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Architectural Support for Programming Languages and Operating Systems</div>
   <div class="d" lang="ko">하드웨어와 소프트웨어의 <strong>경계</strong>를 다루는 최상위 학회. 이 수업의 compilation과 systems 주제가 가장 가까이 있는 곳이다.</div>
   <div class="d" lang="en">A top venue for work on <strong>the boundary</strong> between hardware and software, and the closest home for this course's compilation and systems topics.</div>
-  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
 <h2 class="gletter" id="gB">B</h2>
@@ -509,14 +509,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">backpropagation</div>
   <div class="d" lang="ko">chain rule로 <strong>출력에서 입력 방향으로 gradient를 전파</strong>해 모든 가중치의 <span class="m">∂<i>L</i>/∂<i>w</i></span>를 구하는 절차. 하드웨어 쪽에서 중요한 것은 개념이 아니라 <strong>비용</strong>이다. 곱셈이 forward의 약 두 배라 <strong>학습은 추론의 약 3배</strong>가 되고, 더 비싼 쪽은 <strong>forward의 중간값을 전부 붙잡아 둬야 하는 메모리</strong>다. 그 부담을 덜어내는 것이 activation checkpointing이다.</div>
   <div class="d" lang="en">Propagating gradients <strong>from output back toward input</strong> by the chain rule to obtain <span class="m">∂<i>L</i>/∂<i>w</i></span> for every weight. What matters downstairs is not the concept but <strong>the bill</strong>: roughly twice the multiplies of the forward pass, which makes <strong>training about 3x inference</strong>, and more expensive still is <strong>holding every forward intermediate in memory</strong> until it is consumed. Relieving that is what activation checkpointing does.</div>
-  <div class="src"><a href="L04-dnns.html#s11">Lecture 4-5 &middot; 11</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s11">Lecture 4-5 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">batch &middot; minibatch</div>
   <div class="d" lang="ko">한 번의 가중치 갱신에 쓰는 학습 예제의 <strong>부분집합</strong>. 전체 데이터셋의 gradient를 매번 계산하는 것이 불가능해서 생긴 타협이다. <strong>크기를 키우면 하드웨어 효율은 오르지만 수렴이 나빠진다.</strong> L01 31쪽 표에서 minibatch 32,768이 정확도가 가장 낮은 것이 그 사례다.</div>
   <div class="d" lang="en">The <strong>subset</strong> of training examples used for one weight update, a concession forced by the impossibility of computing the full-dataset gradient every step. <strong>Larger batches use the hardware better and converge worse</strong>: the 32,768 minibatch in the table on page 31 of lecture 1 has the lowest accuracy for exactly that reason.</div>
-  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -524,7 +524,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Batch Normalization</div>
   <div class="d" lang="ko">activation을 채널마다 평균 0, 분산 1로 맞춘 뒤 학습되는 γ, β로 scale·shift하는 층. <strong>추론 때는 통계가 고정돼 곱셈 하나 + 덧셈 하나</strong>로 접히고 앞 conv에 흡수(BN folding)할 수도 있다. <strong>학습 때는 batch 전체에 대한 reduction이라 동기화 지점이 생기고 memory-bound</strong>다.</div>
   <div class="d" lang="en">A layer that normalises activations per channel to zero mean and unit variance, then scales and shifts them by learned γ and β. <strong>At inference the statistics are frozen, so it folds to one multiply and one add</strong> and can be absorbed into the preceding conv (BN folding). <strong>In training it is a reduction over the whole batch: a synchronisation point, and memory-bound.</strong></div>
-  <div class="src"><a href="L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -532,7 +532,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">brain floating point (bfloat16)</div>
   <div class="d" lang="ko">부호 1 + 지수 8 + 가수 7 비트의 16비트 부동소수점. <strong>FP32와 지수 폭이 같아서 표현 범위가 같고, 정밀도만 잃는다.</strong> 그래서 FP32 코드를 거의 그대로 옮길 수 있다. TPU v2가 학습에 쓴 형식이다.</div>
   <div class="d" lang="en">A 16-bit float laid out as 1 sign + 8 exponent + 7 mantissa bits. <strong>It keeps FP32's exponent width, so the dynamic range is the same and only precision is lost</strong>, which is why FP32 code ports across almost unchanged. This is the format TPU v2 trains in.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -540,14 +540,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">BiLingual Evaluation Understudy</div>
   <div class="d" lang="ko">기계 번역 결과와 사람 정답 번역이 <strong>n-gram이 얼마나 겹치는지</strong> 재는 점수. 0~100. 정확도(%)가 아니고, <strong>1~2 BLEU 차이도 큰 차이</strong>로 취급된다.</div>
   <div class="d" lang="en">A machine-translation score measuring <strong>n-gram overlap</strong> with a human reference, 0 to 100. It is not a percentage accuracy, and <strong>one or two BLEU points count as a big gap</strong>.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">broadcast &middot; multicast &middot; unicast</div>
   <div class="d" lang="ko">한 번 읽은 값을 <strong>모든 PE</strong>에 / <strong>일부 PE</strong>에 / <strong>한 PE</strong>에만 보내는 것. spatial reuse를 하드웨어로 구현하는 방법이고, 어느 텐서를 broadcast하느냐가 dataflow마다 다르다(OS는 weight). <strong>읽기는 줄지만 선이 길어진다</strong>. 그래서 큰 배열은 이웃에게 넘겨주기(systolic)를 쓴다.</div>
   <div class="d" lang="en">Sending one read value to <strong>every PE</strong> / <strong>some PEs</strong> / <strong>one PE</strong>. It is how spatial reuse is built in hardware, and which tensor gets broadcast differs by dataflow (OS broadcasts weights). <strong>Fewer reads, longer wires</strong>, which is why large arrays pass data to neighbours (systolic) instead.</div>
-  <div class="src"><a href="L10-dataflow.html#s4">Lecture 10 &middot; 04</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s4">Lecture 10 &middot; 04</a></div>
 </div>
 
 <h2 class="gletter" id="gC">C</h2>
@@ -556,7 +556,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">capacity</div>
   <div class="d" lang="ko">모델이 <strong>표현할 수 있는 함수의 범위</strong>. 파라미터 수, 층 깊이, 다항식 차수로 늘린다. <strong>메모리 용량과 다른 말이지만 연결되어 있다.</strong> capacity를 늘리려고 파라미터를 늘리면 그만큼 바이트가 필요하다. quantization과 pruning은 이 값을 일부러 깎는 기법이다.</div>
   <div class="d" lang="en">The <strong>range of functions a model can represent</strong>, raised by adding parameters, depth or polynomial degree. <strong>A different word from memory capacity, though the two are linked</strong>: raising it by adding parameters costs exactly that many bytes. Quantization and pruning deliberately cut it back.</div>
-  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -564,7 +564,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Coarse-Grained Reconfigurable Array</div>
   <div class="d" lang="ko">재구성 가능한 배열인데 단위가 <strong>1비트 LUT가 아니라 연산기(ALU)</strong>인 구조. ASIC의 효율과 FPGA의 유연성 사이를 노린다. SambaNova의 RDU가 이 계열에 가깝다.</div>
   <div class="d" lang="en">A reconfigurable array whose unit is <strong>an ALU rather than a one-bit LUT</strong>, aiming between ASIC efficiency and FPGA flexibility. SambaNova's RDU is close to this family.</div>
-  <div class="src"><a href="L01-introduction.html#s2">Lecture 1 · 02</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s2">Lecture 1 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -572,14 +572,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">convolutional layer</div>
   <div class="d" lang="ko">같은 커널을 <strong>입력 전체에 미끄러뜨리며</strong> 적용하는 층. 하드웨어 관점의 핵심은 <strong>가중치 하나가 수백 번 재사용된다</strong>는 것이다. 그래서 파라미터는 적고 <a href="#gM">MAC</a>은 많다. AlexNet 기준으로 <strong>파라미터의 3.8%인데 GPU 시간의 92.1%</strong>를 쓴다. 대체로 compute-bound이고, <a href="#gS">systolic array</a>가 노리는 대상이 이쪽이다.</div>
   <div class="d" lang="en">A layer that applies the same kernel <strong>sliding across the whole input</strong>. The point downstairs is that <strong>each weight gets reused hundreds of times</strong>, so parameters are few and <a href="#gM">MACs</a> are many. On AlexNet it is <strong>3.8% of the parameters and 92.1% of the GPU time.</strong> Typically compute-bound, and the thing a <a href="#gS">systolic array</a> is built for.</div>
-  <div class="src"><a href="L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">cross-entropy</div>
   <div class="d" lang="ko">분류에서 쓰는 cost function. <span class="m"><i>CF</i> = − <sup>1</sup>⁄<sub><i>N</i></sub> Σ <i>y<sub>i</sub></i> · log(<i>ŷ<sub>i</sub></i>)</span>. <strong>정답인데 확률을 낮게 준 경우의 벌점이 폭발적으로 커진다.</strong> 정답 라벨이 one-hot이라 <strong>수식의 항 대부분이 0으로 사라지고</strong>, 실제 구현은 정답 클래스의 <span class="m">−log <i>ŷ</i></span> 하나만 계산한다. <strong>수식의 모양과 실제 연산량이 다른 대표 사례.</strong></div>
   <div class="d" lang="en">The cost function used for classification, <span class="m"><i>CF</i> = − <sup>1</sup>⁄<sub><i>N</i></sub> Σ <i>y<sub>i</sub></i> · log(<i>ŷ<sub>i</sub></i>)</span>. <strong>The penalty explodes when the true label is given low probability.</strong> Because the label is one-hot, <strong>almost every term vanishes</strong> and a real implementation computes only <span class="m">−log <i>ŷ</i></span> at the true class. <strong>A textbook case of a formula's shape differing from its op count.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
 </div>
 
 <h2 class="gletter" id="gD">D</h2>
@@ -588,35 +588,35 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">dark silicon</div>
   <div class="d" lang="ko">TDP 한계 때문에 <strong>칩에 있는 트랜지스터를 동시에 다 켤 수 없는</strong> 상태. 프로세서가 과열을 막으려고 <strong>클럭을 낮추고 노는 코어를 끈다.</strong> 다르게 보면 <strong>노는 코어의 전력을 활성 코어로 재배분</strong>하는 것이다. <a href="#gD">Dennard scaling</a>이 끝난 결과이고, <a href="#gD">DSA</a>가 등장한 직접적인 이유다.</div>
   <div class="d" lang="en">The condition where the TDP limit means <strong>not all transistors on a chip can be switched on at once.</strong> Processors <strong>slow the clock and turn off idle cores</strong> to avoid overheating, or seen another way, <strong>reallocate power from idle cores to active ones.</strong> A consequence of the end of <a href="#gD">Dennard scaling</a> and the direct reason <a href="#gD">DSAs</a> appeared.</div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">data parallelism</div>
   <div class="d" lang="ko">모든 worker가 <strong>모델 전체 사본</strong>을 들고 <strong>데이터만 나눠서</strong> gradient를 계산하는 분산학습. worker가 매 iteration 모델 크기만큼의 gradient를 주고받아서 <strong>통신이 병목</strong>이 된다. 반대는 모델을 쪼개는 model parallelism.</div>
   <div class="d" lang="en">Distributed training where every worker holds <strong>a full copy of the model</strong> and only <strong>the data is split</strong>. Each iteration every worker exchanges a model-sized gradient, which makes <strong>communication the bottleneck</strong>. The opposite is model parallelism, which splits the model.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">dataflow</div>
   <div class="d" lang="ko">DNN 연산을 하드웨어에서 <strong>어떤 순서로, 무엇을 병렬로</strong> 실행하는지. loop nest로 적고, <code>for</code>는 시간 순서, <code>spatial_for</code>는 PE에 펼친 병렬이다. 순서가 <strong>어느 텐서가 PE 안 레지스터에 붙어 재사용되는지</strong>를 정하므로 곧 에너지다. <strong>"dataflow architecture"(데이터 도착이 실행을 발화하는 기계)와 다른 말</strong>이다.</div>
   <div class="d" lang="en"><strong>In what order, and with what in parallel</strong>, hardware executes a DNN's operations. Written as a loop nest: <code>for</code> is time order, <code>spatial_for</code> is parallelism across PEs. The order decides <strong>which tensor stays in a PE's register to be reused</strong>, so it is the energy bill. <strong>Not a "dataflow architecture"</strong> (a machine where data arrival fires instructions).</div>
-  <div class="src"><a href="L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Dennard scaling</div>
   <div class="d" lang="ko">트랜지스터가 작아져도 <strong>단위 면적당 전력이 일정하게 유지된다</strong>는 관측. 2000년대 중후반에 끝났다. <strong>Moore의 법칙과 다른 이야기다.</strong> Moore는 개수, Dennard는 전력이다. 도메인 특화 하드웨어는 Moore가 아니라 <strong>Dennard가 끝난 것에 대한 대답</strong>이다.</div>
   <div class="d" lang="en">The observation that <strong>power per unit area stays constant</strong> as transistors shrink. It ended in the mid to late 2000s. <strong>Not the same claim as Moore's law</strong>: Moore is about count, Dennard about power. Domain-specific hardware is a reply to the end of <strong>Dennard</strong>, not of Moore.</div>
-  <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s14">Lecture 1 · 14</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">depthwise convolution</div>
   <div class="d" lang="ko">filter의 채널 <span class="m"><i>i</i></span>가 입력 채널 <span class="m"><i>i</i></span>하고만 곱해지는 conv. 채널끼리 더하지 않는다. <strong>MAC과 weight는 <span class="m"><i>c</i></span>분의 1이 되지만 activation은 그대로</strong>라서 바이트당 연산이 크게 떨어진다. MobileNet의 핵심 부품이고, 1×1 pointwise와 합치면 depthwise separable conv가 된다.</div>
   <div class="d" lang="en">A conv where filter channel <span class="m"><i>i</i></span> meets only input channel <span class="m"><i>i</i></span>, with no summing across channels. <strong>MACs and weights drop by <span class="m"><i>c</i></span> while activations stay the same</strong>, so arithmetic intensity falls sharply. The core part of MobileNet; paired with a 1×1 pointwise conv it becomes a depthwise separable conv.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s6">Lecture 6 &middot; 06</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s6">Lecture 6 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -624,14 +624,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">ping-pong buffering</div>
   <div class="d" lang="ko">같은 용도의 버퍼를 <strong>두 벌</strong> 두고, 한 벌을 연산기가 읽는 동안 다른 한 벌을 채운 뒤 <strong>역할을 맞바꾸는</strong> 기법. 데이터를 가져오는 일과 계산하는 일을 <strong>정말로 동시에</strong> 시킬 수 있게 한다. <strong>공짜가 아니다.</strong> on-chip SRAM이 두 배로 들고, <strong>느린 쪽을 빠르게 만들지는 못한다.</strong> 메모리가 압도적으로 느리면 stall은 그대로 남는다.</div>
   <div class="d" lang="en">Keeping <strong>two</strong> buffers for one purpose, filling one while the arithmetic reads the other and then <strong>swapping their roles</strong>, so fetching and computing can genuinely proceed at once. <strong>Not free</strong>: it doubles the on-chip SRAM, and <strong>it does not make the slow side faster.</strong> When memory dominates, the stall survives.</div>
-  <div class="src"><a href="L04-dnns.html#s9">Lecture 4-5 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s9">Lecture 4-5 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">dropout</div>
   <div class="d" lang="ko">학습 중 매 스텝마다 <strong>노드 일부를 무작위로 꺼서</strong> 특정 노드 의존을 막는 regularization. <strong>학습에만 있고 추론에는 없다</strong>는 것이 결정적이다. 추론 전용 칩은 이걸 구현할 필요가 없다. 그리고 <strong>꺼지는 노드가 매 스텝 바뀌므로 <a href="#gS">sparsity</a>를 만들지 않는다.</strong></div>
   <div class="d" lang="en">Regularization that <strong>randomly switches off a fraction of the nodes</strong> at each training step so the network cannot depend on any one of them. The decisive property is that it <strong>exists in training and not in inference</strong>, so inference-only silicon never implements it. And because the set changes every step, it <strong>creates no <a href="#gS">sparsity</a></strong>.</div>
-  <div class="src"><a href="L02-ml-basics.html#s9">Lecture 2-3 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s9">Lecture 2-3 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -639,7 +639,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Domain-Specific Accelerator / Architecture</div>
   <div class="d" lang="ko">슬라이드의 정의로는 <em>"customized hardware designed for a domain of applications"</em>. <strong>하나의 앱이 아니라 한 부류의 연산</strong>을 잘하는 회로다. Neural Engine은 특정 모델이 아니라 convolution과 matmul을 잘한다.</div>
   <div class="d" lang="en">In the slide's words, <em>"customized hardware designed for a domain of applications"</em>. A circuit good at <strong>a class of computation, not one application</strong>: a Neural Engine is not good at a particular model, it is good at convolution and matmul.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -647,7 +647,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Domain-Specific Language</div>
   <div class="d" lang="ko">특정 영역에 맞춘 언어. <strong>벡터, 밀집 행렬, 희소 행렬 연산을 명시적으로 만들어</strong> 컴파일러가 <a href="#gD">DSA</a>에 효율적으로 매핑할 수 있게 한다. 예: Matlab, <strong>TensorFlow</strong>(DNN용 데이터플로우 언어), P4(SDN), Halide(영상 처리). 과제는 <strong>이식성과 효율의 균형</strong>이다.</div>
   <div class="d" lang="en">A language tailored to a domain. It makes <strong>vector, dense matrix and sparse matrix operations explicit</strong> so a compiler can map them efficiently onto a <a href="#gD">DSA</a>. Examples: Matlab, <strong>TensorFlow</strong> (a dataflow language for DNNs), P4 for SDNs, Halide for image processing. The challenge is <strong>balancing portability against efficiency.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s6">Paper Reading 1 &middot; 06</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s6">Paper Reading 1 &middot; 06</a></div>
 </div>
 
 <h2 class="gletter" id="gE">E</h2>
@@ -656,7 +656,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">epoch</div>
   <div class="d" lang="ko">학습 데이터셋 <strong>전체를 한 번 훑는 것</strong>. 하드웨어에서 중요한 이유는 데이터셋이 메모리에 안 들어가면 <strong>매 epoch마다 디스크에서 다시 읽어야</strong> 하기 때문이다. ImageNet이면 epoch당 약 180 GB다.</div>
   <div class="d" lang="en">One <strong>full pass over the training dataset</strong>. It matters in hardware because a dataset that does not fit in memory has to be <strong>re-read from disk every epoch</strong>: roughly 180 GB per epoch for ImageNet.</div>
-  <div class="src"><a href="L02-ml-basics.html#s3">Lecture 2-3 &middot; 03</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s3">Lecture 2-3 &middot; 03</a></div>
 </div>
 
 <h2 class="gletter" id="gF">F</h2>
@@ -666,7 +666,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">fully connected layer, dense layer</div>
   <div class="d" lang="ko">모든 입력이 모든 출력에 연결된 층. <strong>가중치 하나당 곱셈이 정확히 한 번</strong>이라 재사용이 0이고, 그래서 <a href="#gA">arithmetic intensity</a>가 FP32 기준 <strong>0.25 MAC/byte</strong>다. 4바이트 읽고 한 번 곱한다는 뜻. AlexNet 기준으로 <strong>파라미터의 96.2%인데 GPU 시간의 2.6%</strong>다. batch 1에서는 거의 항상 memory-bound이고, <strong>batch를 키우면 판정이 뒤집힌다.</strong></div>
   <div class="d" lang="en">A layer where every input connects to every output. There is <strong>exactly one multiply per weight</strong>, so reuse is zero and <a href="#gA">arithmetic intensity</a> is <strong>0.25 MAC/byte</strong> in FP32: four bytes read per multiply. On AlexNet it is <strong>96.2% of the parameters and 2.6% of the GPU time.</strong> Almost always memory-bound at batch 1, and <strong>the verdict flips as the batch grows.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s13">Lecture 4-5 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -674,7 +674,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Fast Fourier Transform</div>
   <div class="d" lang="ko">Fourier 변환을 <span class="m"><i>n</i> log <i>n</i></span>에 계산하는 알고리즘. convolution 정리 덕분에 <strong>conv를 주파수 영역의 원소별 곱</strong>으로 바꿀 수 있다. kernel이 클수록 이득이고 3×3에서는 대체로 손해다. weight를 입력 크기의 복소수로 저장해야 하는 것이 대가다.</div>
   <div class="d" lang="en">An algorithm computing the Fourier transform in <span class="m"><i>n</i> log <i>n</i></span>. By the convolution theorem it turns <strong>conv into an elementwise product in frequency.</strong> It pays off for large kernels and mostly loses at 3×3. The price is storing the weights as complex values at the input's size.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -682,14 +682,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">FLoating-point OPeration</div>
   <div class="d" lang="ko">부동소수점 연산 <strong>한 번</strong>. 세는 단위다. "이 모델을 학습시키는 데 총 몇 번"처럼 <strong>워크로드</strong>를 말할 때 쓴다. <strong>MAC 한 번은 FLOP 두 번</strong>(곱하기 + 더하기)이므로, MAC으로 적힌 논문과 비교하려면 2배를 맞춘다.</div>
   <div class="d" lang="en">One floating-point operation: a count, used to describe <strong>a workload</strong>, as in how many it took to train a model. <strong>One MAC is two FLOPs</strong> (a multiply and an add), so comparing against a paper that counts MACs needs a factor of two.</div>
-  <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s13">Lecture 1 · 13</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">FLOP/s</div>
   <div class="d" lang="ko">초당 FLOP. <strong>속도</strong>이고 <strong>기계</strong>를 말할 때 쓴다. V100의 15.7 TFLOP/s가 이것이다. FLOP과 헷갈리면 논지가 뒤집힌다.</div>
   <div class="d" lang="en">FLOP per second: a <strong>rate</strong>, used to describe <strong>a machine</strong>, as in the V100's 15.7 TFLOP/s. Confusing it with FLOP inverts the argument.</div>
-  <div class="src"><a href="L01-introduction.html#s13">Lecture 1 · 13</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s13">Lecture 1 · 13</a></div>
 </div>
 
 <div class="gterm">
@@ -697,7 +697,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Fused Multiply-Add</div>
   <div class="d" lang="ko"><span class="m">a × b + c</span>를 명령어 하나, 반올림 한 번으로 하는 연산. CPU/GPU의 peak FLOP/s는 거의 항상 FMA를 가정하므로 FMA 없는 코드의 천장은 peak의 절반이다. <a href="#gM">MAC</a>과 사실상 같은 연산이고, MAC은 하드웨어 블록 이름, FMA는 부동소수점 명령어 이름이다.</div>
   <div class="d" lang="en"><span class="m">a × b + c</span> in one instruction with one rounding. CPU and GPU peak FLOP/s almost always assumes FMA, so code without it tops out at half of peak. Essentially the same operation as a <a href="#gM">MAC</a>: MAC names the hardware block, FMA the floating-point instruction.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s11">Lecture 7-8-9 &middot; 11</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s11">Lecture 7-8-9 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -705,7 +705,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Field-Programmable Gate Array</div>
   <div class="d" lang="ko"><strong>bit 단위 LUT로 아무 회로나 구성할 수 있는</strong> 재구성 가능 칩. <a href="#gA">ASIC</a>과 대비되는 짝이고, 유연한 대신 같은 기능에서 면적과 속도를 손해 본다. 재구성 단위를 연산기로 키운 것이 <a href="#gC">CGRA</a>다. 이 수업에서는 accelerator 프로토타이핑의 수단으로 나온다.</div>
   <div class="d" lang="en">A reconfigurable chip that can <strong>form arbitrary logic out of bit-level LUTs.</strong> The genuine counterpart to an <a href="#gA">ASIC</a>: flexible, and paying for it in area and speed at equal function. Raising the unit of reconfiguration to whole arithmetic units gives a <a href="#gC">CGRA</a>. In this course it shows up as the way accelerators get prototyped.</div>
-  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -713,7 +713,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">operator fusion, kernel fusion</div>
   <div class="d" lang="ko">연달아 도는 kernel 여럿을 하나로 합쳐 <strong>중간 결과를 메모리에 쓰지 않고</strong> 넘기는 컴파일러 최적화. conv → BN → ReLU가 전형적 대상이다. <strong>MAC은 하나도 줄지 않고 메모리 왕복만 준다.</strong></div>
   <div class="d" lang="en">A compiler optimisation that merges consecutive kernels so <strong>intermediate results never go to memory.</strong> conv → BN → ReLU is the classic target. <strong>It saves no MACs, only memory round trips.</strong></div>
-  <div class="src"><a href="L06-kernel-computation.html#s1">Lecture 6 &middot; 01</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s1">Lecture 6 &middot; 01</a></div>
 </div>
 
 <h2 class="gletter" id="gG">G</h2>
@@ -723,21 +723,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">GEneral Matrix-Matrix multiplication</div>
   <div class="d" lang="ko">BLAS 표준의 행렬 곱셈 루틴 <span class="m"><i>C</i> ← α<i>AB</i> + β<i>C</i></span>. FC 층은 원래 GEMM(batch 1이면 행렬 × 벡터)이고, conv는 <a href="#gI">im2col</a>로 GEMM이 된다. <strong>GPU의 Tensor Core와 TPU의 systolic array가 둘 다 GEMM 기계</strong>라 DNN 연산을 GEMM 모양으로 만드는 것이 곧 가속이다.</div>
   <div class="d" lang="en">The BLAS matrix-multiply routine, <span class="m"><i>C</i> ← α<i>AB</i> + β<i>C</i></span>. An FC layer already is one (matrix × vector at batch 1), and conv becomes one via <a href="#gI">im2col</a>. <strong>Tensor Cores and TPU systolic arrays are both GEMM machines</strong>, so getting DNN work into GEMM shape is what acceleration means.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">generalization gap</div>
   <div class="d" lang="ko">training error와 generalization error 사이의 <strong>간격</strong>. 이 간격이 크면 overfitting이다. L02-3 15쪽 그래프에서 오른쪽 끝의 양방향 화살표가 이것이다.</div>
   <div class="d" lang="en">The <strong>distance</strong> between training error and generalization error. A large gap is overfitting. It is the double-headed arrow at the right edge of the chart on page 15 of lectures 2-3.</div>
-  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">gradient descent</div>
   <div class="d" lang="ko">gradient의 <strong>음의 방향</strong>으로 반복해서 파라미터를 옮겨 cost function을 줄이는 방법. 닫힌 형태의 해 대신 이걸 쓰는 이유는 수학이 아니라 <strong>메모리와 연산량</strong>이다. 파라미터가 <span class="m"><i>n</i></span>개일 때 역행렬은 <span class="m"><i>n</i><sup>3</sup></span>이 들지만 한 스텝은 <span class="m"><i>n</i></span>에 비례한다. <strong>딥러닝 하드웨어가 <a href="#gM">MAC</a> 기계로 만들어진 근본 이유다.</strong></div>
   <div class="d" lang="en">Reducing the cost function by repeatedly stepping the parameters in the <strong>negative gradient direction</strong>. It is preferred over a closed-form solution for reasons of <strong>memory and arithmetic, not mathematics</strong>: inverting an <span class="m"><i>n</i>&times;<i>n</i></span> matrix costs <span class="m"><i>n</i><sup>3</sup></span> while one step costs <span class="m"><i>n</i></span>. <strong>This is the root reason deep learning hardware is built as a <a href="#gM">MAC</a> machine.</strong></div>
-  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gH">H</h2>
@@ -747,14 +747,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">High Bandwidth Memory</div>
   <div class="d" lang="ko">DRAM 다이를 수직으로 쌓아 연산 칩 바로 옆에 수천 개의 선으로 붙인 메모리. 데이터센터 GPU와 TPU의 주 메모리이고, 스펙 시트의 "memory bandwidth"가 보통 이 수치다(H100 3.35 TB/s). <strong>on-chip이 아니다.</strong> 같은 패키지 안의 칩 밖 DRAM이라 roofline에서는 DRAM 사선에 속한다.</div>
   <div class="d" lang="en">DRAM dies stacked vertically beside the compute die and joined by thousands of wires. The main memory of datacenter GPUs and TPUs, and usually what a spec sheet's "memory bandwidth" means (3.35 TB/s on an H100). <strong>Not on-chip</strong>: it shares the package but is off-die DRAM, so on a roofline it is the DRAM diagonal.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s6">Lecture 7-8-9 &middot; 06</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s6">Lecture 7-8-9 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">hierarchical roofline</div>
   <div class="d" lang="ko">메모리 층(L1, L2, HBM, 시스템 메모리)마다 대역폭 사선을 하나씩 그리고, 한 커널을 <strong>층마다 다른 arithmetic intensity로 여러 번</strong> 찍는 roofline. y값은 모두 같다. 점 사이의 가로 거리가 그 층의 재사용이고, 자기 사선에 가장 가까운 점의 층이 병목이다.</div>
   <div class="d" lang="en">A roofline with one bandwidth diagonal per memory level (L1, L2, HBM, system memory), where one kernel is plotted <strong>once per level's arithmetic intensity</strong>, all at the same y. The horizontal gap between points is that level's reuse; the level whose point sits closest to its own diagonal is the bottleneck.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s11">Lecture 7-8-9 &middot; 11</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s11">Lecture 7-8-9 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -762,14 +762,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">International Symposium on High-Performance Computer Architecture</div>
   <div class="d" lang="ko">아키텍처 최상위 학회 중 하나. 슬라이드 17쪽이 HPCA 2023에 <strong>Neural Networks and Accelerators 세션이 셋</strong> 있었다는 것을 보여준다.</div>
   <div class="d" lang="en">One of the top architecture venues. Slide 17 shows that HPCA 2023 had <strong>three separate Neural Networks and Accelerators sessions</strong>.</div>
-  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">hyperparameter</div>
   <div class="d" lang="ko">학습으로 구하지 않고 <strong>사람이 정하는 값</strong>. learning rate <span class="m"><i>&alpha;</i></span>, 정규화 세기 <span class="m"><i>&lambda;</i></span>, momentum 계수 <span class="m"><i>&rho;</i></span>, dropout 비율, batch 크기. <strong>이걸 test set으로 고르면 test set이 학습에 쓰인 셈</strong>이 되므로 validation set이 따로 필요하다.</div>
   <div class="d" lang="en">A value <strong>set by a person</strong> rather than learned: the learning rate <span class="m"><i>&alpha;</i></span>, the regularization strength <span class="m"><i>&lambda;</i></span>, the momentum coefficient <span class="m"><i>&rho;</i></span>, the dropout rate, the batch size. <strong>Choosing them against the test set means the test set has effectively been trained on</strong>, which is why a separate validation set is needed.</div>
-  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
 </div>
 
 <h2 class="gletter" id="gI">I</h2>
@@ -779,7 +779,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Instruction Level Parallelism</div>
   <div class="d" lang="ko">한 명령어 스트림 안에서 동시에 실행할 수 있는 명령어를 찾아 쓰는 것. 1986년부터 2002년경까지 성능을 얻는 주된 방법이었고 <strong>연 50%의 성능 증가</strong>를 냈다. 대가는 <strong>투기 실행(speculation)의 낭비</strong>다. Intel Core i7에서 SPEC 정수 벤치마크를 돌리면 <strong>평균 19%의 명령어가 버려진다.</strong></div>
   <div class="d" lang="en">Finding and using instructions that can execute simultaneously within one instruction stream. From 1986 to about 2002 it was the primary route to performance, delivering <strong>roughly 50% improvement a year.</strong> The price is <strong>the waste of speculation</strong>: on an Intel Core i7 running SPEC integer benchmarks, <strong>19% of instructions are thrown away on average.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s3">Paper Reading 1 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -787,7 +787,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">ImageNet Large Scale Visual Recognition Challenge</div>
   <div class="d" lang="ko">2010년부터 열린 이미지 분류 대회. AlexNet이 우승한 것은 <strong>2012년</strong>이다. 그런데 <strong>AlexNet 논문의 주된 실험은 2010년 데이터셋으로 했다.</strong> 2010 대회만 테스트 라벨이 공개돼 있어서 <a href="#gT">top-1 오차</a>를 논문에 실을 수 있었기 때문. <strong>한 논문 안에 두 연도가 섞여 있으니 숫자를 인용할 때 어느 쪽인지 확인해야 한다.</strong></div>
   <div class="d" lang="en">The image classification competition run from 2010. AlexNet won it in <strong>2012</strong>, yet <strong>the paper's main experiments use the 2010 dataset</strong>, because 2010 is the year whose test labels were public and so the only one where a <a href="#gT">top-1 error</a> could be reported. <strong>Two years are mixed inside one paper, so check which before quoting a number.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -795,7 +795,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">image to column</div>
   <div class="d" lang="ko">conv 입력의 <strong>창 하나를 행렬의 열 하나</strong>로 펼쳐서 conv를 GEMM 한 번으로 바꾸는 재배열. <strong>MAC은 그대로</strong>이고 겹치는 창 때문에 입력 메모리가 약 <span class="m"><i>R</i>·<i>S</i></span>배(3×3이면 약 9배)로 부푼다. 1×1 conv에서는 공짜다. 연산이 아니라 규칙성을 사는 기법이다.</div>
   <div class="d" lang="en">A rearrangement that unrolls <strong>each conv input window into one matrix column</strong>, turning conv into a single GEMM. <strong>MACs are unchanged</strong>; overlapping windows inflate input memory by about <span class="m"><i>R</i>·<i>S</i></span> (roughly 9x for 3×3). Free for a 1×1 conv. It buys regularity, not arithmetic.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -803,7 +803,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Instruction Set Architecture</div>
   <div class="d" lang="ko">소프트웨어가 하드웨어에게 말을 거는 <strong>어휘</strong>. Golden Age 논문의 첫 문장이 그렇게 정의한다. 이 논문의 절반이 ISA를 둘러싼 역사(System/360, 8086 대 iAPX-432, RISC 대 CISC, Itanium)이고, 결론은 <strong>시장이 ISA 논쟁을 결정한다</strong>는 것이다. 지금 32비트와 64비트 프로세서의 <strong>99%가 RISC</strong>다.</div>
   <div class="d" lang="en">The <strong>vocabulary</strong> through which software talks to hardware, as the Golden Age paper defines it in its opening sentence. Half that paper is the history around ISAs (System/360, the 8086 against the iAPX-432, RISC against CISC, Itanium), concluding that <strong>the marketplace settles ISA debates.</strong> Today <strong>99% of 32-bit and 64-bit processors are RISC.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -811,7 +811,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">International Symposium on Computer Architecture</div>
   <div class="d" lang="ko">이 분야에서 가장 오래되고 권위 있는 학회. <strong>Paper Reading 리뷰 폼의 종합 판정이 "ISCA에 붙을 만한가"를 기준으로 한다.</strong> 그래서 이 과제는 독후감이 아니라 학회 심사위원 흉내다.</div>
   <div class="d" lang="en">The oldest and most prestigious venue in the field. <strong>The overall-merit field of the paper review form asks whether a paper is ISCA-worthy</strong>, which is what makes the assignment program-committee work rather than a book report.</div>
-  <div class="src"><a href="L01-introduction.html#s4">Lecture 1 · 04</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s4">Lecture 1 · 04</a></div>
 </div>
 
 <h2 class="gletter" id="gL">L</h2>
@@ -821,35 +821,35 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">weight decay</div>
   <div class="d" lang="ko">cost function에 가중치의 크기를 벌점으로 더하는 것. <strong>L2는 <span class="m">&Sigma;<i>w</i><sup>2</sup></span>, L1은 <span class="m">&Sigma;|<i>w</i>|</span>다.</strong> 슬라이드는 둘을 한 묶음으로 적지만 <strong>결과가 다르다.</strong> L2는 가중치를 작게 만들 뿐이고 <strong>L1만 정확히 0으로 만든다.</strong> 0인 가중치는 곱셈도 저장도 건너뛸 수 있으므로 <strong>L1만 하드웨어 이득이 있다.</strong> 이게 pruning으로 이어진다.</div>
   <div class="d" lang="en">Adding a penalty on weight magnitude to the cost function: <strong>L2 uses <span class="m">&Sigma;<i>w</i><sup>2</sup></span> and L1 uses <span class="m">&Sigma;|<i>w</i>|</span></strong>. The slide groups them together but <strong>they behave differently</strong>. L2 only makes weights small; <strong>L1 drives them to exactly zero</strong>. A zero weight lets you skip both the multiply and the storage, so <strong>only L1 pays off in hardware</strong>, and that is the road to pruning.</div>
-  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">label smoothing</div>
   <div class="d" lang="ko">정답 레이블을 one-hot 대신 정답에 1−ε, 나머지에 ε를 나눈 분포로 바꾸는 regularization. Transformer는 ε = 0.1. <strong>perplexity는 나빠지지만 BLEU는 좋아진다.</strong></div>
   <div class="d" lang="en">A regularizer that replaces one-hot labels with 1−ε on the target and ε spread over the rest. The Transformer uses ε = 0.1. <strong>Perplexity gets worse while BLEU gets better.</strong></div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s18">Paper Reading 2 &middot; 18</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s18">Paper Reading 2 &middot; 18</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">latency &middot; throughput</div>
   <div class="d" lang="ko">latency는 요청 하나가 들어가서 나오기까지의 시간(초), throughput은 단위 시간에 끝나는 요청 수(inference/s). <strong>역수 관계가 아니다.</strong> batch를 키우면 throughput과 latency가 <strong>같이</strong> 오른다(0.25 s·4 inf/s → 0.33 s·6 inf/s). serving은 보통 "latency 상한 아래에서 throughput 최대"로 문제를 세운다.</div>
   <div class="d" lang="en">Latency is the time for one request to go in and come out (seconds); throughput is requests completed per unit time (inferences/s). <strong>Not reciprocals</strong>: batching raises throughput and latency <strong>together</strong> (0.25 s at 4 inf/s → 0.33 s at 6 inf/s). Serving is usually framed as maximising throughput under a latency ceiling.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s7">Lecture 7-8-9 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s7">Lecture 7-8-9 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Little's law</div>
   <div class="d" lang="ko">동시에 날아다녀야 하는 요청 수 = latency × bandwidth. 메모리 대역폭을 다 쓰려면 latency만큼의 요청을 미리 띄워 놓아야 한다. roofline의 사선은 이 concurrency가 충분할 때만 나온다. GPU가 warp를 많이 띄우는 이유다.</div>
   <div class="d" lang="en">Requests in flight = latency × bandwidth. To use full memory bandwidth you must have a latency's worth of requests already issued. The roofline's slope is only reached with that much concurrency, which is why GPUs keep many warps resident.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">loop nest</div>
   <div class="d" lang="ko">conv를 정의대로 쓴 일곱 겹 loop (N, K, P, Q, R, S, C)와 가장 안쪽의 MAC 한 줄. <strong>순서를 바꿔도 답은 같고, 어느 텐서가 안쪽 loop 동안 가만히 있는지가 바뀐다.</strong> 그 선택이 dataflow(weight/output stationary 등)다.</div>
   <div class="d" lang="en">Conv written by definition as seven nested loops (N, K, P, Q, R, S, C) around a single MAC. <strong>Reordering keeps the answer and changes which tensor sits still in the inner loops.</strong> That choice is the dataflow (weight stationary, output stationary and so on).</div>
-  <div class="src"><a href="L06-kernel-computation.html#s5">Lecture 6 &middot; 05</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s5">Lecture 6 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -857,7 +857,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Local Response Normalization</div>
   <div class="d" lang="ko">AlexNet이 쓴 정규화. 같은 공간 위치에서 <strong>인접한 kernel map <span class="m"><i>n</i></span>개</strong>에 걸쳐 활성을 정규화해서, 서로 다른 커널의 큰 활성끼리 <strong>경쟁</strong>하게 만든다. 하이퍼파라미터는 <span class="m"><i>k</i>=2, <i>n</i>=5, <i>&alpha;</i>=10<sup>&minus;4</sup>, <i>&beta;</i>=0.75</span>이고 <strong>전부 validation set으로 정했다.</strong> top-1을 1.4%, top-5를 1.2% 낮췄다.</div>
   <div class="d" lang="en">The normalization AlexNet used: activities are normalized across <strong><span class="m"><i>n</i></span> adjacent kernel maps</strong> at the same spatial position, creating <strong>competition</strong> among large activities from different kernels. Its hyperparameters are <span class="m"><i>k</i>=2, <i>n</i>=5, <i>&alpha;</i>=10<sup>&minus;4</sup>, <i>&beta;</i>=0.75</span>, <strong>all determined on a validation set.</strong> It reduced top-1 by 1.4% and top-5 by 1.2%.</div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gM">M</h2>
@@ -867,7 +867,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Multiply-Accumulate</div>
   <div class="d" lang="ko">곱해서 누적하는 연산 한 번, 그리고 그 연산을 하는 회로. DNN 연산의 기본 단위다. Tesla FSD 칩이 <strong>96×96 MAC</strong>을 갖고 있다는 식으로 배열 크기를 세는 데 쓴다. <strong>MAC 1회 = FLOP 2회.</strong></div>
   <div class="d" lang="en">One multiply-and-accumulate operation, and the circuit that performs it. The basic unit of DNN arithmetic, also used to size arrays, as in the Tesla FSD chip's <strong>96×96 MACs</strong>. <strong>One MAC is two FLOPs.</strong></div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -875,14 +875,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Microcontroller Unit</div>
   <div class="d" lang="ko">CPU와 메모리와 주변장치가 한 칩에 든 <strong>아주 작은 컴퓨터 전체</strong>. 가속기가 아니다. SRAM이 수백 KB 수준이고 <strong>DRAM이 아예 없는 경우가 많아서</strong>, 모델이 여기 안 들어가면 방법이 없다. TinyML이 상대하는 것이 이 급이다.</div>
   <div class="d" lang="en"><strong>An entire very small computer</strong>, CPU plus memory plus peripherals on one chip. Not an accelerator. SRAM runs to a few hundred kilobytes and <strong>there is frequently no DRAM at all</strong>, so a model that does not fit has nowhere to go. This is the class TinyML addresses.</div>
-  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">memory-bound &middot; compute-bound</div>
   <div class="d" lang="ko">데이터를 가져오는 시간이 연산 시간보다 길면 <strong>memory-bound</strong>, 반대면 <strong>compute-bound</strong>. <strong>용량 이야기가 아니라 시간 이야기</strong>다. memory-bound는 돌아가긴 하는데 연산기가 놀고, out of memory는 아예 안 돌아간다. <strong>단위가 구별 기준</strong>이라 초가 붙어 있으면 이쪽, 안 붙어 있으면 용량 쪽이다. 판정을 안 하고 손대면 <strong>연산기를 더 붙여도 아무 일이 안 생긴다.</strong></div>
   <div class="d" lang="en"><strong>Memory-bound</strong> when fetching takes longer than computing, <strong>compute-bound</strong> when the reverse. <strong>A claim about time, not capacity</strong>: memory-bound still runs, with the arithmetic idling, whereas out of memory does not run at all. <strong>The unit is the test</strong>: a per-second in it means this, no per-second means capacity. Reach for a fix without making the verdict and <strong>adding arithmetic units changes nothing.</strong></div>
-  <div class="src"><a href="L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s8">Lecture 4-5 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -890,7 +890,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">International Symposium on Microarchitecture</div>
   <div class="d" lang="ko">ISCA와 쌍벽을 이루는 아키텍처 학회. 이름대로 마이크로아키텍처 쪽에 더 가깝다.</div>
   <div class="d" lang="en">Architecture's other flagship venue alongside ISCA, leaning, as the name says, more microarchitectural.</div>
-  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -898,14 +898,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Multi-Level Intermediate Representation</div>
   <div class="d" lang="ko">여러 추상화 수준의 중간 표현을 한 틀에 담는 컴파일러 인프라(LLVM 프로젝트). ML 모델을 특정 칩용 코드로 내리고 <a href="#gF">fusion</a> 같은 변환을 거는 데 쓴다. L06 3쪽의 Tesla FSD 사례가 런타임을 이것으로 다시 썼다.</div>
   <div class="d" lang="en">Compiler infrastructure (part of LLVM) holding intermediate representations at many abstraction levels in one framework. Used to lower ML models to chip-specific code and apply transforms like <a href="#gF">fusion</a>. The Tesla FSD example on lecture 6 page 3 rewrote its runtime with it.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s1">Lecture 6 &middot; 01</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s1">Lecture 6 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">MLPerf</div>
   <div class="d" lang="ko">학습과 추론 하드웨어·소프트웨어를 공정하게 비교하려는 공통 벤치마크 모음(첫 결과 2018년 12월, 지금은 MLCommons 운영). <strong>closed</strong> 부문은 모델과 정확도 목표를 고정해 하드웨어만 비교하고, <strong>open</strong>은 모델 변경을 허용한다.</div>
   <div class="d" lang="en">A common benchmark suite for fairly comparing training and inference hardware and software (first results Dec 2018, now run by MLCommons). The <strong>closed</strong> division fixes the model and accuracy target so only hardware is compared; <strong>open</strong> allows model changes.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s15">Lecture 7-8-9 &middot; 15</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s15">Lecture 7-8-9 &middot; 15</a></div>
 </div>
 
 <div class="gterm">
@@ -913,21 +913,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Conference on Machine Learning and Systems</div>
   <div class="d" lang="ko">ML과 시스템의 교집합을 다루려고 <strong>새로 생긴</strong> 학회. 슬라이드 17쪽이 AICAS, TinyML과 함께 "새 학회"의 예로 든다.</div>
   <div class="d" lang="en">A <strong>newer</strong> venue created for the intersection of ML and systems. Slide 17 lists it with AICAS and TinyML as examples of the new conferences.</div>
-  <div class="src"><a href="L01-introduction.html#s8">Lecture 1 · 08</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s8">Lecture 1 · 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">momentum</div>
   <div class="d" lang="ko">이전 스텝의 이동 방향을 기억해서 <strong>비슷한 방향으로 계속 가려는</strong> 최적화 기법. 코드로는 <code>vx</code> 변수 하나가 늘어나는 것인데, <strong>그 변수가 모델 전체와 같은 크기</strong>다. 즉 학습 메모리가 가중치 한 벌만큼 더 필요해진다. <a href="#gA">Adam</a>은 이런 버퍼를 둘 갖는다.</div>
   <div class="d" lang="en">An optimization technique that remembers the previous direction of travel and <strong>keeps moving that way</strong>. In code it adds one variable, <code>vx</code>, and <strong>that variable is the size of the entire model</strong>, so training memory grows by another full copy of the weights. <a href="#gA">Adam</a> keeps two such buffers.</div>
-  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Moore's law</div>
   <div class="d" lang="ko">같은 면적에 들어가는 트랜지스터 <strong>개수</strong>가 약 2년마다 두 배가 된다는 관측. 슬라이드 33쪽이 <strong>14 nm에 5년 머물렀다</strong>는 것으로 정체를 보여준다. <a href="#gD">Dennard scaling</a>과 다른 이야기다.</div>
   <div class="d" lang="en">The observation that the <strong>number</strong> of transistors per unit area doubles about every two years. Slide 33 shows the stall by way of <strong>five years spent at 14 nm</strong>. A different claim from <a href="#gD">Dennard scaling</a>.</div>
-  <div class="src"><a href="L01-introduction.html#s14">Lecture 1 · 14</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s14">Lecture 1 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -935,14 +935,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Mean Squared Error</div>
   <div class="d" lang="ko">예측값과 정답의 차이를 제곱해서 평균한 cost function. <span class="m"><i>MSE</i> = <sup>1</sup>&frasl;<sub><i>m</i></sub> &Sigma; (<i>ŷ<sub>i</sub></i> &minus; <i>y<sub>i</sub></i>)<sup>2</sup></span> 형태다. 계산 자체는 싸지만 <strong>모든 예제를 하나로 줄이는 축약</strong>이라 여러 장치에 나눠도 마지막에는 모아야 한다.</div>
   <div class="d" lang="en">A cost function averaging the squared difference between prediction and truth. Cheap to compute, but <strong>a reduction of every example down to one value</strong>, so splitting it across devices still requires a gather at the end.</div>
-  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">multi-head attention</div>
   <div class="d" lang="ko">Q, K, V를 서로 다른 학습된 사영으로 <strong>h번 줄여서 attention을 병렬로</strong> 돌리고 이어붙이는 것. Transformer base는 h = 8, d<sub>k</sub> = 64. head마다 차원이 1/h라 <strong>계산량은 single-head와 비슷</strong>하다.</div>
   <div class="d" lang="en">Projecting Q, K and V <strong>h times with different learned projections, running attention on each in parallel</strong>, and concatenating. The Transformer base uses h = 8, d<sub>k</sub> = 64. Each head is 1/h the width, so <strong>the cost is about that of one full-width head</strong>.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s15">Paper Reading 2 &middot; 15</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s15">Paper Reading 2 &middot; 15</a></div>
 </div>
 
 <h2 class="gletter" id="gN">N</h2>
@@ -952,7 +952,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Neural Network Accelerator</div>
   <div class="d" lang="ko">Tesla FSD 칩의 다이 사진에서 신경망 전용 블록에 붙은 이름. 회사마다 부르는 이름이 다르다: Apple은 <strong>Neural Engine</strong>, Google은 <strong>TPU</strong>, NVIDIA는 <strong>Tensor Core</strong>(GPU 안의 유닛). 같은 일을 하는 것이 아니라 <strong>비슷한 자리에 있는 것</strong>이므로 스펙을 직접 비교하면 안 된다.</div>
   <div class="d" lang="en">The label on the neural-network block in the Tesla FSD die shot. Every company names it differently: Apple's <strong>Neural Engine</strong>, Google's <strong>TPU</strong>, NVIDIA's <strong>Tensor Core</strong> (a unit inside the GPU). These are not the same thing so much as <strong>things in a similar position</strong>, so their specs should not be compared head to head.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -960,7 +960,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Neural Processing Unit</div>
   <div class="d" lang="ko">SoC 안에 CPU/GPU와 나란히 들어가는 <strong>신경망 전용 블록</strong>. 대개 추론 전용이다. <strong>주로 벤더의 마케팅 용어</strong>라 이름이 회사마다 다르고 (Neural Engine, Hexagon NPU, AI Engine), 논문에서는 accelerator라고 쓰는 편이다. <a href="#gA">ASIC</a>과 배타적이지 않다. NPU는 <em>무엇을 하는가</em>, ASIC은 <em>어떻게 만들었는가</em>를 말한다.</div>
   <div class="d" lang="en">A <strong>neural-network-only block</strong> sitting alongside the CPU and GPU inside an SoC, usually inference-only. <strong>Largely a vendor marketing term</strong>, so the name differs by company (Neural Engine, Hexagon NPU, AI Engine) while papers tend to say accelerator. Not exclusive with <a href="#gA">ASIC</a>: NPU names <em>what it does</em>, ASIC <em>how it was built</em>.</div>
-  <div class="src"><a href="L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s10">Lecture 4-5 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -968,7 +968,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">NVIDIA Deep Learning Accelerator</div>
   <div class="d" lang="ko">NVIDIA가 RTL까지 공개한 추론 가속기. conv 코어가 <strong>입력·출력 채널을 PE 격자에 펼친 weight stationary</strong>이고, 이 수업 L10 31~32쪽의 loop nest가 그 dataflow다. GPU의 Tensor Core와 다른, CPU가 설정해서 돌리는 별도의 고정 기능 가속기다.</div>
   <div class="d" lang="en">An inference accelerator NVIDIA open-sourced down to the RTL. Its conv core is <strong>weight stationary with input and output channels spread across a PE grid</strong>; the loop nest on lecture 10 pages 31-32 is its dataflow. A separate fixed-function accelerator configured by a CPU, not the GPU's Tensor Core.</div>
-  <div class="src"><a href="L10-dataflow.html#s11">Lecture 10 &middot; 11</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s11">Lecture 10 &middot; 11</a></div>
 </div>
 
 <h2 class="gletter" id="gO">O</h2>
@@ -978,14 +978,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">OS, WS, IS</div>
   <div class="d" lang="ko">가장 안쪽 loop들이 도는 동안 <strong>PE 안 레지스터에 붙잡아 두는 텐서</strong>로 dataflow를 부르는 이름. OS는 psum을 붙잡고 weight를 broadcast, WS와 IS는 weight나 입력을 붙잡고 psum을 이웃 PE로 넘긴다. <strong>"영원히 안 움직인다"가 아니라 안쪽 loop 동안만</strong>이다. FC 층(<span class="m"><i>PQ</i></span> = 1)의 WS는 weight를 한 번 쓰고 바로 바꾼다.</div>
   <div class="d" lang="en">Dataflows named by <strong>the tensor pinned in the PE's register</strong> while the innermost loops run. OS pins the psum and broadcasts weights; WS and IS pin a weight or an input and pass psums to neighbouring PEs. <strong>Pinned only during the inner loops, not forever</strong>: on an FC layer (<span class="m"><i>PQ</i></span> = 1), WS uses each weight once and swaps it.</div>
-  <div class="src"><a href="L10-dataflow.html#s12">Lecture 10 &middot; 12</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s12">Lecture 10 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">overfitting &middot; underfitting</div>
   <div class="d" lang="ko">capacity가 <strong>최적점보다 오른쪽</strong>에 있으면 overfitting, <strong>왼쪽</strong>에 있으면 underfitting이다. overfitting은 training error는 계속 내려가는데 generalization error가 올라가는 상태다. <strong>이 곡선이 이 수업에서 가장 자주 돌아오는 그림이다.</strong> quantization과 pruning이 정확도를 거의 안 잃고 모델을 줄일 수 있는 이유가 여기 있다. 원래 오른쪽에 너무 멀리 가 있었던 것이다.</div>
   <div class="d" lang="en">Sitting <strong>to the right</strong> of the optimal capacity is overfitting, <strong>to the left</strong> is underfitting. Overfitting is the state where training error keeps falling while generalization error climbs. <strong>This curve is the figure that returns most often in this course</strong>: it is why quantization and pruning can shrink a model at almost no accuracy cost. You were too far right to begin with.</div>
-  <div class="src"><a href="L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s7">Lecture 2-3 &middot; 07</a></div>
 </div>
 
 <h2 class="gletter" id="gP">P</h2>
@@ -994,7 +994,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">padding &middot; stride</div>
   <div class="d" lang="ko">stride는 conv 창을 한 번에 몇 칸 옮기는지, padding은 입력 테두리에 두르는 0의 줄 수. 출력 크기는 <span class="m"><i>P</i> = (<i>H</i> − <i>R</i> + 2·<i>pad</i>)/<i>stride</i> + 1</span>. 3×3에 pad 1, stride 1이면 크기가 유지된다. <strong>padding으로 생긴 0과의 곱셈은 건너뛰지 않으면 낭비</strong>다.</div>
   <div class="d" lang="en">Stride is how far the conv window moves per step; padding is how many rings of zeros surround the input. Output size is <span class="m"><i>P</i> = (<i>H</i> − <i>R</i> + 2·<i>pad</i>)/<i>stride</i> + 1</span>, so a 3×3 with pad 1 and stride 1 preserves size. <strong>Multiplying by padded zeros is waste unless skipped.</strong></div>
-  <div class="src"><a href="L06-kernel-computation.html#s3">Lecture 6 &middot; 03</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s3">Lecture 6 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1002,7 +1002,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">PS</div>
   <div class="d" lang="ko">분산학습에서 worker들의 gradient를 모아 평균 내고 공유 parameter를 들고 있는 중앙 서버. 2012~2017년 대세 구조. 지금은 worker끼리 직접 주고받는 all-reduce가 더 흔하다.</div>
   <div class="d" lang="en">The central server in distributed training that collects and averages workers' gradients and holds the shared parameters. The dominant design from 2012 to 2017; worker-to-worker all-reduce is more common now.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1010,7 +1010,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">psum</div>
   <div class="d" lang="ko">출력 원소 하나를 만드는 <span class="m"><i>RSC</i></span>개 곱 중 <strong>일부만 더한 중간값</strong>. MAC마다 읽고 다시 써야 해서 <strong>접근이 두 번</strong>이고, 그래서 PE 안에 붙잡으면(OS) 아끼는 양이 크다. activation 함수는 누적이 끝난 뒤에만 걸고, 보통 입력보다 비트가 넓다.</div>
   <div class="d" lang="en">A <strong>running total of some</strong> of the <span class="m"><i>RSC</i></span> products that make one output element. It is read and written back on every MAC, <strong>two accesses</strong>, so pinning it in the PE (OS) saves a lot. The activation function applies only after accumulation ends, and a psum is usually wider than the inputs.</div>
-  <div class="src"><a href="L10-dataflow.html#s2">Lecture 10 &middot; 02</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s2">Lecture 10 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1018,7 +1018,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Process Design Kit</div>
   <div class="d" lang="ko">특정 공정에서 설계할 때 EDA 도구가 읽는 자료 묶음. 표준 셀 라이브러리, 타이밍 모델, 설계 규칙, 기생 모델. 이 수업은 <strong>ASU와 ARM의 7nm 교육용 PDK</strong>를 권한다. <strong>교육용 PDK의 숫자는 실제 파운드리 7nm와 같지 않다.</strong> 논문에 쓸 때 반드시 밝힌다.</div>
   <div class="d" lang="en">The bundle an EDA tool reads to design in a given process: standard cell library, timing models, design rules, parasitics. This course suggests the <strong>ASU/ARM 7nm educational PDK</strong>. <strong>An educational PDK's numbers are not a real foundry 7nm</strong>, and a paper has to say so.</div>
-  <div class="src"><a href="L01-introduction.html#s6">Lecture 1 · 06</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s6">Lecture 1 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1026,21 +1026,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Processing Element</div>
   <div class="d" lang="ko">가속기 배열의 한 칸. 보통 <a href="#gM">MAC</a> 하나와 작은 레지스터를 갖는다. "PE 배열이 96×96"처럼 가속기의 규모를 말하는 단위다.</div>
   <div class="d" lang="en">One cell of an accelerator array, usually a <a href="#gM">MAC</a> plus a little local storage. The unit in which accelerator size gets quoted, as in a 96×96 PE array.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">pooling</div>
   <div class="d" lang="ko">채널마다 따로 공간 크기를 줄이는 층(max 또는 avg). <strong>자체 파라미터는 없고</strong>, 뒤 층의 입력을 줄여 그 층의 weight를 줄인다. avg는 conv 하드웨어로 돌릴 수 있지만 max는 비교 연산이라 <strong>전용 유닛이 더 효율적</strong>이다.</div>
   <div class="d" lang="en">A layer that shrinks spatial size per channel, by max or average. <strong>It has no parameters of its own</strong>; it shrinks the next layer's input and so that layer's weights. Avg can run on conv hardware, but max is a comparison, so <strong>a dedicated unit is more efficient.</strong></div>
-  <div class="src"><a href="L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">positional encoding</div>
   <div class="d" lang="ko">recurrence도 convolution도 없는 Transformer에 <strong>토큰 순서 정보</strong>를 주려고 embedding에 더하는 벡터. 원 논문은 파장이 2π부터 10000·2π까지인 <strong>sin/cos</strong>를 쓴다. 학습된 embedding도 결과는 거의 같았다.</div>
   <div class="d" lang="en">A vector added to the embeddings to give the Transformer, which has no recurrence or convolution, <strong>the order of the tokens</strong>. The original uses <strong>sines and cosines</strong> with wavelengths from 2π to 10000·2π; learned embeddings did about as well.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s16">Paper Reading 2 &middot; 16</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s16">Paper Reading 2 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -1048,7 +1048,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Parametric ReLU</div>
   <div class="d" lang="ko">음수 쪽 기울기 <span class="m"><i>a</i></span>를 채널마다 <strong>학습</strong>하는 ReLU 변형. 원소별 연산인데도 <strong>읽어 올 파라미터가 생겨서</strong> 고정 함수로 하드와이어한 activation 유닛으로는 못 돌린다.</div>
   <div class="d" lang="en">A ReLU variant that <strong>learns</strong> the negative-side slope <span class="m"><i>a</i></span> per channel. Though elementwise, it <strong>has parameters to fetch</strong>, so an activation unit hardwired to a fixed function can't run it.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
 </div>
 
 <h2 class="gletter" id="gR">R</h2>
@@ -1058,14 +1058,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Rectified Linear Unit</div>
   <div class="d" lang="ko"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>. AlexNet이 <strong>가장 중요한 기법으로 첫 번째에 놓은</strong> 것이다. tanh 같은 <strong>포화 비선형성보다 학습이 훨씬 빠르다.</strong> CIFAR-10에서 25% 학습 오류에 도달하는 데 <strong>6배 적은 반복</strong>이 든다. 논문은 <em>"전통적인 포화 뉴런을 썼다면 이렇게 큰 신경망으로 실험할 수 없었을 것"</em>이라고 적었다. <strong>하드웨어에서는 비교 하나</strong>라 지수 함수가 필요한 tanh나 sigmoid와 달리 거의 공짜다.</div>
   <div class="d" lang="en"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>, the technique AlexNet <strong>placed first as the most important.</strong> It <strong>trains much faster than saturating nonlinearities</strong> like tanh: <strong>six times fewer iterations</strong> to reach 25% training error on CIFAR-10. The paper writes that <em>they would not have been able to experiment with such large networks using traditional saturating neurons.</em> <strong>In hardware it is one comparison</strong>, nearly free, unlike tanh or sigmoid which need an exponential.</div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">reuse distance</div>
   <div class="d" lang="ko">같은 데이터의 두 사용 사이에 끼어 있는 다른 접근의 수. 그만큼 버퍼에 들고 있어야 다시 안 읽는다. 재사용 <strong>횟수</strong>는 알고리즘이 정하고 <strong>거리</strong>는 연산 순서가 정한다. 어느 데이터의 거리를 1로 만들지 고르는 것이 dataflow(weight/output stationary)다.</div>
   <div class="d" lang="en">The number of other accesses between two uses of the same datum; you must buffer that much to avoid re-reading it. The algorithm sets the reuse <strong>count</strong>; the operation order sets the <strong>distance</strong>. Choosing which data gets distance 1 is what a dataflow (weight or output stationary) is.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s20">Lecture 7-8-9 &middot; 20</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s20">Lecture 7-8-9 &middot; 20</a></div>
 </div>
 
 <div class="gterm">
@@ -1073,7 +1073,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">machine balance, critical hardware intensity</div>
   <div class="d" lang="ko">roofline의 사선과 지붕이 만나는 arithmetic intensity. <strong>peak FLOPs/s ÷ memory bandwidth</strong>. 이보다 intensity가 낮으면 memory-bound다. TPU v5e는 1.97e14 ÷ 8.2e11 = 240 FLOPs/byte. 대역폭이 커지면 왼쪽으로, 연산이 빨라지면 오른쪽으로 간다.</div>
   <div class="d" lang="en">The arithmetic intensity where a roofline's diagonal meets its roof: <strong>peak FLOPs/s ÷ memory bandwidth.</strong> Below it you are memory-bound. For TPU v5e, 1.97e14 ÷ 8.2e11 = 240 FLOPs/byte. More bandwidth moves it left; faster compute moves it right.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -1081,14 +1081,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">the fifth RISC architecture from Berkeley</div>
   <div class="d" lang="ko">개방형 <a href="#gI">ISA</a>. Golden Age가 <strong>"프로세서를 위한 Linux"</strong>로 소개한다. <strong>모듈식</strong>이라 작은 기본 집합(50개 명령어)이 전체 소프트웨어 스택을 돌리고 확장(M, A, F, D로 53개, C로 34개, 합계 137개)은 선택이다. <strong>ARMv8은 500개가 넘고 명령어 형식도 최소 14개인데 RISC-V는 6개</strong>다. 그리고 <strong>커스텀 가속기를 위해 방대한 opcode 공간을 예약</strong>해 두었다.</div>
   <div class="d" lang="en">An open <a href="#gI">ISA</a>, introduced by Golden Age as <strong>"a Linux for processors."</strong> It is <strong>modular</strong>: a small base of 50 instructions runs the full software stack and the extensions are optional (53 for M, A, F and D, another 34 for C, 137 in total). <strong>ARMv8 has over 500 instructions and at least 14 instruction formats against RISC-V's six.</strong> It also <strong>reserves a vast opcode space for custom accelerators.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s7">Paper Reading 1 &middot; 07</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s7">Paper Reading 1 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">roofline</div>
   <div class="d" lang="ko">가로축 arithmetic intensity, 세로축 달성 가능 성능인 로그-로그 그림. <strong>attainable = min(peak, AI × BW)</strong>. latency ≈ max(연산 시간, 메모리 시간)을 "초당"으로 뒤집은 것이라 완벽한 겹치기를 가정한다. 측정한 점은 정의상 지붕 아래에 있다.</div>
   <div class="d" lang="en">A log-log chart of attainable performance against arithmetic intensity: <strong>attainable = min(peak, AI × BW).</strong> It is latency ≈ max(compute time, memory time) flipped to "per second", so it assumes perfect overlap. Measured points sit below the roof by definition.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s8">Lecture 7-8-9 &middot; 08</a></div>
 </div>
 
 <h2 class="gletter" id="gS">S</h2>
@@ -1098,7 +1098,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">intra-attention</div>
   <div class="d" lang="ko"><strong>한 시퀀스 안의</strong> 위치끼리 attention 하는 것. 어떤 두 위치든 한 번에 연결되고(경로 O(1)) 순차 연산이 없지만, 층당 계산이 <strong>O(n²·d)</strong>라 시퀀스가 길면 비싸다.</div>
   <div class="d" lang="en">Attention between positions <strong>within one sequence</strong>. Any two positions connect in one step (path O(1)) with no sequential operations, but each layer costs <strong>O(n²·d)</strong>, so long sequences get expensive.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s12">Paper Reading 2 &middot; 12</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s12">Paper Reading 2 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -1106,42 +1106,42 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Stochastic Gradient Descent</div>
   <div class="d" lang="ko">gradient를 전체 데이터가 아니라 <a href="#gB">minibatch</a>로 근사해서 갱신하는 방법. <strong>한 스텝의 방향은 오히려 부정확하다.</strong> 그래도 쓰는 이유는 한 스텝이 싸져서 같은 시간에 훨씬 많이 갱신할 수 있기 때문이다. <strong>알고리즘의 개선이기 이전에 메모리 제약에 대한 타협이다.</strong></div>
   <div class="d" lang="en">Updating from a gradient approximated on a <a href="#gB">minibatch</a> rather than the whole dataset. <strong>Each individual step points less accurately</strong>; it is used anyway because a cheap step means far more of them in the same wall-clock time. <strong>A concession to memory before it is an algorithmic improvement.</strong></div>
-  <div class="src"><a href="L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">sparsity</div>
   <div class="d" lang="ko">텐서에서 <strong>0인 원소의 비율</strong>. 0은 곱셈도 저장도 건너뛸 수 있으므로 하드웨어 이득이 된다. 다만 <strong>0이 흩어져 있으면 건너뛰는 제어 논리가 오히려 더 비싸질 수 있다.</strong> 그래서 뒤에서 structured sparsity가 나온다. <a href="#gL">L1</a>은 sparsity를 만들고 L2와 <a href="#gD">dropout</a>은 만들지 않는다.</div>
   <div class="d" lang="en">The <strong>fraction of zero elements</strong> in a tensor. Zeros let you skip both the multiply and the storage, which is the hardware payoff. But <strong>when the zeros are scattered, the control logic for skipping them can cost more than it saves</strong>, which is why structured sparsity appears later. <a href="#gL">L1</a> produces sparsity; L2 and <a href="#gD">dropout</a> do not.</div>
-  <div class="src"><a href="L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">spatial_for</div>
   <div class="d" lang="ko">loop nest 표기에서 반복을 <strong>시간이 아니라 PE 여러 개에 한 번에 펼친다</strong>는 표시. 범위가 그 차원에 배정된 PE 수다. 어떤 텐서와 무관한 차원을 펼치면 그 텐서를 broadcast하고, 출력과 무관한 차원(<code>c</code>)을 펼치면 PE 결과를 공간에서 더해야 한다. HLS의 <code>UNROLL</code>과 같은 뜻이다.</div>
   <div class="d" lang="en">Loop-nest notation marking iterations <strong>spread across many PEs at once rather than run in time.</strong> Its bound is the number of PEs given to that dimension. Unroll a dimension some tensor ignores and that tensor is broadcast; unroll one the output ignores (<code>c</code>) and PE results must be summed in space. Same idea as HLS's <code>UNROLL</code>.</div>
-  <div class="src"><a href="L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s6">Lecture 10 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">speculation</div>
   <div class="d" lang="ko">분기를 예측하고 <strong>결과가 확정되기 전에 명령어를 실행</strong>해서 파이프라인을 채우는 것. 맞으면 성능이 오르지만 <strong>틀리면 명령어를 버리고 상태를 되돌려야</strong> 한다. 15단 파이프라인에 4-issue면 명령어 60개가 in-flight이고 그중 <strong>약 15개가 분기</strong>라, 낭비를 10% 아래로 묶으려면 <strong>분기마다 99.3%의 정확도</strong>가 필요하다. 그리고 <strong>Meltdown과 Spectre가 여기서 나왔다.</strong></div>
   <div class="d" lang="en">Predicting branches and <strong>executing instructions before the outcome is known</strong>, to keep the pipeline full. Correct predictions buy performance; <strong>a mispredict means discarding the instructions and restoring state.</strong> With a 15-stage 4-issue pipeline there are 60 instructions in flight, <strong>about 15 of them branches</strong>, so holding waste under 10% needs <strong>99.3% accuracy per branch.</strong> And <strong>Meltdown and Spectre came out of it.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s4">Paper Reading 1 &middot; 04</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s4">Paper Reading 1 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">stochastic rounding</div>
   <div class="d" lang="ko">값을 가까운 격자점으로 그냥 반올림하지 않고, <strong>거리에 비례한 확률로</strong> 위아래 격자점 중 하나를 고르는 것. 한 번 한 번은 틀려도 <strong>기댓값이 원래 값과 같다(unbiased).</strong> TernGrad와 QSGD가 쓴다.</div>
   <div class="d" lang="en">Rounding to one of the two neighbouring grid points <strong>with probability proportional to distance</strong> instead of always to the nearest. Each result is off, but <strong>the expectation equals the original value (unbiased)</strong>. Used by TernGrad and QSGD.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">systolic array</div>
   <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. <strong>이 수업에서 내부를 제대로 파는 것은 뒤쪽 강의다.</strong> L01에서는 이름만 나온다.</div>
   <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. <strong>The internals get opened up in a later lecture</strong>; lecture 1 only names it.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <h2 class="gletter" id="gT">T</h2>
@@ -1150,14 +1150,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">temporal &middot; spatial reuse</div>
   <div class="d" lang="ko">메모리에서 한 번 읽은 데이터를 <strong>같은 PE가 여러 사이클에</strong> 쓰면 temporal, <strong>여러 PE가 한 사이클에</strong> 쓰면 spatial reuse. temporal은 PE 안의 저장 공간이, spatial은 multicast 배선이 필요하다. 둘 다 arithmetic intensity의 분모를 줄인다.</div>
   <div class="d" lang="en">Data read once from memory and used <strong>by one PE across cycles</strong> is temporal reuse; <strong>by many PEs in one cycle</strong>, spatial. Temporal needs storage inside the PE; spatial needs multicast wiring. Both shrink the denominator of arithmetic intensity.</div>
-  <div class="src"><a href="L07-hardware-metrics.html#s20">Lecture 7-8-9 &middot; 20</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s20">Lecture 7-8-9 &middot; 20</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Tensor Core</div>
   <div class="d" lang="ko">NVIDIA GPU 안에 들어 있는 행렬 곱셈 전용 유닛. <span class="m">D = A·B + C</span> 형태만 하고, 입력은 낮은 정밀도로 받아 FP32로 누산한다. V100의 <strong>15.7 TFLOP/s(FP32)와 125 Tensor TFLOP/s의 8배 차이</strong>가 이 유닛에서 나온다. <strong>범용 칩 안에 전용 가속기가 들어 있는 예다.</strong></div>
   <div class="d" lang="en">A matrix-multiply unit inside NVIDIA GPUs. It only does <span class="m">D = A·B + C</span>, taking reduced-precision inputs and accumulating in FP32. The <strong>eightfold gap between the V100's 15.7 FP32 TFLOP/s and its 125 Tensor TFLOP/s</strong> comes from this unit. <strong>An example of a dedicated accelerator living inside a general-purpose chip.</strong></div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -1165,14 +1165,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Ternary Gradients</div>
   <div class="d" lang="ko">분산학습에서 gradient를 원소마다 <strong>{−1, 0, +1} × scaler</strong>로 stochastic rounding 해서 보내는 기법 (Wen et al., NIPS 2017). 2 bit 기준 worker→server 통신 16배 감소. layer-wise scaler와 2.5σ gradient clipping을 같이 쓴다.</div>
   <div class="d" lang="en">Sending gradients in distributed training as <strong>{−1, 0, +1} times a scaler</strong> per element via stochastic rounding (Wen et al., NIPS 2017). Worker-to-server traffic drops 16× at 2 bits. Paired with layer-wise scalers and 2.5σ gradient clipping.</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">top-1 &middot; top-5 error</div>
   <div class="d" lang="ko">ImageNet에서 관례적으로 함께 보고하는 두 오류율. <strong>top-5 오류는 모델이 가장 그럴듯하다고 본 다섯 라벨 안에 정답이 없는 테스트 이미지의 비율</strong>이다. AlexNet은 ILSVRC-2010에서 <strong>37.5% / 17.0%</strong>, ILSVRC-2012에서 <strong>top-5 15.3%로 우승</strong>했고 2위는 26.2%였다. <strong>둘을 섞어 인용하면 논지가 완전히 달라진다.</strong></div>
   <div class="d" lang="en">The two error rates customarily reported together on ImageNet. <strong>Top-5 error is the fraction of test images for which the correct label is not among the five the model considers most probable.</strong> AlexNet reported <strong>37.5% and 17.0%</strong> on ILSVRC-2010 and <strong>won ILSVRC-2012 with a top-5 of 15.3%</strong> against 26.2% for second place. <strong>Quoting one for the other changes the claim entirely.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s13">Paper Reading 1 &middot; 13</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s13">Paper Reading 1 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1180,14 +1180,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Tera Operations Per Second</div>
   <div class="d" lang="ko">초당 1조 회 연산. 보통 <strong>INT8 정수</strong> 기준의 이론 최대 처리량이고 edge 추론 칩의 스펙에 쓰인다. Coral Edge TPU가 4 TOPS다. <strong>TFLOP/s와 나란히 놓으면 안 된다.</strong> 정수와 부동소수점이고 정밀도도 다르다.</div>
   <div class="d" lang="en">A trillion operations per second, usually the theoretical peak counted in <strong>INT8 integer</strong> ops, quoted on edge inference parts. The Coral Edge TPU is 4 TOPS. <strong>Never set it beside TFLOP/s</strong>: different arithmetic, different precision.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">TOPS/W</div>
   <div class="d" lang="ko">TOPS를 소비 전력으로 나눈 값. <strong>edge 칩에서는 절대 성능보다 이 값이 더 중요하다.</strong> Coral Edge TPU가 2 TOPS/W다.</div>
   <div class="d" lang="en">TOPS divided by power draw. <strong>On edge parts this matters more than absolute performance.</strong> The Coral Edge TPU is 2 TOPS/W.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -1195,14 +1195,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Tensor Processing Unit</div>
   <div class="d" lang="ko">Google의 ML 가속기. <a href="#gS">systolic array</a> 기반이다. V1은 추론 전용, V2는 <a href="#gB">bfloat</a>으로 학습까지, V3는 V2의 2배. <strong>Edge TPU</strong>는 별개 제품으로 Coral 보드에 들어가고 4 TOPS / 2 TOPS/W다.</div>
   <div class="d" lang="en">Google's ML accelerator, built on a <a href="#gS">systolic array</a>. V1 is inference only, V2 trains using <a href="#gB">bfloat</a>, V3 is twice V2. The <strong>Edge TPU</strong> is a separate product on the Coral board at 4 TOPS and 2 TOPS/W.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Transformer</div>
   <div class="d" lang="ko">recurrence와 convolution 없이 <strong>attention만으로</strong> 만든 encoder-decoder (Vaswani et al., NIPS 2017). 학습이 행렬곱 위주라 병렬화가 잘 된다. BERT(encoder 쪽)와 GPT(decoder 쪽)의 조상.</div>
   <div class="d" lang="en">An encoder-decoder built <strong>from attention alone</strong>, with no recurrence or convolution (Vaswani et al., NIPS 2017). Training is mostly matrix multiplies, so it parallelizes well. The ancestor of BERT (encoder side) and GPT (decoder side).</div>
-  <div class="src"><a href="PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
+  <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s11">Paper Reading 2 &middot; 11</a></div>
 </div>
 
 <h2 class="gletter" id="gV">V</h2>
@@ -1212,14 +1212,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Very Long Instruction Word / Explicitly Parallel Instruction Computer</div>
   <div class="d" lang="ko">독립적인 연산 여러 개를 <strong>한 명령어에 묶어</strong> 하드웨어를 단순하게 만드는 접근. RISC처럼 <strong>일을 하드웨어에서 컴파일러로 옮긴다.</strong> Intel과 HP의 <strong>Itanium</strong>이 이 방식이었고 정수 프로그램에서 실패했다. 그런데 Golden Age는 <strong>DSA가 투기적 out-of-order 대신 VLIW를 쓸 수 있다</strong>고 적는다. <strong>실패한 아이디어가 아니라 범위를 잘못 잡은 아이디어였다.</strong></div>
   <div class="d" lang="en">Bundling several independent operations into <strong>one wide instruction</strong> so the hardware can be simpler, shifting work <strong>from hardware to the compiler</strong> as RISC did. Intel and HP's <strong>Itanium</strong> took this route and failed on integer programs. Yet Golden Age notes that <strong>DSAs can use VLIW instead of speculative out-of-order mechanisms</strong>: <strong>not a failed idea but an idea scoped wrongly.</strong></div>
-  <div class="src"><a href="PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">von Neumann bottleneck</div>
   <div class="d" lang="ko">연산기와 메모리가 <strong>하나의 통로</strong>로 연결돼 있어서, 연산기를 아무리 빠르게 만들어도 <strong>그 통로의 폭이 성능 상한</strong>이 되는 현상. <strong>memory wall과 다르다.</strong> memory wall은 연산 속도와 메모리 속도의 격차가 <em>시간이 갈수록 벌어진다</em>는 추세 이야기이고, 이쪽은 <strong>구조 자체</strong>의 이야기라 처음부터 있었다. 대역폭을 늘려도 구조는 그대로다.</div>
   <div class="d" lang="en">Compute and memory joined by <strong>one channel</strong>, so however fast the arithmetic gets, <strong>the width of that channel caps performance.</strong> <strong>Not the memory wall</strong>, which is a claim about a <em>trend</em>, the gap between compute and memory speed widening over time. This is about <strong>the structure itself</strong> and was there from the start; widening the bus leaves it unchanged.</div>
-  <div class="src"><a href="L04-dnns.html#s6">Lecture 4-5 &middot; 06</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s6">Lecture 4-5 &middot; 06</a></div>
 </div>
 
 <h2 class="gletter" id="gW">W</h2>
@@ -1228,14 +1228,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">weight decay</div>
   <div class="d" lang="ko"><a href="#gL">L2 regularization</a>을 <strong>갱신 규칙 안에 직접 넣은 형태</strong>. cost function에 항을 더하는 대신, 가중치를 갱신할 때마다 <strong>현재 값에 비례하는 양을 빼는</strong> 것으로 같은 효과를 낸다. AlexNet은 계수 <strong>0.0005</strong>를 썼다. 두 형태가 순수 <a href="#gS">SGD</a>에서는 같지만 <a href="#gA">Adam</a>에서는 달라진다는 것이 나중에 문제가 됐다.</div>
   <div class="d" lang="en"><a href="#gL">L2 regularization</a> written <strong>directly into the update rule</strong>: instead of adding a term to the cost function, each update <strong>subtracts an amount proportional to the current weight</strong>, to the same effect. AlexNet used a coefficient of <strong>0.0005</strong>. The two forms coincide under plain <a href="#gS">SGD</a> but diverge under <a href="#gA">Adam</a>, which later turned out to matter.</div>
-  <div class="src"><a href="L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Winograd transform</div>
   <div class="d" lang="ko">중간값을 재결합해서 <strong>곱셈을 덧셈으로 바꿔 치르는</strong> conv 알고리즘 (Lavin &amp; Gray, CVPR 2016). F(2,3)은 곱셈 6 → 4, 2차원 F(2×2, 3×3)은 36 → 16(2.25배). 근사가 아니라 항등식이다. <strong>3×3, stride 1에 잘 맞고</strong>, 변환 행렬의 분수 때문에 INT8과 궁합이 나쁘다.</div>
   <div class="d" lang="en">A conv algorithm that re-associates intermediates to <strong>pay for multiplies with additions</strong> (Lavin &amp; Gray, CVPR 2016). F(2,3) goes from 6 multiplies to 4; 2-D F(2×2, 3×3) from 36 to 16 (2.25x). An identity, not an approximation. <strong>Best for 3×3 at stride 1</strong>; the fractions in its transform matrices pair badly with INT8.</div>
-  <div class="src"><a href="L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1243,7 +1243,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Wafer Scale Engine</div>
   <div class="d" lang="ko">Cerebras의 칩. 46,225 mm²(한 변 215 mm), 1.2조 트랜지스터, 40만 코어, <strong>온칩 메모리 18 GB</strong>. 300 mm 웨이퍼에서 잘라낼 수 있는 최대치에 붙어 있다. 설계 전략이 <strong>모델을 통째로 칩 안에 올려 off-chip 접근을 없애는 것</strong>이다.</div>
   <div class="d" lang="en">Cerebras's chip: 46,225 mm² (215 mm on a side), 1.2 trillion transistors, 400,000 cores and <strong>18 GB of on-chip memory</strong>. It sits right against what a single 300 mm wafer can yield. Its strategy is <strong>to hold the entire model on chip and delete off-chip traffic</strong>.</div>
-  <div class="src"><a href="L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
 
 </div>

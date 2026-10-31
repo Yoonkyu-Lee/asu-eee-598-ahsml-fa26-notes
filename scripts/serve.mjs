@@ -12,7 +12,8 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
 
 const PORT = Number(process.argv[2]) || 4599;
-const ROOT = process.cwd();
+// 사이트는 docs/ 아래에 있다 (GitHub Pages 소스 폴더). 저장소 루트에서 실행한다.
+const ROOT = resolve(process.cwd(), 'docs');
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',

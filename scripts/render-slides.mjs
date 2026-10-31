@@ -1,8 +1,8 @@
 // 슬라이드 PDF의 쪽을 PNG로 렌더한다. 도해를 눈으로 확인하기 위한 것.
 // poppler(pdftoppm)가 이 머신에 없어서 vendor/pdf.js + playwright 로 대신한다.
 //
-// 사용법: node scripts/render-slides.mjs slides/L01-course-intro.pdf 12-18
-//         node scripts/render-slides.mjs slides/L01-course-intro.pdf        (전체)
+// 사용법: node scripts/render-slides.mjs docs/slides/L01-course-intro.pdf 12-18
+//         node scripts/render-slides.mjs docs/slides/L01-course-intro.pdf        (전체)
 // 결과:  shots/slides/<stem>-p12.png ...
 
 import { chromium } from 'playwright';
@@ -36,8 +36,8 @@ await page.route('**/__host', r => r.fulfill({ contentType: 'text/html', body: '
 await page.goto(origin + '/__host');
 
 const total = await page.evaluate(async ({ origin, file }) => {
-  const pdfjs = await import(origin + '/vendor/pdf.js/pdf.min.mjs');
-  pdfjs.GlobalWorkerOptions.workerSrc = origin + '/vendor/pdf.js/pdf.worker.min.mjs';
+  const pdfjs = await import(origin + '/docs/assets/vendor/pdf.js/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc = origin + '/docs/assets/vendor/pdf.js/pdf.worker.min.mjs';
   window.__doc = await pdfjs.getDocument({ url: origin + '/' + file }).promise;
   return window.__doc.numPages;
 }, { origin, file: file.replace(/\\/g, '/') });

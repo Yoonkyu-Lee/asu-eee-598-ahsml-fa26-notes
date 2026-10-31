@@ -441,12 +441,12 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
     <span class="chip hot">스압 주의</span>
     <span class="chip dim">슬라이드 리더 없음</span>
   </div>
-  <a class="backlink" href="index.html">← 강의 목록으로</a>
+  <a class="backlink" href="../index.html">← 강의 목록으로</a>
 </header>
 
 <nav class="toc">
   <div class="mini-head">
-    <a class="back" href="index.html">← 강의 목록</a>
+    <a class="back" href="../index.html">← 강의 목록</a>
     <div class="mod">Paper Reading 2</div>
     <div class="name">TernGrad &amp; Transformer</div>
     <div class="rule"></div>
@@ -636,7 +636,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
   </div>
 
   <h3>backprop은 뭐임?</h3>
-  <p>6100만 개 기울기를 하나하나 따로 재면 영원히 걸림. <strong>backpropagation(backprop, 역전파)</strong>은 출력 쪽부터 입력 쪽으로 거꾸로 훑으면서 <strong>모든 기울기를 한 번에 효율적으로 계산하는 방법</strong>임 (미분의 연쇄법칙 활용). 이 글에선 <strong>"backprop 돌리면 gradient가 나온다"</strong>만 알면 충분함. 더 궁금하면 <a href="L04-dnns.html#s11">Lecture 4-5</a>.</p>
+  <p>6100만 개 기울기를 하나하나 따로 재면 영원히 걸림. <strong>backpropagation(backprop, 역전파)</strong>은 출력 쪽부터 입력 쪽으로 거꾸로 훑으면서 <strong>모든 기울기를 한 번에 효율적으로 계산하는 방법</strong>임 (미분의 연쇄법칙 활용). 이 글에선 <strong>"backprop 돌리면 gradient가 나온다"</strong>만 알면 충분함. 더 궁금하면 <a href="../lectures/L04-dnns.html#s11">Lecture 4-5</a>.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ B4 -->
@@ -905,7 +905,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <p>한 iteration이 어떻게 도는지 보자. 논문 Figure 1이 이거임.</p>
   <figure class="paperfig">
-    <img src="img/pr2/tg-fig1.png" alt="TernGrad 논문 Figure 1: parameter server와 worker 1..N 사이 gradient 화살표" loading="lazy" style="max-width:380px">
+    <img src="../assets/img/pr2/tg-fig1.png" alt="TernGrad 논문 Figure 1: parameter server와 worker 1..N 사이 gradient 화살표" loading="lazy" style="max-width:380px">
     <figcaption><span class="src">원문 캡처 · TernGrad Figure 1 · Wen et al., NIPS 2017, 3쪽</span> 주황 화살표가 worker가 올려보내는 gradient <span class="m"><i>g</i><sub><i>t</i></sub><sup>(<i>i</i>)</sup></span>, 파란 화살표가 server가 내려주는 평균 <span class="m"><i>ḡ</i><sub><i>t</i></sub></span>. worker 박스 안의 작은 식이 각자 하는 갱신 <span class="m"><i>w</i><sub><i>t</i>+1</sub> ← <i>w</i><sub><i>t</i></sub> − <i>ḡ</i><sub><i>t</i></sub></span>.</figcaption>
   </figure>
 
@@ -997,7 +997,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
   </div>
 
   <div class="callout">
-    <strong>강의 연결.</strong> <a href="L04-dnns.html#s8">Lecture 4-5의 memory-bound vs compute-bound</a>랑 똑같은 구도임. 거기선 칩 안에서 "DRAM에서 가져오는 속도 vs 연산 속도"였고, 여기선 칩 밖에서 <strong>"네트워크로 보내는 속도 vs GPU 연산 속도"</strong>임. 층만 바뀌었지 <strong>"데이터 옮기는 게 연산보다 비싸다"</strong>는 결론은 같음.
+    <strong>강의 연결.</strong> <a href="../lectures/L04-dnns.html#s8">Lecture 4-5의 memory-bound vs compute-bound</a>랑 똑같은 구도임. 거기선 칩 안에서 "DRAM에서 가져오는 속도 vs 연산 속도"였고, 여기선 칩 밖에서 <strong>"네트워크로 보내는 속도 vs GPU 연산 속도"</strong>임. 층만 바뀌었지 <strong>"데이터 옮기는 게 연산보다 비싸다"</strong>는 결론은 같음.
   </div>
 </section>
 
@@ -1125,7 +1125,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>Algorithm 1: 한 iteration 전체</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-alg1.png" alt="TernGrad 논문 Algorithm 1: worker 6단계와 server 1단계" loading="lazy" style="max-width:460px">
+    <img src="../assets/img/pr2/tg-alg1.png" alt="TernGrad 논문 Algorithm 1: worker 6단계와 server 1단계" loading="lazy" style="max-width:460px">
     <figcaption><span class="src">원문 캡처 · TernGrad Algorithm 1 · Wen et al., NIPS 2017, 3쪽</span> 원문 그대로. 아래 코드 블록은 이걸 줄마다 주석 달아서 옮긴 것.</figcaption>
   </figure>
 
@@ -1317,7 +1317,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>Figure 2 읽는 법</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-fig2.png" alt="TernGrad 논문 Figure 2: conv와 fc layer gradient 히스토그램 네 단계" loading="lazy">
+    <img src="../assets/img/pr2/tg-fig2.png" alt="TernGrad 논문 Figure 2: conv와 fc layer gradient 히스토그램 네 단계" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Figure 2 · Wen et al., NIPS 2017, 5쪽</span> 아래 표에서 패널 (a)~(d)를 하나씩 풀어줌. 윗줄 conv, 아랫줄 fc. 가로축 눈금 범위가 (a)에서 (b)로 가면서 확 줄어드는 걸 먼저 보셈.</figcaption>
   </figure>
 
@@ -1358,7 +1358,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>LeNet on MNIST (Figure 3)</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-fig3.png" alt="TernGrad 논문 Figure 3: worker 수에 따른 LeNet 정확도, momentum SGD와 vanilla SGD" loading="lazy">
+    <img src="../assets/img/pr2/tg-fig3.png" alt="TernGrad 논문 Figure 3: worker 수에 따른 LeNet 정확도, momentum SGD와 vanilla SGD" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Figure 3 · Wen et al., NIPS 2017, 6쪽</span> 세로축이 98%에서 시작한다는 거 주의. 선이 꽤 출렁여 보여도 실제 차이는 0.2%포인트 안쪽임.</figcaption>
   </figure>
 
@@ -1372,7 +1372,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>CifarNet on CIFAR-10 (Table 1)</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-tab1.png" alt="TernGrad 논문 Table 1: CifarNet 결과" loading="lazy">
+    <img src="../assets/img/pr2/tg-tab1.png" alt="TernGrad 논문 Table 1: CifarNet 결과" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Table 1 · Wen et al., NIPS 2017, 7쪽</span> 아래에 같은 숫자를 다시 옮겨둠.</figcaption>
   </figure>
 
@@ -1428,7 +1428,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>AlexNet 결과 (Table 2)</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-tab2.png" alt="TernGrad 논문 Table 2: AlexNet 정확도 비교" loading="lazy">
+    <img src="../assets/img/pr2/tg-tab2.png" alt="TernGrad 논문 Table 2: AlexNet 정확도 비교" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Table 2 · Wen et al., NIPS 2017, 8쪽</span> 굵은 두 숫자(56.62%, 57.54%)가 논문이 강조한 batch 1024 비교. 각주의 † DR = dropout 비율, ‡ noclip = clipping 뺀 것.</figcaption>
   </figure>
 
@@ -1455,7 +1455,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>Figure 4 (AlexNet, 4 workers, batch 512)</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-fig4.png" alt="TernGrad 논문 Figure 4: AlexNet top-1 정확도, training loss, fc6 gradient sparsity vs iteration" loading="lazy">
+    <img src="../assets/img/pr2/tg-fig4.png" alt="TernGrad 논문 Figure 4: AlexNet top-1 정확도, training loss, fc6 gradient sparsity vs iteration" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Figure 4 · Wen et al., NIPS 2017, 8쪽</span> 가로축은 전부 iteration(시간 아님). (c)는 TernGrad 줄만 있음. 0으로 뭉개진 비율이라 baseline엔 해당 없음.</figcaption>
   </figure>
 
@@ -1468,7 +1468,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>GoogLeNet 결과 (Table 3, top-5)</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-tab3.png" alt="TernGrad 논문 Table 3: GoogLeNet top-5 정확도 비교" loading="lazy">
+    <img src="../assets/img/pr2/tg-tab3.png" alt="TernGrad 논문 Table 3: GoogLeNet top-5 정확도 비교" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Table 3 · Wen et al., NIPS 2017, 8쪽</span> top-1 열이 없고 top-5만 있음. weight decay와 DR 둘 다 TernGrad 줄에서 바뀌어 있음.</figcaption>
   </figure>
 
@@ -1508,7 +1508,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>Figure 5 읽는 법</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tg-fig5.png" alt="TernGrad 논문 Figure 5: 두 GPU 클러스터에서 GPU 수별 학습 throughput 막대그래프" loading="lazy">
+    <img src="../assets/img/pr2/tg-fig5.png" alt="TernGrad 논문 Figure 5: 두 GPU 클러스터에서 GPU 수별 학습 throughput 막대그래프" loading="lazy">
     <figcaption><span class="src">원문 캡처 · TernGrad Figure 5 · Wen et al., NIPS 2017, 9쪽</span> 왼쪽 (a) 싼 클러스터, 오른쪽 (b) 비싼 클러스터. 각 그래프 안의 확대 박스가 GPU 1~16개 구간을 키운 것 (눈금이 따로 있음, 박스 안 4000과 바깥 100000을 헷갈리지 말 것). 옅은 무늬 막대가 TernGrad, 진한 막대가 FP32.</figcaption>
   </figure>
 
@@ -1539,7 +1539,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
   </div>
 
   <div class="callout">
-    <strong>(보충) 왜 AlexNet과 VggNet-A가 이득이 큰가를 강의 언어로.</strong> <a href="L04-dnns.html#s13">Lecture 4-5</a>에서 본 대로 AlexNet은 <strong>시간은 conv가, parameter는 FC가</strong> 먹음. gradient 크기는 parameter 수에 비례하니까, FC가 큰 모델은 <strong>계산은 적은데 보낼 gradient는 많음</strong> = 통신/계산 비율이 큼. GoogLeNet은 FC를 거의 없애서 parameter가 적음. 그래서 애초에 통신이 덜 문제라 TernGrad로 얻을 게 적음. Figure 4(c)에서 굳이 <strong>fc6</strong>의 sparsity를 보여준 것도 같은 맥락으로 읽힘.
+    <strong>(보충) 왜 AlexNet과 VggNet-A가 이득이 큰가를 강의 언어로.</strong> <a href="../lectures/L04-dnns.html#s13">Lecture 4-5</a>에서 본 대로 AlexNet은 <strong>시간은 conv가, parameter는 FC가</strong> 먹음. gradient 크기는 parameter 수에 비례하니까, FC가 큰 모델은 <strong>계산은 적은데 보낼 gradient는 많음</strong> = 통신/계산 비율이 큼. GoogLeNet은 FC를 거의 없애서 parameter가 적음. 그래서 애초에 통신이 덜 문제라 TernGrad로 얻을 게 적음. Figure 4(c)에서 굳이 <strong>fc6</strong>의 sparsity를 보여준 것도 같은 맥락으로 읽힘.
   </div>
 </section>
 
@@ -1670,7 +1670,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
   </ul>
 
   <div class="callout">
-    <strong>하드웨어 관점 번역 (보충).</strong> GPU는 수천 개 연산기를 <strong>동시에</strong> 돌려야 제값을 함. RNN은 한 스텝에서 하는 일이 "d차원 벡터 × d×d 행렬" 하나뿐이라 연산기 대부분이 놀고, 다음 스텝은 이번 스텝 끝나야 시작함. 연산기를 채울 방법이 batch를 키우는 것뿐인데 그건 메모리가 막음. <strong>알고리즘의 데이터 의존성이 하드웨어 활용률의 상한을 정하는 전형적인 예</strong>임. <a href="L04-dnns.html#s7">Lecture 4-5의 DNN 계산 관점</a>에서 본 "데이터 의존성" 얘기가 바로 이거.
+    <strong>하드웨어 관점 번역 (보충).</strong> GPU는 수천 개 연산기를 <strong>동시에</strong> 돌려야 제값을 함. RNN은 한 스텝에서 하는 일이 "d차원 벡터 × d×d 행렬" 하나뿐이라 연산기 대부분이 놀고, 다음 스텝은 이번 스텝 끝나야 시작함. 연산기를 채울 방법이 batch를 키우는 것뿐인데 그건 메모리가 막음. <strong>알고리즘의 데이터 의존성이 하드웨어 활용률의 상한을 정하는 전형적인 예</strong>임. <a href="../lectures/L04-dnns.html#s7">Lecture 4-5의 DNN 계산 관점</a>에서 본 "데이터 의존성" 얘기가 바로 이거.
   </div>
 
   <h3>attention은 원래 RNN의 보조였음</h3>
@@ -1713,7 +1713,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   
   <figure class="paperfig">
-    <img src="img/pr2/tf-fig1.png" alt="Transformer 논문 Figure 1: 왼쪽 encoder, 오른쪽 decoder 구조도" loading="lazy" style="max-width:430px">
+    <img src="../assets/img/pr2/tf-fig1.png" alt="Transformer 논문 Figure 1: 왼쪽 encoder, 오른쪽 decoder 구조도" loading="lazy" style="max-width:430px">
     <figcaption><span class="src">원문 캡처 · Transformer Figure 1 · Vaswani et al., NIPS 2017, 3쪽</span> 인터넷에서 제일 많이 본 그 그림. 왼쪽 회색 상자가 encoder 한 층, 오른쪽이 decoder 한 층이고 옆의 N×가 그걸 N번(=6) 쌓는다는 뜻. 상자 옆으로 돌아가는 화살표가 residual 연결. 아래 그림은 이걸 핑프용으로 단순화한 것.</figcaption>
   </figure>
 <figure>
@@ -1812,7 +1812,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   
   <figure class="paperfig">
-    <img src="img/pr2/tf-fig2.png" alt="Transformer 논문 Figure 2: 왼쪽 scaled dot-product attention, 오른쪽 multi-head attention" loading="lazy">
+    <img src="../assets/img/pr2/tf-fig2.png" alt="Transformer 논문 Figure 2: 왼쪽 scaled dot-product attention, 오른쪽 multi-head attention" loading="lazy">
     <figcaption><span class="src">원문 캡처 · Transformer Figure 2 · Vaswani et al., NIPS 2017, 4쪽</span> 왼쪽: 아래에서 위로 MatMul(QKᵀ) → Scale(÷√d<sub>k</sub>) → Mask(선택) → SoftMax → MatMul(×V). 식 (1)을 그림으로 그린 것. 오른쪽: 그걸 h개 겹쳐 돌리고 Concat → Linear. 오른쪽은 <a href="#s15">15</a>에서 설명함.</figcaption>
   </figure>
 <h3>식 (1)</h3>
@@ -2019,7 +2019,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   <h3>Table 1 한 칸씩 풀기</h3>
   <figure class="paperfig">
-    <img src="img/pr2/tf-tab1.png" alt="Transformer 논문 Table 1: layer 종류별 복잡도, 순차 연산, 최대 경로 길이" loading="lazy">
+    <img src="../assets/img/pr2/tf-tab1.png" alt="Transformer 논문 Table 1: layer 종류별 복잡도, 순차 연산, 최대 경로 길이" loading="lazy">
     <figcaption><span class="src">원문 캡처 · Transformer Table 1 · Vaswani et al., NIPS 2017, 6쪽</span> 아래에서 같은 표를 한 줄씩 풀어줌.</figcaption>
   </figure>
 
@@ -2158,7 +2158,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   
   <figure class="paperfig">
-    <img src="img/pr2/tf-tab2.png" alt="Transformer 논문 Table 2: BLEU와 학습 FLOPs 비교" loading="lazy">
+    <img src="../assets/img/pr2/tf-tab2.png" alt="Transformer 논문 Table 2: BLEU와 학습 FLOPs 비교" loading="lazy">
     <figcaption><span class="src">원문 캡처 · Transformer Table 2 · Vaswani et al., NIPS 2017, 8쪽</span> 가운데 가로줄 위가 단일 모델, 아래 세 줄이 앙상블, 굵은 선 아래가 Transformer. 굵은 글씨가 열마다 최고값인데 EN-FR은 41.29(앙상블)와 41.0(단일)이 둘 다 굵음.</figcaption>
   </figure>
 <h3>논문이 주장하는 것</h3>
@@ -2191,7 +2191,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
       <div class="body">
         <p><strong>base</strong>: 12 h = 43,200 s. <span class="m">43,200 × 8 × 9.5·10<sup>12</sup> = 3.28·10<sup>18</sup></span> → 표의 <strong>3.3·10<sup>18</sup></strong> ✓</p>
         <p><strong>big</strong>: 3.5 d = 302,400 s. <span class="m">302,400 × 8 × 9.5·10<sup>12</sup> = 2.30·10<sup>19</sup></span> → 표의 <strong>2.3·10<sup>19</sup></strong> ✓</p>
-        <p>포인트: 이건 <strong>실제로 실행한 연산 수를 센 게 아니라</strong> "GPU가 그 시간 동안 풀가동했다면" 가정한 추정임. 다른 모델 줄도 같은 방식이면 GPU 종류와 시간으로 계산한 값이고. <a href="L04-dnns.html#s7">Lecture 4-5</a>에서 연산량을 FLOP <strong>개수</strong>로 셌던 것과 단위를 맞추려고, 여기선 FLOP/s(<strong>속도</strong>) × 시간으로 개수를 환산한 거임.</p>
+        <p>포인트: 이건 <strong>실제로 실행한 연산 수를 센 게 아니라</strong> "GPU가 그 시간 동안 풀가동했다면" 가정한 추정임. 다른 모델 줄도 같은 방식이면 GPU 종류와 시간으로 계산한 값이고. <a href="../lectures/L04-dnns.html#s7">Lecture 4-5</a>에서 연산량을 FLOP <strong>개수</strong>로 셌던 것과 단위를 맞추려고, 여기선 FLOP/s(<strong>속도</strong>) × 시간으로 개수를 환산한 거임.</p>
       </div>
     </details>
   </div>
@@ -2204,7 +2204,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
 
   
   <figure class="paperfig">
-    <img src="img/pr2/tf-tab3.png" alt="Transformer 논문 Table 3: Transformer 구조 변형별 perplexity, BLEU, parameter 수" loading="lazy">
+    <img src="../assets/img/pr2/tf-tab3.png" alt="Transformer 논문 Table 3: Transformer 구조 변형별 perplexity, BLEU, parameter 수" loading="lazy">
     <figcaption><span class="src">원문 캡처 · Transformer Table 3 · Vaswani et al., NIPS 2017, 9쪽</span> 빈칸 = base와 같은 값. 줄 묶음 (A)~(E)가 각각 한 가지 부품만 바꾼 실험. 아래에 같은 표를 옮기면서 칸을 채워둠.</figcaption>
   </figure>
 <p>조건: 영→독 <strong>개발셋 newstest2013</strong>. beam search는 위와 같지만 <strong>checkpoint averaging 없음</strong>. 표에 안 적힌 값은 base와 같음. perplexity(PPL)는 <strong>word-piece 단위</strong>라 단어 단위 perplexity랑 비교하면 안 됨.</p>
@@ -2277,7 +2277,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
     <li>향후: 텍스트 말고 <strong>이미지, 오디오, 비디오</strong> 같은 다른 입출력으로 확장. 큰 입출력을 효율적으로 다루는 <strong>local, restricted attention</strong> 연구. 그리고 <strong>생성을 덜 순차적으로 만들기</strong></li>
   </ul>
   <div class="callout">
-    <strong>마지막 향후 과제에 주목.</strong> Transformer가 병렬화한 건 <strong>학습</strong>임. 학습 땐 정답 문장을 통째로 넣고 mask로 가리면 되니까 모든 위치를 동시에 계산함. 근데 <strong>실제로 번역을 생성할 때</strong>(inference)는 여전히 auto-regressive라서 <strong>한 토큰씩 순서대로</strong> 만들어야 함. 논문이 이걸 스스로 남은 숙제로 적어둠. <a href="L04-dnns.html#s5">Lecture 4-5의 training vs inference</a> 구분이 여기서 그대로 살아남.
+    <strong>마지막 향후 과제에 주목.</strong> Transformer가 병렬화한 건 <strong>학습</strong>임. 학습 땐 정답 문장을 통째로 넣고 mask로 가리면 되니까 모든 위치를 동시에 계산함. 근데 <strong>실제로 번역을 생성할 때</strong>(inference)는 여전히 auto-regressive라서 <strong>한 토큰씩 순서대로</strong> 만들어야 함. 논문이 이걸 스스로 남은 숙제로 적어둠. <a href="../lectures/L04-dnns.html#s5">Lecture 4-5의 training vs inference</a> 구분이 여기서 그대로 살아남.
   </div>
 </section>
 
@@ -2302,7 +2302,7 @@ figcaption .src{font-family:var(--mono);font-size:11px;letter-spacing:.04em;colo
   </table>
 
   <div class="callout">
-    <strong>이 수업 전체의 한 줄과 연결.</strong> 이 과목은 결국 <strong>"연산보다 데이터 이동이 비싸다"</strong>로 수렴함. TernGrad는 그걸 <strong>칩 밖(네트워크)</strong>에서 정면으로 다룬 논문이고, Transformer는 연산을 <strong>GPU가 좋아하는 모양(큰 행렬곱)</strong>으로 바꾼 대신 <strong>n×n이라는 새로운 데이터 덩어리</strong>를 만든 논문임. 둘 다 <a href="L04-dnns.html#s8">memory-bound vs compute-bound</a> 틀로 다시 읽을 수 있음.
+    <strong>이 수업 전체의 한 줄과 연결.</strong> 이 과목은 결국 <strong>"연산보다 데이터 이동이 비싸다"</strong>로 수렴함. TernGrad는 그걸 <strong>칩 밖(네트워크)</strong>에서 정면으로 다룬 논문이고, Transformer는 연산을 <strong>GPU가 좋아하는 모양(큰 행렬곱)</strong>으로 바꾼 대신 <strong>n×n이라는 새로운 데이터 덩어리</strong>를 만든 논문임. 둘 다 <a href="../lectures/L04-dnns.html#s8">memory-bound vs compute-bound</a> 틀로 다시 읽을 수 있음.
   </div>
 
   <h3>핑프용: 이 두 논문이 지금 어디서 살아 있나</h3>

@@ -408,14 +408,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <span class="chip hot">turning convolution into GEMM</span>
     <span class="chip dim">the output-size formula is from ECE 479; the transforms are new</span>
   </div>
-  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
-  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+  <a class="backlink" href="../index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">← All lectures</a>
 </header>
 
 <nav class="toc">
   <div class="mini-head">
-    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
-    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <a class="back" href="../index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">← All lectures</a>
     <div class="mod">Lecture 6</div>
     <div class="name">DNN Kernel Computation</div>
     <div class="rule"></div>
@@ -1608,10 +1608,10 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <p lang="ko">41쪽은 40쪽 아래 그림을 왼쪽에 작게 두고, 회색 화살표 <em>Read this</em>로 오른쪽을 가리킨다. 가운데 빨간 제목 <strong>Scaled Dot Product Attention</strong>과 식 <span class="m">softmax(<i>QK</i><sup>T</sup>/√<i>d<sub>k</sub></i>)<i>V</i></span>, 그 아래 블록도 <strong>MatMul(Q, K) → Scale → Mask (opt.) → SoftMax → MatMul(·, V)</strong>. 오른쪽 끝은 <em>Attention Is All You Need</em>의 Transformer 전체 구조도(왼쪽 encoder 스택, 오른쪽 decoder 스택, 각각 Multi-Head Attention, Add &amp; Norm, Feed Forward, 아래에 Positional Encoding, 맨 위 Linear와 Softmax)다.</p>
   <p lang="en">Page 41 shrinks page 40's bottom figure to the left and points a grey <em>read this</em> arrow to the right: a red heading <strong>scaled dot product attention</strong> with <span class="m">softmax(<i>QK</i><sup>T</sup>/√<i>d<sub>k</sub></i>)<i>V</i></span>, and below it the block chain <strong>MatMul(Q, K) → Scale → Mask (opt.) → SoftMax → MatMul(·, V)</strong>. On the far right is the full Transformer diagram from <em>Attention Is All You Need</em>: encoder stack left, decoder stack right, each with multi-head attention, add &amp; norm and feed forward, positional encoding below, linear and softmax on top.</p>
   <div class="callout" lang="ko">
-    <strong><em>Read this</em>는 <a href="PR2-terngrad-and-transformer.html">Paper Reading 2</a>에서 이미 읽은 그 논문이다.</strong> ECE 479 Lec21에서 attention, <span class="m">√<i>d<sub>k</sub></i></span>, multi-head도 이미 봤다. 이 강의의 관점에서 새로 볼 것 하나. 블록도의 <strong>MatMul이 둘</strong>이고, 둘 다 <strong>weight가 아니라 activation끼리의 곱셈</strong>이다. <span class="m"><i>Q</i></span>, <span class="m"><i>K</i></span>, <span class="m"><i>V</i></span>는 입력에서 방금 계산된 값이다. <strong>conv나 FC처럼 "weight를 미리 올려 두고 재사용"하는 전략이 이 두 곱셈에는 통하지 않는다</strong>. 그리고 그 크기가 문장 길이의 제곱으로 자란다. Transformer 가속이 CNN 가속과 다른 문제가 되는 이유가 이 블록도 한 장에 들어 있다.
+    <strong><em>Read this</em>는 <a href="../readings/PR2-terngrad-and-transformer.html">Paper Reading 2</a>에서 이미 읽은 그 논문이다.</strong> ECE 479 Lec21에서 attention, <span class="m">√<i>d<sub>k</sub></i></span>, multi-head도 이미 봤다. 이 강의의 관점에서 새로 볼 것 하나. 블록도의 <strong>MatMul이 둘</strong>이고, 둘 다 <strong>weight가 아니라 activation끼리의 곱셈</strong>이다. <span class="m"><i>Q</i></span>, <span class="m"><i>K</i></span>, <span class="m"><i>V</i></span>는 입력에서 방금 계산된 값이다. <strong>conv나 FC처럼 "weight를 미리 올려 두고 재사용"하는 전략이 이 두 곱셈에는 통하지 않는다</strong>. 그리고 그 크기가 문장 길이의 제곱으로 자란다. Transformer 가속이 CNN 가속과 다른 문제가 되는 이유가 이 블록도 한 장에 들어 있다.
   </div>
   <div class="callout" lang="en">
-    <strong><em>Read this</em> is the paper you already read for <a href="PR2-terngrad-and-transformer.html">paper reading 2</a>.</strong> Attention, <span class="m">√<i>d<sub>k</sub></i></span> and multi-head are also familiar from ECE 479 lecture 21. One thing is new from this lecture's angle: the block diagram has <strong>two MatMuls</strong>, and both multiply <strong>activations by activations, not by weights.</strong> <span class="m"><i>Q</i></span>, <span class="m"><i>K</i></span> and <span class="m"><i>V</i></span> were just computed from the input. <strong>The conv and FC strategy of "load the weights once and reuse them" doesn't apply to these two multiplies</strong>, and their size grows with the square of the sequence length. Why accelerating Transformers is a different problem from accelerating CNNs is all in this one diagram.
+    <strong><em>Read this</em> is the paper you already read for <a href="../readings/PR2-terngrad-and-transformer.html">paper reading 2</a>.</strong> Attention, <span class="m">√<i>d<sub>k</sub></i></span> and multi-head are also familiar from ECE 479 lecture 21. One thing is new from this lecture's angle: the block diagram has <strong>two MatMuls</strong>, and both multiply <strong>activations by activations, not by weights.</strong> <span class="m"><i>Q</i></span>, <span class="m"><i>K</i></span> and <span class="m"><i>V</i></span> were just computed from the input. <strong>The conv and FC strategy of "load the weights once and reuse them" doesn't apply to these two multiplies</strong>, and their size grows with the square of the sequence length. Why accelerating Transformers is a different problem from accelerating CNNs is all in this one diagram.
   </div>
 
   <h3 data-slide="42"><span lang="ko">Compound CNN Layers: 넓게-좁게-넓게 vs 좁게-넓게-좁게</span><span lang="en">Compound CNN layers: wide-narrow-wide vs narrow-wide-narrow</span></h3>
@@ -1889,7 +1889,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   }, { threshold: 0 }).observe(title);
 })();
 </script>
-<script src="reader.js" type="module"></script>
+<script src="../assets/reader.js" type="module"></script>
 <button class="lang-btn" type="button">English</button>
 <button class="theme-btn" type="button">☾ 다크</button>
 <script>

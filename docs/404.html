@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · 페이지 이동</title>
+<script>
+// 2026-10-30에 노트를 lectures/, readings/ 로 옮겼다. 예전 주소(루트의 L07-….html, PR1-….html)로 들어오면 새 주소로 보낸다.
+(function () {
+  var m = location.pathname.match(/^(.*\/)((L|PR)\d+-[^\/]+\.html)$/);
+  if (!m) return;
+  var dir = m[3] === 'L' ? 'lectures/' : 'readings/';
+  if (m[1].slice(-dir.length) === dir) return;
+  location.replace(m[1] + dir + m[2] + location.hash);
+})();
+</script>
+<style>
+body { font: 16px/1.6 system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; background: #fff; }
+@media (prefers-color-scheme: dark) { body { color: #e8e8e8; background: #141414; } a { color: #8ab4ff; } }
+</style>
+</head>
+<body>
+<h1>페이지를 찾을 수 없습니다</h1>
+<p>주소가 바뀌었을 수 있습니다. <a href="/asu-eee-598-ahsml-fa26-notes/">목차로 가기</a></p>
+</body>
+</html>

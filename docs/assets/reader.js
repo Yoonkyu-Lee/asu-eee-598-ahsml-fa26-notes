@@ -66,12 +66,13 @@ function teardown() {
   }
 }
 
-// 노트 파일명에서 슬라이드 경로를 만든다. L02-probability-space.html → slides/L02-probability-space.pdf
+// 노트 파일명에서 슬라이드 경로를 만든다. lectures/L02-probability-space.html → slides/L02-probability-space.pdf
+// 노트는 lectures/ 아래, 이 스크립트는 assets/ 아래에 있으므로 슬라이드 경로는 스크립트 기준으로 잡는다.
 function pdfUrl() {
   const name = location.pathname.split('/').pop() || '';
   const stem = name.replace(/\.html?$/i, '');
   if (!/^L\d+-/.test(stem)) return null;
-  return `slides/${stem}.pdf`;
+  return new URL(`../slides/${stem}.pdf`, import.meta.url).href;
 }
 
 function css(href) {
