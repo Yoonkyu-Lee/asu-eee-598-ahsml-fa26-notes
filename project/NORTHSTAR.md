@@ -26,7 +26,7 @@
 1. **운영자 서비스 대신하기 → ML**: 검색(임베딩 + top-k), 피드·추천 랭킹, 스팸·봇 판별을 각 기기·홈 노드가 한다.
 2. **드러내지 않고 증명하기 → crypto**: 서명 검증, 복호화, 익명 자격·영지식 증명, 그룹 암호화.
 
-사업 모델(가설): 참여에 필요한 컴퓨트를 주는 하드웨어(홈 노드 박스, eGPU 같은 것)를 판다.
+사업 모델(가설): 참여에 필요한 컴퓨트를 주는 하드웨어를 판다. **대상 기기는 상시 켜진 홈 노드 박스** (공유기·NAS처럼 24시간 켜 두는 기기). 2026-10-31 결정: CP5에서 노트북의 NPU·iGPU가 이미 수집 시간 목표를 지켜서, 하드웨어의 몫은 상시 총전력(유휴 + 작업), ML과 암호의 공존, 스팸이 몰릴 때의 수집에서 찾는다.
 
 ## 4. 바꾸면 안 되는 것 (불변식)
 
@@ -43,7 +43,7 @@
 
 ## 6. EEE 598에서의 몫
 
-- 수업은 **ML(과 교수님이 허락한 crypto)을 위한 하드웨어·시스템.** 기여는 하드웨어·시스템 쪽이어야 한다. 프로토콜 전체를 만드는 게 아니다.
+- 수업은 **ML을 위한 하드웨어·시스템**이지만, 교수님 확인으로 **crypto도 똑같이 범위 안**이다 (ML에만 한정할 필요 없음). 기여는 하드웨어·시스템 쪽이어야 한다. 프로토콜 전체를 만드는 게 아니다.
 - 공식: 워크로드 **W**(server-blind가 만드는 일) → 기존 하드웨어가 비효율적인 성질 **P** → P를 이용하는 구조 **M** → 공정한 평가.
 - **메인 워크로드는 측정으로 정한다.** (CP1: 수집 경로는 인코더가 약 98%, Ed25519+ChaCha20은 0.5%. 쿼리 경로는 싸다.)
 - 공정한 비교 규칙: 같은 Recall(목표 Recall@10 ≥ 0.95, FP32 정확 검색 기준), 같은 자원(PE·SRAM·대역폭·정밀도), 한 번에 한 요소만 바꾸는 ablation, P99 지연, 새 게시물 5초 안 검색 가능(P99).
@@ -65,4 +65,4 @@
 - 범용 "엣지 벡터 검색 가속기"도 아니다. 그건 이미 있다 (CP0: RoCR, IKS 등). 우리 차별점은 server-blind가 만드는 조건(수집 마감, 검색 중 삽입, 암호와 ML의 공존, 오프라인 후 밀린 수집)이다.
 
 ---
-English, for teammates and reviewers: *Replace the operator with compute on users' own devices, so a community can be operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. Our course contribution is hardware that makes that compute cheap. Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest. The main workload is chosen by measurement, and every design is compared at equal recall and equal resources.*
+English, for teammates and reviewers: *Replace the operator with compute on users' own devices, so a community can be operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. Our course contribution is hardware that makes that compute cheap, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest. The main workload is chosen by measurement, and every design is compared at equal recall and equal resources.*

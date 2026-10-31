@@ -46,3 +46,5 @@ __pycache__/
 # onnxruntime 양자화 전처리가 실행 위치에 남기는 임시 파일 (모델 가중치 90 MB)
 project/*.data
 project/*.onnx
+# CP6 Rust 벤치 빌드 산출물
+project/src/crypto_bench/target/

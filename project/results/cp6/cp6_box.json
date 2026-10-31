@@ -1,0 +1,111 @@
+{
+  "assumptions": {
+    "posts_per_day": 1000000,
+    "msg_bytes": 1024,
+    "links_mbps": [
+      10,
+      100
+    ]
+  },
+  "ordinary_day": {
+    "posts_per_s": 11.574074074074074,
+    "per_encoder": {
+      "LP-E core INT8 (CP4, 측정)": {
+        "encoder_J": 0.05391875889200031,
+        "crypto_J": 0.007887841001211744,
+        "avg_active_W": 0.7153541654306951,
+        "crypto_share": 0.12762133841434675
+      },
+      "laptop NPU, per-head mask (CP5, 측정)": {
+        "encoder_J": 0.0794879699213819,
+        "crypto_J": 0.007887841001211744,
+        "avg_active_W": 1.0112941079003894,
+        "crypto_share": 0.09027488177705834
+      },
+      "Hailo-8L batch 1 (출처 속도 x 비전 모델 전력, 추정)": {
+        "encoder_J": 0.016,
+        "crypto_J": 0.007887841001211744,
+        "avg_active_W": 0.27647964121772856,
+        "crypto_share": 0.3302031774580056
+      },
+      "design 16x16 INT8 (CP4 모델, 추정)": {
+        "encoder_J": 0.0086,
+        "crypto_J": 0.007887841001211744,
+        "avg_active_W": 0.19083149306958036,
+        "crypto_share": 0.47840350963064493
+      }
+    },
+    "box_idle_W": {
+      "Raspberry Pi 5 idle (출처, cp6_survey.md)": [
+        2.4,
+        3.3
+      ],
+      "2-bay NAS, disks asleep (출처)": [
+        4.41,
+        4.41
+      ]
+    }
+  },
+  "spam_flood": {
+    "10Mbps": {
+      "msgs_per_s": 1220.703125,
+      "verifiers": {
+        "P-core, one by one": {
+          "us_per_proof": 1387.5,
+          "cores_needed": 1.6937255859375,
+          "active_W": 18.148320943803313,
+          "active_mJ_per_proof": 14.867104517163673
+        },
+        "P-core, batch of 64": {
+          "us_per_proof": 354.021875,
+          "cores_needed": 0.4321556091308594,
+          "active_W": 4.630560438650104,
+          "active_mJ_per_proof": 3.7933551113421653
+        },
+        "LP-E core, one by one": {
+          "us_per_proof": 3500.0,
+          "cores_needed": 4.2724609375,
+          "active_W": 9.390212437920418,
+          "active_mJ_per_proof": 7.692462029144407
+        },
+        "LP-E core, batch of 64": {
+          "us_per_proof": 901.4796875000001,
+          "cores_needed": 1.1004390716552734,
+          "active_W": 2.4185959354557465,
+          "active_mJ_per_proof": 1.9813137903253475
+        }
+      },
+      "mJ_per_proof_for_2W": 1.6383999999999999
+    },
+    "100Mbps": {
+      "msgs_per_s": 12207.03125,
+      "verifiers": {
+        "P-core, one by one": {
+          "us_per_proof": 1387.5,
+          "cores_needed": 16.937255859375,
+          "active_W": 181.48320943803313,
+          "active_mJ_per_proof": 14.867104517163673
+        },
+        "P-core, batch of 64": {
+          "us_per_proof": 354.021875,
+          "cores_needed": 4.321556091308594,
+          "active_W": 46.30560438650104,
+          "active_mJ_per_proof": 3.7933551113421653
+        },
+        "LP-E core, one by one": {
+          "us_per_proof": 3500.0,
+          "cores_needed": 42.724609375,
+          "active_W": 93.90212437920418,
+          "active_mJ_per_proof": 7.692462029144407
+        },
+        "LP-E core, batch of 64": {
+          "us_per_proof": 901.4796875000001,
+          "cores_needed": 11.004390716552734,
+          "active_W": 24.185959354557465,
+          "active_mJ_per_proof": 1.9813137903253475
+        }
+      },
+      "mJ_per_proof_for_2W": 0.16384
+    }
+  }
+}
