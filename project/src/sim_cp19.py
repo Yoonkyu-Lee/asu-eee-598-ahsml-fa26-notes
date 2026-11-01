@@ -318,7 +318,7 @@ class Box:
                 job["layers"] = 6
             else:
                 job["s"], job["J"] = self.et.img
-                job["layers"] = 12
+                job["layers"] = getattr(self.et, "img_chunks", 12)     # yield points per image (12 = layers)
         if job["cls"] == 2:
             self.backlog_left += 1
         if self.sched == "Q0":
@@ -348,7 +348,8 @@ class Box:
             b = min(self.B, self.et.bmax_img, len(self.pool_i))
             take = [self.pool_i.popleft() for _ in range(b)]
             s, J = self.et.imgs(b)
-            return {"kind": "image", "cls": 2, "members": take, "s": s, "J": J, "layers": 12}
+            return {"kind": "image", "cls": 2, "members": take, "s": s, "J": J,
+                    "layers": getattr(self.et, "img_chunks", 12)}
         return None
 
     def _e_next(self) -> None:
@@ -402,6 +403,7 @@ class Box:
                     self.backlog_left -= 1
                     if self.backlog_left == 0:
                         self.backlog_done = t1
+                        self.snap = (self.v_J, self.e_J, self.v_s, self.e_s, self.host_s)   # work up to catch-up
                 elif j["m"]["rec"]:
                     self.lat[job["kind"]][j["m"]["t_box"]] = t1 - j["m"]["t_box"]
                     if self.abort_s and t1 - j["m"]["t_box"] > self.abort_s:
@@ -471,8 +473,8 @@ def summary(box: Box, dur: float, a: float = -np.inf, b: float = np.inf) -> dict
 
 # ------------------------------------------------------------------ scenarios
 
-def s1_day(et, inp, lens, sched="Q2") -> dict:
-    box = Box(et, inp["cost"], sched=sched, seed=191)
+def s1_day(et, inp, lens, sched="Q2", make=None) -> dict:
+    box = (make or Box)(et, inp["cost"], sched=sched, seed=191)
     legit(box, inp, lens, 0, 86_400, lambda t: t // 3600, query_dt=60)
     box.run(86_400 + 600)
     r = summary(box, 86_400)
@@ -485,17 +487,17 @@ def s1_day(et, inp, lens, sched="Q2") -> dict:
     return r
 
 
-def s2_peak(et, inp, lens, sched) -> dict:
-    box = Box(et, inp["cost"], sched=sched, seed=192)
+def s2_peak(et, inp, lens, sched, make=None) -> dict:
+    box = (make or Box)(et, inp["cost"], sched=sched, seed=192)
     legit(box, inp, lens, 0, 3600, lambda t: 20, probe_dt=5, query_dt=5)
     box.run(3600 + 300)
     return summary(box, 3600)
 
 
-def s3_backlog(et, inp, lens, hours, sched, B, trace=None, live_first=True) -> dict:
+def s3_backlog(et, inp, lens, hours, sched, B, trace=None, live_first=True, make=None) -> dict:
     """Off for `hours` before 20:00; at t = 0 the box downloads what it missed (in creation order, 100 Mbps) and
     processes it at backlog priority while the peak hour's live traffic continues."""
-    box = Box(et, inp["cost"], sched=sched, backlog_B=B, seed=193, trace=trace, live_first=live_first)
+    box = (make or Box)(et, inp["cost"], sched=sched, backlog_B=B, seed=193, trace=trace, live_first=live_first)
     rng = np.random.default_rng(1930 + hours)
     missed = []
 
@@ -520,18 +522,21 @@ def s3_backlog(et, inp, lens, hours, sched, B, trace=None, live_first=True) -> d
     legit(box, inp, lens, 0, 4 * 3600, lambda t: 20, probe_dt=5, query_dt=5)
     box.run(4 * 3600 + 600)
     end = box.backlog_done or float("inf")
+    if getattr(box, "snap", None) and end < float("inf"):   # power and busy shares over the catch-up only
+        box.v_J, box.e_J, box.v_s, box.e_s, hs = box.snap
+        box.host_s = hs
     r = summary(box, min(end, 4 * 3600), 0.0, min(end, 4 * 3600))
     r.update({"hours": hours, "sched": sched, "B": B, "live_first": live_first, "missed_msgs": len(missed), "download_MB": nbytes / 1e6,
               "download_s": t_link, "catch_up_s": end, "catch_up_min": end / 60})
     return r
 
 
-def s4_flood(et, inp, lens, order, policy, mix, h_conn, seeds=3, dur=60.0, trace=None) -> dict:
+def s4_flood(et, inp, lens, order, policy, mix, h_conn, seeds=3, dur=60.0, trace=None, make=None) -> dict:
     """mix: 'invalid' (every flood proof is wrong) or 'replay' (CP14 worst mix: 15% wrong, 85% replayed valid)."""
     rows = []
     for s in range(seeds):
         vmode = "worst" if (mix == "replay" and order == "O-a") else "single"
-        box = Box(et, inp["cost"], order=order, sched="Q2", vmode=vmode, h_conn=h_conn if policy == "N-b" else 0.0,
+        box = (make or Box)(et, inp["cost"], order=order, sched="Q2", vmode=vmode, h_conn=h_conn if policy == "N-b" else 0.0,
                   seed=194 + s, trace=trace if s == 0 else None)
         rng = np.random.default_rng(1940 + s)
         n = rng.poisson(FLOOD_PER_S * dur)
@@ -553,9 +558,9 @@ def s4_flood(et, inp, lens, order, policy, mix, h_conn, seeds=3, dur=60.0, trace
     return r
 
 
-def s5_spam(et, inp, lens, K, per_id_s, dur=3600.0, seed=195) -> dict:
+def s5_spam(et, inp, lens, K, per_id_s, dur=3600.0, seed=195, make=None) -> dict:
     """K identities each sending image posts with a 256-token body at the limit (valid proofs)."""
-    box = Box(et, inp["cost"], sched="Q2", seed=seed, abort_s=60.0)
+    box = (make or Box)(et, inp["cost"], sched="Q2", seed=seed, abort_s=60.0)
     rng = np.random.default_rng(seed)
     n = rng.poisson(K * per_id_s * dur)
     for t in np.sort(rng.uniform(0, dur, n)):
@@ -567,7 +572,7 @@ def s5_spam(et, inp, lens, K, per_id_s, dur=3600.0, seed=195) -> dict:
     return r
 
 
-def k_crit(et, inp, lens, per_id_s) -> dict:
+def k_crit(et, inp, lens, per_id_s, make=None) -> dict:
     """Largest K with K1 held for an hour (bisection on K around the capacity estimate)."""
     s_spam = et.text1(256)[0] + et.img[0]
     d = inp["day"]
@@ -578,19 +583,19 @@ def k_crit(et, inp, lens, per_id_s) -> dict:
     ok = lambda r: (not r["aborted"]) and r["text_p99_s"] is not None and r["text_p99_s"] <= LIMITS["K1_text_box_s"]
     lo, hi = max(1, int(k0 / 4)), int(k0 * 2) + 2
     runs = {}
-    r = s5_spam(et, inp, lens, lo, per_id_s)
+    r = s5_spam(et, inp, lens, lo, per_id_s, make=make)
     runs[lo] = r
     if not ok(r):
         lo = 0
     while True:
-        r = s5_spam(et, inp, lens, hi, per_id_s)
+        r = s5_spam(et, inp, lens, hi, per_id_s, make=make)
         runs[hi] = r
         if not ok(r):
             break
         lo, hi = hi, hi * 2
     while hi - lo > max(1, int(0.02 * hi)):
         mid = (lo + hi) // 2
-        r = s5_spam(et, inp, lens, mid, per_id_s)
+        r = s5_spam(et, inp, lens, mid, per_id_s, make=make)
         runs[mid] = r
         lo, hi = (mid, hi) if ok(r) else (lo, mid)
     best = runs.get(lo)
