@@ -1,0 +1,729 @@
+{
+ "community": {
+  "n": 5,
+  "D": 2,
+  "seed": 21,
+  "ports": [
+   8601,
+   8602,
+   8603,
+   8604,
+   8605
+  ],
+  "holders": {
+   "0": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "1": [
+    0,
+    2,
+    4
+   ],
+   "2": [
+    1,
+    2,
+    3
+   ],
+   "3": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "mesh": {
+   "0": {
+    "0": [
+     1,
+     3,
+     4
+    ],
+    "1": [
+     0,
+     2
+    ],
+    "2": [
+     1,
+     3,
+     4
+    ],
+    "3": [
+     0,
+     2
+    ],
+    "4": [
+     0,
+     2
+    ]
+   },
+   "1": {
+    "0": [
+     2,
+     4
+    ],
+    "2": [
+     0,
+     4
+    ],
+    "4": [
+     0,
+     2
+    ]
+   },
+   "2": {
+    "1": [
+     2,
+     3
+    ],
+    "2": [
+     1,
+     3
+    ],
+    "3": [
+     1,
+     2
+    ]
+   },
+   "3": {
+    "0": [
+     2,
+     3
+    ],
+    "1": [
+     2,
+     3,
+     4
+    ],
+    "2": [
+     0,
+     1
+    ],
+    "3": [
+     0,
+     1,
+     4
+    ],
+    "4": [
+     1,
+     3
+    ]
+   }
+  }
+ },
+ "actions": 145,
+ "messages": 140,
+ "x2": {
+  "table": {
+   "0": {
+    "ed25519": [
+     138,
+     138
+    ],
+    "proof": [
+     137,
+     137
+    ],
+    "rln": [
+     137,
+     137
+    ],
+    "decrypt": [
+     133,
+     133
+    ],
+    "text": [
+     121,
+     121
+    ],
+    "image": [
+     104,
+     104
+    ],
+    "insert": [
+     225,
+     225
+    ],
+    "tally": [
+     10,
+     10
+    ],
+    "delete": [
+     2,
+     2
+    ],
+    "query": [
+     1,
+     1
+    ],
+    "send": [
+     288,
+     288
+    ],
+    "pull": [
+     141,
+     186
+    ],
+    "dup": [
+     110,
+     56
+    ]
+   },
+   "1": {
+    "ed25519": [
+     128,
+     128
+    ],
+    "proof": [
+     127,
+     127
+    ],
+    "rln": [
+     127,
+     127
+    ],
+    "decrypt": [
+     126,
+     126
+    ],
+    "text": [
+     117,
+     117
+    ],
+    "image": [
+     102,
+     102
+    ],
+    "insert": [
+     219,
+     219
+    ],
+    "tally": [
+     8,
+     8
+    ],
+    "delete": [
+     1,
+     1
+    ],
+    "query": [
+     1,
+     1
+    ],
+    "send": [
+     155,
+     155
+    ],
+    "pull": [
+     62,
+     83
+    ],
+    "dup": [
+     80,
+     53
+    ]
+   },
+   "2": {
+    "ed25519": [
+     141,
+     141
+    ],
+    "proof": [
+     140,
+     140
+    ],
+    "rln": [
+     140,
+     140
+    ],
+    "decrypt": [
+     136,
+     136
+    ],
+    "text": [
+     124,
+     124
+    ],
+    "image": [
+     104,
+     104
+    ],
+    "insert": [
+     228,
+     228
+    ],
+    "tally": [
+     10,
+     10
+    ],
+    "delete": [
+     2,
+     2
+    ],
+    "query": [
+     1,
+     1
+    ],
+    "send": [
+     290,
+     290
+    ],
+    "pull": [
+     107,
+     63
+    ],
+    "dup": [
+     153,
+     206
+    ]
+   },
+   "3": {
+    "ed25519": [
+     129,
+     129
+    ],
+    "proof": [
+     128,
+     128
+    ],
+    "rln": [
+     128,
+     128
+    ],
+    "decrypt": [
+     126,
+     126
+    ],
+    "text": [
+     117,
+     117
+    ],
+    "image": [
+     102,
+     102
+    ],
+    "insert": [
+     219,
+     219
+    ],
+    "tally": [
+     8,
+     8
+    ],
+    "delete": [
+     1,
+     1
+    ],
+    "query": [
+     1,
+     1
+    ],
+    "send": [
+     159,
+     159
+    ],
+    "pull": [
+     48,
+     40
+    ],
+    "dup": [
+     93,
+     100
+    ]
+   },
+   "4": {
+    "ed25519": [
+     135,
+     135
+    ],
+    "proof": [
+     134,
+     134
+    ],
+    "rln": [
+     134,
+     134
+    ],
+    "decrypt": [
+     133,
+     133
+    ],
+    "text": [
+     121,
+     121
+    ],
+    "image": [
+     104,
+     104
+    ],
+    "insert": [
+     225,
+     225
+    ],
+    "tally": [
+     10,
+     10
+    ],
+    "delete": [
+     2,
+     2
+    ],
+    "query": [
+     1,
+     1
+    ],
+    "send": [
+     161,
+     161
+    ],
+    "pull": [
+     54,
+     40
+    ],
+    "dup": [
+     88,
+     109
+    ]
+   }
+  },
+  "differences": [
+   [
+    0,
+    "pull",
+    141,
+    186
+   ],
+   [
+    0,
+    "dup",
+    110,
+    56
+   ],
+   [
+    1,
+    "pull",
+    62,
+    83
+   ],
+   [
+    1,
+    "dup",
+    80,
+    53
+   ],
+   [
+    2,
+    "pull",
+    107,
+    63
+   ],
+   [
+    2,
+    "dup",
+    153,
+    206
+   ],
+   [
+    3,
+    "pull",
+    48,
+    40
+   ],
+   [
+    3,
+    "dup",
+    93,
+    100
+   ],
+   [
+    4,
+    "pull",
+    54,
+    40
+   ],
+   [
+    4,
+    "dup",
+    88,
+    109
+   ]
+  ],
+  "pass": false,
+  "e1_slash_published": [
+   1,
+   0,
+   1,
+   0,
+   0
+  ]
+ },
+ "e1_wall_s": {
+  "max": 0.8118674755096436,
+  "mean": 0.5582305823053633
+ },
+ "searches": [
+  {
+   "box": 0,
+   "q": "A couple of men in the water on surfboards.",
+   "top": [
+    {
+     "mid": "100",
+     "kind": "post",
+     "topic": "sub B",
+     "title": "A couple of men in the water on surfboards.",
+     "body": "",
+     "score": 1,
+     "own": true,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "0",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A man riding a wave on top of a white surfboard.",
+     "body": "",
+     "score": 0,
+     "own": true,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "87",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "Two surfers catching two different waves, one after the other.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    }
+   ]
+  },
+  {
+   "box": 1,
+   "q": "A kitchen filled with a wooden cabinet and a large window.",
+   "top": [
+    {
+     "mid": "101",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A kitchen filled with a wooden cabinet and a large window.",
+     "body": "",
+     "score": 0,
+     "own": true,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "68",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "An older picture of a large kitchen with white appliances.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "38",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A spacious living room with three windows and a wooden floor.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    }
+   ]
+  },
+  {
+   "box": 2,
+   "q": "A table with some oranges and some cups.",
+   "top": [
+    {
+     "mid": "102",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A table with some oranges and some cups.",
+     "body": "",
+     "score": 2,
+     "own": true,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "45",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "The dining table near the kitchen has a bowl of fruit on it.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "88",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A restaurant table with a plate of vegetable pizza and garnishment",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    }
+   ]
+  },
+  {
+   "box": 3,
+   "q": "a close up of a person holding up a plate of food",
+   "top": [
+    {
+     "mid": "52",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A woman in striped shirt holding a plate with a bagel on it.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "21",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "Closeup of a plate of food that includes chicken, mushrooms and broccoli.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    },
+    {
+     "mid": "88",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "A restaurant table with a plate of vegetable pizza and garnishment",
+     "body": "",
+     "score": 0,
+     "own": true,
+     "photo": true,
+     "deleted": false
+    }
+   ]
+  },
+  {
+   "box": 4,
+   "q": "TOTD: Warm up your car's interior quickly by setting the heat to full force as soon as the car is on, and aiming the side vents at the side windows.",
+   "top": [
+    {
+     "mid": "104",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "TOTD: Warm up your car's interior quickly by setting the heat to full force as soon as the car is on, and aiming the side vents at the side windows.",
+     "body": "DON'T aim the side vent at your hand/torso, and use the car's automatic vent settings. Try it. It works.\n\nEdit: I meant \"heat to the highest temperature,\" not \"to full force\".",
+     "score": 2,
+     "own": true,
+     "photo": false,
+     "deleted": false
+    },
+    {
+     "mid": "116",
+     "kind": "comment",
+     "topic": "sub A",
+     "title": null,
+     "body": "How do women have that ability to turn cold in a milisecond. What is the thought process going on in there? \r\n\r\nThe average man would just chill and distance or remove himself from",
+     "score": 0,
+     "own": false,
+     "photo": false,
+     "deleted": false
+    },
+    {
+     "mid": "31",
+     "kind": "post",
+     "topic": "sub A",
+     "title": "Eating a donut makes for a quick and easy breakfast.",
+     "body": "",
+     "score": 0,
+     "own": false,
+     "photo": true,
+     "deleted": false
+    }
+   ]
+  }
+ ],
+ "checks": {
+  "D1": {
+   "hits": 94,
+   "misses": [],
+   "max_settle_s": 0.8118674755096436,
+   "pass": true
+  },
+  "D2": {
+   "identical_rankings": 20,
+   "queries": 20,
+   "recall@10": 1.0,
+   "pass": true
+  },
+  "D3": {
+   "checks": 8,
+   "pass": true
+  },
+  "D4": {
+   "pass": true
+  },
+  "D5": {
+   "scores_of_double_voted_post": [
+    1,
+    1,
+    1
+   ],
+   "expected": 1,
+   "banned_everywhere": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "after_slash_refused": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "pass": true
+  },
+  "D6": {
+   "verified_by": [
+    0,
+    1,
+    2
+   ],
+   "allowed": [
+    0,
+    1,
+    2
+   ],
+   "pass": true
+  }
+ },
+ "chip_virtual_ms": [
+  58950.48843152956,
+  57743.705798529525,
+  58984.871695176626,
+  57743.79539852953,
+  58950.21963152955
+ ]
+}

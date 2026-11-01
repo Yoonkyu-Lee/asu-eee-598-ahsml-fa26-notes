@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
+    <li><b>Five real boxes run the whole community, and they confirm the simulator's numbers.</b> We ran five boxes as separate processes on the laptop, each with its own web page, using real signatures, encryption, rate-limit tags, MiniLM and CLIP, and fed them 140 messages (104 photo posts, three kinds of attack) plus 5 searches (see <a href="#demo-h">The demo</a>). Every per-box count of the work that sizes the chip (signatures, proofs, decrypts, text and image encodings, index inserts, sends and so on: 5 boxes × 11 tasks) matched the event simulator exactly, so we keep trusting the simulator. Only photo sends and duplicate receipts split differently between boxes, with equal totals (412 and 524), because who passes a message on first depends on delays. The check also caught one shortcut in the simulator (only the first box in the network to catch a rate-limit cheater sent the penalty notice, which no real box can know); it's fixed. All six demo functions passed: each post came up first in 94 of 94 title searches (a message was done on all five boxes within 0.81 s), finding photos by words matched an independent ranking 20 of 20 times, deleted posts vanished, non-members never received room messages, double votes and rate-limit cheaters were stopped, and an invalid proof never got past the author's neighbors <span class="k k-meas">measured</span>.</li>
     <li><b>Same scenarios, same targets: existing box hardware still can't stop a proof flood, and the case for our own encoder is thinner than we thought.</b> We ran the five scenarios on four boxes with the same box software (see <a href="#compare-h">The whole box against existing hardware</a>). The boxes that verify proofs on the CPU (Pi 5 alone, Pi 5 + Hailo-8L, Jetson Orin Nano) get 14–37 cores' worth of host work in a 100 Mbps flood of invalid proofs and never finish new posts. Only boxes with our verify unit pass. A verify-only chip next to a Hailo-8L passes every target too, and it beats our one-chip design on spam with valid proofs (2,327 vs 100 identities) and on catching up (1.0 vs 17.8 min). We keep one chip because it uses less power on an ordinary day: 3.9 mW against 4.5–6.0 mW, even with the Hailo's unknown idle power counted as zero. So the verify unit is the core of our contribution. Photos also changed the image encoder. On 4,700 COCO photos, no INT8 version of CLIP's image tower keeps 0.95 of the exact search's top 10 (the best gets 0.814) <span class="k k-meas">measured</span>, so the tower now runs in FP16: 0.55 s and 64 mJ per image. One FP16 layer is then too long for a search query to wait behind, so the encoder has to let queries in between matrix multiplies (31 ms instead of 55 ms). Everything except photo quality is <span class="k k-est">estimated</span>.</li>
     <li><b>One box under five scenarios: things break in front of the chip before the chip itself.</b> We ran the re-sized chip in the busiest box of a 1M-user community through an ordinary day, the evening peak, catching up after being offline, a flood of invalid proofs, and spam with valid proofs (see <a href="#scenarios-h">Where a box breaks first</a>). In a 100 Mbps flood of invalid proofs the verify unit is only 85% busy, but checking each signature before the proof needs 3.90–4.59 cores on a 4-core Pi 5-class host. Dropping repeats with one table lookup and then checking the proof first brings the host down to 0.85 cores. A box that was off for 8 hours catches up in 14.3 min, but only if live work goes first on the host and the verify unit (otherwise new posts wait 18.9 s). The chip can't stop spam that carries valid proofs: 310 identities posting up to their rate limit push new posts past 5 s, and a 32×32 encoder only raises that to 2,682, so this is a job for identity cost and rate limits. These runs used the INT8 image tower; with FP16 the catch-up takes 17.8 min and the spam limit falls to 100 identities. All <span class="k k-est">estimated</span>.</li>
-    <li><b>The encoder is re-sized: the chip is half the area.</b> Sized for the load the simulator measured instead of "every box gets every post", an 8×8 INT8 array with 1 MB of SRAM is enough: it clears an 8-hour backlog in 11.3 min, embeds a new post in 125 ms (P99), a search query in 10.9 ms and an image in 143 ms (in INT8; photos have since moved the image tower to FP16, 0.55 s), and holds up for communities of up to 5.3 million users. The encoder goes from 9.22 to <b>3.53 mm²</b> and the chip from 11.3 to <b>5.61 mm²</b> <span class="k k-est">estimated</span>. Text search stays on MiniLM: CLIP's text tower finds a post by its title in the top 10 only 0.776 of the time, against 0.943 for MiniLM <span class="k k-meas">measured</span>. And software can't make every box compute the same image embedding: static INT8 is bit-identical across batch sizes and thread counts, but two runtimes running the same model file disagree (cosine 0.872) <span class="k k-meas">measured</span>. An integer-only encoder with a fixed operation order and rounding is now a candidate requirement for our chip (see <a href="#encoder-h">The encoder</a>).</li>
   </ul>
 </section>
 
@@ -166,12 +166,12 @@ footer { font-size: 13px; color: var(--muted); }
 
 <section aria-labelledby="system-h">
   <h2 id="system-h">2. The whole system: a community with everything but the hardware</h2>
-  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done, the simulator's core (which messages reach which box) has results, and the box software on top of it (ingest, search, feeds, votes, forgetting, private rooms) now runs through a whole simulated day, both further down in this section. One box has also been run through backlog and attack scenarios and compared with existing box hardware on the same scenarios (<a href="#scenarios-h">section 5</a>). One question decides the approach: <b>what runs for real, and what is a model?</b></p>
+  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done, the simulator's core (which messages reach which box) has results, and the box software on top of it (ingest, search, feeds, votes, forgetting, private rooms) now runs through a whole simulated day, both further down in this section. One box has also been run through backlog and attack scenarios and compared with existing box hardware on the same scenarios (<a href="#scenarios-h">section 5</a>). And five boxes now run as real processes with a web page each, doing the same work the simulator counts (<a href="#demo-h">the demo</a>). One question decides the approach: <b>what runs for real, and what is a model?</b></p>
   <ul>
     <li><b>Functions run for real (emulation).</b> The box software is real code: real ciphertexts, real signatures, real embeddings, real search results. It runs on the laptop CPU instead of the box's hardware but computes the same thing.</li>
     <li><b>Time and energy are simulated.</b> We can't run hundreds of boxes in real time, so the simulator runs on a virtual clock (discrete events). Each task's time and energy come from our chip models (the verify-unit cycle model, the encoder's Timeloop + Accelergy model) and, for host work, from laptop timings scaled to a Pi 5-class CPU.</li>
     <li><b>Each message is computed once.</b> When many boxes receive the same post, the result (verification, embedding) is computed once and shared; each box is still charged the modeled time and energy.</li>
-    <li><b>Only the demo runs in real time:</b> a few boxes as real processes, with a web UI to write posts.</li>
+    <li><b>Only the demo runs in real time:</b> five boxes as real processes on the laptop, each with a web page to post, search, vote and chat. It doubles as a check that the simulator counts each box's work correctly (<a href="#demo-h">the demo</a>).</li>
   </ul>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
@@ -536,7 +536,7 @@ footer { font-size: 13px; color: var(--muted); }
     <summary>Limits of the simulated day, and the trace</summary>
     <ul class="small">
       <li>Images are synthetic (no dataset downloaded yet). The embedding tolerance and image-search results may differ on photos.</li>
-      <li>Searching images with text works only through post titles and bodies: CLIP's text tower wasn't in the simulated day. We have since decided to keep MiniLM for text and use CLIP's text tower only to find images by words (<a href="#encoder-h">The encoder</a>); its quality on that job isn't measured yet.</li>
+      <li>Searching images with text works only through post titles and bodies: CLIP's text tower wasn't in the simulated day. We have since decided to keep MiniLM for text and use CLIP's text tower only to find images by words (<a href="#encoder-h">The encoder</a>). Measured since: the right photo is in the top 10 for 0.671 of captions over 4,700 COCO photos (FP32, <a href="#photos-h">photo results</a>) and for all of them over the demo's 104 photos (<a href="#demo-h">the demo</a>) <span class="k k-meas">measured</span>.</li>
       <li>Proof pairings aren't executed (valid/invalid flag + modeled cost). Tags and RLN secret sharing are real.</li>
       <li>Only 20 sample boxes keep full state; the others share results per message. A relaying box decides "which of two conflicting messages came first" from a reference order; a real box uses the order it saw.</li>
       <li>Boxes are either on or off all day. Catching up after being offline has since been run for a single box (<a href="#scenarios-h">Where a box breaks first</a>), not yet across the network.</li>
@@ -545,6 +545,118 @@ footer { font-size: 13px; color: var(--muted); }
       <li>Host costs are preliminary laptop timings × the Pi 5 scale <span class="k k-est">estimated</span>.</li>
     </ul>
     <p class="small"><b>The trace.</b> The run writes a <a href="https://github.com/Yoonkyu-Lee/asu-eee-598-ahsml-fa26-notes/blob/main/project/results/cp17/trace_box_peak_hour.json">Perfetto trace of one box's peak hour</a> for the busiest and a median sample box, with four rows: verify, text encoder, image encoder, host. Download the JSON and open it at <a href="https://ui.perfetto.dev">ui.perfetto.dev</a>.</p>
+  </details>
+
+  <h3 id="demo-h">The demo: five real boxes, and a check that the simulator counts right</h3>
+  <p>The system numbers so far came from the event simulator, which computes each message once and shares the result. Two things were still missing: evidence that the simulator counts each box's work correctly, and a community a person can actually use. So we ran five boxes as separate real processes on the laptop, each with its own web page, using real Ed25519 signatures, ChaCha20-Poly1305 encryption, RLN tags, MiniLM and CLIP. As in the simulator, a proof's pairing check is a valid/invalid flag plus its modeled time on the chip. The community: 5 users with one box each, a public sub-community all five join, a second one with 3 members, a private room with 3 members and a room key, and a penalty-notice channel everyone hears. The gossip mesh has a target degree of only 2, so messages have to be relayed (with a degree of 4 or more, every box would be a direct neighbor and relaying wouldn't get tested).</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 466" role="img" aria-label="Demo setup: a browser page for each of five box processes. Each box receives gossip, drops repeats, checks the signature, proof and rate-limit tags, forwards to its mesh neighbors only after the message passes, then decrypts, embeds and indexes text, tallies votes, forgets deleted posts and applies penalties; photo bodies are fetched from the neighbor that sent the envelope and embedded with CLIP. A scenario runner feeds the same 140 messages and the same mesh to the five real processes and to the event simulator, and compares the work each box does per task.">
+      <defs><marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <!-- browser -->
+      <rect class="box" x="10" y="10" width="960" height="66" rx="8"/>
+      <text x="24" y="34" font-weight="600">Browser: one web page per box</text>
+      <text x="24" y="56" class="mut" font-size="12">post text or a photo · feed and votes · search · find photos by words · delete your post · private room · this box's work counts + virtual chip time</text>
+      <path class="wire" d="M490,76 L490,98" marker-end="url(#d1)"/>
+      <text x="500" y="92" class="mut" font-size="11">HTTP, local to the laptop</text>
+      <!-- boxes -->
+      <rect class="box-pick" x="10" y="102" width="960" height="180" rx="8"/>
+      <text x="24" y="126" font-weight="700">Node box × 5 · separate real processes · real Ed25519, ChaCha20, RLN tags, MiniLM, CLIP</text>
+      <rect class="box" x="24" y="140" width="290" height="126" rx="6"/>
+      <text x="36" y="162" font-size="12" font-weight="600">Receive (gossip)</text>
+      <text x="36" y="182" class="mut" font-size="11">drop repeats</text>
+      <text x="36" y="200" class="mut" font-size="11">check signature, proof, RLN tags</text>
+      <text x="36" y="218" class="mut" font-size="11">forward to mesh neighbors only after</text>
+      <text x="36" y="236" class="mut" font-size="11">the message passes</text>
+      <text x="36" y="254" class="mut" font-size="11">proof = valid flag + modeled chip time</text>
+      <path class="wire" d="M314,203 L334,203" marker-end="url(#d1)"/>
+      <rect class="box" x="338" y="140" width="290" height="126" rx="6"/>
+      <text x="350" y="162" font-size="12" font-weight="600">Ingest</text>
+      <text x="350" y="182" class="mut" font-size="11">decrypt (room messages: room key)</text>
+      <text x="350" y="200" class="mut" font-size="11">embed text with MiniLM INT8 → index</text>
+      <text x="350" y="218" class="mut" font-size="11">tally votes · forget deleted posts</text>
+      <text x="350" y="236" class="mut" font-size="11">penalize identities over the rate limit</text>
+      <path class="wire" d="M628,203 L648,203" marker-end="url(#d1)"/>
+      <rect class="box-path" x="652" y="140" width="304" height="126" rx="6"/>
+      <text x="664" y="162" font-size="12" font-weight="600">Photos (envelope + fetch)</text>
+      <text x="664" y="182" class="mut" font-size="11">fetch the body from the neighbor</text>
+      <text x="664" y="200" class="mut" font-size="11">that sent the envelope</text>
+      <text x="664" y="218" class="mut" font-size="11">CLIP image tower (FP32 on the laptop,</text>
+      <text x="664" y="236" class="mut" font-size="11">same quality as the chip's FP16)</text>
+      <text x="664" y="254" class="mut" font-size="11">CLIP text tower: find photos by words</text>
+      <path class="wire" d="M490,330 L490,286" marker-end="url(#d1)"/>
+      <text x="500" y="314" class="mut" font-size="11">same 140 messages · same mesh (degree 2, so messages relay)</text>
+      <!-- runner -->
+      <rect class="box" x="10" y="334" width="960" height="122" rx="8"/>
+      <text x="24" y="358" font-weight="600">Scenario runner (fixed seed): 140 messages + 5 search queries</text>
+      <rect class="box-path" x="24" y="372" width="290" height="70" rx="6"/>
+      <text x="36" y="394" font-size="12" font-weight="600">Real time: 5 box processes</text>
+      <text x="36" y="414" class="mut" font-size="11">each message enters at its author's box;</text>
+      <text x="36" y="430" class="mut" font-size="11">wait until the network is quiet</text>
+      <rect class="box" x="338" y="372" width="290" height="70" rx="6"/>
+      <text x="350" y="394" font-size="12" font-weight="600">Event simulator</text>
+      <text x="350" y="414" class="mut" font-size="11">the same messages on the same mesh,</text>
+      <text x="350" y="430" class="mut" font-size="11">work counted by task name</text>
+      <rect class="box-pick" x="652" y="372" width="304" height="70" rx="6"/>
+      <text x="664" y="394" font-size="12" font-weight="600">Compare: work per box × task</text>
+      <text x="664" y="414" class="mut" font-size="11">55 of 55 chip-sizing counts identical</text>
+      <text x="664" y="430" class="mut" font-size="11">photo sends, duplicates: equal totals</text>
+    </svg>
+  </div>
+  <p>The scenario: 140 messages (104 of them photo posts with COCO photos, plus three kinds of attack) and 5 search queries, the same for both runs. We decided in advance: if every box × task count matches, we trust the simulator. If one doesn't, we find out whether the simulator took a shortcut (then we fix the simulator), the box server has a bug (fix the box), or it's a real race over which box passes a message on first (record it), and rerun until every count matches.</p>
+  <div class="duo">
+    <div class="card">
+      <h3>Work that sizes the chip</h3>
+      <div class="big">55 / 55</div>
+      <p>box × task counts identical between the real boxes and the simulator: signature, proof, RLN tag, decrypt, text, image, index, tally, delete, query, send (5 boxes × 11 tasks) <span class="k k-meas">measured</span>.</p>
+    </div>
+    <div class="card">
+      <h3>Demo functions</h3>
+      <div class="big">6 / 6</div>
+      <p>pass on the five real boxes: search, finding photos by words, forgetting, private room, one vote per person with rate-limit penalties, and invalid proofs stopped at the first hop <span class="k k-meas">measured</span>.</p>
+    </div>
+  </div>
+  <ul class="small">
+    <li><b>Only photo sends and duplicate receipts differ per box, and their totals match</b> (412 photo sends and 524 duplicates in both runs). Which neighbor passes an envelope on first decides whom a box fetches the photo from and which copy becomes the duplicate. That depends on delays: milliseconds on the laptop, against the simulator's model of 50 ms per hop and a 20 Mbps uplink. Fetching from a fixed neighbor (say, the lowest-numbered one) would make the counts match but add delay, so we left it. The consequence: the per-box split of image uplink in the simulated day comes from the delay model; the totals don't depend on it.</li>
+    <li><b>The check caught one shortcut in the simulator on its first run.</b> Two boxes (0 and 2) caught the same identity going over its rate limit, but the simulator let only "the first box in the whole network to notice" send the penalty notice, which no real box can know. Now every box that catches it sends a notice, and the notice is one message tied to the revealed secret (same ID), so a box that already has it doesn't send another. We fixed both the simulator and the box server, and the send counts then matched. In the simulated 10,000-box day this changes only a few penalty-notice sends and duplicates among 136.82 million events, so we didn't rerun it.</li>
+  </ul>
+  <div class="tbl"><table>
+    <thead><tr><th>Demo test (real boxes)</th><th>Result</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Search: every post searched by its title on every box that holds its sub-community</td><td>the post came up first in all <b>94 of 94</b> searches. A message was done on all five boxes 0.56 s after posting on average, 0.81 s at most (target: 5 s)</td><td>pass</td></tr>
+      <tr><td>Find photos by words: 20 captions, different from the ones the photos were posted with</td><td>each box's results matched a ranking computed separately with the same model, <b>20 of 20</b>; Recall@10 1.00 over 104 photos</td><td>pass</td></tr>
+      <tr><td>Forgetting: an author deletes 2 posts</td><td>gone from search and feeds in all 8 cases (post × box that held it)</td><td>pass</td></tr>
+      <tr><td>Private room (boxes 1, 2, 3)</td><td>only the room's boxes read its 3 messages and find them in search; boxes 0 and 4 never receive them</td><td>pass</td></tr>
+      <tr><td>One vote per person, rate limit</td><td>the double vote isn't counted (score 1, as expected); an identity going over its limit is revealed and removed on all five boxes, and its later posts are refused everywhere</td><td>pass</td></tr>
+      <tr><td>Invalid proof</td><td>only the author's box (1) and its mesh neighbors (0, 2) checked it; boxes 3 and 4 never did</td><td>pass</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li>On the first run, search and voting failed because of two mistakes in the test scenario, not in the boxes: room messages reused a post's title, so a room message ranked first for that title, and two of the "ten honest votes" were the same person on the same post, which the boxes rightly rejected as a double vote. We fixed the scenario and reran with the same pass conditions.</li>
+    <li>Each box's page lets you write a post (attach a COCO photo), read the feed, vote up or down, delete your own post, search text, find photos by words (a photo grid), and use the private room (a non-member sees that it has no key and can't read). It also shows the box's work counts and its virtual chip time: about 58–59 s per box, mostly 104 photos at 0.55 s each on the FP16 image tower <span class="k k-est">estimated</span>.</li>
+  </ul>
+  <details>
+    <summary>Work per box: real time against the simulator</summary>
+    <p class="small">Counts over the whole scenario. Where one number is shown, both runs gave exactly that number <span class="k k-meas">measured</span>.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Box</th><th>Signature</th><th>Proof</th><th>RLN</th><th>Decrypt</th><th>Text</th><th>Image</th><th>Index</th><th>Tally</th><th>Delete</th><th>Query</th><th>Send</th><th>Photo sends (real / sim)</th><th>Duplicates (real / sim)</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0</td><td class="num">138</td><td class="num">137</td><td class="num">137</td><td class="num">133</td><td class="num">121</td><td class="num">104</td><td class="num">225</td><td class="num">10</td><td class="num">2</td><td class="num">1</td><td class="num">288</td><td class="num">141 / 186</td><td class="num">110 / 56</td></tr>
+        <tr><td class="num">1</td><td class="num">128</td><td class="num">127</td><td class="num">127</td><td class="num">126</td><td class="num">117</td><td class="num">102</td><td class="num">219</td><td class="num">8</td><td class="num">1</td><td class="num">1</td><td class="num">155</td><td class="num">62 / 83</td><td class="num">80 / 53</td></tr>
+        <tr><td class="num">2</td><td class="num">141</td><td class="num">140</td><td class="num">140</td><td class="num">136</td><td class="num">124</td><td class="num">104</td><td class="num">228</td><td class="num">10</td><td class="num">2</td><td class="num">1</td><td class="num">290</td><td class="num">107 / 63</td><td class="num">153 / 206</td></tr>
+        <tr><td class="num">3</td><td class="num">129</td><td class="num">128</td><td class="num">128</td><td class="num">126</td><td class="num">117</td><td class="num">102</td><td class="num">219</td><td class="num">8</td><td class="num">1</td><td class="num">1</td><td class="num">159</td><td class="num">48 / 40</td><td class="num">93 / 100</td></tr>
+        <tr><td class="num">4</td><td class="num">135</td><td class="num">134</td><td class="num">134</td><td class="num">133</td><td class="num">121</td><td class="num">104</td><td class="num">225</td><td class="num">10</td><td class="num">2</td><td class="num">1</td><td class="num">161</td><td class="num">54 / 40</td><td class="num">88 / 109</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+  <details>
+    <summary>Limits of the demo</summary>
+    <ul class="small">
+      <li>Five boxes and local traffic on one laptop: no real delay, loss or home-router (NAT) problems. The mesh degree is 2.</li>
+      <li>Proofs aren't real Groth16: a valid/invalid flag plus the modeled chip time, the same as in the simulator.</li>
+      <li>Photos are COCO, sent as the 224×224 center crop itself; there's no separate thumbnail.</li>
+      <li>Nobody outside the project has used it yet; we haven't run a usability test with people.</li>
+    </ul>
   </details>
 
   <details>
@@ -560,10 +672,10 @@ footer { font-size: 13px; color: var(--muted); }
     </table></div>
     <ul class="small">
       <li>If 100 boxes, 10,000 users and one simulated day don't finish within 2 hours on the laptop CPU, most boxes switch to statistics only and a sample of boxes keeps running real functions. We used that split from the start (a separate index on every box would take several GB), and a full day of 10,000 boxes with the box software took 586 s for 136.82 million events; the message-level core alone did a 10,000-box peak hour in 30 s (9.43 million events) <span class="k k-meas">measured</span>.</li>
-      <li>Check: the same 5-box scenario, run in real time and in the event simulator, must give the same work counts per box. If not, we fix the simulator.</li>
+      <li>Check: the same 5-box scenario, run in real time and in the event simulator, must give the same work counts per box. If not, we fix the simulator. It does, after one fix to the simulator (<a href="#demo-h">the demo</a>).</li>
     </ul>
-    <p class="small"><b>Network.</b> The simulation implements the gossipsub v1.1 rules itself (mesh degree, forward only after validation, the penalty for invalid messages, disconnecting peers), so every hop can be traced. Real libp2p is a candidate for the demo. Plain flooding is the baseline, to see how much gossip shrinks a flood. Parameters come from source defaults (the gossipsub spec, nwaku); any value without a source is marked as an estimate and swept.</p>
-    <p class="small"><b>Crypto.</b> Signatures and encryption are real (Ed25519 with a one-time key per post, ChaCha20-Poly1305). In the simulation, the pairing check of an anonymous rate-limiting proof is a valid/invalid flag with a modeled verification cost (generating a real proof is the user device's job, not box load), while its tags and secret shares are computed for real. Whether the demo uses real Groth16 proofs is still open. Private rooms use one shared group key for now; key rotation (MLS-style) comes later.</p>
+    <p class="small"><b>Network.</b> The simulation implements the gossipsub v1.1 rules itself (mesh degree, forward only after validation, the penalty for invalid messages, disconnecting peers), so every hop can be traced. The demo boxes follow the same rules over plain HTTP on the laptop; real libp2p is not in yet. Plain flooding is the baseline, to see how much gossip shrinks a flood. Parameters come from source defaults (the gossipsub spec, nwaku); any value without a source is marked as an estimate and swept.</p>
+    <p class="small"><b>Crypto.</b> Signatures and encryption are real (Ed25519 with a one-time key per post, ChaCha20-Poly1305). In the simulation, the pairing check of an anonymous rate-limiting proof is a valid/invalid flag with a modeled verification cost (generating a real proof is the user device's job, not box load), while its tags and secret shares are computed for real. The demo boxes do the same; they don't use real Groth16 proofs yet. Private rooms use one shared group key for now; key rotation (MLS-style) comes later.</p>
     <p class="small"><b>ML.</b> Two options for text and images:</p>
     <div class="tbl"><table>
       <thead><tr><th>Option</th><th>Text</th><th>Images</th><th>Search</th></tr></thead>
@@ -587,8 +699,9 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>busiest box of a 1M-user community: chip 3.9 mW average with the image tower in FP16 (3.4 mW, 0.14% of the idle box's energy, with INT8) <span class="k k-est">estimated</span></td><td>host idle power is from sources (2.4–3.3 W); wake-up costs and the always-on part of the chip aren't modeled</td><td class="num">done</td></tr>
       <tr><td>One shared encoder keeps search fast during a backlog and during spam</td><td>with the image tower in FP16, the encoder must let queries in between matrix multiplies: query encoding 22 ms (P99) at the peak, 31 ms while catching up. Yielding only at layer boundaries gives 55 ms <span class="k k-est">estimated</span></td><td>the controller that switches tasks between matrix multiplies isn't designed beyond the model, and its area isn't counted</td><td class="num">open</td></tr>
       <tr><td>Putting the encoder on the same chip beats a separate encoder chip</td><td>ordinary-day accelerator power 3.9 mW, against 4.5–6.0 mW for a verify-only chip + Hailo-8L with the Hailo's idle power counted as zero <span class="k k-est">estimated</span></td><td>the Hailo-8L's idle power has no source; the two-chip box is better on valid spam (2,327 vs 100 identities) and catch-up (1.0 vs 17.8 min)</td><td class="num">open</td></tr>
-      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes. Finding photos by caption: the right photo is in the top 10 for 0.671 of captions (FP32, 4,700 COCO photos) <span class="k k-meas">measured</span></td><td>image search in the simulated day failed on synthetic images and hasn't been rerun on photos; demo</td><td class="num">1</td></tr>
-      <tr><td>Spam can't exhaust a box's ingest</td><td>invalid proofs: handled at 0.88 W with proofs checked first, and stopped at the first hop in the simulated day. Valid spam: <b>not met</b>. With the image tower in FP16, 100 identities at the rate limit break 5 s freshness on the 8×8 encoder (310 with INT8; 2,682 on a 32×32 encoder with INT8; 2,327 with a Hailo-8L as the encoder) <span class="k k-est">estimated</span></td><td>identity cost and per-identity limits (a protocol problem, not a chip one); valid spam spreading across many boxes not run</td><td class="num">open</td></tr>
+      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes. Five real boxes with a web page each: search, finding photos by words, forgetting, private rooms, one vote per person and penalties all pass (6 of 6 tests). Finding photos by caption: the right photo is in the top 10 for 0.671 of captions over 4,700 COCO photos (FP32), and for all 20 captions over the demo's 104 photos <span class="k k-meas">measured</span></td><td>no test with real users; the demo is 5 boxes on one laptop; image search with re-saved copies failed on synthetic images in the simulated day and hasn't been rerun on photos</td><td class="num">done</td></tr>
+      <tr><td>The simulator's per-box numbers can be trusted</td><td>five real box processes and the simulator, same 140 messages: all 55 box × task counts of chip-sizing work identical; photo sends and duplicates differ per box with equal totals; one simulator shortcut (who sends a penalty notice) found and fixed <span class="k k-meas">measured</span></td><td>only 5 boxes on a local link; the per-box split of photo uploads depends on the delay model</td><td class="num">done</td></tr>
+      <tr><td>Spam can't exhaust a box's ingest</td><td>invalid proofs: handled at 0.88 W with proofs checked first, and stopped at the first hop in the simulated day. Valid spam: <b>not met</b>. With the image tower in FP16, 100 identities at the rate limit break 5 s freshness on the 8×8 encoder (310 with INT8; 2,682 on a 32×32 encoder with INT8; 2,327 with a Hailo-8L as the encoder) <span class="k k-est">estimated</span></td><td>identity cost and per-identity limits (a protocol problem, not a chip one); valid spam spreading across many boxes not run</td><td class="num">1</td></tr>
       <tr><td>Boxes could share identical embeddings only with a fixed integer-only encoder</td><td>static INT8 is bit-identical within one runtime but not across two runtimes; on photos no INT8 version of the image tower reaches 0.95 agreement with exact search (best 0.814) <span class="k k-meas">measured</span></td><td>an integer-only encoder would have to clear the same quality bar; other hardware (ARM, NPU) not tested</td><td class="num">open</td></tr>
     </tbody>
   </table></div>
@@ -1479,6 +1592,8 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="dropped-h">
   <h2 id="dropped-h">6. Paths we tried and dropped</h2>
   <ul class="dropped">
+    <li><b>Letting only the first box that catches a rate-limit cheater announce the penalty.</b> The simulator did this, but it needs knowledge of the whole network that no real box has; the real boxes showed it when two of them caught the same cheater <span class="k k-meas">measured</span>. <i>Instead:</i> every box that catches it sends the notice, and the notice is one message tied to the revealed secret, so copies collapse into one and a box that already has it stays quiet.</li>
+    <li><b>Fetching each photo from a fixed neighbor (for example the lowest-numbered one).</b> It would make each box's photo sends the same in real time and in the simulator, but it adds delay. <i>Instead:</i> a box fetches from whichever neighbor sent it the envelope; only the per-box split of photo uploads depends on timing, and the totals match (412 photo sends, 524 duplicates) <span class="k k-meas">measured</span>.</li>
     <li><b>An INT8 image tower.</b> On 4,700 COCO photos, no INT8 version of CLIP's image tower keeps 0.95 of the exact search's top 10: 0.631 with INT8 in the linear layers only, 0.814 with the patch embedding and the first and last blocks left in float, even though caption recall drops by only 0.7–1.1 points <span class="k k-meas">measured</span>. <i>Instead:</i> the image tower runs in FP16 on the chip's existing FP16 unit, 0.55 s and 64 mJ per image instead of 143 ms and 27.3 mJ <span class="k k-est">estimated</span>.</li>
     <li><b>Letting search queries in only at layer boundaries.</b> With the image tower in FP16, one image layer takes 46 ms, and a query waiting behind it takes 55 ms, over the 50 ms target <span class="k k-est">estimated</span>. <i>Instead:</i> the encoder switches tasks between matrix multiplies (31 ms).</li>
     <li><b>Shrinking the verify unit to 5 multipliers + 6 adders.</b> With proofs checked first, the worst flood is all-invalid proofs again, and 5 + 6 would be 95.6% busy, just short of the 5% headroom we require. It would have saved 0.28 mm² <span class="k k-est">estimated</span>. <i>Instead:</i> 6 + 6 stays.</li>
@@ -1519,14 +1634,14 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Step</th><th>What</th><th>What it leaves behind</th></tr></thead>
     <tbody>
-      <tr><td class="num"><b>1 (next)</b></td><td><b>Demo, and a check of the simulator against real time.</b> Run a few boxes as real processes with a web UI: write posts, search, post images and find them by words (COCO photos), delete, and use private rooms. Then run the same small scenario in real time and in the event simulator, and check that each box does the same amount of work in both</td><td>the presentation demo, and evidence that the simulator's numbers mean what they say</td></tr>
+      <tr><td class="num"><b>1 (next)</b></td><td><b>Stopping spam with valid proofs, without an operator.</b> This is the one attack the chip can't absorb (<a href="#scenarios-h">valid spam</a>). Compare protocol options, such as a cost per identity, limits per sub-community, and embedding upvoted posts first, on the same box model and on the demo boxes, and find the cheapest way for a box to survive spam from 1% of members (10,000 identities in a 1M-user community)</td><td>a spam defense that needs no operator, and a first answer to what an identity should cost</td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Done since the last update: the comparison with existing box hardware on the same scenarios, switching choices off one at a time, and image quality on photos (see <a href="#compare-h">The whole box against existing hardware</a> and <a href="#photos-h">photo results</a>). Still open, outside the numbered steps: spam with valid proofs, which the chip can't absorb and which needs a cost per identity; runs with many boxes and neighbors; live-first on the network link while catching up; the Hailo-8L's idle power, which decides one chip versus two; whether our neighbor-agreement bar is too strict for the image tower; and whether an integer-only encoder keeps enough quality. The midterm report will cover the chip results so far plus this system design.</p>
+  <p class="small muted">Done since the last update: the demo with five real boxes, and the check that the simulator counts each box's work the same as real processes do (see <a href="#demo-h">The demo</a>). Still open, outside the numbered steps: runs with many boxes and neighbors; live-first on the network link while catching up; the Hailo-8L's idle power, which decides one chip versus two; whether our neighbor-agreement bar is too strict for the image tower; and whether an integer-only encoder keeps enough quality. The midterm report will cover the chip results so far plus this system design.</p>
 
   <h3>Good places to start (no hardware tools needed)</h3>
   <ul class="help">
-    <li><b>The client web UI.</b> A browser client for the community: post text and images, read a feed, search, vote, delete, chat in a private room. It talks to the same client API that the simulated users use, so the same UI works against the simulation and against the demo boxes. No CAD tools or chip knowledge needed.</li>
+    <li><b>The client web UI.</b> A first version exists: each demo box serves one page to post text or a COCO photo, read the feed, vote, delete your own post, search, find photos by words, use a private room, and see the box's work counts (<a href="#demo-h">The demo</a>). It's plain, and nobody outside the project has tried it. Making it feel like a real community site, or running a small usability test with a few classmates, would help. No CAD tools or chip knowledge needed.</li>
     <li><b>The behavior parameters we had to estimate.</b> Most come from Reddit's public statistics now (table in <a href="#load-h">section 2</a>), but we found no source for the time-of-day curve, a direct measure of how popularity spreads across sub-communities, post body length, page views per daily user, or any non-Reddit community such as DCInside. Subscriptions per user and the share of boxes online are estimates too. A source for any of these would firm up the per-box load.</li>
     <li><b>The Hailo-8L's idle power.</b> It now decides one chip versus two: a verify-only chip next to a Hailo-8L meets every target and handles spam and catching up better, and our one-chip design wins only by 0.6–2.1 mW on an ordinary day plus whatever the Hailo draws when idle <span class="k k-est">estimated</span>. A datasheet, forum measurement or paper that gives the Hailo-8L's idle power on a Pi 5 would settle it. No hardware tools needed.</li>
     <li><b>What should an identity cost?</b> Spam from real identities posting at their rate limit is the one attack the chip can't absorb: with the image tower in FP16, 100 identities (0.01% of a 1M-user community) keep honest posts from being searchable within 5 s on our box. A Hailo-8L as the encoder reaches 2,327, and even a 32×32 encoder array (ours is 8×8) only reached 2,682 with INT8 images <span class="k k-est">estimated</span>. Prior work on making anonymous identities expensive (money, hardware, time, or compute), or on filtering spam before it gets embedded, would go straight into the design. Protocol thinking, no hardware tools.</li>

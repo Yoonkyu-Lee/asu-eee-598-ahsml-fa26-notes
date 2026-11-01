@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home node box</title>
+<style>
+:root { --bg:#f7f7f5; --card:#fff; --ink:#1d1d1b; --mute:#6b6b66; --line:#e2e1dc; --acc:#2f6f5e; --warn:#a1452b; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161615; --card:#1f1f1d; --ink:#ecebe6; --mute:#a3a29b; --line:#33332f; --acc:#7cc4ad; --warn:#e58d6f; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui, sans-serif; }
+header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+header h1 { font-size:18px; margin:0; }
+header span { color:var(--mute); font-size:13px; }
+main { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; padding:14px 16px; max-width:1200px; }
+@media (max-width:800px) { main { grid-template-columns:1fr; } }
+section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+h2 { font-size:15px; margin:0 0 8px; }
+input, textarea, select, button { font:inherit; color:inherit; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+textarea { width:100%; min-height:60px; }
+input[type=text] { width:100%; }
+button { background:var(--acc); color:var(--card); border:none; cursor:pointer; }
+button.ghost { background:transparent; color:var(--acc); border:1px solid var(--line); padding:2px 8px; }
+.row { display:flex; gap:8px; align-items:center; margin:6px 0; flex-wrap:wrap; }
+.item { border-top:1px solid var(--line); padding:8px 0; }
+.item .t { font-weight:600; }
+.item .m { color:var(--mute); font-size:12px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; }
+.grid figure { margin:0; font-size:11px; color:var(--mute); }
+canvas { width:100%; border-radius:4px; display:block; }
+.item canvas { max-width:180px; margin-bottom:4px; }
+table { border-collapse:collapse; font-size:13px; }
+td { padding:2px 10px 2px 0; }
+.err { color:var(--warn); }
+</style>
+</head>
+<body>
+<header><h1 id="who">Home node box</h1><span id="sub"></span></header>
+<main>
+  <section>
+    <h2>Write</h2>
+    <div class="row"><select id="topic"><option value="0">sub A</option><option value="1">sub B</option></select>
+      <label><input type="checkbox" id="photo"> attach a photo (COCO)</label></div>
+    <input type="text" id="title" placeholder="Title (empty + photo = the photo's caption)">
+    <textarea id="body" placeholder="Body"></textarea>
+    <div class="row"><button onclick="post()">Post</button><span id="postmsg" class="m"></span></div>
+  </section>
+  <section>
+    <h2>Search</h2>
+    <div class="row"><input type="text" id="q" placeholder="Search posts (MiniLM)" style="flex:1"><button onclick="search()">Text</button>
+      <button onclick="searchImg()">Photos by words</button></div>
+    <div id="results"></div>
+  </section>
+  <section>
+    <h2>Feed <button class="ghost" onclick="feed()">refresh</button></h2>
+    <div id="feed"></div>
+  </section>
+  <section>
+    <h2>Room R</h2>
+    <div id="room"></div>
+    <div class="row"><input type="text" id="roomtext" placeholder="Message to the room" style="flex:1"><button onclick="roomSend()">Send</button></div>
+  </section>
+  <section>
+    <h2>This box's work <button class="ghost" onclick="stats()">refresh</button></h2>
+    <div id="stats"></div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const get = p => fetch(p).then(r => r.json());
+const send = (p, b) => fetch(p, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b)}).then(r => r.json());
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+async function draw(mid, el) {
+  const r = await get("/api/img?mid=" + mid);
+  if (!r.rgb) return;
+  const b = atob(r.rgb), c = document.createElement("canvas");
+  c.width = 224; c.height = 224;
+  const ctx = c.getContext("2d"), im = ctx.createImageData(224, 224);
+  for (let i = 0, j = 0; i < b.length; i += 3, j += 4) { im.data[j] = b.charCodeAt(i); im.data[j+1] = b.charCodeAt(i+1); im.data[j+2] = b.charCodeAt(i+2); im.data[j+3] = 255; }
+  ctx.putImageData(im, 0, 0);
+  el.prepend(c);
+}
+function itemHtml(it, actions) {
+  const a = actions ? `<button class="ghost" onclick="vote('${it.mid}',1)">▲</button><button class="ghost" onclick="vote('${it.mid}',-1)">▼</button>` +
+    (it.own ? `<button class="ghost" onclick="del('${it.mid}')">delete</button>` : "") : "";
+  return `<div class="item" id="i${it.mid}"><div class="t">${esc(it.title || it.body)}</div>` +
+    `<div class="m">${esc(it.topic)} · score ${it.score}${it.own ? " · yours" : ""}${it.photo ? " · photo" : ""}</div><div class="row">${a}</div></div>`;
+}
+async function feed() {
+  const rows = await get("/api/feed");
+  $("feed").innerHTML = rows.map(it => itemHtml(it, true)).join("") || "<p class='m'>Nothing yet.</p>";
+  rows.filter(it => it.photo).forEach(it => draw(it.mid, $("i" + it.mid)));
+}
+async function search() {
+  const rows = await get("/api/search?q=" + encodeURIComponent($("q").value));
+  $("results").innerHTML = rows.map(it => itemHtml(it, false)).join("") || "<p class='m'>No match.</p>";
+}
+async function searchImg() {
+  const rows = await get("/api/search_image?q=" + encodeURIComponent($("q").value));
+  $("results").innerHTML = `<div class="grid">${rows.map(it => `<figure id="g${it.mid}"><figcaption>${esc(it.title)}</figcaption></figure>`).join("")}</div>`;
+  rows.forEach(it => draw(it.mid, $("g" + it.mid)));
+}
+async function post() {
+  const r = await send("/api/post", {topic: +$("topic").value, title: $("title").value, body: $("body").value, photo: $("photo").checked});
+  $("postmsg").textContent = r.mid ? "posted" : (r.error || "error");
+  $("title").value = $("body").value = ""; setTimeout(feed, 800);
+}
+async function vote(mid, d) { await send("/api/vote", {mid, dir:d}); setTimeout(feed, 500); }
+async function del(mid) { const r = await send("/api/delete", {mid}); if (r.error) alert(r.error); setTimeout(feed, 500); }
+async function room() {
+  const r = await get("/api/room");
+  $("room").innerHTML = r.member ? (r.items.map(it => `<div class="item">${esc(it.body)}</div>`).join("") || "<p class='m'>No messages.</p>")
+    : "<p class='m'>This box is not in room R: it never gets the room key and cannot read the room.</p>";
+}
+async function roomSend() { const r = await send("/api/room", {body: $("roomtext").value}); if (r.error) alert(r.error); $("roomtext").value = ""; setTimeout(room, 500); }
+async function stats() {
+  const s = await get("/api/stats");
+  $("who").textContent = "Home node box " + s.box;
+  $("sub").textContent = `holds ${s.topics.length} topics · ${s.items} items · ${s.index.text} text / ${s.index.image} photo vectors · ${s.banned} banned identities`;
+  const rows = Object.entries(s.count).sort();
+  $("stats").innerHTML = `<table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join("")}` +
+    `<tr><td>chip time (model)</td><td>${s.chip_virtual_ms.toFixed(1)} ms</td></tr></table>`;
+}
+stats(); feed(); room();
+</script>
+</body>
+</html>

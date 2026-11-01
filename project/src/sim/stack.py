@@ -84,13 +84,17 @@ class DayNet:
         self.index_n = np.zeros(M)
         self.searchable: dict[tuple, float] = {}           # (sample box, mid) -> time searchable
         self.mismatch = 0                                  # sample box verdict != reference verdict
-        self.slashed: set[int] = set()
+        self.notice: dict[int, int] = {}                   # revealed secret a0 -> its slashing notice (one message)
         self.pull = {}                                     # image mid -> {full, parent, asked, want}
         self.search_lat: list[float] = []
         self.on_publish = None                             # hook (driver bookkeeping)
 
     # ---- publishing
     def publish(self, m: Msg, author: int) -> None:
+        self._register(m, author)
+        self.deliver(author, m.mid, -1)
+
+    def _register(self, m: Msg, author: int) -> None:
         self.verdict[m.mid] = self.ref.validate(m)
         if self.on_publish:
             self.on_publish(m)
@@ -99,7 +103,18 @@ class DayNet:
             self.arr[m.mid] = np.full(self.M, np.nan)
         if m.image is not None:
             self.pull[m.mid] = {"full": {author: self.eng.t}, "parent": {}, "asked": set(), "want": defaultdict(list)}
-        self.deliver(author, m.mid, -1)
+
+    def _slash(self, box: int, a0: int, t: float) -> None:
+        """Every box that finds a reused share publishes the notice unless it already has it. The notice is one
+        message per revealed secret, so a second finder's copy arrives elsewhere as a duplicate (CP21 X2: the
+        earlier "first box in the whole network publishes" needed a global view no box has)."""
+        if a0 not in self.notice:
+            s = self.W.make_slash(t, a0, self.memb_topic)
+            self.notice[a0] = s.mid
+            self._register(s, box)
+        mid = self.notice[a0]
+        if not self.got[mid][box]:
+            self.eng.at(t, self.deliver, box, mid, -1)
 
     def _send(self, frm: int, to: int, nbytes: float, t_ready: float, fn, *args) -> None:
         start = max(t_ready, self.uplink_free[frm])
@@ -131,10 +146,8 @@ class DayNet:
             if sv[0] != v[0]:
                 self.mismatch += 1
         if v[0] != "ok" and frm >= 0:                         # a relay drops it; the author's own box sends anyway
-            if v[0] == "slash" and mid not in self.slashed:   # the first box to see the reuse publishes the secret
-                self.slashed.add(mid)
-                s = self.W.make_slash(t1, v[1], self.memb_topic)
-                self.eng.at(t1, self.publish, s, box)
+            if v[0] == "slash":
+                self._slash(box, v[1], t1)
             if sb is not None:
                 sb.apply(m, t1, sv)
             return
