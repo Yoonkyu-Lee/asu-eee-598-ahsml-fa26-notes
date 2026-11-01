@@ -1,0 +1,29 @@
+{{add_to_path(cwd())}}
+globals:
+  version: 0.4
+  environment_variables:
+    TIMELOOP_HIDE_INCONSEQUENTIAL_STATS: 1
+  expression_custom_functions: []
+
+problem: {{include(problem, 'problem')}}
+
+architecture: {{include(cwd() ~ '/arch.yaml', 'architecture')}}
+
+variables:
+  version: 0.4
+  technology: "45nm"
+  global_cycle_seconds: {{CYCLE_S}}
+
+components:
+  version: 0.4
+  classes: {{include_all(COMPONENTS ~ '/*.yaml', 'compound_components.classes')}}
+
+mapper:
+  version: 0.4
+  optimization_metrics: [delay, energy]
+  live_status: False
+  num_threads: 4
+  timeout: {{TIMEOUT}}
+  victory_condition: {{VICTORY}}
+  algorithm: random_pruned
+  diagnostics: False

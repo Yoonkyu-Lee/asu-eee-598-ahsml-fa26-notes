@@ -1,0 +1,155 @@
+{
+ "source": "CACTI (HewlettPackard/cacti master, via accelergy-cacti-plug-in 7649b2c CactiSRAM, 45 nm); Aladdin 45 nm tables (accelergy-aladdin-plug-in 5e2e126 data/*.csv, 32-bit entries)",
+ "sram": {
+  "enc_glb_2MB": {
+   "width_bits": 128,
+   "depth": 131072,
+   "banks": 16,
+   "bytes": 2097152,
+   "read_pJ": 2.0110400000000002e-10,
+   "write_pJ": 1.9489e-10,
+   "leak_mW": 0.05552864,
+   "area_um2": 6076130.0,
+   "random_cycle_ns": 2.37369
+  },
+  "enc_glb_1MB": {
+   "width_bits": 128,
+   "depth": 65536,
+   "banks": 16,
+   "bytes": 1048576,
+   "read_pJ": 1.3249e-10,
+   "write_pJ": 1.4718600000000003e-10,
+   "leak_mW": 0.03179184000000001,
+   "area_um2": 3258760.0,
+   "random_cycle_ns": 1.82301
+  },
+  "enc_in_buf_16KB": {
+   "width_bits": 128,
+   "depth": 1024,
+   "banks": 1,
+   "bytes": 16384,
+   "read_pJ": 1.07481e-11,
+   "write_pJ": 2.32224e-11,
+   "leak_mW": 0.000497793,
+   "area_um2": 50649.399999999994,
+   "random_cycle_ns": 1.12712
+  },
+  "enc_acc_buf_16KB": {
+   "width_bits": 256,
+   "depth": 512,
+   "banks": 1,
+   "bytes": 16384,
+   "read_pJ": 1.4315800000000001e-11,
+   "write_pJ": 4.45186e-11,
+   "leak_mW": 0.000499724,
+   "area_um2": 53741.49999999999,
+   "random_cycle_ns": 1.12712
+  },
+  "ver_buf_8KB": {
+   "width_bits": 256,
+   "depth": 256,
+   "banks": 1,
+   "bytes": 8192,
+   "read_pJ": 1.1484e-11,
+   "write_pJ": 2.6410200000000005e-11,
+   "leak_mW": 0.000257769,
+   "area_um2": 30797.899999999998,
+   "random_cycle_ns": 0.886261
+  },
+  "ver_ucode_32KB": {
+   "width_bits": 256,
+   "depth": 1024,
+   "banks": 1,
+   "bytes": 32768,
+   "read_pJ": 2.6838000000000003e-11,
+   "write_pJ": 5.1786500000000005e-11,
+   "leak_mW": 0.000928967,
+   "area_um2": 103395.0,
+   "random_cycle_ns": 1.34298
+  }
+ },
+ "aladdin_2ns": {
+  "adder": {
+   "latency_ns": 2.0,
+   "dynamic_pJ": 0.0858,
+   "leak_mW": 0.0024,
+   "area_um2": 179.0,
+   "note": "this is a one stage adder",
+   "table_bits": 32
+  },
+  "multiplier": {
+   "latency_ns": 2.0,
+   "dynamic_pJ": 9.55,
+   "leak_mW": 0.05,
+   "area_um2": 5140.0,
+   "note": "this is a 1 stage fixed point multiplier",
+   "table_bits": 32
+  },
+  "fp_sp_adder": {
+   "latency_ns": 2.0,
+   "dynamic_pJ": 11.026,
+   "leak_mW": 0.021,
+   "area_um2": 3010.0,
+   "note": "this is a three stage single precision adder",
+   "table_bits": 32
+  },
+  "fp_sp_multiplier": {
+   "latency_ns": 2.0,
+   "dynamic_pJ": 29.7,
+   "leak_mW": 0.0594,
+   "area_um2": 3010.0,
+   "note": "this is a 3 stage floating point single precision multiplier",
+   "table_bits": 32
+  },
+  "reg": {
+   "latency_ns": 2.0,
+   "dynamic_pJ": 0.00901,
+   "leak_mW": 7e-05,
+   "area_um2": 5.98,
+   "note": "this is a 1 stage register",
+   "table_bits": 32
+  }
+ },
+ "aladdin_3ns": {
+  "adder": {
+   "latency_ns": 3.0,
+   "dynamic_pJ": 0.0859,
+   "leak_mW": 0.0024,
+   "area_um2": 179.0,
+   "note": "this is a one stage adder",
+   "table_bits": 32
+  },
+  "multiplier": {
+   "latency_ns": 3.0,
+   "dynamic_pJ": 8.8,
+   "leak_mW": 0.05,
+   "area_um2": 4970.0,
+   "note": "this is a 1 stage fixed point multiplier",
+   "table_bits": 32
+  },
+  "fp_sp_adder": {
+   "latency_ns": 3.0,
+   "dynamic_pJ": 10.584,
+   "leak_mW": 0.02,
+   "area_um2": 2960.0,
+   "note": "this is a three stage single precision adder",
+   "table_bits": 32
+  },
+  "fp_sp_multiplier": {
+   "latency_ns": 3.0,
+   "dynamic_pJ": 27.8,
+   "leak_mW": 0.0494,
+   "area_um2": 2960.0,
+   "note": "this is a 3 stage floating point single precision multiplier",
+   "table_bits": 32
+  },
+  "reg": {
+   "latency_ns": 3.0,
+   "dynamic_pJ": 0.00901,
+   "leak_mW": 7e-05,
+   "area_um2": 5.98,
+   "note": "this is a 1 stage register",
+   "table_bits": 32
+  }
+ }
+}

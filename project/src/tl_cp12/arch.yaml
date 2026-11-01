@@ -1,0 +1,106 @@
+# CP12 encoder: INT8 weight-stationary array for MiniLM-L6 GEMMs (CP3 contract), 45 nm.
+# Structure follows the CP4 design point (src/model_cp4.py) and the simple_weight_stationary
+# example of timeloop-accelergy-exercises. Jinja variables: R (array side), GLB_KB, DRAM_WPC, CYCLE_S.
+architecture:
+  version: 0.4
+  nodes:
+  - !Container
+    name: system
+    attributes:
+      global_cycle_seconds: {{CYCLE_S}}
+
+  - !Component # host LPDDR4. Only weights come from here (activations stay in glb); the model script
+                # charges DRAM energy and the bandwidth limit for weights itself, so bandwidth here is not limiting
+    name: DRAM
+    class: DRAM
+    attributes:
+      type: "LPDDR4"
+      width: 64
+      datawidth: 8
+      read_bandwidth: {{DRAM_WPC}}
+      write_bandwidth: {{DRAM_WPC}}
+
+  - !Container
+    name: encoder
+    attributes:
+      technology: "45nm"
+
+  - !Component # global buffer: activations + one GEMM's weights double-buffered
+    name: glb
+    class: smartbuffer_SRAM
+    attributes:
+      depth: {{GLB_KB * 64}}
+      width: 128
+      n_banks: 16
+      datawidth: 8
+      read_bandwidth: 16
+      write_bandwidth: 16
+    constraints:
+      dataspace: {keep: [Weights, Inputs, Outputs]}
+
+  # buffers next to the array (CP4 "local buffer", 32 KB in total); each keeps one data space
+  - !Component
+    name: in_buf
+    class: smartbuffer_SRAM
+    attributes:
+      depth: 1024
+      width: 128
+      datawidth: 8
+      read_bandwidth: {{R}}
+      write_bandwidth: {{R}}
+    constraints:
+      dataspace: {keep: [Inputs], bypass: [Weights, Outputs]}
+  - !Component # INT32 partial sums
+    name: acc_buf
+    class: smartbuffer_SRAM
+    attributes:
+      depth: 512
+      width: 256
+      datawidth: 32
+      read_bandwidth: {{R}}
+      write_bandwidth: {{R}}
+    constraints:
+      dataspace: {keep: [Outputs], bypass: [Weights, Inputs]}
+
+  - !Container
+    name: PE
+    spatial: {meshX: {{R}}, meshY: {{R}}}
+    constraints:
+      spatial:
+        permutation: [C, M]
+        split: 6   # transpiled permutation is PNQSR C M: C on X (rows), M on Y (columns)
+        factors: [R=1, S=1, Q=1, N=1, P=1, C={{R}}, M={{R}}]
+
+  - !Parallel
+    nodes:
+    - !Component # the stationary weight
+      name: weight_reg
+      class: storage
+      subclass: aladdin_register
+      attributes: {depth: 1, width: 8, datawidth: 8}
+      constraints:
+        dataspace: {keep: [Weights]}
+        temporal: {factors: [R=1, S=1, M=1, C=1]}
+    - !Component # input passed along the row
+      name: input_reg
+      class: storage
+      subclass: aladdin_register
+      attributes: {depth: 1, width: 8, datawidth: 8}
+      constraints:
+        dataspace: {keep: [Inputs]}
+        temporal: {factors: [P=1, Q=1, C=1, N=1]}
+    - !Component # partial sum passed down the column
+      name: psum_reg
+      class: storage
+      subclass: aladdin_register
+      attributes: {depth: 1, width: 32, datawidth: 32}
+      constraints:
+        dataspace: {keep: [Outputs]}
+        temporal: {factors: [P=1, Q=1, M=1, N=1]}
+
+  - !Component
+    name: mac
+    class: intmac
+    attributes:
+      multiplier_width: 8
+      adder_width: 32

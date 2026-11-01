@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node Box Status</title>
+<meta name="description" content="Status of our EEE 598 project: a low-power home node box that does an operator's job (search and spam-proof verification) for a server-blind, operator-free community.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f5; --surface: #ffffff; --ink: #18201c; --muted: #56615b; --line: #d3dad6;
+  --path: #2f6b4f; --path-soft: #e2eee7;
+  --attack: #9a5b0e; --attack-soft: #f7e9d3;
+  --pick: #3a4fb0; --pick-soft: #e4e8f8;
+  --bad: #a33a2e; --bad-soft: #f6e1dd;
+  --src: #6b3fa0; --src-soft: #efe6f8;
+  --f-body: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --bg: #111613; --surface: #19201c; --ink: #e3eae6; --muted: #9daaa3; --line: #2b3530;
+  --path: #6fc39a; --path-soft: #17332a; --attack: #e2ad5a; --attack-soft: #3a2b12;
+  --pick: #9aa8ff; --pick-soft: #222a52; --bad: #f08b7d; --bad-soft: #3d1f1a;
+  --src: #c9a4f5; --src-soft: #2e2142; } }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111613; --surface: #19201c; --ink: #e3eae6; --muted: #9daaa3; --line: #2b3530;
+  --path: #6fc39a; --path-soft: #17332a; --attack: #e2ad5a; --attack-soft: #3a2b12;
+  --pick: #9aa8ff; --pick-soft: #222a52; --bad: #f08b7d; --bad-soft: #3d1f1a;
+  --src: #c9a4f5; --src-soft: #2e2142; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--f-body);
+  padding: 28px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+  overflow-wrap: break-word; }
+.wrap { max-width: 860px; margin-inline: auto; display: flex; flex-direction: column; gap: 28px; }
+a { color: var(--pick); }
+h1 { margin: 0; font-size: clamp(26px, 5vw, 36px); line-height: 1.2; text-wrap: balance; }
+h2 { margin: 0 0 4px; font-size: 22px; line-height: 1.3; text-wrap: balance; }
+h3 { margin: 18px 0 6px; font-size: 17px; }
+p { margin: 0 0 10px; max-width: 72ch; }
+ul, ol { margin: 0 0 10px; padding-left: 1.3em; max-width: 72ch; }
+li { margin: 4px 0; }
+.meta { font: 600 13px var(--f-mono); color: var(--muted); margin-bottom: 8px; }
+.lede { font-size: 18px; color: var(--ink); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+section { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+.recent { border-left: 4px solid var(--pick); }
+.recent ul { margin: 6px 0 0; }
+.goal { font-size: 19px; font-weight: 600; border-left: 3px solid var(--path); padding: 4px 0 4px 14px; margin: 8px 0 14px; max-width: 70ch; }
+
+/* number labels */
+.k { display: inline-block; font: 600 11px/1.6 var(--f-mono); padding: 0 7px; border-radius: 999px; letter-spacing: .02em; white-space: nowrap; vertical-align: 1px; }
+.k-meas { background: var(--path-soft); color: var(--path); }
+.k-src  { background: var(--src-soft); color: var(--src); }
+.k-syn  { background: var(--pick-soft); color: var(--pick); }
+.k-est  { background: var(--attack-soft); color: var(--attack); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+/* two-up cards */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 10px 0; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--bg); min-width: 0; }
+.card.flood { border-color: var(--attack); background: var(--attack-soft); }
+.card h3 { margin: 0 0 4px; font-size: 15px; }
+.card .big { font: 600 22px var(--f-mono); }
+.card p { margin: 4px 0 0; font-size: 14px; }
+
+/* tables */
+.tbl { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px 0 12px; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .03em; text-transform: uppercase; background: var(--bg); }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 13px; }
+td.kind { white-space: nowrap; }
+
+/* diagrams */
+.diagram { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.scrollhint { font-size: 12px; color: var(--muted); display: none; }
+@media (max-width: 800px) { .scrollhint { display: block; } }
+svg text { font-family: var(--f-body); fill: var(--ink); }
+svg .mono { font-family: var(--f-mono); }
+svg .mut { fill: var(--muted); }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+svg .box-plan { fill: var(--surface); stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+svg .box-path { fill: var(--path-soft); stroke: var(--path); stroke-width: 1.4; }
+svg .box-pick { fill: var(--pick-soft); stroke: var(--pick); stroke-width: 2; }
+svg .box-attack { fill: var(--attack-soft); stroke: var(--attack); stroke-width: 1.4; }
+svg .wire { stroke: var(--path); stroke-width: 2; fill: none; }
+svg .wire-attack { stroke: var(--attack); stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+svg .wire-mem { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+svg .head { fill: var(--path); }
+svg .head-attack { fill: var(--attack); }
+svg .head-mem { fill: var(--muted); }
+svg .t-attack { fill: var(--attack); }
+svg .t-path { fill: var(--path); }
+
+details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 10px 0; background: var(--bg); }
+details > summary { cursor: pointer; font-weight: 600; }
+details[open] > summary { margin-bottom: 8px; }
+.dropped li { margin: 8px 0; }
+.dropped b { color: var(--ink); }
+.help li { margin: 8px 0; }
+footer { font-size: 13px; color: var(--muted); }
+
+@media (max-width: 640px) {
+  section { padding: 16px; }
+  .duo { grid-template-columns: 1fr; }
+  .lede { font-size: 17px; }
+  .goal { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="meta">EEE 598 · Hardware and Systems for ML · final project · <a href="../index.html">course notes</a></div>
+  <h1>A home node box that does the moderator's job</h1>
+  <p class="meta" style="margin-top:10px">Last updated: 2026-10-31</p>
+  <p class="lede">Project status for the team: what we're building, why, the current design, what we've found, and where you could jump in. About a 5-minute read; the expandable sections hold the details.</p>
+  <div class="legend">
+    <span>Every number is labeled:</span>
+    <span><span class="k k-meas">measured</span> on our laptop</span>
+    <span><span class="k k-src">source</span> paper, vendor or datasheet</span>
+    <span><span class="k k-syn">synthesized</span> our RTL, 45 nm synthesis</span>
+    <span><span class="k k-est">estimated</span> our model or an assumption</span>
+  </div>
+</header>
+
+<section class="recent" aria-labelledby="recent-h">
+  <h2 id="recent-h">What changed recently</h2>
+  <ul>
+    <li><b>First estimate of the whole chip.</b> We put the verify unit and the text encoder on one 45 nm die, both costed with the same tools (Timeloop + Accelergy). The chip is <b>11.0 mm²</b> and draws <b>0.092 W</b> on an ordinary day and <b>0.48 W</b> during a 100 Mbps spam flood. It leaks 27 mW when idle before we power-gate it <span class="k k-est">estimated</span>. To clear the overnight backlog in under an hour at 500 MHz, the encoder needs a <b>32×32</b> array (16×16 takes 106 min).</li>
+    <li><b>Box comparison: the flood is where our hardware matters.</b> Our chip keeps up with the flood. A Pi 5 or Jetson CPU handles only 1/3–1/2 of it <span class="k k-est">estimated</span>, and the laptop keeps up only at 46.3 W <span class="k k-meas">measured</span>. On an ordinary day the chip barely changes the box total: the host's own idle power (2.4–3.3 W <span class="k k-src">source</span>) sets it. We keep the encoder on our chip rather than using a Hailo-8L, because the chip draws less (0.092 W vs 0.134–0.182 W <span class="k k-est">estimated</span>) and the Hailo is limited to 128 tokens.</li>
+    <li><b>We modeled the whole proof-verify unit cycle by cycle</b> by replaying a real batch verification. It takes 14,368 field multiplications per proof, 1.38× our earlier hand count. To keep up, the unit needs <b>5 multipliers + 4 adders + an 8 KB buffer</b> <span class="k k-est">cycle model</span>.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="goal-h">
+  <h2 id="goal-h">1. The goal, and why</h2>
+  <p class="goal">Replace the community operator with compute on users' own devices, so an online community can be as free, anonymous and forgetful as a real-life conversation and still be as easy to use as today's sites. Our part is the hardware that makes that compute cheap.</p>
+  <p>On today's forums the operator can read everything, can restore deleted posts, and comes under pressure that shakes the whole community. In a real-life conversation nobody is monitoring, only the speaker is responsible, and words are gone once spoken. We want those properties online:</p>
+  <ul>
+    <li><b>Server-blind:</b> servers and storage nodes never see plaintext. We don't allow any optimization that breaks this, such as letting the server build the search index.</li>
+    <li><b>No operator:</b> nobody gets privileged access.</li>
+    <li><b>Forgetting:</b> if the author deletes a post, the original is gone.</li>
+    <li><b>Creating identities is expensive:</b> users are anonymous, but running many accounts is hard.</li>
+    <li><b>We don't give up usability:</b> search, feeds, recommendations, votes, comments, chat and sub-communities stay. If peer-to-peer rules a feature out as it exists today, we replace it with something that meets the same need.</li>
+  </ul>
+  <p>Earlier peer-to-peer communities gave up either autonomy and anonymity or usability. We get both by paying in <b>compute</b>, and that compute goes to two places:</p>
+  <ol>
+    <li><b>ML, to replace the operator's services:</b> search (text embeddings + top-k), feed ranking, spam and bot detection.</li>
+    <li><b>Crypto, to prove things without revealing them:</b> signature checks, decryption, and anonymous credentials and zero-knowledge proofs.</li>
+  </ol>
+  <p class="small muted">The target device is an <b>always-on home node box</b>, something you leave running like a router or a NAS. Both ML and crypto are in scope for the course project. The project is not a generic "edge vector-search accelerator"; those already exist. What sets us apart is the conditions that server-blindness creates.</p>
+</section>
+
+<section aria-labelledby="box-h">
+  <h2 id="box-h">2. What the box must do, and why it needs hardware</h2>
+  <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries.</p>
+  <div class="duo">
+    <div class="card">
+      <h3>An ordinary day: easy</h3>
+      <div class="big">&lt; 1 W</div>
+      <p>active power for 10<sup>6</sup> posts/day <span class="k k-est">estimated</span>, whichever encoder option we pick. That is less than the box's own idle power, 2.4–4.4 W for comparable devices <span class="k k-src">source</span>.</p>
+    </div>
+    <div class="card flood">
+      <h3>A spam flood: hard</h3>
+      <div class="big">24–181 W</div>
+      <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our chip: 0.48 W <span class="k k-est">estimated</span>.</p>
+    </div>
+  </div>
+  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest.</p>
+  <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
+  <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>.</p>
+</section>
+
+<section aria-labelledby="design-h">
+  <h2 id="design-h">3. Current design</h2>
+  <h3 style="margin-top:6px">The box: the path of one message</h3>
+  <p>The verify unit sits in front of everything else, so invalid messages are dropped before they reach the host or the encoder.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the encoder; host and encoder use DRAM.">
+      <defs>
+        <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-attack" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <!-- budget header -->
+      <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 11.0 mm² at 45 nm · V and E power-gated when idle (est.)</text>
+      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day, 10⁶ posts: chip 0.092 W (est.) · host idle 2.4–3.3 W (source) sets the box total · chip idle 27 mW before gating</text>
+      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W, keeps up (est.) · Pi 5 / Jetson CPUs reach 1/3–1/2 of it (est.) · laptop CPU 46.3 W (measured)</text>
+      <!-- network -->
+      <rect class="box" x="14" y="130" width="126" height="84" rx="8"/>
+      <text x="77" y="160" text-anchor="middle" font-weight="600">Network</text>
+      <text x="77" y="181" text-anchor="middle" class="mut" font-size="12">ciphertext +</text>
+      <text x="77" y="197" text-anchor="middle" class="mut" font-size="12">signature + proof</text>
+      <!-- flood wire -->
+      <path class="wire-attack" d="M140,170 L213,170" marker-end="url(#a2)"/>
+      <text x="176" y="158" text-anchor="middle" class="mono t-attack" font-size="11">flood</text>
+      <text x="176" y="190" text-anchor="middle" class="mono t-attack" font-size="11">12,207/s</text>
+      <!-- verify unit -->
+      <rect class="box-pick" x="218" y="100" width="216" height="150" rx="8"/>
+      <text x="326" y="126" text-anchor="middle" font-weight="700">Proof verify unit (V)</text>
+      <text x="326" y="146" text-anchor="middle" class="mut" font-size="12">decode + subgroup checks</text>
+      <text x="326" y="162" text-anchor="middle" class="mut" font-size="12">→ batched pairing check</text>
+      <text x="326" y="186" text-anchor="middle" class="mono" font-size="12">14,368 Fp mults / proof</text>
+      <text x="326" y="204" text-anchor="middle" class="mono" font-size="12">0.0317 mJ/proof · 1.83 mm²</text>
+      <text x="326" y="230" text-anchor="middle" class="mut" font-size="11.5">5 multipliers · 4 adders · 8 KB (est.)</text>
+      <!-- drop -->
+      <path class="wire-attack" d="M326,250 L326,306" marker-end="url(#a2)"/>
+      <rect class="box-attack" x="256" y="308" width="140" height="44" rx="8"/>
+      <text x="326" y="335" text-anchor="middle" font-size="13">invalid → drop</text>
+      <!-- valid wire -->
+      <path class="wire" d="M434,175 L491,175" marker-end="url(#a1)"/>
+      <text x="462" y="163" text-anchor="middle" class="mono t-path" font-size="11">valid 11.6/s</text>
+      <text x="462" y="194" text-anchor="middle" class="mut" font-size="10.5">rate-limited</text>
+      <!-- host -->
+      <rect class="box" x="496" y="100" width="210" height="150" rx="8"/>
+      <text x="601" y="126" text-anchor="middle" font-weight="600">Host CPU (small cores)</text>
+      <text x="601" y="150" text-anchor="middle" font-size="12">Ed25519 signature check</text>
+      <text x="601" y="168" text-anchor="middle" font-size="12">ChaCha20-Poly1305 decrypt</text>
+      <text x="601" y="186" text-anchor="middle" font-size="12">tokenize · index · search</text>
+      <text x="601" y="214" text-anchor="middle" class="mut" font-size="11.5">exact top-10 over 10⁶ vectors:</text>
+      <text x="601" y="230" text-anchor="middle" class="mut" font-size="11.5">25 ms (measured, laptop)</text>
+      <!-- encoder -->
+      <path class="wire" d="M706,175 L759,175" marker-end="url(#a1)"/>
+      <rect class="box-path" x="764" y="88" width="204" height="174" rx="8"/>
+      <text x="866" y="114" text-anchor="middle" font-weight="700">Text encoder (E)</text>
+      <text x="866" y="136" text-anchor="middle" font-size="12">INT8 32×32 array · 500 MHz</text>
+      <text x="866" y="154" text-anchor="middle" font-size="12">FP16 attention · vector unit</text>
+      <text x="866" y="172" text-anchor="middle" font-size="12">2 MB SRAM + 32 KB local</text>
+      <text x="866" y="198" text-anchor="middle" class="mono" font-size="12">8.05 ms · 7.90 mJ / post</text>
+      <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">backlog 45 min · 9.22 mm²</text>
+      <text x="866" y="244" text-anchor="middle" class="mut" font-size="11">(est., Timeloop + Accelergy)</text>
+      <!-- dram -->
+      <rect class="box" x="496" y="308" width="472" height="52" rx="8"/>
+      <text x="732" y="330" text-anchor="middle" font-weight="600">DRAM</text>
+      <text x="732" y="349" text-anchor="middle" class="mut" font-size="12">encoder weights (10.6 MB INT8) streamed per post · search index</text>
+      <path class="wire-mem" d="M601,250 L601,304" marker-end="url(#a3)"/>
+      <path class="wire-mem" d="M866,262 L866,304" marker-end="url(#a3)"/>
+    </svg>
+  </div>
+  <p class="small muted">The host-CPU costs are small. On our laptop, an Ed25519 check is 29–31 µs on a P-core and 103–105 µs on a low-power E-core, and decrypting 1 KB is 1.7 / 3.1 µs <span class="k k-meas">measured</span>. The encoder numbers come from Timeloop (how each matrix multiply maps onto the array) and Accelergy (45 nm energy and area: CACTI for SRAM, Aladdin tables for logic). We haven't written RTL for the encoder.</p>
+
+  <h3>Inside the verify unit</h3>
+  <p>The unit handles the whole job of accepting a proof, not just the pairing: decoding and subgroup checks are 26% (measured) to 36% (model) of the work per proof. Left on the CPU, they would need 1.4 P-cores during a flood.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 250" role="img" aria-label="Verify unit internals: a microcoded sequencer drives an 8 KB operand buffer feeding 5 Montgomery multipliers and 4 adders; the result is a batch pass or fail.">
+      <defs><marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <rect class="box-plan" x="10" y="20" width="180" height="190" rx="8"/>
+      <text x="100" y="46" text-anchor="middle" font-weight="600">Sequencer</text>
+      <text x="100" y="68" text-anchor="middle" font-size="12">microcode, lock-step</text>
+      <text x="100" y="84" text-anchor="middle" font-size="12">across the batch</text>
+      <text x="100" y="108" text-anchor="middle" font-size="11.5" class="mut">point decompression</text>
+      <text x="100" y="124" text-anchor="middle" font-size="11.5" class="mut">G2 subgroup check</text>
+      <text x="100" y="140" text-anchor="middle" font-size="11.5" class="mut">random batch weights</text>
+      <text x="100" y="156" text-anchor="middle" font-size="11.5" class="mut">Miller loop</text>
+      <text x="100" y="172" text-anchor="middle" font-size="11.5" class="mut">final exponentiation</text>
+      <text x="100" y="198" text-anchor="middle" font-size="11" class="mut">256-op lookahead window</text>
+      <path class="wire" d="M190,115 L243,115" marker-end="url(#b1)"/>
+      <rect class="box-plan" x="248" y="20" width="180" height="190" rx="8"/>
+      <text x="338" y="46" text-anchor="middle" font-weight="600">Operand buffer</text>
+      <text x="338" y="70" text-anchor="middle" font-size="12" class="mono">8 KB</text>
+      <text x="338" y="90" text-anchor="middle" font-size="12" class="mut">peak 194 live values</text>
+      <text x="338" y="108" text-anchor="middle" font-size="12" class="mut">(256-bit each)</text>
+      <path class="wire" d="M428,75 L483,75" marker-end="url(#b1)"/>
+      <path class="wire" d="M428,165 L483,165" marker-end="url(#b1)"/>
+      <rect class="box-pick" x="488" y="20" width="262" height="110" rx="8"/>
+      <text x="619" y="46" text-anchor="middle" font-weight="700">Montgomery multiplier × 5</text>
+      <text x="619" y="66" text-anchor="middle" font-size="12">254-bit, 64-bit word-serial (CIOS)</text>
+      <text x="619" y="88" text-anchor="middle" class="mono" font-size="12">each: 0.28 mm² · 300 MHz</text>
+      <text x="619" y="106" text-anchor="middle" class="mono" font-size="12">4 cycles · 1.76 nJ / multiply</text>
+      <text x="619" y="123" text-anchor="middle" class="mut" font-size="11">RTL + 45 nm synthesis</text>
+      <rect class="box-plan" x="488" y="142" width="262" height="68" rx="8"/>
+      <text x="619" y="168" text-anchor="middle" font-weight="600">254-bit adder × 4</text>
+      <text x="619" y="190" text-anchor="middle" font-size="12" class="mut">add / subtract + conditional subtract</text>
+      <path class="wire" d="M750,115 L803,115" marker-end="url(#b1)"/>
+      <rect class="box-plan" x="808" y="60" width="162" height="110" rx="8"/>
+      <text x="889" y="90" text-anchor="middle" font-weight="600">Verdict</text>
+      <text x="889" y="112" text-anchor="middle" font-size="12">batch pass / fail</text>
+      <text x="889" y="132" text-anchor="middle" font-size="12" class="mut">on fail: split and</text>
+      <text x="889" y="148" text-anchor="middle" font-size="12" class="mut">retry halves</text>
+      <!-- legend -->
+      <rect class="box-pick" x="10" y="225" width="22" height="14" rx="3"/>
+      <text x="40" y="237" font-size="12" class="mut">built (RTL, simulated, synthesized)</text>
+      <rect class="box-plan" x="290" y="225" width="22" height="14" rx="3"/>
+      <text x="320" y="237" font-size="12" class="mut">planned: exists only in the cycle model, no RTL yet</text>
+    </svg>
+  </div>
+  <p class="small muted">Keeping the multipliers busy took three things: as many adders as multipliers (there are 2.5 additions per multiplication), running all proofs in a batch in lock-step, and a lookahead window a few hundred operations deep. Before we switched to lock-step order, the same hardware managed 14,110 proofs/s. Reordering by dependency depth also fills the multipliers, but then the buffer grows to 740 KB. So the throughput-versus-buffer tradeoff is set by how the microcode orders operations, more than by the hardware.</p>
+
+  <h3>The chip: two gated domains behind PCIe</h3>
+  <p>The box is a Pi 5-class host SoC (network, storage, queries, Ed25519, ChaCha20) with LPDDR4, plus our accelerator chip on PCIe. The chip has two power domains that are switched off whenever they have no work, and a small always-on part.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 300" role="img" aria-label="Accelerator chip: host SoC with DRAM connects over PCIe to the chip. Inside, an always-on control domain, a verify-unit domain V of 1.83 mm², and an encoder domain E of 9.22 mm² dominated by a 2 MB SRAM.">
+      <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <!-- host -->
+      <rect class="box" x="10" y="70" width="170" height="150" rx="8"/>
+      <text x="95" y="98" text-anchor="middle" font-weight="600">Host SoC (Pi 5-class)</text>
+      <text x="95" y="120" text-anchor="middle" font-size="12" class="mut">network · storage</text>
+      <text x="95" y="136" text-anchor="middle" font-size="12" class="mut">queries · Ed25519</text>
+      <text x="95" y="152" text-anchor="middle" font-size="12" class="mut">ChaCha20</text>
+      <text x="95" y="176" text-anchor="middle" font-size="12">+ LPDDR4</text>
+      <text x="95" y="200" text-anchor="middle" font-size="11.5" class="mut">idle 2.4–3.3 W (source)</text>
+      <path class="wire-mem" d="M180,145 L223,145" marker-end="url(#c1)"/>
+      <text x="202" y="135" text-anchor="middle" class="mono mut" font-size="11">PCIe</text>
+      <!-- chip outline -->
+      <rect x="228" y="14" width="742" height="272" rx="10" style="fill:none;stroke:var(--ink);stroke-width:1.4"/>
+      <text x="244" y="36" font-weight="700">Our chip · 11.0 mm² · 45 nm (est.)</text>
+      <!-- always-on -->
+      <rect class="box-plan" x="244" y="56" width="150" height="214" rx="8"/>
+      <text x="319" y="84" text-anchor="middle" font-weight="600">Always on</text>
+      <text x="319" y="106" text-anchor="middle" font-size="12" class="mut">PCIe · DMA control</text>
+      <text x="319" y="122" text-anchor="middle" font-size="12" class="mut">queues</text>
+      <text x="319" y="138" text-anchor="middle" font-size="12" class="mut">power management</text>
+      <text x="319" y="168" text-anchor="middle" font-size="11.5" class="mut">small;</text>
+      <text x="319" y="184" text-anchor="middle" font-size="11.5" class="mut">not in the model yet</text>
+      <!-- V -->
+      <rect class="box-pick" x="408" y="56" width="210" height="214" rx="8"/>
+      <text x="513" y="84" text-anchor="middle" font-weight="700">V · verify unit</text>
+      <text x="513" y="106" text-anchor="middle" font-size="12">proof FIFO → sequencer</text>
+      <text x="513" y="122" text-anchor="middle" font-size="12">5 multipliers · 4 adders</text>
+      <text x="513" y="138" text-anchor="middle" font-size="12">8 KB operand registers</text>
+      <text x="513" y="166" text-anchor="middle" class="mono" font-size="12">1.83 mm² · leak 10.9 mW</text>
+      <text x="513" y="184" text-anchor="middle" class="mono" font-size="12">0.0317 mJ / proof</text>
+      <text x="513" y="212" text-anchor="middle" font-size="11.5" class="mut">idle 99.95% of an</text>
+      <text x="513" y="228" text-anchor="middle" font-size="11.5" class="mut">ordinary day → gated</text>
+      <text x="513" y="254" text-anchor="middle" font-size="11.5" class="t-attack">49% busy in a 100 Mbps flood</text>
+      <!-- E -->
+      <rect class="box-path" x="632" y="56" width="324" height="214" rx="8"/>
+      <text x="794" y="84" text-anchor="middle" font-weight="700">E · text encoder</text>
+      <text x="794" y="106" text-anchor="middle" font-size="12">DMA → 2 MB global SRAM (6.80 mm²)</text>
+      <text x="794" y="122" text-anchor="middle" font-size="12">→ input + accumulator buffers</text>
+      <text x="794" y="138" text-anchor="middle" font-size="12">→ INT8 32×32 array (1.20 mm²)</text>
+      <text x="794" y="154" text-anchor="middle" font-size="12">FP16 attention (0.53 mm²) · vector unit</text>
+      <text x="794" y="182" text-anchor="middle" class="mono" font-size="12">9.22 mm² · leak 16.2 mW</text>
+      <text x="794" y="212" text-anchor="middle" font-size="11.5" class="mut">busy 9.3% of an ordinary day → gated</text>
+      <text x="794" y="228" text-anchor="middle" font-size="11.5" class="mut">weights (10.6 MB) streamed from host DRAM</text>
+      <text x="794" y="254" text-anchor="middle" font-size="11.5" class="mut">500 MHz</text>
+    </svg>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Chip, by workload</th><th>Power</th><th>What it's doing</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Ordinary day (11.6 posts/s)</td><td class="num">0.092 W</td><td>encoder busy 9.3% of the day</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>100 Mbps flood (12,207 proofs/s)</td><td class="num">0.48 W</td><td>verify unit 49% busy; within the 2 W budget</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Overnight backlog (330k posts in 45 min)</td><td class="num">0.90 W</td><td>encoder working through 8 hours of posts</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Idle</td><td class="num">27 mW before gating · 0 after</td><td>within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+</section>
+
+<section aria-labelledby="results-h">
+  <h2 id="results-h">4. Key results</h2>
+  <h3 style="margin-top:6px">The whole box, compared with existing combinations</h3>
+  <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Box</th><th>Ordinary day</th><th>100 Mbps flood</th><th>Idle</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td><b>Pi 5-class host + our chip</b></td><td class="num">2.49–3.39 W</td><td class="num"><b>keeps up</b> at 2.88–3.78 W</td><td class="num">2.4–3.3 W</td><td><span class="k k-src">source</span> host idle · <span class="k k-est">estimated</span> chip</td></tr>
+      <tr><td>Pi 5 + Hailo-8L</td><td class="num">2.55–3.50 W (without Hailo idle)</td><td class="num"><b>falls behind</b>: 4 CPU cores top out at 3,854/s</td><td class="num">2.4–3.3 W + Hailo idle (unknown)</td><td><span class="k k-src">source</span> Hailo 121 posts/s, 1.4–1.9 W · <span class="k k-est">estimated</span> CPU</td></tr>
+      <tr><td>Jetson Orin Nano</td><td class="num">no published encoder numbers</td><td class="num"><b>falls behind</b>: 6 CPU cores reach 4,095–5,241/s</td><td class="num">2.5–4.7 W</td><td><span class="k k-src">source</span> idle · <span class="k k-est">estimated</span> CPU</td></tr>
+      <tr><td>Laptop, Core Ultra 9 185H (NPU + CPU)</td><td class="num">7.43 W</td><td class="num">keeps up, but at 46.3 W</td><td class="num">6.42 W</td><td><span class="k k-meas">measured</span></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. One 11 mm² chip does it at 0.48 W <span class="k k-est">estimated</span>.</li>
+    <li><b>On an ordinary day the chip hardly matters.</b> Our box is 0.06–0.11 W below Pi 5 + Hailo-8L, much less than the spread in host idle power (2.4–3.3 W). To lower everyday power further you'd have to work on the host's idle power, which is outside this course project.</li>
+    <li><b>Encoder on our chip, not a Hailo-8L.</b> We decided in advance to keep the encoder on our chip only if the chip's ordinary-day power came in under the Hailo-8L's share. It did: 0.092 W vs 0.134–0.182 W (11.6–15.7 mJ per post × 11.6 posts/s, estimated from vendor figures). The Hailo is also fixed at 128 tokens.</li>
+  </ul>
+  <p class="small muted">ARM CPU speeds are scaled from our laptop (a Pi 5 Cortex-A76 core ≈ 1/2.93 of a 185H core, from Geekbench 6 scores; a Jetson core ≈ 0.71–0.91× a Pi core), so the Pi and Jetson flood rates are estimates. We couldn't find MiniLM numbers for the Jetson.</p>
+
+  <h3>What existing hardware does</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>Number</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Where ingest time goes on a laptop CPU</td><td class="num">encoder ≈98% · signature + decrypt ≈0.5%</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Exact top-10 search, 10<sup>6</sup> vectors (FP32, 1.5 GB)</td><td class="num">25 ms</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>CPU encoder baseline (FP32, all cores, length-bucketed batch 8)</td><td class="num">7.15 ms · 0.53 J / post</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Laptop NPU, out of the box</td><td class="num">8-hour backlog in 174 min (target: 1 h)</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Laptop NPU, with our attention-mask workaround</td><td class="num">8.15 ms / post · backlog in 45 min · Recall@10 0.997</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Hailo-8L running MiniLM (x86 host, 128-token input only)</td><td class="num">121 posts/s (batch 1) · 1.4–1.9 W module</td><td class="kind"><span class="k k-src">vendor</span></td></tr>
+      <tr><td>Groth16 verify (BN254), one core: P-core / low-power E-core</td><td class="num">1.39 ms / 3.50 ms</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Same, batch of 64, per proof</td><td class="num">0.35 ms / 0.90 ms</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Active energy per verification</td><td class="num">14.9 mJ (P-core, one at a time) · 2.1 mJ (E-core, batched)</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>CPU power needed to verify a 100 Mbps flood (12,207 msg/s)</td><td class="num">24–181 W</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Pairings on edge NPUs (Hailo, Coral, RK3588)</td><td class="num">not supported (8/16-bit MAC arrays)</td><td class="kind"><span class="k k-src">source</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Our design (45 nm)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>Number</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Montgomery multiplier, 254-bit, 64-bit word-serial</td><td class="num">0.28 mm² · 300 MHz · 4 cycles · 1.76 nJ / multiply</td><td class="kind"><span class="k k-syn">synthesized</span></td></tr>
+      <tr><td>Multiplier functional check</td><td class="num">1,000 test vectors, 0 errors</td><td class="kind"><span class="k k-meas">simulated</span></td></tr>
+      <tr><td>Field ops per proof in a batch, counted from a traced real BN254 verification</td><td class="num">14,368 multiplies · 35,938 adds (earlier hand count: 10,415 multiplies)</td><td class="kind"><span class="k k-meas">counted</span></td></tr>
+      <tr><td>Verify unit: 5 multipliers (1.42 mm²) + 4 adders + 8 KB buffer</td><td class="num">24,862 proofs/s · multiplier utilization 0.79 (target ≥ 24,414/s, 2× the flood)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
+      <tr><td>Same unit with 4 multipliers</td><td class="num">20,633 proofs/s (misses the target)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
+      <tr><td>Verify unit energy per proof, batched · one proof alone</td><td class="num">0.0317 mJ (multiplies 80%, moving operands 19%) · 0.103 mJ</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Verify unit area · leakage</td><td class="num">1.83 mm² (multipliers 1.42, operand registers 0.30, 32 KB microcode 0.10, adders 0.01) · 10.9 mW</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Latency of one proof, not batched</td><td class="num">282 µs (4.3× faster than 1.22 ms tuned software on a P-core)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
+      <tr><td>Encoder: INT8 32×32 array, 2 MB SRAM, 32 KB local buffers, 500 MHz</td><td class="num">8.05 ms · 7.90 mJ / post · 8-hour backlog in 45 min · new post encoded in 14 ms (P99)</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td>Encoder area · leakage</td><td class="num">9.22 mm² (2 MB SRAM 6.80, array 1.20, FP16 attention 0.53) · 16.2 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">11.0 mm² · 0.092 W ordinary day · 0.48 W in a 100 Mbps flood · 0.90 W during the backlog · 27 mW idle before gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">"Synthesized" means Synopsys Design Compiler with the FreePDK45 (OSU) library, with power computed from simulated switching activity. Everything else on the chip (adders, buffers, sequencer, the whole encoder) is costed with Accelergy's 45 nm tables (CACTI for SRAM, Aladdin for logic), not RTL. The 2 W budget, 10<sup>6</sup> posts/day, 1 KB messages, 100 Mbps flood and 1-hour backlog target are all <b>assumptions</b>.</p>
+
+  <details>
+    <summary>Choosing the encoder array size</summary>
+    <p class="small">We decided in advance: at 500 MHz, take the <b>smallest</b> array (8×8, 16×16 or 32×32) that clears an 8-hour backlog in ≤ 60 min and keeps a new post's P99 under 5 s. 1 GHz is shown only as a sensitivity check. Backlog runs use batch 8 sorted by length; energy is shown for batch 1 / batch 8. All from Timeloop mappings + Accelergy 45 nm costs <span class="k k-est">model</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Array</th><th>Clock</th><th>Per post (batch 1)</th><th>Energy, B=1 / B=8</th><th>8-hour backlog</th><th>New post P99</th><th>Area</th><th>Leakage</th></tr></thead>
+      <tbody>
+        <tr><td>8×8</td><td class="num">500 MHz</td><td class="num">72.0 ms</td><td class="num">9.73 / 9.76 mJ</td><td class="num">401 min</td><td class="num">125 ms</td><td class="num">7.08 mm²</td><td class="num">1.4 mW</td></tr>
+        <tr><td>16×16</td><td class="num">500 MHz</td><td class="num">18.9 ms</td><td class="num">8.48 / 7.59 mJ</td><td class="num">106 min</td><td class="num">33 ms</td><td class="num">7.50 mm²</td><td class="num">4.3 mW</td></tr>
+        <tr><td><b>32×32 (chosen)</b></td><td class="num">500 MHz</td><td class="num">8.05 ms</td><td class="num">7.90 / 7.25 mJ</td><td class="num"><b>45 min</b></td><td class="num">14 ms</td><td class="num">9.22 mm²</td><td class="num">16.2 mW</td></tr>
+        <tr><td>16×16</td><td class="num">1 GHz</td><td class="num">9.45 ms</td><td class="num">8.44 / 7.55 mJ</td><td class="num">53 min</td><td class="num">16 ms</td><td class="num">7.50 mm²</td><td class="num">4.3 mW</td></tr>
+        <tr><td>32×32</td><td class="num">1 GHz</td><td class="num">4.04 ms</td><td class="num">7.83 / 7.18 mJ</td><td class="num">22 min</td><td class="num">7 ms</td><td class="num">9.22 mm²</td><td class="num">16.2 mW</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">Every option is far under 5 s for a new post, so the backlog decides the size. Energy at 32×32, batch 8: on-chip matrix multiplies 64%, attention 24%, vector ops 9%, leakage while busy 1.8%, weight reads from DRAM 1.2%. At batch 1 the DRAM share grows to 8.6%, because all 10.6 MB of weights are re-read for every post. The 32×32 mappings got a shorter search (each took over 20 minutes), so their average utilization is only 0.49 (0.20–0.81) against 0.92–1.00 for 8×8 and 16×16. The 32×32 times are therefore an upper bound.</p>
+  </details>
+
+  <details>
+    <summary>How the new encoder estimate compares with our earlier hand model</summary>
+    <p class="small">Earlier we estimated the encoder by hand from 45 nm energy-per-operation tables (dynamic energy only): 8.55 mJ per post. The new tool-based estimate is 7.90 mJ, 0.92× the old one <span class="k k-est">model</span>. We had agreed that a gap above 2× would force us to redo the ordinary-day numbers; it stayed well inside that.</p>
+    <p class="small">The totals agree, but the parts don't. One INT8 MAC costs 1.27 pJ in the Aladdin tables, 4.2× the 0.3 pJ we used before (INT8 multiply 0.2 + INT32 add 0.1). Memory is cheaper than we assumed: the 2 MB global SRAM is 12.6 pJ/byte (we used 25 pJ/byte from a 1 MB table entry) and DRAM is 64 pJ/byte (we used 160). Our synthesized Montgomery multiplier also came out 4.2× its early estimate, so the logic estimates move in the same direction.</p>
+  </details>
+
+  <details>
+    <summary>Idle power depends on the SRAM cell and on power gating</summary>
+    <p class="small">The default model uses low-standby-power SRAM cells (CACTI's itrs-lstp), which barely leak. With high-performance cells (itrs-hp), the 2 MB SRAM alone leaks <b>1.04 W</b> instead of 0.05 mW, and the whole chip leaks 1.10 W <span class="k k-est">estimated</span>. With gating, that chip still does the ordinary day at 0.19 W, the flood at 0.59 W and the backlog at 1.96 W (just under 2 W). Without gating it burns 1.1 W doing nothing, 22× our 50 mW idle limit. The catch with low-standby cells: a random access to the 2 MB array takes 2.37 ns, longer than the 2 ns cycle at 500 MHz, so it would need banking or two-cycle access, which the model doesn't include.</p>
+  </details>
+
+  <details>
+    <summary>Ordinary day: every encoder option is under 1 W</summary>
+    <p class="small">10<sup>6</sup> posts/day (11.6 posts/s), with verification on a low-power E-core and active energy only, except the last row, where our chip does both and leakage is included <span class="k k-est">estimated</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Encoder</th><th>Encoder J / post</th><th>Verify J / post</th><th>Avg. active W</th><th>Verify share</th></tr></thead>
+      <tbody>
+        <tr><td>Low-power E-core, INT8 (measured)</td><td class="num">54 mJ</td><td class="num">7.9 mJ</td><td class="num">0.72 W</td><td class="num">13%</td></tr>
+        <tr><td>Laptop NPU with workaround (measured)</td><td class="num">80 mJ</td><td class="num">7.9 mJ</td><td class="num">1.01 W</td><td class="num">9%</td></tr>
+        <tr><td>Hailo-8L batch 1 (vendor speed × vision-model power)</td><td class="num">≈16 mJ</td><td class="num">7.9 mJ</td><td class="num">0.28 W</td><td class="num">33%</td></tr>
+        <tr><td>Our chip: 32×32 INT8 encoder + verify unit (model)</td><td class="num">7.90 mJ</td><td class="num">0.0317 mJ</td><td class="num">0.092 W</td><td class="num">&lt; 1%</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details>
+    <summary>Spam flood: CPU cores and watts needed</summary>
+    <p class="small">1 KB messages, every proof verified before dropping. Batched watts are scaled from one-at-a-time energy by the time ratio <span class="k k-est">estimated</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Link</th><th>msg/s</th><th>P-core, one at a time</th><th>P-core, batched</th><th>E-core, one at a time</th><th>E-core, batched</th><th>To fit 2 W</th></tr></thead>
+      <tbody>
+        <tr><td>10 Mbps</td><td class="num">1,221</td><td class="num">1.7 cores, 18 W</td><td class="num">0.4 cores, 4.6 W</td><td class="num">4.3 cores, 9.4 W</td><td class="num">1.1 cores, 2.4 W</td><td class="num">≤ 1.6 mJ</td></tr>
+        <tr><td>100 Mbps</td><td class="num">12,207</td><td class="num">17 cores, 181 W</td><td class="num">4.3 cores, 46 W</td><td class="num">43 cores, 94 W</td><td class="num">11 cores, 24 W</td><td class="num">≤ 0.16 mJ</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details>
+    <summary>Multiplier variants we synthesized</summary>
+    <p class="small">All 254-bit Montgomery (CIOS) multipliers; "word" is how many bits of one operand are processed per step. All passed 1,000 test vectors with 0 errors <span class="k k-syn">synthesized</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Variant</th><th>Area</th><th>Clock</th><th>Cycles / multiply</th><th>Energy / multiply</th></tr></thead>
+      <tbody>
+        <tr><td>64-bit word, first version</td><td class="num">0.29 mm²</td><td class="num">295 MHz</td><td class="num">6</td><td class="num">1.90 nJ</td></tr>
+        <tr><td>128-bit word</td><td class="num">0.52 mm²</td><td class="num">≥ 169 MHz</td><td class="num">4</td><td class="num">2.79 nJ</td></tr>
+        <tr><td>256-bit word</td><td class="num">1.05 mm²</td><td class="num">≤ 125 MHz</td><td class="num">3</td><td class="num">4.22 nJ</td></tr>
+        <tr><td><b>64-bit word, overlapped control (current)</b></td><td class="num">0.28 mm²</td><td class="num">300 MHz</td><td class="num">4</td><td class="num">1.76 nJ</td></tr>
+        <tr><td>64-bit word, interleaved 2–4 multiplies + retiming (dropped)</td><td class="num">0.30–0.32 mm²</td><td class="num">353–360 MHz</td><td class="num">4</td><td class="num">1.77–1.90 nJ</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">The measured multiply energy came out 4.2× our early estimate (1.90 vs 0.45 nJ), mostly from wire switching (40% of power) and a long serial path. Each row-step chains three multipliers, so the 64-bit version tops out at about 300 MHz.</p>
+  </details>
+</section>
+
+<section aria-labelledby="dropped-h">
+  <h2 id="dropped-h">5. Paths we tried and dropped</h2>
+  <ul class="dropped">
+    <li><b>Plain INT8 encoder.</b> No INT8 variant reached our quality bar (Recall@10 ≥ 0.95 against exact FP32 search); the best was 0.878. Mixed precision needed 83% of weight MACs left in FP32 and was only 1.1× faster. <i>Instead:</i> ingest in INT8 and re-rank the top 20 in FP32 at query time. That gives Recall@10 0.993 and ingest 1.9× faster with 2.2× less energy than FP32 (3.70 ms, 0.25 J/post) <span class="k k-meas">measured</span>, at about 252 ms and 18.7 J per query <span class="k k-est">estimated</span>.</li>
+    <li><b>"The laptop NPU is too slow, so we need hardware."</b> Out of the box it was about 3× over the backlog target. But 89% of its time (at 256 tokens) went to a softmax plus broadcast mask that the compiler sent down a slow path. Expanding the mask fixed it: 45 min, Recall@10 0.997 <span class="k k-meas">measured</span>. It was a software problem, so we moved the target to the always-on box and argued from power instead of time.</li>
+    <li><b>Doing the crypto on the encoder's INT8 array.</b> 615 proofs/s, 40× short <span class="k k-est">estimated</span>. A weight-stationary array pays off only when one operand stays put, but pairing math is mostly variable × variable, and the array has no integer carry handling.</li>
+    <li><b>A big-integer multiply instruction on the host core.</b> The energy was fine (0.012 mJ/proof) but it ran at half the throughput and would tie up the host core for the whole flood <span class="k k-est">estimated</span>.</li>
+    <li><b>Software only.</b> Batched verification on one low-power core: 989 proofs/s, 2.06 mJ/proof <span class="k k-meas">measured</span>. It misses on both energy and throughput.</li>
+    <li><b>Wider multipliers (128/256-bit word).</b> They were bigger, slower and used more energy per multiply (table above).</li>
+    <li><b>Interleaving independent multiplies through a pipelined multiplier and letting the tool retime it.</b> We had decided up front that it needed a 1.5× clock gain to justify the complexity. The clock rose only 1.20–1.22× (about 360 MHz): the critical path stopped at 2.78 ns inside the retimed multiplier, and we haven't found out why. We gave up a real gain to stick to that call: the 2-way version would have been about 20% smaller (0.91 vs 1.13 mm² for a 4-multiplier unit).</li>
+    <li><b>A smaller encoder array (8×8 or 16×16).</b> At 500 MHz, 16×16 clears the 8-hour backlog in 106 min and 8×8 in 401 min, both over the 60-minute target <span class="k k-est">model</span>. 16×16 would pass at 1 GHz (53 min), but we fixed the clock at 500 MHz beforehand and treated 1 GHz only as a sensitivity check.</li>
+    <li><b>A verify-only chip next to a Hailo-8L.</b> The Hailo's share of ordinary-day power (0.134–0.182 W) is more than our whole chip (0.092 W) <span class="k k-est">estimated</span>, and it truncates posts to 128 tokens.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="next-h">
+  <h2 id="next-h">6. What's next, and where you could help</h2>
+  <p><b>Next: floods that break batches.</b> Every flood number above assumes all proofs are valid. Batch verification fails as a whole if even one proof in the batch is bad, and an attacker can make bad proofs for free. We'll measure, with the cycle model, how throughput drops as the share of bad proofs rises, and pick a batch size and splitting strategy (or a hardware change) that still keeps up with 100 Mbps. This is the "spam must not exhaust ingest" requirement.</p>
+  <h3>Open questions you could take</h3>
+  <ul class="help">
+    <li><b>ARM measurements.</b> We have no verification costs on ARM, from measurement or from any source. A real box CPU is likely ARM. Running the Groth16 / Ed25519 / ChaCha20 benchmarks on a Raspberry Pi 5 would fill that gap.</li>
+    <li><b>Pi 5 + Hailo measurements.</b> The Hailo numbers are vendor figures on an x86 host with PCIe Gen3 x4, and the Pi 5 has x1. MiniLM power isn't published (we borrowed a vision-model figure), and we don't know its idle power. The input is fixed at 128 tokens, while our median post is 128 tokens and 17% are cut even at 256. Measuring throughput, power, idle power, and the quality loss from truncation would firm up the comparison.</li>
+    <li><b>Encoder on the Pi 5 CPU.</b> We haven't measured the encoder's energy on a Pi 5 CPU, so we couldn't evaluate the cheapest option (verify-only chip, encoder on the host). If the CPU handles an ordinary day within about 0.09 W, that option comes back.</li>
+    <li><b>Does the encoder need 2 MB of SRAM?</b> It's 74% of the encoder's area. Weights are streamed per matrix multiply, so a double buffer plus activations may be enough, if it still clears the backlog in an hour.</li>
+    <li><b>RTL for the rest of the verify unit, and for the encoder MAC.</b> Only the Montgomery multiplier exists in RTL. The 254-bit adders, the operand buffer, the microcoded sequencer and the encoder's INT8 MAC are still estimates.</li>
+    <li><b>Hand-pipelining the multiplier.</b> We'd like to know why retiming stops at 2.78 ns. A hand-split pipeline reaching ≥ 443 MHz (1.5×) would make interleaving worth reopening.</li>
+    <li><b>A better scheduler.</b> Our scheduler is a simple greedy one in program order. A smarter microcode schedule might meet the target with 4 multipliers instead of 5.</li>
+    <li><b>Is our quality bar right?</b> The strict Recall@10 bar mostly penalizes swaps between near-tied results: the median score gap between the 10th and 11th results is just 0.0033. Changing the bar needs human relevance judgments.</li>
+    <li><b>How big is a real flood?</b> The flood size is an assumption. We need sources on how much network-layer per-peer limits (peer scoring) cap it.</li>
+  </ul>
+</section>
+
+<footer>
+  <p>Course project for EEE 598 (Hardware and Systems for ML). Every design is compared at equal recall and equal resources, changing one factor at a time. All 45 nm figures are synthesis results or model estimates, not silicon measurements.</p>
+</footer>
+
+</div>
+</body>
+</html>

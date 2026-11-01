@@ -1,0 +1,73 @@
+{
+ "source": "CACTI (HewlettPackard/cacti master, via accelergy-cacti-plug-in 7649b2c CactiSRAM, 45 nm); Aladdin 45 nm tables (accelergy-aladdin-plug-in 5e2e126 data/*.csv, 32-bit entries); SENSITIVITY: CACTI cells itrs-hp",
+ "sram": {
+  "enc_glb_2MB": {
+   "width_bits": 128,
+   "depth": 131072,
+   "banks": 16,
+   "bytes": 2097152,
+   "read_pJ": 1.4582400000000003e-10,
+   "write_pJ": 1.37215e-10,
+   "leak_mW": 1035.1808,
+   "area_um2": 6077230.0,
+   "random_cycle_ns": 0.9347590000000001
+  },
+  "enc_glb_1MB": {
+   "width_bits": 128,
+   "depth": 65536,
+   "banks": 16,
+   "bytes": 1048576,
+   "read_pJ": 9.428820000000001e-11,
+   "write_pJ": 1.04698e-10,
+   "leak_mW": 582.6672,
+   "area_um2": 3260349.9999999995,
+   "random_cycle_ns": 0.5701520000000001
+  },
+  "enc_in_buf_16KB": {
+   "width_bits": 128,
+   "depth": 1024,
+   "banks": 1,
+   "bytes": 16384,
+   "read_pJ": 9.10741e-12,
+   "write_pJ": 1.8975500000000002e-11,
+   "leak_mW": 9.07943,
+   "area_um2": 50701.9,
+   "random_cycle_ns": 0.318311
+  },
+  "enc_acc_buf_16KB": {
+   "width_bits": 256,
+   "depth": 512,
+   "banks": 1,
+   "bytes": 16384,
+   "read_pJ": 1.1623200000000002e-11,
+   "write_pJ": 3.61387e-11,
+   "leak_mW": 9.110350000000002,
+   "area_um2": 53779.2,
+   "random_cycle_ns": 0.318311
+  },
+  "ver_buf_8KB": {
+   "width_bits": 256,
+   "depth": 256,
+   "banks": 1,
+   "bytes": 8192,
+   "read_pJ": 9.0578e-12,
+   "write_pJ": 2.11564e-11,
+   "leak_mW": 4.63644,
+   "area_um2": 30795.300000000003,
+   "random_cycle_ns": 0.25266900000000003
+  },
+  "ver_ucode_32KB": {
+   "width_bits": 256,
+   "depth": 1024,
+   "banks": 1,
+   "bytes": 32768,
+   "read_pJ": 2.1677800000000003e-11,
+   "write_pJ": 4.1414000000000004e-11,
+   "leak_mW": 17.2306,
+   "area_um2": 103421.0,
+   "random_cycle_ns": 0.431177
+  }
+ },
+ "aladdin_2ns": {},
+ "aladdin_3ns": {}
+}
