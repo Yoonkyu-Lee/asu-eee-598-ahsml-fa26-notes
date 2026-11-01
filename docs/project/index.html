@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
-    <li><b>The project now covers the whole community, not just the chip, and image posts are in scope.</b> We'll build everything except physical devices and silicon: the protocol, the node software, the client, the community algorithms, and a simulation of many boxes and users. Chips we can't fabricate plug into that software as cycle and energy models. This step was the design (see <a href="#system-h">The whole system</a>): the boxes' functions run for real (real encryption, signatures, embeddings and search), and time and energy come from the chip models on a virtual clock. It also exposed a hidden assumption: every chip number so far assumes each box receives <b>every</b> post (10<sup>6</sup>/day), 1 KB messages and a 100 Mbps flood <span class="k k-est">assumption</span>. How posts are replicated across boxes is now a knob on chip size, and the simulator will replace those assumptions with per-box load.</li>
+    <li><b>First simulator results: a box receives far less than the chip was sized for.</b> The simulator core now generates a community from Reddit-based behavior parameters and spreads its messages over a gossip network (see <a href="#load-h">What one box actually receives</a>). In a community of 1M users (one box each), the busiest 1% of boxes at the peak hour verify <b>4.2 proofs/s</b> and embed <b>0.45 text posts/s</b> and 0.02 images/s <span class="k k-est">simulation model</span>. The old "every box ingests all 10<sup>6</sup> posts a day" assumption (11.6 posts/s) is <b>26×</b> that. Ordinary verification uses <b>0.03%</b> of the verify unit's capacity, so the unit is there for floods; <b>votes are about 90%</b> of the messages that carry a proof. Text posts reach every subscribed box in 0.36 s (P99), but a 177 KB image takes <b>2.1 s</b> over 20 Mbps home uplinks, over our 1 s network budget.</li>
+    <li><b>The project now covers the whole community, not just the chip, and image posts are in scope.</b> We'll build everything except physical devices and silicon: the protocol, the node software, the client, the community algorithms, and a simulation of many boxes and users. Chips we can't fabricate plug into that software as cycle and energy models. This step was the design (see <a href="#system-h">The whole system</a>): the boxes' functions run for real (real encryption, signatures, embeddings and search), and time and energy come from the chip models on a virtual clock. It also exposed a hidden assumption: every chip number so far assumes each box receives <b>every</b> post (10<sup>6</sup>/day), 1 KB messages and a 100 Mbps flood <span class="k k-est">assumption</span>. The simulator replaces those assumptions with per-box load (first results in the item above).</li>
     <li><b>Rejecting an invalid proof got 35% cheaper, so the verify unit shrank to 6 multipliers + 6 adders.</b> Throwing away one invalid proof used to cost 43,507 field multiplications; it now costs <b>28,418</b> (0.65×) <span class="k k-meas">counted</span>. Four changes, each checked to give the same results as the original math: cheaper (cyclotomic) squarings and a signed-digit exponent in the final exponentiation, a precomputed table for the verifying key's fixed points (3.1 MB in host DRAM), and running the subgroup check only on proofs that pass the pairing test. The unit now handles at least <b>13,429 proofs/s</b> at any share of invalid proofs (flood: 12,207/s), in <b>2.12 mm²</b>. The chip shrinks to <b>11.3 mm²</b>, and flood power is 0.48 W (all valid) to <b>1.05 W</b> (worst mix) <span class="k k-est">cycle model</span>.</li>
-    <li><b>The worst attack is now a mix, not an all-invalid flood.</b> Since invalid proofs skip the subgroup check, sending only invalid proofs is no longer the attacker's best move. The worst case is about <b>15% invalid</b>: most proofs are valid and pay for the subgroup check, yet batches already keep failing. Before this change an all-invalid flood was the worst case, and it had pushed the unit from 5 + 4 to 8 + 8 <span class="k k-est">cycle model</span>.</li>
   </ul>
 </section>
 
@@ -166,7 +166,7 @@ footer { font-size: 13px; color: var(--muted); }
 
 <section aria-labelledby="system-h">
   <h2 id="system-h">2. The whole system: a community with everything but the hardware</h2>
-  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done; nothing in this section has results yet. One question decides the approach: <b>what runs for real, and what is a model?</b></p>
+  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done, and the simulator's core (messages only, no ML yet) has its first results, further down in this section. One question decides the approach: <b>what runs for real, and what is a model?</b></p>
   <ul>
     <li><b>Functions run for real (emulation).</b> The box software is real code: real ciphertexts, real signatures, real embeddings, real search results. It runs on the laptop CPU instead of the box's hardware but computes the same thing.</li>
     <li><b>Time and energy are simulated.</b> We can't run hundreds of boxes in real time, so the simulator runs on a virtual clock (discrete events). Each task's time and energy come from our chip models (the verify-unit cycle model, the encoder's Timeloop + Accelergy model) and, for host work, from laptop timings scaled to a Pi 5-class CPU.</li>
@@ -204,7 +204,7 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="664" y="240" class="mut" font-size="11">once per message, shared by all boxes</text>
       <text x="24" y="274" class="mut" font-size="12">Time and energy: verify unit from our cycle model · encoders from Timeloop + Accelergy (45 nm)</text>
       <text x="24" y="294" class="mut" font-size="12">Host work (decrypt, index, search): laptop timings scaled to a Pi 5-class CPU</text>
-      <text x="24" y="314" class="mut" font-size="12">Run mode: discrete-event by default (~100–1,000 boxes) · if too slow, real functions on sample boxes only · demo in real time</text>
+      <text x="24" y="314" class="mut" font-size="12">Run mode: discrete events (message core: 10⁴ boxes × peak hour in 30 s) · if too slow, real functions on sample boxes · demo in real time</text>
       <text x="24" y="334" class="mut" font-size="12">ML: MiniLM for text + CLIP for images, or CLIP for both if it keeps text Recall@10 ≥ 0.95</text>
       <path class="wire" d="M490,360 L490,386" marker-end="url(#s1)"/>
       <!-- traces -->
@@ -224,14 +224,137 @@ footer { font-size: 13px; color: var(--muted); }
     </svg>
   </div>
 
-  <h3>The new knob on chip size: who stores what</h3>
-  <p>Until now every chip number assumed that each box receives every public post. That was never written down as a choice. How posts are replicated across boxes decides how much one box has to ingest, so it goes straight into chip size. We'll compare three policies:</p>
+  <h3 id="load-h">What one box actually receives (first simulator results)</h3>
+  <p>The simulator core is running: an event engine on a virtual clock, a generated community (users, sub-communities, subscriptions), the replication policies below, and gossip-style forwarding with the gossipsub rules. One user = one box. It tracks every message's kind, size and arrival time at each box; it doesn't run ML, reads or searches yet. A community of 10<sup>6</sup> boxes is too big to run event by event, so per-box counts come from a formula (the sum of the message rates of the sub-communities a box holds), and a 10,000-box event run checks that formula and measures how fast posts spread. All numbers here are model outputs, built on parameters from sources plus estimates.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 432" role="img" aria-label="Simulator core: behavior parameters from sources drive an event engine where each user owns one box. Users post, comment and vote; each message carries a signature and a rate-limiting proof and is published to a sub-community; gossip spreads it under a replication policy. Traces record each message and per-box work, which gives per-box load compared against the chip's capacity.">
+      <defs><marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <!-- parameters -->
+      <rect class="box" x="10" y="10" width="960" height="90" rx="8"/>
+      <text x="24" y="34" font-weight="600">Behavior parameters: from Reddit's public statistics and papers; where there is none, estimated and swept</text>
+      <text x="24" y="58" class="mut" font-size="12">daily active share · posts, comments and votes per user · activity tail · read-only share · time-of-day peak</text>
+      <text x="24" y="80" class="mut" font-size="12">sub-community popularity · subscriptions per user · image share and size · message sizes · share of boxes online</text>
+      <path class="wire" d="M490,100 L490,124" marker-end="url(#m1)"/>
+      <!-- engine -->
+      <rect class="box-pick" x="10" y="128" width="960" height="154" rx="8"/>
+      <text x="24" y="152" font-weight="700">Event engine (virtual clock) · M users = M boxes, one per home</text>
+      <rect class="box" x="24" y="166" width="300" height="82" rx="6"/>
+      <text x="36" y="188" font-size="12" font-weight="600">User actions</text>
+      <text x="36" y="207" class="mut" font-size="11">text and image posts · comments · votes</text>
+      <text x="36" y="224" class="mut" font-size="11">90% only read; activity is heavy-tailed</text>
+      <text x="36" y="241" class="mut" font-size="11">reads, search, deletes: next step</text>
+      <rect class="box" x="338" y="166" width="300" height="82" rx="6"/>
+      <text x="350" y="188" font-size="12" font-weight="600">Message</text>
+      <text x="350" y="207" class="mut" font-size="11">ciphertext + signature + rate-limiting proof</text>
+      <text x="350" y="224" class="mut" font-size="11">published to one sub-community (topic)</text>
+      <text x="350" y="241" class="mut" font-size="11">votes: one proof each, or bundled per 50 s</text>
+      <rect class="box-path" x="652" y="166" width="304" height="82" rx="6"/>
+      <text x="664" y="188" font-size="12" font-weight="600">Gossip + replication</text>
+      <text x="664" y="207" class="mut" font-size="11">gossipsub rules: mesh degree 6, forward</text>
+      <text x="664" y="224" class="mut" font-size="11">after validation, seen messages skipped</text>
+      <text x="664" y="241" class="mut" font-size="11">store: all / subscribed / subscribed + k</text>
+      <text x="24" y="270" class="mut" font-size="12">Large communities: per-box counts from a formula (sum of held sub-communities' rates) · a 10⁴-box event run checks it and times spreading</text>
+      <path class="wire" d="M245,282 L245,306" marker-end="url(#m1)"/>
+      <path class="wire" d="M735,282 L735,306" marker-end="url(#m1)"/>
+      <!-- traces -->
+      <rect class="box" x="10" y="310" width="470" height="112" rx="8"/>
+      <text x="24" y="334" font-weight="600">Traces</text>
+      <text x="24" y="356" font-size="11.5">System: each message's time, sub-community, kind, size,</text>
+      <text x="24" y="374" font-size="11.5">and arrival time at every box</text>
+      <text x="24" y="392" font-size="11.5">Box: work per second (proofs, text, images, duplicate bytes)</text>
+      <text x="24" y="410" class="mut" font-size="11">→ Perfetto trace: median and busiest box, peak hour</text>
+      <!-- load -->
+      <rect class="box-path" x="500" y="310" width="470" height="112" rx="8"/>
+      <text x="514" y="334" font-weight="600">Per-box load → back to the chip</text>
+      <text x="514" y="356" font-size="11.5">average box · peak hour · busiest 1% of boxes</text>
+      <text x="514" y="374" class="mono" font-size="11.5">1M users, busiest 1% at peak: 4.2 proofs/s,</text>
+      <text x="514" y="392" class="mono" font-size="11.5">0.45 text posts/s, 0.02 images/s (est.)</text>
+      <text x="514" y="410" class="mut" font-size="11">vs. verify unit 13,429/s · old assumption 11.6 posts/s</text>
+    </svg>
+  </div>
+
+  <div class="duo">
+    <div class="card">
+      <h3>The old sizing assumption</h3>
+      <div class="big">26×</div>
+      <p>"Every box ingests all 10<sup>6</sup> posts a day" (11.6 posts/s) is 26× what the busiest 1% of boxes embed at the peak hour in a 1M-user community (0.45 text posts/s) <span class="k k-est">simulation model</span>.</p>
+    </div>
+    <div class="card">
+      <h3>Ordinary-day verification</h3>
+      <div class="big">0.03%</div>
+      <p>of the verify unit's capacity: at most 4.2 proofs/s against 13,429/s <span class="k k-est">simulation model</span>. The unit is there for floods, not for normal traffic.</p>
+    </div>
+  </div>
+
+  <p>Load on one box at the peak hour, by community size (subscribed-only storage, votes bundled every 50 s) <span class="k k-est">simulation model</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Community (users = boxes)</th><th>Whole community per day: posts / comments / votes</th><th>Proofs verified per box /s: average box, daily average · busiest 1%, peak</th><th>Text posts embedded /s (busiest 1%, peak)</th><th>Images embedded /s (busiest 1%, peak)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">10<sup>3</sup></td><td class="num">4 / 14 / 178</td><td class="num">0.002 · 0.004</td><td class="num">0.0003</td><td class="num">0.00001</td></tr>
+      <tr><td class="num">10<sup>4</sup></td><td class="num">37 / 204 / 2,208</td><td class="num">0.026 · 0.045</td><td class="num">0.0045</td><td class="num">0.0002</td></tr>
+      <tr><td class="num">10<sup>5</sup></td><td class="num">385 / 2,224 / 21,326</td><td class="num">0.23 · 0.42</td><td class="num">0.046</td><td class="num">0.002</td></tr>
+      <tr><td class="num"><b>10<sup>6</sup></b></td><td class="num">3,810 / 22,079 / 213,595</td><td class="num">2.1 · <b>4.2</b></td><td class="num"><b>0.45</b></td><td class="num">0.02</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li><b>The encoder was sized for a load no realistic box sees on an ordinary day.</b> With the same behavior rates, a community would need about 24 million box owners (busiest 1% at peak) or 39 million (daily average) to reach 11.6 posts/s per box, if every box stored everything (linear extrapolation). In daily active users that is about 1/19–1/12 of Reddit <span class="k k-est">estimated</span>. We had decided in advance that if real ingest came in under a tenth of the assumption, we would re-decide the encoder toward smaller. It came in at 1/26, so what's left to justify the encoder's size is the backlog after a box has been offline, and images.</li>
+    <li><b>Votes are 89–91% of the messages that carry a proof,</b> because every vote carries its own anonymous rate-limiting proof. This doesn't change chip size (floods set the verify unit). Bundling a user's votes into one proof every 50 s did nothing: each bundle held 1.00 vote on average, since a user rarely votes twice in the same sub-community within 50 s, and it delayed vote counts by 26 s on average (50 s at most) <span class="k k-est">simulation model</span>. A daily anonymous tally, or one proof covering many votes, would cut ordinary verification to about 1/9 <span class="k k-est">estimated</span>. Votes may also be the cheapest message for an attacker to imitate in a flood, which the attack scenarios will test.</li>
+    <li><b>The event run agrees with the formula.</b> 10,000 boxes, peak hour: every online subscribed box received every message (delivery completeness 1.000). Total deliveries differ from the formula by 6.1%, but that hour has only 166 messages, so random (Poisson) noise of about 8% dominates. Run alone for 2,000 simulated hours, the message generator matches the formula within 1.9% for posts, 0.04% for comments and 0.2% for votes (we required 2%). Duplicate bytes received are 5.6× the unique bytes, because each box forwards right away to its 6 mesh neighbors <span class="k k-est">simulation model</span>.</li>
+  </ul>
+
+  <p><b>How fast a new post spreads.</b> We allow the network 1 s of the 5 s in which a new post must become searchable <span class="k k-est">estimated budget</span>. Time from posting until every online box in the largest sub-community (9,420 subscribed boxes) has it, 300 test posts per run, 50 ms per hop <span class="k k-est">simulation model</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Home uplink</th><th>Text post, P99</th><th>Image post (177 KB), P99</th></tr></thead>
+    <tbody>
+      <tr><td class="num">5 Mbps</td><td class="num">0.39 s</td><td class="num"><b>7.3 s</b></td></tr>
+      <tr><td class="num">20 Mbps (default)</td><td class="num">0.36 s</td><td class="num"><b>2.1 s</b></td></tr>
+      <tr><td class="num">100 Mbps</td><td class="num">0.35 s</td><td class="num">0.69 s</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Text passes; images fail. At every hop a box sends the whole image to its 6 mesh neighbors one after another, and that clogs a home uplink; at 5 Mbps an image misses even the full 5 s. So <b>images are a delivery problem before they are a compute problem</b>. Options for the next step: spread only a small envelope (thumbnail and hash) and let the boxes that need the image fetch it, or have the author's box send its image embedding along (other boxes then skip image encoding, but have to trust an embedding they didn't compute).</p>
+
+  <details>
+    <summary>Behavior parameters and their sources</summary>
+    <p class="small">Defaults and the range we swept. "From sources" means computed from sourced figures; DAUq / WAUq are Reddit's daily / weekly active unique visitors.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Parameter</th><th>Default</th><th>Swept</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td>Share of box owners active on a given day</td><td class="num">0.26</td><td class="num">0.10–0.50</td><td><span class="k k-src">from sources</span> Reddit DAUq 121.4M / WAUq 471.6M (Q4 2025 shareholder letter)</td></tr>
+        <tr><td>Posts / comments per active user per day</td><td class="num">0.0147 / 0.0853</td><td class="num">×1–×5</td><td><span class="k k-src">from sources</span> 2.2 billion posts + comments in H2 2025 / 184 days / DAUq ≈ 0.10; posts : comments = 1 : 5.8 (2022: 430M : 2.5B). <span class="k k-est">estimated</span> ×5, because DAUq includes logged-out visitors</td></tr>
+        <tr><td>Votes per active user per day</td><td class="num">0.82</td><td class="num">×1–×5</td><td><span class="k k-src">from sources</span> 24 billion upvotes in 2022 / 2.93 billion posts + comments = 8.2, × 0.10</td></tr>
+        <tr><td>Users who only read</td><td class="num">0.90</td><td class="num">0.75–0.95</td><td><span class="k k-src">source</span> the 90-9-1 rule (Nielsen Norman Group)</td></tr>
+        <tr><td>Per-user activity tail (lognormal σ)</td><td class="num">1.85</td><td class="num">1.2–2.3</td><td><span class="k k-src">from sources</span> "the top 20% write 84% of comments" (arXiv 2503.02661, Pushshift 2021 data)</td></tr>
+        <tr><td>Users per sub-community</td><td class="num">4,700</td><td class="num">500–20,000</td><td><span class="k k-src">from sources</span> DAUq 121.4M / more than 100k active subreddits (Reddit S-1) / 0.26</td></tr>
+        <tr><td>Sub-community popularity (Zipf exponent)</td><td class="num">1.3</td><td class="num">1.0–1.5</td><td><span class="k k-src">from sources</span> 85% of comments mentioning presidential candidates were in the top 500 subreddits (Pew 2016, a narrow sample)</td></tr>
+        <tr><td>Subscriptions per user</td><td class="num">10 (drawn; duplicates merged)</td><td class="num">3–30</td><td><span class="k k-est">estimated</span>; for scale, heavy posters are active in 26–29 communities (arXiv 1503.01180)</td></tr>
+        <tr><td>Share of image posts</td><td class="num">0.30</td><td class="num">0.3–0.6</td><td><span class="k k-src">source</span> about 30% of submissions are images, GIFs or video (arXiv 1703.01725, 2005–2014)</td></tr>
+        <tr><td>Image size</td><td class="num">177 KB</td><td class="num">—</td><td><span class="k k-src">source</span> 90th-percentile web image (HTTP Archive 2024), <span class="k k-est">our choice</span> as a stand-in for photo uploads</td></tr>
+        <tr><td>Comment / post size</td><td class="num">180 B / 650 B</td><td class="num">—</td><td><span class="k k-src">from sources</span> mean comment of 30.15 words (arXiv 2105.12006) × about 6 B; post <span class="k k-est">estimated</span> from our text sample (mean 164 tokens)</td></tr>
+        <tr><td>Share of boxes online</td><td class="num">0.95</td><td class="num">0.80–0.99</td><td><span class="k k-est">estimated</span>; home connections reach "up to 99%" availability (arXiv 1709.09349)</td></tr>
+        <tr><td>Time-of-day curve</td><td class="num">peak / average 1.6 (8 pm)</td><td class="num">1.3–2.0</td><td><span class="k k-est">estimated</span>; no source found</td></tr>
+        <tr><td>Hop delay / home uplink</td><td class="num">50 ms / 20 Mbps</td><td class="num">uplink 5–100 Mbps</td><td><span class="k k-est">estimated</span></td></tr>
+        <tr><td>Searches (used in the next step)</td><td class="num">—</td><td class="num">—</td><td><span class="k k-src">source</span> 35 million searches a day (Reddit S-1, 2024), about 0.3–0.5 per DAUq depending on the year</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">Not found: the time-of-day curve, a direct Zipf exponent for sub-community popularity, post body length, page views per daily user, and any figures for DCInside (a large Korean forum).</p>
+  </details>
+
+  <details>
+    <summary>Sensitivity, limits, and the trace</summary>
+    <p class="small"><b>Sensitivity.</b> For 10<sup>5</sup> users, busiest 1% of boxes at peak, proofs verified per second (default 0.42) <span class="k k-est">simulation model</span>: votes ×5 → 1.93 · active share 0.10–0.50 → 0.16–0.81 · comments ×5 → 0.58 · time-of-day peak 1.3–2.0 → 0.34–0.53. Every other parameter moves it by less than ±10%. The only setting that changed the policy choice was 20,000 users per sub-community (just 5 sub-communities): everyone subscribes to everything, so subscribed-only equals store-everything, a tie with identical numbers. So no single parameter decides the policy.</p>
+    <p class="small"><b>Limits.</b> One user per box; a box shared by several people gets that many times the load. Activity rates are based on Reddit's DAUq, which mixes in logged-out visitors (covered by the ×5 sweep) and bots. Everyone is in one time zone; several time zones would lower the peak. Gossip is immediate forwarding only (no IHAVE/IWANT gossip, no mesh-maintenance heartbeat, no penalties), and a box that is off stays off for the whole hour, with the mesh already repaired around it. Reads, searches and deletes aren't simulated yet.</p>
+    <p class="small"><b>The trace.</b> The run writes a <a href="https://github.com/Yoonkyu-Lee/asu-eee-598-ahsml-fa26-notes/blob/main/project/results/cp16/trace_peak_hour.json">Perfetto trace of the peak hour</a> for the median box and the busiest box (message counters plus verification spans). Download the JSON and open it at <a href="https://ui.perfetto.dev">ui.perfetto.dev</a> to zoom in like a waveform.</p>
+  </details>
+
+  <h3>Who stores what: a smaller knob than we expected</h3>
+  <p>Until now every chip number assumed that each box receives every public post. That was never written down as a choice. How posts are replicated across boxes decides how much one box has to ingest, so we compared three policies:</p>
   <ul class="small">
     <li><b>All:</b> every box receives every public post (what the chip numbers assume today).</li>
     <li><b>Subscribed:</b> a box receives only the sub-communities its owner subscribes to.</li>
-    <li><b>Subscribed + k:</b> subscriptions plus k random extra sub-communities, held so posts stay available.</li>
+    <li><b>Subscribed + k:</b> subscriptions, plus the boxes share out any sub-community that has too few copies, so its posts stay available.</li>
   </ul>
-  <p>For each policy we'll measure per-box ingest, availability (the share of posts still readable while the author's box is off) and search coverage. We decided in advance to take the lightest policy that keeps availability at or above 99%, and to re-size the chip for that policy's 99th-percentile box at the peak hour.</p>
+  <p>We decided in advance to take the policy that keeps availability (the chance that some other box holding a sub-community's posts is online while the author's box is off) at or above 99% in every sub-community, and of those, the one with the lowest load on the busiest 1% of boxes at the peak hour. <b>Subscribed only</b> won: every sub-community stays at or above 99% at every community size, and no sub-community had fewer than 3 subscribers, so "+ k" added nothing. But it barely helps the boxes that matter: the average box gets 0.78× the load of "All", the busiest 1% still get 0.94× <span class="k k-est">simulation model</span>. Activity is concentrated in popular sub-communities that nearly everyone subscribes to.</p>
 
   <details>
     <summary>Other design choices, and what we decided in advance</summary>
@@ -245,7 +368,7 @@ footer { font-size: 13px; color: var(--muted); }
       </tbody>
     </table></div>
     <ul class="small">
-      <li>If 100 boxes, 10,000 users and one simulated day don't finish within 2 hours on the laptop CPU, most boxes switch to statistics only and a sample of boxes keeps running real functions.</li>
+      <li>If 100 boxes, 10,000 users and one simulated day don't finish within 2 hours on the laptop CPU, most boxes switch to statistics only and a sample of boxes keeps running real functions. The message-level core is well inside this: 10,000 boxes for a peak hour took 30 s on the laptop (9.43 million events) <span class="k k-meas">measured</span>, so even a whole day counted at the peak rate stays under 12 minutes <span class="k k-est">estimated</span>.</li>
       <li>Check: the same 5-box scenario, run in real time and in the event simulator, must give the same work counts per box. If not, we fix the simulator.</li>
     </ul>
     <p class="small"><b>Network.</b> The simulation implements the gossipsub v1.1 rules itself (mesh degree, forward only after validation, the penalty for invalid messages, disconnecting peers), so every hop can be traced. Real libp2p is a candidate for the demo. Plain flooding is the baseline, to see how much gossip shrinks a flood. Parameters come from source defaults (the gossipsub spec, nwaku); any value without a source is marked as an estimate and swept.</p>
@@ -259,7 +382,7 @@ footer { font-size: 13px; color: var(--muted); }
       </tbody>
     </table></div>
     <p class="small">We use CLIP for both if it keeps our existing text-search quality bar (Recall@10 ≥ 0.95 against exact FP32 MiniLM search), since fewer models make a simpler chip. Otherwise, separate models. The image encoder's chip cost will be estimated the same way as the text encoder's (Timeloop + Accelergy).</p>
-    <p class="small"><b>User behavior.</b> Post rate distribution, time-of-day curve, share of image posts, read-to-write ratio, search rate, and how popularity is spread across sub-communities all come from sources (public Reddit and community statistics, papers). Where there is none, we estimate and sweep. The chip is sized at the worst end of that sweep (99th-percentile box, peak hour).</p>
+    <p class="small"><b>User behavior.</b> Post, comment and vote rates, the share of read-only users, how popularity is spread across sub-communities, the share and size of image posts, and the search rate come from sources (mostly Reddit's public statistics, plus papers). Where there is none, we estimate and sweep. The chip is sized at the worst end of that sweep (busiest 1% of boxes, peak hour). The table with every value and its source is under <a href="#load-h">What one box actually receives</a>.</p>
   </details>
 
   <h3>What the final report will claim, and what's still missing</h3>
@@ -267,12 +390,12 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Claim</th><th>Evidence now</th><th>Gap</th><th>Filled in step</th></tr></thead>
     <tbody>
-      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements, text only</td><td><b>How much one box actually receives</b> (subscriptions, replication, peak hours) is assumed; no images</td><td class="num">1–2</td></tr>
-      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">5</td></tr>
-      <tr><td>Our chip (11.3 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">4 (+ RTL)</td></tr>
-      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model</td><td>real per-box load (simulation); the image encoder's share</td><td class="num">3–4</td></tr>
-      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td><b>none yet</b></td><td>implementation and demo</td><td class="num">2, 6</td></tr>
-      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed)</td><td>network simulation with attackers in it</td><td class="num">4</td></tr>
+      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements; simulated message load per box (text and image counts, peak hour, busiest boxes)</td><td>the work behind those messages isn't run yet (ML, reads, searches); images don't spread within the 1 s network budget</td><td class="num">1</td></tr>
+      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">4</td></tr>
+      <tr><td>Our chip (11.3 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">3 (+ RTL)</td></tr>
+      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model, which assumed 26× the simulated ingest of the busiest boxes</td><td>encoder re-sized for the backlog and images; the image encoder's share</td><td class="num">2–3</td></tr>
+      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td><b>none yet</b></td><td>implementation and demo</td><td class="num">1, 5</td></tr>
+      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed)</td><td>network simulation with attackers in it (votes may be the cheapest message to imitate)</td><td class="num">3</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -280,7 +403,7 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="box-h">
   <h2 id="box-h">3. What the box must do, and why it needs hardware</h2>
   <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries. Image posts will add an image encoder to that path; we haven't costed it yet.</p>
-  <p class="small muted">The box and chip numbers in this section and the next two assume each box receives all 10<sup>6</sup> posts/day, messages are 1 KB, and a flood fills a 100 Mbps link <span class="k k-est">assumption</span>. The simulator in section 2 will replace them with the load real boxes see.</p>
+  <p class="small muted">The box and chip numbers in this section and the next two assume each box receives all 10<sup>6</sup> posts/day, messages are 1 KB, and a flood fills a 100 Mbps link <span class="k k-est">assumption</span>. The first simulator results (<a href="#load-h">section 2</a>) put the ordinary-day assumption at 26× what the busiest 1% of boxes ingest at the peak hour in a 1M-user community, so the ordinary-day numbers below are pessimistic. The flood numbers don't depend on it.</p>
   <div class="duo">
     <div class="card">
       <h3>An ordinary day: easy</h3>
@@ -293,7 +416,7 @@ footer { font-size: 13px; color: var(--muted); }
       <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our chip: 0.48 W if every proof is valid, up to 1.05 W for the worst mix of invalid proofs <span class="k k-est">estimated</span>.</p>
     </div>
   </div>
-  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
+  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. The simulator confirms this from the other side: on an ordinary day even the busiest boxes of a 1M-user community verify at most 4.2 proofs/s, 0.03% of the unit's capacity <span class="k k-est">simulation model</span>. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
   <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Our unit stays under that even in the worst case: 0.077 mJ per proof at the worst mix of invalid proofs <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
   <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>.</p>
 </section>
@@ -481,7 +604,7 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>Idle</td><td class="num">28.7 mW before gating · 0 after</td><td>leakage: encoder 16.2 mW + verify unit 12.4 mW; within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. We'll size it together with the image encoder (step 3 in <a href="#next-h">What's next</a>), because images change what the SRAM has to hold. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. We'll size it together with the image encoder (step 2 in <a href="#next-h">What's next</a>), because images change what the SRAM has to hold, and the simulated load says the encoder as a whole can likely shrink. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
 </section>
 
 <section aria-labelledby="results-h">
@@ -721,6 +844,8 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="dropped-h">
   <h2 id="dropped-h">6. Paths we tried and dropped</h2>
   <ul class="dropped">
+    <li><b>Sizing the box for "every box ingests all 10<sup>6</sup> posts a day."</b> Nobody chose that number; it was a hidden assumption. With behavior from Reddit's statistics, the busiest 1% of boxes in a 1M-user community embed 0.45 text posts/s at the peak hour, 1/26 of the 11.6 posts/s we had assumed <span class="k k-est">simulation model</span>. We had decided in advance to re-decide the encoder toward smaller if real ingest fell under a tenth of the assumption. <i>Instead:</i> the encoder's size has to be justified by the backlog after a box has been offline and by images.</li>
+    <li><b>Bundling each user's votes into one proof every 50 s.</b> Every vote carries its own proof, and votes are about 90% of proof-carrying messages. Bundling was meant to cut that, but each bundle held 1.00 vote on average and vote counts arrived 26 s later on average <span class="k k-est">simulation model</span>. It technically passed our advance rule (lower verification, counts within 60 s) by 0.1%, which is no real gain. <i>Instead:</i> the next step looks at other vote designs, such as a daily anonymous tally or one proof covering many votes.</li>
     <li><b>Plain INT8 encoder.</b> No INT8 variant reached our quality bar (Recall@10 ≥ 0.95 against exact FP32 search); the best was 0.878. Mixed precision needed 83% of weight MACs left in FP32 and was only 1.1× faster. <i>Instead:</i> ingest in INT8 and re-rank the top 20 in FP32 at query time. That gives Recall@10 0.993 and ingest 1.9× faster with 2.2× less energy than FP32 (3.70 ms, 0.25 J/post) <span class="k k-meas">measured</span>, at about 252 ms and 18.7 J per query <span class="k k-est">estimated</span>.</li>
     <li><b>"The laptop NPU is too slow, so we need hardware."</b> Out of the box it was about 3× over the backlog target. But 89% of its time (at 256 tokens) went to a softmax plus broadcast mask that the compiler sent down a slow path. Expanding the mask fixed it: 45 min, Recall@10 0.997 <span class="k k-meas">measured</span>. It was a software problem, so we moved the target to the always-on box and argued from power instead of time.</li>
     <li><b>Doing the crypto on the encoder's INT8 array.</b> 615 proofs/s, 40× short <span class="k k-est">estimated</span>. A weight-stationary array pays off only when one operand stays put, but pairing math is mostly variable × variable, and the array has no integer carry handling.</li>
@@ -744,20 +869,20 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Step</th><th>What</th><th>What it leaves behind</th></tr></thead>
     <tbody>
-      <tr><td class="num"><b>1 (next)</b></td><td><b>User behavior parameters + simulator core:</b> event engine, gossip with the gossipsub rules, users, text posts, traces</td><td>how much text each box ingests, for each replication policy</td></tr>
-      <tr><td class="num">2</td><td>Box functions (ingest, query, feed, forgetting, private rooms) + virtual accelerator + image posts</td><td>a working community, and a full work log for every box</td></tr>
-      <tr><td class="num">3</td><td>Image encoder chip cost + encoder SRAM size (Timeloop + Accelergy)</td><td>a chip estimate that includes images</td></tr>
-      <tr><td class="num">4</td><td>Scenarios: ordinary day, peak, backlog, flood (with attackers and a real neighbor structure)</td><td>chip size and power re-decided from simulated load</td></tr>
-      <tr><td class="num">5</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
-      <tr><td class="num">6</td><td>Demo: web UI, a few boxes running in real time</td><td>for the presentation</td></tr>
+      <tr><td class="num"><b>1 (next)</b></td><td><b>Box functions + image posts.</b> First two decisions: how images travel (send the whole image right away / spread only a small envelope and let boxes fetch it / the author's box sends its embedding along) and how votes carry proofs. Then ingest, search, feed, forgetting and private rooms on top of the virtual accelerator</td><td>a working community, and a full work log for every box</td></tr>
+      <tr><td class="num">2</td><td>Image encoder chip cost + encoder size re-decided (Timeloop + Accelergy). Ordinary ingest is 1/26 of what the encoder was sized for, so its size now rests on the backlog after being offline and on images; this includes the 2 MB SRAM</td><td>a chip estimate that includes images</td></tr>
+      <tr><td class="num">3</td><td>Scenarios: ordinary day, peak, backlog, flood (with attackers and a real neighbor structure; votes as the cheapest message to imitate)</td><td>chip size and power re-decided from simulated load</td></tr>
+      <tr><td class="num">4</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
+      <tr><td class="num">5</td><td>Demo: web UI, a few boxes running in real time</td><td>for the presentation</td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Shrinking the encoder's 2 MB SRAM (6.80 mm² of the 11.3 mm² chip <span class="k k-est">estimated</span>), announced earlier as the next step, moved to step 3: image posts change what the SRAM has to hold. The midterm report will cover the chip results so far plus this system design.</p>
+  <p class="small muted">Done since the last update: the behavior parameters and the simulator core (see <a href="#load-h">What one box actually receives</a>). Shrinking the encoder's 2 MB SRAM (6.80 mm² of the 11.3 mm² chip <span class="k k-est">estimated</span>) is part of step 2, because image posts change what the SRAM has to hold. The midterm report will cover the chip results so far plus this system design.</p>
 
   <h3>Good places to start (no hardware tools needed)</h3>
   <ul class="help">
     <li><b>The client web UI.</b> A browser client for the community: post text and images, read a feed, search, vote, delete, chat in a private room. It talks to the same client API that the simulated users use, so the same UI works against the simulation and against the demo boxes. No CAD tools or chip knowledge needed.</li>
-    <li><b>The user behavior model.</b> How often people post, when during the day, what share of posts are images, how much they read versus write, how often they search, and how popularity spreads across sub-communities. Each parameter needs a source (public Reddit or community statistics, papers); where there is none, a reasonable range we can sweep. These numbers decide how much load each box sees, and so the chip size.</li>
+    <li><b>The behavior parameters we had to estimate.</b> Most come from Reddit's public statistics now (table in <a href="#load-h">section 2</a>), but we found no source for the time-of-day curve, a direct measure of how popularity spreads across sub-communities, post body length, page views per daily user, or any non-Reddit community such as DCInside. Subscriptions per user and the share of boxes online are estimates too. A source for any of these would firm up the per-box load.</li>
+    <li><b>How images should travel.</b> A 177 KB image takes 2.1 s to spread over 20 Mbps home uplinks, past our 1 s network budget, because every box pushes it to 6 neighbors in turn <span class="k k-est">simulation model</span>. Sending only a thumbnail-and-hash envelope and fetching on demand, or shipping the author's embedding, each has a cost (fetch delay, or trusting an embedding). Ideas and prior art (how other gossip networks move large payloads) are welcome; it's the first decision of the next step.</li>
   </ul>
 
   <h3>Open hardware questions you could take</h3>
