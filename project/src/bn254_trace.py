@@ -250,6 +250,36 @@ class Fp12:
             first = False
         return r
 
+    def cyc_sq(self):  # CP14: Granger-Scott squaring in the cyclotomic subgroup (arkworks cyclotomic_square)
+        r0, r4, r3 = self.c0.c0, self.c0.c1, self.c0.c2
+        r2, r1, r5 = self.c1.c0, self.c1.c1, self.c1.c2
+
+        def pair(a, b):  # (a + b y)^2 over Fp4 = Fp2[y]/(y^2 - xi)
+            tmp = a * b
+            return (a + b) * (b.mul_xi() + a) - tmp - tmp.mul_xi(), tmp.dbl()
+        t0, t1 = pair(r0, r1)
+        t2, t3 = pair(r2, r3)
+        t4, t5 = pair(r4, r5)
+        z0 = (t0 - r0).dbl() + t0
+        z1 = (t1 + r1).dbl() + t1
+        tmp = t5.mul_xi()
+        z2 = (r2 + tmp).dbl() + tmp
+        z3 = (t4 - r3).dbl() + t4
+        z4 = (t2 - r4).dbl() + t2
+        z5 = (r5 + t3).dbl() + t3
+        return Fp12(Fp6(z0, z4, z3), Fp6(z2, z1, z5))
+
+    def exp_cyc_naf(self, e):  # CP14: NAF exponent, inverse = conjugate (arkworks cyclotomic_exp)
+        inv, r, started = self.conj(), None, False
+        for d in reversed(naf(e)):
+            if started:
+                r = r.cyc_sq()
+            if d:
+                base = self if d > 0 else inv
+                r = base if not started else r * base
+                started = True
+        return r
+
     def __eq__(self, o): return self.c0 == o.c0 and self.c1 == o.c1
 
 
@@ -476,6 +506,52 @@ def final_exp(f):
     y4 = _exp_by_neg_x(y3)
     y5 = y4.sq()
     y6 = _exp_by_neg_x(y5)
+    y3, y6 = y3.conj(), y6.conj()
+    y7 = y6 * y4
+    y8 = y7 * y3
+    y9 = y8 * y1
+    y10 = y8 * y4
+    y11 = y10 * r
+    y13 = y9.frob(1) * y11
+    y14 = y8.frob(2) * y13
+    y15 = (r.conj() * y9).frob(3)
+    return y15 * y14
+
+
+def final_exp_opt(f, cyc: bool = True, use_naf: bool = True):
+    """CP14: final_exp with cyclotomic squarings (O1) and/or a NAF exponent x (O2); same result."""
+    sq = (lambda a: a.cyc_sq()) if cyc else (lambda a: a.sq())
+
+    def exp_x(a):
+        if use_naf:
+            if cyc:
+                return a.exp_cyc_naf(X).conj()
+            inv, r, started = a.conj(), None, False
+            for d in reversed(naf(X)):
+                if started:
+                    r = r.sq()
+                if d:
+                    r = (a if d > 0 else inv) if not started else r * (a if d > 0 else inv)
+                    started = True
+            return r.conj()
+        r, first = None, True
+        for bit in bin(X)[2:]:
+            if not first:
+                r = sq(r)
+            if bit == "1":
+                r = a if first else r * a
+            first = False
+        return r.conj()
+
+    f1 = f.conj() * f.inv()
+    r = f1.frob(2) * f1
+    y0 = exp_x(r)
+    y1 = sq(y0)
+    y2 = sq(y1)
+    y3 = y2 * y1
+    y4 = exp_x(y3)
+    y5 = sq(y4)
+    y6 = exp_x(y5)
     y3, y6 = y3.conj(), y6.conj()
     y7 = y6 * y4
     y8 = y7 * y3

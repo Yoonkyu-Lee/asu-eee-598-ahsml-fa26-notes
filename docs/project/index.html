@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
-    <li><b>Floods of invalid proofs break batching, so the verify unit grew.</b> A batch check fails as a whole if one proof in it is bad, and an attacker can make bad proofs for free. The worst attack sends only invalid proofs: batching then buys nothing, and every proof needs its own check, which costs 3.2× as much time as a batched one. Our earlier unit (5 multipliers + 4 adders) then handles only 7,469 proofs/s, 61% of a 100 Mbps flood, and keeps up only while at most 6% of proofs are invalid. We moved to <b>8 multipliers + 8 adders</b>: 13,181 proofs/s even when every proof is invalid. The verify unit grows from 1.83 to <b>2.69 mm²</b>, the chip from 11.0 to <b>11.9 mm²</b>, and flood power ranges from 0.48 W (all proofs valid) to <b>1.33 W</b> (all invalid) <span class="k k-est">cycle model</span>.</li>
-    <li><b>First estimate of the whole chip.</b> We put the verify unit and the text encoder on one 45 nm die, both costed with the same tools (Timeloop + Accelergy). With the larger verify unit the chip is <b>11.9 mm²</b>. It draws <b>0.092 W</b> on an ordinary day and 0.48–1.33 W during a 100 Mbps spam flood <span class="k k-est">estimated</span>. To clear the overnight backlog in under an hour at 500 MHz, the encoder needs a <b>32×32</b> array (16×16 takes 106 min).</li>
-    <li><b>Box comparison: the flood is where our hardware matters.</b> Our chip keeps up with the flood. A Pi 5 or Jetson CPU handles only 1/3–1/2 of it <span class="k k-est">estimated</span>, and the laptop keeps up only at 46.3 W <span class="k k-meas">measured</span>. On an ordinary day the chip barely changes the box total: the host's own idle power (2.4–3.3 W <span class="k k-src">source</span>) sets it. We keep the encoder on our chip rather than using a Hailo-8L, because the chip draws less (0.092 W vs 0.134–0.182 W <span class="k k-est">estimated</span>) and the Hailo is limited to 128 tokens.</li>
+    <li><b>Rejecting an invalid proof got 35% cheaper, so the verify unit shrank to 6 multipliers + 6 adders.</b> Throwing away one invalid proof used to cost 43,507 field multiplications; it now costs <b>28,418</b> (0.65×) <span class="k k-meas">counted</span>. Four changes, each checked to give the same results as the original math: cheaper (cyclotomic) squarings and a signed-digit exponent in the final exponentiation, a precomputed table for the verifying key's fixed points (3.1 MB in host DRAM), and running the subgroup check only on proofs that pass the pairing test. The unit now handles at least <b>13,429 proofs/s</b> at any share of invalid proofs (flood: 12,207/s), in <b>2.12 mm²</b>. The chip shrinks to <b>11.3 mm²</b>, and flood power is 0.48 W (all valid) to <b>1.05 W</b> (worst mix) <span class="k k-est">cycle model</span>.</li>
+    <li><b>The worst attack is now a mix, not an all-invalid flood.</b> Since invalid proofs skip the subgroup check, sending only invalid proofs is no longer the attacker's best move. The worst case is about <b>15% invalid</b>: most proofs are valid and pay for the subgroup check, yet batches already keep failing. Before this change an all-invalid flood was the worst case, and it had pushed the unit from 5 + 4 to 8 + 8 <span class="k k-est">cycle model</span>.</li>
+    <li><b>First estimate of the whole chip.</b> We put the verify unit and the text encoder on one 45 nm die, both costed with the same tools (Timeloop + Accelergy). The chip is now <b>11.3 mm²</b>. It draws <b>0.092 W</b> on an ordinary day and 0.48–1.05 W during a 100 Mbps spam flood <span class="k k-est">estimated</span>. Our chip keeps up with the flood; a Pi 5 or Jetson CPU handles only 1/3–1/2 of it <span class="k k-est">estimated</span>.</li>
   </ul>
 </section>
 
@@ -175,11 +175,11 @@ footer { font-size: 13px; color: var(--muted); }
     <div class="card flood">
       <h3>A spam flood: hard</h3>
       <div class="big">24–181 W</div>
-      <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our chip: 0.48 W if every proof is valid, 1.33 W if every proof is invalid <span class="k k-est">estimated</span>.</p>
+      <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our chip: 0.48 W if every proof is valid, up to 1.05 W for the worst mix of invalid proofs <span class="k k-est">estimated</span>.</p>
     </div>
   </div>
-  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest flood is one made entirely of invalid proofs (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
-  <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Our unit stays under that even in the worst case: 0.100 mJ per proof when every proof is invalid and has to be checked on its own <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
+  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
+  <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Our unit stays under that even in the worst case: 0.077 mJ per proof at the worst mix of invalid proofs <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
   <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>.</p>
 </section>
 
@@ -189,16 +189,16 @@ footer { font-size: 13px; color: var(--muted); }
   <p>The verify unit sits in front of everything else, so invalid messages are dropped before they reach the host or the encoder.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the encoder; host and encoder use DRAM.">
+    <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the encoder; host, encoder and verify unit use DRAM.">
       <defs>
         <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
         <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-attack" d="M0,0 L10,5 L0,10 z"/></marker>
         <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker>
       </defs>
       <!-- budget header -->
-      <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 11.9 mm² at 45 nm · V and E power-gated when idle (est.)</text>
-      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day, 10⁶ posts: chip 0.092 W (est.) · host idle 2.4–3.3 W (source) sets the box total</text>
-      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W (all valid) – 1.33 W (all invalid), keeps up (est.) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
+      <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 11.3 mm² at 45 nm · V and E power-gated when idle (est.)</text>
+      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day, 10⁶ posts: chip 0.092 W (est.) · host idle 2.4–3.3 W (source) sets the box total · chip idle 28.7 mW before gating</text>
+      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W (all valid) – 1.05 W (worst mix), keeps up (est.) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
       <!-- network -->
       <rect class="box" x="14" y="130" width="126" height="84" rx="8"/>
       <text x="77" y="160" text-anchor="middle" font-weight="600">Network</text>
@@ -214,8 +214,8 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="326" y="146" text-anchor="middle" class="mut" font-size="12">decode + subgroup checks</text>
       <text x="326" y="162" text-anchor="middle" class="mut" font-size="12">→ adaptive batched pairing check</text>
       <text x="326" y="186" text-anchor="middle" class="mono" font-size="12">14,368 Fp mults / proof</text>
-      <text x="326" y="204" text-anchor="middle" class="mono" font-size="12">0.032–0.100 mJ · 2.69 mm²</text>
-      <text x="326" y="230" text-anchor="middle" class="mut" font-size="11.5">8 multipliers · 8 adders · 8 KB (est.)</text>
+      <text x="326" y="204" text-anchor="middle" class="mono" font-size="12">0.032–0.077 mJ · 2.12 mm²</text>
+      <text x="326" y="230" text-anchor="middle" class="mut" font-size="11.5">6 multipliers · 6 adders · 8 KB (est.)</text>
       <!-- drop -->
       <path class="wire-attack" d="M326,250 L326,306" marker-end="url(#a2)"/>
       <rect class="box-attack" x="256" y="308" width="140" height="44" rx="8"/>
@@ -243,9 +243,11 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">backlog 45 min · 9.22 mm²</text>
       <text x="866" y="244" text-anchor="middle" class="mut" font-size="11">(est., Timeloop + Accelergy)</text>
       <!-- dram -->
-      <rect class="box" x="496" y="308" width="472" height="52" rx="8"/>
-      <text x="732" y="330" text-anchor="middle" font-weight="600">DRAM</text>
-      <text x="732" y="349" text-anchor="middle" class="mut" font-size="12">encoder weights (10.6 MB INT8) streamed per post · search index</text>
+      <rect class="box" x="496" y="308" width="472" height="62" rx="8"/>
+      <text x="732" y="327" text-anchor="middle" font-weight="600">DRAM</text>
+      <text x="732" y="344" text-anchor="middle" class="mut" font-size="12">encoder weights (10.6 MB INT8) streamed per post · search index</text>
+      <text x="732" y="361" text-anchor="middle" class="mut" font-size="12">verifying-key table for V (3.1 MB, ≤ 0.125 GB/s in a flood)</text>
+      <path class="wire-mem" d="M412,250 L412,339 L492,339" marker-end="url(#a3)"/>
       <path class="wire-mem" d="M601,250 L601,304" marker-end="url(#a3)"/>
       <path class="wire-mem" d="M866,262 L866,304" marker-end="url(#a3)"/>
     </svg>
@@ -256,18 +258,19 @@ footer { font-size: 13px; color: var(--muted); }
   <p>The unit handles the whole job of accepting a proof, not just the pairing: decoding and subgroup checks are 26% (measured) to 36% (model) of the work per proof. Left on the CPU, they would need 1.4 P-cores during a flood.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 250" role="img" aria-label="Verify unit internals: a microcoded sequencer drives an 8 KB operand buffer feeding 8 Montgomery multipliers and 8 adders; the result is a batch pass or fail, and a failed batch is split in halves and retested.">
+    <svg viewBox="0 0 980 250" role="img" aria-label="Verify unit internals: a microcoded sequencer drives an 8 KB operand buffer feeding 6 Montgomery multipliers and 6 adders; the result is a batch pass or fail, and a failed batch is split in halves and retested.">
       <defs><marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
       <rect class="box-plan" x="10" y="20" width="180" height="190" rx="8"/>
       <text x="100" y="46" text-anchor="middle" font-weight="600">Sequencer</text>
-      <text x="100" y="68" text-anchor="middle" font-size="12">microcode, lock-step</text>
-      <text x="100" y="84" text-anchor="middle" font-size="12">across the batch</text>
-      <text x="100" y="108" text-anchor="middle" font-size="11.5" class="mut">point decompression</text>
-      <text x="100" y="124" text-anchor="middle" font-size="11.5" class="mut">G2 subgroup check</text>
-      <text x="100" y="140" text-anchor="middle" font-size="11.5" class="mut">random batch weights</text>
-      <text x="100" y="156" text-anchor="middle" font-size="11.5" class="mut">Miller loop</text>
-      <text x="100" y="172" text-anchor="middle" font-size="11.5" class="mut">final exponentiation</text>
-      <text x="100" y="198" text-anchor="middle" font-size="11" class="mut">256-op lookahead window</text>
+      <text x="100" y="66" text-anchor="middle" font-size="12">microcode, lock-step</text>
+      <text x="100" y="82" text-anchor="middle" font-size="12">across the batch</text>
+      <text x="100" y="102" text-anchor="middle" font-size="11.5" class="mut">point decompression</text>
+      <text x="100" y="117" text-anchor="middle" font-size="11.5" class="mut">public inputs from a table</text>
+      <text x="100" y="132" text-anchor="middle" font-size="11.5" class="mut">random batch weights</text>
+      <text x="100" y="147" text-anchor="middle" font-size="11.5" class="mut">Miller loop</text>
+      <text x="100" y="162" text-anchor="middle" font-size="11.5" class="mut">final exp. (cyclotomic)</text>
+      <text x="100" y="177" text-anchor="middle" font-size="11.5" class="mut">subgroup check, if passed</text>
+      <text x="100" y="200" text-anchor="middle" font-size="11" class="mut">256-op lookahead window</text>
       <path class="wire" d="M190,115 L243,115" marker-end="url(#b1)"/>
       <rect class="box-plan" x="248" y="20" width="180" height="190" rx="8"/>
       <text x="338" y="46" text-anchor="middle" font-weight="600">Operand buffer</text>
@@ -277,13 +280,13 @@ footer { font-size: 13px; color: var(--muted); }
       <path class="wire" d="M428,75 L483,75" marker-end="url(#b1)"/>
       <path class="wire" d="M428,165 L483,165" marker-end="url(#b1)"/>
       <rect class="box-pick" x="488" y="20" width="262" height="110" rx="8"/>
-      <text x="619" y="46" text-anchor="middle" font-weight="700">Montgomery multiplier × 8</text>
+      <text x="619" y="46" text-anchor="middle" font-weight="700">Montgomery multiplier × 6</text>
       <text x="619" y="66" text-anchor="middle" font-size="12">254-bit, 64-bit word-serial (CIOS)</text>
       <text x="619" y="88" text-anchor="middle" class="mono" font-size="12">each: 0.28 mm² · 300 MHz</text>
       <text x="619" y="106" text-anchor="middle" class="mono" font-size="12">4 cycles · 1.76 nJ / multiply</text>
       <text x="619" y="123" text-anchor="middle" class="mut" font-size="11">RTL + 45 nm synthesis</text>
       <rect class="box-plan" x="488" y="142" width="262" height="68" rx="8"/>
-      <text x="619" y="168" text-anchor="middle" font-weight="600">254-bit adder × 8</text>
+      <text x="619" y="168" text-anchor="middle" font-weight="600">254-bit adder × 6</text>
       <text x="619" y="190" text-anchor="middle" font-size="12" class="mut">add / subtract + conditional subtract</text>
       <path class="wire" d="M750,115 L803,115" marker-end="url(#b1)"/>
       <rect class="box-plan" x="808" y="60" width="162" height="110" rx="8"/>
@@ -300,13 +303,13 @@ footer { font-size: 13px; color: var(--muted); }
     </svg>
   </div>
   <p class="small muted">Keeping the multipliers busy took three things: as many adders as multipliers (there are 2.5 additions per multiplication), running all proofs in a batch in lock-step, and a lookahead window a few hundred operations deep. Before we switched to lock-step order, the earlier 5-multiplier unit managed 14,110 proofs/s. Reordering by dependency depth also fills the multipliers, but then the buffer grows to 740 KB. So the throughput-versus-buffer tradeoff is set by how the microcode orders operations, more than by the hardware.</p>
-  <p class="small muted">The unit used to have 5 multipliers + 4 adders, sized for a flood of valid proofs. The worst-case flood (every proof invalid, so every proof is checked alone) pushed it to 8 + 8. A lone check is mostly a fixed cost (final exponentiation plus the verifying key's Miller loops) with 3.7 additions per multiplication, so with only 4 adders the adders, not the multipliers, held it back. The operand register file's extra ports and the crossbar for 8 + 8 are not in the area model yet.</p>
+  <p class="small muted">The unit's size has moved twice. It started at 5 multipliers + 4 adders, sized for a flood of valid proofs. Floods of invalid proofs, where many proofs must be checked alone, pushed it to 8 + 8 at first. Making a lone check cheaper brought it back to <b>6 + 6</b> (see <a href="#invalid-h">Floods of invalid proofs</a>). A lone check now has 4.2 additions per multiplication, so the adders matter as much as the multipliers. The operand register file's extra ports and the crossbar for 6 + 6 are not in the area model yet.</p>
 
   <h3>The chip: two gated domains behind PCIe</h3>
   <p>The box is a Pi 5-class host SoC (network, storage, queries, Ed25519, ChaCha20) with LPDDR4, plus our accelerator chip on PCIe. The chip has two power domains that are switched off whenever they have no work, and a small always-on part.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 300" role="img" aria-label="Accelerator chip: host SoC with DRAM connects over PCIe to the chip. Inside, an always-on control domain, a verify-unit domain V of 2.69 mm², and an encoder domain E of 9.22 mm² dominated by a 2 MB SRAM.">
+    <svg viewBox="0 0 980 300" role="img" aria-label="Accelerator chip: host SoC with DRAM connects over PCIe to the chip. Inside, an always-on control domain, a verify-unit domain V of 2.12 mm², and an encoder domain E of 9.22 mm² dominated by a 2 MB SRAM.">
       <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker></defs>
       <!-- host -->
       <rect class="box" x="10" y="70" width="170" height="150" rx="8"/>
@@ -320,7 +323,7 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="202" y="135" text-anchor="middle" class="mono mut" font-size="11">PCIe</text>
       <!-- chip outline -->
       <rect x="228" y="14" width="742" height="272" rx="10" style="fill:none;stroke:var(--ink);stroke-width:1.4"/>
-      <text x="244" y="36" font-weight="700">Our chip · 11.9 mm² · 45 nm (est.)</text>
+      <text x="244" y="36" font-weight="700">Our chip · 11.3 mm² · 45 nm (est.)</text>
       <!-- always-on -->
       <rect class="box-plan" x="244" y="56" width="150" height="214" rx="8"/>
       <text x="319" y="84" text-anchor="middle" font-weight="600">Always on</text>
@@ -333,13 +336,13 @@ footer { font-size: 13px; color: var(--muted); }
       <rect class="box-pick" x="408" y="56" width="210" height="214" rx="8"/>
       <text x="513" y="84" text-anchor="middle" font-weight="700">V · verify unit</text>
       <text x="513" y="106" text-anchor="middle" font-size="12">proof FIFO → sequencer</text>
-      <text x="513" y="122" text-anchor="middle" font-size="12">8 multipliers · 8 adders</text>
+      <text x="513" y="122" text-anchor="middle" font-size="12">6 multipliers · 6 adders</text>
       <text x="513" y="138" text-anchor="middle" font-size="12">8 KB operand registers</text>
-      <text x="513" y="166" text-anchor="middle" class="mono" font-size="12">2.69 mm²</text>
-      <text x="513" y="184" text-anchor="middle" class="mono" font-size="12">0.0317–0.100 mJ / proof</text>
+      <text x="513" y="166" text-anchor="middle" class="mono" font-size="12">2.12 mm² · leak 12.4 mW</text>
+      <text x="513" y="184" text-anchor="middle" class="mono" font-size="12">0.032–0.077 mJ / proof</text>
       <text x="513" y="212" text-anchor="middle" font-size="11.5" class="mut">idle nearly all of an</text>
       <text x="513" y="228" text-anchor="middle" font-size="11.5" class="mut">ordinary day → gated</text>
-      <text x="513" y="254" text-anchor="middle" font-size="11.5" class="t-attack">93% busy, flood of invalid proofs</text>
+      <text x="513" y="254" text-anchor="middle" font-size="11.5" class="t-attack">10% headroom at the worst flood</text>
       <!-- E -->
       <rect class="box-path" x="632" y="56" width="324" height="214" rx="8"/>
       <text x="794" y="84" text-anchor="middle" font-weight="700">E · text encoder</text>
@@ -358,12 +361,12 @@ footer { font-size: 13px; color: var(--muted); }
     <tbody>
       <tr><td>Ordinary day (11.6 posts/s)</td><td class="num">0.092 W</td><td>encoder busy 9.3% of the day</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>100 Mbps flood (12,207 proofs/s), all proofs valid</td><td class="num">0.48 W</td><td>verify unit checks proofs in large batches</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>100 Mbps flood, all proofs invalid (worst case)</td><td class="num">1.33 W</td><td>every proof checked alone; verify unit 93% busy; within the 2 W budget</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>100 Mbps flood, worst mix (about 15% invalid)</td><td class="num">1.05 W</td><td>every proof checked alone, and most also pay for the subgroup check; verify unit has 10% headroom; within the 2 W budget</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Overnight backlog (330k posts in 45 min)</td><td class="num">0.90 W</td><td>encoder working through 8 hours of posts</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Idle</td><td class="num">27 mW before gating · 0 after</td><td>within our 50 mW idle limit even without gating; computed with the earlier 5-multiplier verify unit, not yet redone for 8 + 8</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Idle</td><td class="num">28.7 mW before gating · 0 after</td><td>leakage: encoder 16.2 mW + verify unit 12.4 mW; within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area, and our next step. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
 </section>
 
 <section aria-labelledby="results-h">
@@ -373,14 +376,14 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Box</th><th>Ordinary day</th><th>100 Mbps flood</th><th>Idle</th><th>Basis</th></tr></thead>
     <tbody>
-      <tr><td><b>Pi 5-class host + our chip</b></td><td class="num">2.49–3.39 W</td><td class="num"><b>keeps up</b> at 2.88–3.78 W with valid proofs; chip rises to 1.33 W if all are invalid</td><td class="num">2.4–3.3 W</td><td><span class="k k-src">source</span> host idle · <span class="k k-est">estimated</span> chip</td></tr>
+      <tr><td><b>Pi 5-class host + our chip</b></td><td class="num">2.49–3.39 W</td><td class="num"><b>keeps up</b> at 2.88–3.78 W with valid proofs; chip rises to 1.05 W at the worst mix of invalid proofs</td><td class="num">2.4–3.3 W</td><td><span class="k k-src">source</span> host idle · <span class="k k-est">estimated</span> chip</td></tr>
       <tr><td>Pi 5 + Hailo-8L</td><td class="num">2.55–3.50 W (without Hailo idle)</td><td class="num"><b>falls behind</b>: 4 CPU cores top out at 3,854/s</td><td class="num">2.4–3.3 W + Hailo idle (unknown)</td><td><span class="k k-src">source</span> Hailo 121 posts/s, 1.4–1.9 W · <span class="k k-est">estimated</span> CPU</td></tr>
       <tr><td>Jetson Orin Nano</td><td class="num">no published encoder numbers</td><td class="num"><b>falls behind</b>: 6 CPU cores reach 4,095–5,241/s</td><td class="num">2.5–4.7 W</td><td><span class="k k-src">source</span> idle · <span class="k k-est">estimated</span> CPU</td></tr>
       <tr><td>Laptop, Core Ultra 9 185H (NPU + CPU)</td><td class="num">7.43 W</td><td class="num">keeps up, but at 46.3 W</td><td class="num">6.42 W</td><td><span class="k k-meas">measured</span></td></tr>
     </tbody>
   </table></div>
   <ul class="small">
-    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. One 11.9 mm² chip does it at 0.48 W, and at 1.33 W even when every proof is invalid <span class="k k-est">estimated</span>.</li>
+    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. One 11.3 mm² chip does it at 0.48 W, and at no more than 1.05 W whatever share of the proofs is invalid <span class="k k-est">estimated</span>.</li>
     <li><b>On an ordinary day the chip hardly matters.</b> Our box is 0.06–0.11 W below Pi 5 + Hailo-8L, much less than the spread in host idle power (2.4–3.3 W). To lower everyday power further you'd have to work on the host's idle power, which is outside this course project.</li>
     <li><b>Encoder on our chip, not a Hailo-8L.</b> We decided in advance to keep the encoder on our chip only if the chip's ordinary-day power came in under the Hailo-8L's share. It did: 0.092 W vs 0.134–0.182 W (11.6–15.7 mJ per post × 11.6 posts/s, estimated from vendor figures). The Hailo is also fixed at 128 tokens.</li>
   </ul>
@@ -388,7 +391,7 @@ footer { font-size: 13px; color: var(--muted); }
 
   <h3 id="invalid-h">Floods of invalid proofs</h3>
   <p>Batch verification checks n proofs at once with one randomly weighted pairing product. If even one proof in the batch is invalid, the whole batch fails and the unit has to find out which proofs are bad. For an attacker, valid proofs are expensive: each needs an identity and a generated proof, and exceeding the rate limit reveals their secret key. Invalid proofs are free: any three points on the curve pass the format and subgroup checks. So the cheapest attack is to mix invalid proofs into the flood. We modeled every share of invalid proofs from 0 to 100%. Honest messages are never dropped: every valid proof in a failed batch is still found and accepted.</p>
-  <p>The key number is the <b>fixed cost of one check</b>: the final exponentiation, the Miller loops for the verifying key's three pairs, and the public-input multi-scalar multiplication. It is worth 4.3 proofs, and a check of a single proof is almost nothing but this fixed cost. Field operations per check, decoding excluded <span class="k k-meas">counted</span>:</p>
+  <p>The key number is the <b>fixed cost of one check</b>: the final exponentiation, the Miller loops for the verifying key's three pairs, and the public-input multi-scalar multiplication. In our first count it was worth 4.3 proofs, and a check of a single proof is almost nothing but this fixed cost. Field operations per check, decoding excluded, as first counted <span class="k k-meas">counted</span>:</p>
   <div class="tbl"><table>
     <thead><tr><th>Check</th><th>Fixed (mults / adds)</th><th>Per proof (mults / adds)</th></tr></thead>
     <tbody>
@@ -404,7 +407,7 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>C, split in half and keep Miller values:</b> after a failure, compute each proof's Miller loop value once and store it (384 B per proof). Each subtest then only multiplies stored values and pays the fixed cost.</li>
     <li><b>D, adaptive batch size:</b> pick the next batch size n from the recent failure rate, down to n = 1 (every proof alone) when many proofs are bad.</li>
   </ul>
-  <p>Proofs classified per second on the earlier unit (5 multipliers + 4 adders), against the 12,207/s flood <span class="k k-est">cycle model</span>:</p>
+  <p>Proofs classified per second on the earlier unit (5 multipliers + 4 adders) with our first operation count, against the 12,207/s flood <span class="k k-est">cycle model</span>:</p>
   <div class="tbl"><table>
     <thead><tr><th>Invalid share</th><th>A, n=8</th><th>B, n=8</th><th>B, n=32</th><th>C, n=32</th><th>Every proof alone</th><th>D (best n)</th></tr></thead>
     <tbody>
@@ -418,29 +421,65 @@ footer { font-size: 13px; color: var(--muted); }
     </tbody>
   </table></div>
   <ul class="small">
-    <li><b>The worst attack sends only invalid proofs.</b> Above 17–30% invalid (depending on the hardware), batching loses, and every proof pays for a check of its own. The earlier unit then manages 7,469/s, 61% of the flood. It keeps up only while at most <b>6%</b> of proofs are invalid, about 730 invalid proofs/s.</li>
+    <li><b>With that first count, the worst attack sent only invalid proofs.</b> Above 17–30% invalid (depending on the hardware), batching loses, and every proof pays for a check of its own. The earlier unit then manages 7,469/s, 61% of the flood. It keeps up only while at most <b>6%</b> of proofs are invalid, about 730 invalid proofs/s.</li>
     <li><b>Keeping Miller values (C) doesn't beat recomputing (B).</b> Every subtest pays the fixed cost again, and the stored values only cut the per-proof part from 8.8k to 0.8k multiplications. C helps a little only for large batches at moderate invalid shares (n=128, 3% invalid: 11,201 vs 8,706).</li>
-    <li><b>We use D + B:</b> large batches (64–128) when nearly all proofs are valid, 16 at 1% invalid, 8 at 3–15%, and every proof alone above 20%. D + C has the same worst case and needs more storage, so B wins.</li>
-    <li><b>Batching is still worth keeping.</b> A lone check costs 3.2× the time and 3.1× the energy of a proof in a batch. We had agreed to drop batching if that ratio fell under 2×.</li>
+    <li><b>We use D + B:</b> large batches (64–128) when nearly all proofs are valid, 16 at 1% invalid, 8 at 3% to about 15%, and every proof alone beyond that. D + C has the same worst case and needs more storage, so B wins.</li>
+    <li><b>Batching is still worth keeping.</b> In the first count a lone check cost 3.2× the time and 3.1× the energy of a proof in a batch. We had agreed to drop batching if that ratio fell under 2×.</li>
     <li>If the attacker spreads the invalid proofs evenly instead of at random, a fixed n=32 does 7% worse at 1/16 invalid (8,954 vs 9,562/s). The worst case of D (every proof alone) doesn't change.</li>
+    <li><b>The lesson:</b> the earlier unit's "2× headroom over the flood" only held when every proof is valid. The hardware is sized by the fixed cost of a single check, not by batching. Our first answer was more hardware: we had agreed to add multipliers only while the verify unit stayed within 3.66 mm² and the chip within 2 W, and 8 multipliers + 8 adders kept up even with every proof invalid. Then we went after the fixed cost itself.</li>
   </ul>
-  <p>We decided in advance: if the best strategy's worst case fell short of 12,207/s, add multipliers, but only while the verify unit stays within 3.66 mm² (2× the earlier unit) and the chip within 2 W during the flood. Worst case over all invalid shares, strategy D <span class="k k-est">cycle model</span>:</p>
+
+  <h3 id="lone-h">Making a lone check cheaper</h3>
+  <p>Rejecting one invalid proof means decoding it and checking it alone. Where that cost went in our first count, for one proof on its own <span class="k k-meas">counted</span>:</p>
   <div class="tbl"><table>
-    <thead><tr><th>Multipliers × adders</th><th>Worst-case proofs/s</th><th>Verify unit area</th><th>Chip in the flood (worst share)</th><th>Keeps up?</th></tr></thead>
+    <thead><tr><th>Step</th><th>Field mults</th><th>Field adds</th><th>Note</th></tr></thead>
     <tbody>
-      <tr><td>5 × 4 (earlier)</td><td class="num">7,469</td><td class="num">1.83 mm²</td><td class="num">0.91 W</td><td>no</td></tr>
-      <tr><td>5 × 6</td><td class="num">8,449</td><td class="num">1.83 mm²</td><td class="num">0.95 W</td><td>no</td></tr>
-      <tr><td>6 × 6</td><td class="num">10,030</td><td class="num">2.12 mm²</td><td class="num">1.11 W</td><td>no</td></tr>
-      <tr><td>7 × 7</td><td class="num">11,573</td><td class="num">2.40 mm²</td><td class="num">1.27 W</td><td>no, 5% short</td></tr>
-      <tr><td><b>8 × 8 (chosen)</b></td><td class="num"><b>13,181</b></td><td class="num"><b>2.69 mm²</b></td><td class="num"><b>1.33 W</b></td><td><b>yes</b></td></tr>
-      <tr><td>10 × 10</td><td class="num">16,145</td><td class="num">3.26 mm²</td><td class="num">1.34 W</td><td>yes</td></tr>
+      <tr><td>Decode: two G1 square roots</td><td class="num">722</td><td class="num">2</td><td>unpacking compressed points</td></tr>
+      <tr><td>Decode: G2 square root</td><td class="num">1,090</td><td class="num">13</td><td></td></tr>
+      <tr><td>Decode: G2 subgroup check</td><td class="num">4,017</td><td class="num">11,853</td><td>a 128-bit scalar multiplication</td></tr>
+      <tr><td>Public-input multi-scalar multiplication</td><td class="num">9,111</td><td class="num">12,418</td><td>five 254-bit scalars</td></tr>
+      <tr><td>Miller loop</td><td class="num">16,339</td><td class="num">62,339</td><td>the proof's pair plus the verifying key's pairs</td></tr>
+      <tr><td>Final exponentiation</td><td class="num">12,381</td><td class="num">66,362</td><td>three exponentiations by the curve parameter x: 11,070 mults</td></tr>
     </tbody>
   </table></div>
+  <p class="small muted">Inside a batch, decoding shares its inversions across proofs, so it is 5,676 mults / 11,914 adds per proof.</p>
+  <p>We tried five changes, one at a time. We decided in advance to keep a change only if our self-tests showed it gives exactly the same values as the original math, and it adds at most 64 KB of on-chip SRAM and at most 0.85 GB/s of DRAM reads during the flood (10% of LPDDR4's 8.5 GB/s). Then we would rerun the flood model and take the smallest (multipliers, adders) that keeps 12,207/s at every share of invalid proofs. All changes passed the self-tests. Cost to reject one invalid proof, changes added in order <span class="k k-meas">counted</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Change (cumulative)</th><th>Mults</th><th>Adds</th><th>What shrank</th></tr></thead>
+    <tbody>
+      <tr><td>As first counted</td><td class="num">43,507</td><td class="num">153,035</td><td></td></tr>
+      <tr><td>+ cyclotomic squarings in the final exponentiation (Fp12 squaring: 36 → 18 mults)</td><td class="num">40,105</td><td class="num">144,719</td><td>final exp. −3,402 mults</td></tr>
+      <tr><td>+ signed-digit (NAF) form of the exponent x</td><td class="num">39,457</td><td class="num">141,377</td><td>final exp. −648 more (12,381 → 8,331 in total)</td></tr>
+      <tr><td>+ precomputed table for the verifying key's fixed points, 4-bit windows (368 KB)</td><td class="num">33,880</td><td class="num">132,991</td><td>public inputs 9,111 → 3,534 mults</td></tr>
+      <tr><td>+ same table, 8-bit windows (3.1 MB)</td><td class="num">32,461</td><td class="num">131,185</td><td>public inputs 9,111 → 2,115 mults</td></tr>
+      <tr><td><b>+ subgroup check only for proofs that pass the test (chosen)</b></td><td class="num"><b>28,418</b></td><td class="num"><b>119,287</b></td><td>decoding 5,676 → 1,633 mults</td></tr>
+      <tr><td>+ uncompressed proofs, 128 → 256 B (not used)</td><td class="num">26,798</td><td class="num">119,290</td><td>square roots −1,620 mults</td></tr>
+    </tbody>
+  </table></div>
+  <p>Worst case over all invalid shares, proofs classified per second, by unit size <span class="k k-est">cycle model</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Mults × adders</th><th>First count</th><th>+ squarings, NAF</th><th>+ key table</th><th>+ deferred subgroup check</th><th>+ uncompressed</th><th>Verify unit area</th></tr></thead>
+    <tbody>
+      <tr><td>5 × 5</td><td class="num">8,441</td><td class="num">9,307</td><td class="num">11,198</td><td class="num">11,301</td><td class="num">11,260</td><td class="num">1.83 mm²</td></tr>
+      <tr><td>5 × 6</td><td class="num">8,449</td><td class="num">9,316</td><td class="num">11,324</td><td class="num">11,353</td><td class="num">11,883</td><td class="num">1.83 mm²</td></tr>
+      <tr><td>6 × 5</td><td class="num">9,253</td><td class="num">10,016</td><td class="num">10,794</td><td class="num">10,980</td><td class="num">10,934</td><td class="num">2.11 mm²</td></tr>
+      <tr><td><b>6 × 6 (chosen)</b></td><td class="num">10,030</td><td class="num">11,060</td><td class="num"><b>13,306</b></td><td class="num"><b>13,429</b></td><td class="num">13,380</td><td class="num"><b>2.12 mm²</b></td></tr>
+      <tr><td>7 × 6</td><td class="num">11,020</td><td class="num">11,929</td><td class="num">12,856</td><td class="num">12,998</td><td class="num">13,022</td><td class="num">2.40 mm²</td></tr>
+      <tr><td>7 × 8</td><td class="num">11,592</td><td class="num"><b>12,782</b></td><td class="num">15,536</td><td class="num">15,576</td><td class="num">16,303</td><td class="num">2.41 mm²</td></tr>
+      <tr><td>8 × 8 (earlier)</td><td class="num"><b>13,181</b></td><td class="num">14,534</td><td class="num">17,486</td><td class="num">17,647</td><td class="num">17,583</td><td class="num">2.69 mm²</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Bold: the smallest unit that keeps up (12,207/s) in each column. Four adders never got close in any column. The key-table columns use 8-bit windows.</p>
   <ul class="small">
-    <li><b>8 multipliers + 8 adders keeps up even when every proof is invalid.</b> The verify unit is 1.47× the earlier one and the chip goes from 11.0 to 11.9 mm². Adders help only up to 6 (5 × 4 → 5 × 6 is +13%, more adders add nothing).</li>
-    <li>Chip power in the flood = the ordinary-day chip (0.092 W) + verify unit dynamic and leakage. In the worst case verification costs 0.100 mJ per proof, 3.1× a batched proof.</li>
-    <li>Added delay for a valid message: filling a batch ≤ 10.5 ms (n=128) plus P99 ≤ 32 ms to resolve one batch, far under the 1 s we allowed so new posts stay searchable within 5 s. Queueing delay isn't modeled, and the 8 × 8 unit is 93% busy when every proof is invalid.</li>
-    <li><b>The lesson:</b> the earlier unit's "2× headroom over the flood" only held when every proof is valid. Against an all-invalid flood the headroom needed is the lone-to-batched cost ratio, 3.2×. The hardware is sized by the fixed cost of a single check, not by batching.</li>
+    <li><b>6 multipliers + 6 adders: at least 13,429 proofs/s, 10% headroom.</b> The verify unit goes from 2.69 mm² (the earlier 8 + 8) to <b>2.12 mm²</b> and leaks 12.4 mW. The chip is <b>11.3 mm²</b> and draws at most <b>1.05 W</b> in the flood. The worst-case energy is <b>0.077 mJ</b> per proof <span class="k k-est">estimated</span>.</li>
+    <li><b>Part of the earlier 8 + 8 was our own model being conservative.</b> Our operation trace counted the final exponentiation's squarings as general squarings and used a plain binary exponent. Counting them the way the arkworks library already computes them gets to 7 × 8 on its own. A simplification that looks "safe" can move the hardware size by a whole step, so we now note such simplifications next to the results.</li>
+    <li><b>The biggest gain beyond the library comes from the verifying key being fixed.</b> Its points never change, so a precomputed table turns the public-input multiplication into additions only: 9,111 → 2,115 mults, 16% of the cost to reject a proof. The price is a 3.1 MB table in host DRAM and up to 0.125 GB/s of reads during the flood. The 4-bit-window table is only 368 KB but needs 0.226 GB/s; we took 8-bit windows for fewer reads. The table is rebuilt offline whenever the verifying key changes.</li>
+    <li><b>The worst attack moved from "all invalid" to about 15% invalid.</b> Invalid proofs now skip the subgroup check, so an all-invalid flood is easier (14,633/s on 6 × 6). The worst case is a mostly valid flood with about 15% invalid proofs (13,429/s): batches keep failing, and the valid proofs still pay for the subgroup check. That is why deferring the check raised the worst case only a little (13,306 → 13,429). Deferring is safe: a proof that fails the test is discarded anyway, and every accepted proof still passes the subgroup check, so the set of accepted proofs doesn't change. A proof built to pass the test but fail the subgroup check costs the same as a valid one, which the numbers above already cover.</li>
+    <li>On 6 × 6 by invalid share: 0% → 29,704/s (n=128), 1% → 23,304 (n=16), 10% → 15,137 (n=8), 15% → 13,429 (every proof alone), 100% → 14,633 (alone) <span class="k k-est">cycle model</span>.</li>
+    <li><b>We keep proofs compressed.</b> Sending them uncompressed (256 B instead of 128 B) skips three square roots but changes the wire format, and it doesn't shrink the unit: 5 × 6 reaches 11,883/s, 97% of the flood. We had agreed to change the wire format only if it saved a multiplier.</li>
+    <li><b>Additions are now 4.2× multiplications</b>, so the remaining lever is on the add side. Cutting additions by 7%, or a better adder (for example, multiplying by the constant 9 with one shift-and-add), looks like enough for 5 multipliers, saving 0.28 mm² (2.5% of the chip).</li>
+    <li>Added delay for a valid message: filling a batch ≤ 10.5 ms (n=128) plus P99 ≤ 4.3 ms to resolve one batch on 6 × 6, far under the 1 s we allowed so new posts stay searchable within 5 s. Queueing delay isn't modeled.</li>
+    <li>Caveats: the throughput assumes the microcode runs independent lone checks side by side. Run one at a time, a lone check takes 26,542 cycles on 6 × 6, which is 11,303/s, short of the flood. The model also reuses multiplier utilization measured on batches, where additions are 2.5× multiplications, not 4.2×. If utilization turns out lower on lone checks, 7 × 6 is the fallback.</li>
   </ul>
 
   <details>
@@ -451,7 +490,7 @@ footer { font-size: 13px; color: var(--muted); }
       <li>nwaku, the Waku <a href="https://github.com/logos-co/logos-lips/blob/master/docs/messaging/core/draft/17/rln-relay.md">RLN-relay</a> implementation (<a href="https://github.com/logos-messaging/logos-delivery/blob/306050e5abbcc04c01b964692bd9732f6448a7da/logos_delivery/waku/node/waku_node/relay.nim">relay.nim</a>): an invalid proof is rejected and penalized with weight −100, the graylist threshold is −10,000, and bad peers are disconnected. It verifies proofs one at a time, without batching. From that, a connection is cut after about 10 invalid proofs <span class="k k-est">estimated</span>, assuming a topic weight of 1.</li>
       <li>New connections: go-libp2p's <a href="https://github.com/libp2p/go-libp2p/blob/master/p2p/host/resource-manager/conn_rate_limiter.go">resource manager</a> allows 0.2/s per IPv4 /32, 0.2/s per IPv6 /56 and 0.5/s per IPv6 /48, with no global cap. We didn't find the equivalent limit in nim-libp2p, which nwaku uses.</li>
     </ul>
-    <p class="small">So for the earlier unit's 6% limit (about 730 invalid proofs/s), an attacker needs 73 new connections per second, which about 366 IPv4 addresses (or 146 IPv6 /48s) can supply <span class="k k-est">estimated</span>. Penalties limit what one connection can do, not an attacker with many addresses. Having the chip itself survive a 100%-invalid flood is the most robust way to keep spam from exhausting ingest.</p>
+    <p class="small">So for the earlier unit's 6% limit (about 730 invalid proofs/s), an attacker needs 73 new connections per second, which about 366 IPv4 addresses (or 146 IPv6 /48s) can supply <span class="k k-est">estimated</span>. Penalties limit what one connection can do, not an attacker with many addresses. Having the chip itself survive any share of invalid proofs is the most robust way to keep spam from exhausting ingest.</p>
   </details>
 
   <h3>What existing hardware does</h3>
@@ -479,15 +518,17 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>Montgomery multiplier, 254-bit, 64-bit word-serial</td><td class="num">0.28 mm² · 300 MHz · 4 cycles · 1.76 nJ / multiply</td><td class="kind"><span class="k k-syn">synthesized</span></td></tr>
       <tr><td>Multiplier functional check</td><td class="num">1,000 test vectors, 0 errors</td><td class="kind"><span class="k k-meas">simulated</span></td></tr>
       <tr><td>Field ops per proof in a batch, counted from a traced real BN254 verification</td><td class="num">14,368 multiplies · 35,938 adds (earlier hand count: 10,415 multiplies)</td><td class="kind"><span class="k k-meas">counted</span></td></tr>
-      <tr><td><b>Verify unit (current): 8 multipliers + 8 adders + 8 KB buffer</b></td><td class="num">13,181 proofs/s even when every proof is invalid (flood: 12,207/s) · 2.69 mm²</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
-      <tr><td>Earlier verify unit: 5 multipliers (1.42 mm²) + 4 adders, all proofs valid</td><td class="num">24,862 proofs/s · multiplier utilization 0.79 (target was ≥ 24,414/s, 2× the flood) · but 7,469 proofs/s when every proof is invalid</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
+      <tr><td><b>Verify unit (current): 6 multipliers + 6 adders + 8 KB buffer</b></td><td class="num">at least 13,429 proofs/s at any share of invalid proofs (flood: 12,207/s) · 2.12 mm²</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
+      <tr><td>Cost to reject one invalid proof (decode + lone check)</td><td class="num">28,418 mults · 119,287 adds (first count: 43,507 · 153,035)</td><td class="kind"><span class="k k-meas">counted</span></td></tr>
+      <tr><td>Verifying-key table in host DRAM (8-bit windows)</td><td class="num">3.1 MB · up to 0.125 GB/s of reads during the flood</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Earlier verify unit: 5 multipliers (1.42 mm²) + 4 adders, all proofs valid</td><td class="num">24,862 proofs/s · multiplier utilization 0.79 (target was ≥ 24,414/s, 2× the flood) · but 7,469 proofs/s when every proof is invalid (first operation count)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
       <tr><td>Same earlier unit with 4 multipliers, all valid</td><td class="num">20,633 proofs/s (misses the target)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
-      <tr><td>Verify unit energy per proof, batched · every proof invalid</td><td class="num">0.0317 mJ (multiplies 80%, moving operands 19%) · 0.100 mJ (3.1× batched)</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Verify unit area · leakage</td><td class="num">2.69 mm² with 8 + 8 · the earlier 5 + 4 unit was 1.83 mm² (multipliers 1.42, operand registers 0.30, 32 KB microcode 0.10, adders 0.01) and leaked 10.9 mW</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Verify unit energy per proof, batched · worst mix of invalid proofs</td><td class="num">0.0317 mJ (multiplies 80%, moving operands 19%) · 0.077 mJ</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Verify unit area · leakage</td><td class="num">2.12 mm² · 12.4 mW with 6 + 6 · the earlier 5 + 4 unit was 1.83 mm² (multipliers 1.42, operand registers 0.30, 32 KB microcode 0.10, adders 0.01) and leaked 10.9 mW</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Latency of one proof, not batched (5-multiplier unit)</td><td class="num">282 µs (4.3× faster than 1.22 ms tuned software on a P-core)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
       <tr><td>Encoder: INT8 32×32 array, 2 MB SRAM, 32 KB local buffers, 500 MHz</td><td class="num">8.05 ms · 7.90 mJ / post · 8-hour backlog in 45 min · new post encoded in 14 ms (P99)</td><td class="kind"><span class="k k-est">model</span></td></tr>
       <tr><td>Encoder area · leakage</td><td class="num">9.22 mm² (2 MB SRAM 6.80, array 1.20, FP16 attention 0.53) · 16.2 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
-      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">11.9 mm² · 0.092 W ordinary day · 0.48 W (all valid) to 1.33 W (all invalid) in a 100 Mbps flood · 0.90 W during the backlog · 27 mW idle before gating (with the earlier verify unit)</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">11.3 mm² · 0.092 W ordinary day · 0.48 W (all valid) to 1.05 W (worst mix) in a 100 Mbps flood · 0.90 W during the backlog · 28.7 mW idle before gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
   <p class="small muted">"Synthesized" means Synopsys Design Compiler with the FreePDK45 (OSU) library, with power computed from simulated switching activity. Everything else on the chip (adders, buffers, sequencer, the whole encoder) is costed with Accelergy's 45 nm tables (CACTI for SRAM, Aladdin for logic), not RTL. The 2 W budget, 10<sup>6</sup> posts/day, 1 KB messages, 100 Mbps flood and 1-hour backlog target are all <b>assumptions</b>.</p>
@@ -573,7 +614,9 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>Wider multipliers (128/256-bit word).</b> They were bigger, slower and used more energy per multiply (table above).</li>
     <li><b>Interleaving independent multiplies through a pipelined multiplier and letting the tool retime it.</b> We had decided up front that it needed a 1.5× clock gain to justify the complexity. The clock rose only 1.20–1.22× (about 360 MHz): the critical path stopped at 2.78 ns inside the retimed multiplier, and we haven't found out why. We gave up a real gain to stick to that call: the 2-way version would have been about 20% smaller (0.91 vs 1.13 mm² for a 4-multiplier unit).</li>
     <li><b>A smaller encoder array (8×8 or 16×16).</b> At 500 MHz, 16×16 clears the 8-hour backlog in 106 min and 8×8 in 401 min, both over the 60-minute target <span class="k k-est">model</span>. 16×16 would pass at 1 GHz (53 min), but we fixed the clock at 500 MHz beforehand and treated 1 GHz only as a sensitivity check.</li>
-    <li><b>Keeping the 5-multiplier verify unit and relying on smarter batch splitting.</b> It was sized with 2× headroom over a flood of valid proofs, but no splitting strategy can go below the cost of checking every proof alone, and that drops it to 7,469 proofs/s, 61% of the flood, when every proof is invalid <span class="k k-est">cycle model</span>. 7 multipliers + 7 adders still came up 5% short, so we went to 8 + 8.</li>
+    <li><b>Keeping the 5-multiplier verify unit and relying on smarter batch splitting.</b> It was sized with 2× headroom over a flood of valid proofs, but no splitting strategy can go below the cost of checking every proof alone, and that drops it to 7,469 proofs/s, 61% of the flood, when every proof is invalid (with our first operation count) <span class="k k-est">cycle model</span>. 7 multipliers + 7 adders still came up 5% short, so at first we went to 8 + 8.</li>
+    <li><b>An 8 + 8 verify unit.</b> Part of that size came from our own operation count being conservative (general instead of cyclotomic squarings, a plain binary exponent). With the library's real formulas, a precomputed verifying-key table and a deferred subgroup check, the cost to reject an invalid proof fell to 0.65×, and 6 multipliers + 6 adders keep up at any share of invalid proofs (2.12 mm² instead of 2.69 mm²) <span class="k k-est">cycle model</span>.</li>
+    <li><b>Sending proofs uncompressed.</b> It skips three square roots per proof but doubles the proof to 256 B and changes the wire format, and the smallest unit that keeps up is still 6 + 6 (5 + 6 reaches 97% of the flood) <span class="k k-est">cycle model</span>. We decided in advance to change the format only if it saved a multiplier.</li>
     <li><b>Caching each proof's Miller loop value to split failed batches faster.</b> Every subtest still pays the fixed cost of a check, so it was no better than simply recomputing, and it needs extra storage (48 KB at n=128) <span class="k k-est">cycle model</span>.</li>
     <li><b>Relying on network-layer peer penalties to stop invalid proofs.</b> Peers that send invalid proofs get penalized and disconnected, but we found no source for a numeric per-node cap, and an attacker with a few hundred IP addresses gets around it <span class="k k-est">estimated</span>. So the chip itself has to survive a flood of nothing but invalid proofs.</li>
     <li><b>A verify-only chip next to a Hailo-8L.</b> The Hailo's share of ordinary-day power (0.134–0.182 W) is more than our whole chip (0.092 W) <span class="k k-est">estimated</span>, and it truncates posts to 128 tokens.</li>
@@ -582,16 +625,16 @@ footer { font-size: 13px; color: var(--muted); }
 
 <section aria-labelledby="next-h">
   <h2 id="next-h">6. What's next, and where you could help</h2>
-  <p><b>Next: shrink the fixed cost of a single check.</b> The verify unit is now sized by the cost of checking one proof alone, which is mostly the final exponentiation and the verifying key's Miller loops. Our model counts the squarings in the final exponentiation as general Fp12 squarings, but most of them are cyclotomic squarings, which are cheaper. With those, a better final-exponentiation chain and precomputing the verifying-key side, a smaller unit (6–7 multipliers instead of 8) might still survive a flood of nothing but invalid proofs.</p>
+  <p><b>Next: shrink the encoder's SRAM.</b> Of the 11.3 mm² chip, 6.80 mm² is the encoder's 2 MB global SRAM <span class="k k-est">estimated</span>. The weights are streamed from DRAM for every matrix multiply anyway, so the encoder may need only a double buffer plus activations. We'll rerun Timeloop + Accelergy across SRAM sizes for backlog time (≤ 60 min), energy and area, and pick the smallest SRAM that still clears the backlog in time.</p>
   <h3>Open questions you could take</h3>
   <ul class="help">
     <li><b>ARM measurements.</b> We have no verification costs on ARM, from measurement or from any source. A real box CPU is likely ARM. Running the Groth16 / Ed25519 / ChaCha20 benchmarks on a Raspberry Pi 5 would fill that gap.</li>
     <li><b>Pi 5 + Hailo measurements.</b> The Hailo numbers are vendor figures on an x86 host with PCIe Gen3 x4, and the Pi 5 has x1. MiniLM power isn't published (we borrowed a vision-model figure), and we don't know its idle power. The input is fixed at 128 tokens, while our median post is 128 tokens and 17% are cut even at 256. Measuring throughput, power, idle power, and the quality loss from truncation would firm up the comparison.</li>
     <li><b>Encoder on the Pi 5 CPU.</b> We haven't measured the encoder's energy on a Pi 5 CPU, so we couldn't evaluate the cheapest option (verify-only chip, encoder on the host). If the CPU handles an ordinary day within about 0.09 W, that option comes back.</li>
-    <li><b>Does the encoder need 2 MB of SRAM?</b> It's 74% of the encoder's area. Weights are streamed per matrix multiply, so a double buffer plus activations may be enough, if it still clears the backlog in an hour.</li>
-    <li><b>RTL for the rest of the verify unit, and for the encoder MAC.</b> Only the Montgomery multiplier exists in RTL. The 254-bit adders, the operand buffer, the microcoded sequencer and the encoder's INT8 MAC are still estimates. With 8 multipliers and 8 adders, the operand register file needs more ports and a crossbar, which the area model leaves out.</li>
+    <li><b>Fewer additions in the verify unit.</b> A lone check now does 4.2 additions per multiplication, and 5 multipliers + 6 adders already reach 97% of the flood. Cutting additions by 7%, or a smarter adder (for example, a three-input adder, or multiplying by the constant 9 with one shift-and-add), could drop a multiplier and save 0.28 mm² <span class="k k-est">estimated</span>.</li>
+    <li><b>RTL for the rest of the verify unit, and for the encoder MAC.</b> Only the Montgomery multiplier exists in RTL. The 254-bit adders, the operand buffer, the microcoded sequencer and the encoder's INT8 MAC are still estimates. With 6 multipliers and 6 adders, the operand register file needs more ports and a crossbar, which the area model leaves out.</li>
     <li><b>Hand-pipelining the multiplier.</b> We'd like to know why retiming stops at 2.78 ns. A hand-split pipeline reaching ≥ 443 MHz (1.5×) would make interleaving worth reopening.</li>
-    <li><b>A better scheduler.</b> Our scheduler is a simple greedy one in program order, and our throughput assumes the microcode runs independent checks side by side in lock-step. Run one at a time, a lone check on the earlier unit takes 50,235 cycles, over 20% slower. A smarter schedule might let 7 multipliers + 7 adders (only 5% short) handle the worst-case flood.</li>
+    <li><b>A better scheduler.</b> Our scheduler is a simple greedy one in program order, and our throughput assumes the microcode runs independent checks side by side in lock-step. Run one at a time, a lone check on the 6 + 6 unit takes 26,542 cycles, which is 11,303 proofs/s, short of the 12,207/s flood. The utilization we assume also comes from batches, which have fewer additions per multiplication than lone checks. A scheduler that keeps the unit busy on lone checks would confirm 6 + 6; if it can't, 7 multipliers + 6 adders is the fallback.</li>
     <li><b>Adapting the batch size against a changing attacker.</b> Our results pick the batch size knowing the invalid share, which is an upper bound. A real unit has to estimate it from recent failures, and an attacker who switches the share suddenly costs it a few batches. Queueing delay during the flood also isn't modeled.</li>
     <li><b>Is our quality bar right?</b> The strict Recall@10 bar mostly penalizes swaps between near-tied results: the median score gap between the 10th and 11th results is just 0.0033. Changing the bar needs human relevance judgments.</li>
     <li><b>How big is a real flood?</b> The flood size is an assumption. Peer scoring in gossipsub and Waku penalizes and disconnects peers that send invalid messages, but we found no source that puts a number on how many invalid messages can still reach one node, and we couldn't find nim-libp2p's limit on new connections. A source for either would tell us how much of the worst case the network already absorbs.</li>
