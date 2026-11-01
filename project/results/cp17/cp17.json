@@ -1,0 +1,536 @@
+{
+ "host_laptop_s": {
+  "ed25519_verify": 0.0001089176000095904,
+  "decrypt_650B": 4.7159666622368e-06,
+  "decrypt_177KB": 9.975399996619671e-05,
+  "rln_check": 4.532866665006925e-06,
+  "search_8000": 0.00026589099996878455,
+  "feed_8000": 0.001885867999517359,
+  "insert": 6.149999680928885e-08,
+  "tokenize": 3.7101333340009054e-05
+ },
+ "cost_box_s": {
+  "sig": 0.0003191285680280999,
+  "nullifier": 1.3281299328470292e-05,
+  "decrypt_fixed": 1.2791414674040289e-05,
+  "decrypt_per_b": 1.5790271481746672e-09,
+  "insert": 0.00010888710167687775,
+  "tally": 1.3281299328470292e-05,
+  "search_fixed": 5.860000000000001e-05,
+  "search_per_vec": 9.738257873856734e-08,
+  "feed_fixed": 5.860000000000001e-05,
+  "feed_per_item": 6.906991548232327e-07,
+  "verify": 8.96360219028063e-05,
+  "image_enc": 0.01902899882726542
+ },
+ "chip": {
+  "text_164tok_ms": 8.05,
+  "query_12tok_ms": 0.5527473613471953,
+  "image_ms": 19.028998827265422,
+  "image_mJ": 18.674421209366066,
+  "macs_text_164": 1865097216,
+  "macs_image": 4408811520
+ },
+ "tolerance": {
+  "n": 300,
+  "same_fp32_int8": {
+   "min": 0.8770554661750793,
+   "p001": 0.8774490356445312,
+   "p50": 0.987250030040741
+  },
+  "cross_fp32": {
+   "max": 0.9810808897018433,
+   "p99": 0.965173602104187,
+   "p50": 0.8829787969589233
+  },
+  "int8_rerun_bit_exact": false,
+  "fp32_threads_1_vs_all_bit_exact": true,
+  "fp32_threads_1_vs_all_max_abs": 0.0,
+  "images": "synthetic (ml.synth_image), not photos"
+ },
+ "images": {
+  "holders": 9420,
+  "image_enc_chip_ms": 19.028998827265422,
+  "runs": {
+   "I1 5 Mbps": {
+    "searchable_s": {
+     "p50": 4.442452395951932,
+     "p99": 6.117224724500829,
+     "max": 7.306819190203896,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 1181461.9267515924,
+     "p99_box": 2136600.0,
+     "max_box": 2670750.0
+    },
+    "dup_bytes_per_post_per_box": 1003430.8280254777,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I2 5 Mbps": {
+    "searchable_s": {
+     "p50": 4.398788998827968,
+     "p99": 5.858548998824972,
+     "max": 7.464788998824815,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 251354.06581740975,
+     "p99_box": 616502.3049999999,
+     "max_box": 755408.0
+    },
+    "dup_bytes_per_post_per_box": 62274.140127388535,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I3 5 Mbps": {
+    "searchable_s": {
+     "p50": 0.5519042628347961,
+     "p99": 0.7075699942520259,
+     "max": 0.8131612599622713,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 0.0016008492569002124,
+     "p99_box": 0.01
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 77882.50594479831,
+     "p99_box": 139385.5,
+     "max_box": 176457.5
+    },
+    "dup_bytes_per_post_per_box": 65182.14522292994,
+    "holders": 9420,
+    "q": 0.00148619957537155,
+    "checkers_per_post": {
+     "mean": 14.08,
+     "min": 6
+    },
+    "p_unchecked": 8.229143466633823e-07
+   },
+   "I1 20 Mbps": {
+    "searchable_s": {
+     "p50": 1.3588468616621867,
+     "p99": 1.8150957930795357,
+     "max": 2.128904724496806,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 1181461.9267515924,
+     "p99_box": 2136600.0,
+     "max_box": 2670750.0
+    },
+    "dup_bytes_per_post_per_box": 1003430.8280254777,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I2 20 Mbps": {
+    "searchable_s": {
+     "p50": 1.4630434645341666,
+     "p99": 2.0115834645354767,
+     "max": 2.5101234645367185,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 251354.06581740975,
+     "p99_box": 598427.7699999998,
+     "max_box": 775868.0
+    },
+    "dup_bytes_per_post_per_box": 62274.140127388535,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I3 20 Mbps": {
+    "searchable_s": {
+     "p50": 0.329021128540262,
+     "p99": 0.40222759425159893,
+     "max": 0.4531179942516701,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 0.0016008492569002124,
+     "p99_box": 0.01
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 77825.04607218684,
+     "p99_box": 139979.0,
+     "max_box": 178831.5
+    },
+    "dup_bytes_per_post_per_box": 65182.14522292994,
+    "holders": 9420,
+    "q": 0.00148619957537155,
+    "checkers_per_post": {
+     "mean": 14.08,
+     "min": 6
+    },
+    "p_unchecked": 8.229143466633823e-07
+   },
+   "I1 100 Mbps": {
+    "searchable_s": {
+     "p50": 0.5046477930782203,
+     "p99": 0.6328437930792461,
+     "max": 0.7256502587879368,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 1181461.9267515924,
+     "p99_box": 2136600.0,
+     "max_box": 2670750.0
+    },
+    "dup_bytes_per_post_per_box": 1003430.8280254777,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I2 100 Mbps": {
+    "searchable_s": {
+     "p50": 0.5836474645366252,
+     "p99": 0.6975994645363244,
+     "max": 0.8257954645343943,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 1.0,
+     "p99_box": 1.0
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 251354.06581740975,
+     "p99_box": 598525.1649999995,
+     "max_box": 787738.0
+    },
+    "dup_bytes_per_post_per_box": 62274.140127388535,
+    "holders": 9420,
+    "q": 0.00148619957537155
+   },
+   "I3 100 Mbps": {
+    "searchable_s": {
+     "p50": 0.26610208854310713,
+     "p99": 0.32080295425384975,
+     "max": 0.37087741995981105,
+     "missing": 0
+    },
+    "encodes_per_post_per_box": {
+     "mean": 0.0016008492569002124,
+     "p99_box": 0.01
+    },
+    "tx_bytes_per_post_per_box": {
+     "mean": 77826.87319532908,
+     "p99_box": 139385.5,
+     "max_box": 180018.5
+    },
+    "dup_bytes_per_post_per_box": 65182.14522292994,
+    "holders": 9420,
+    "q": 0.00148619957537155,
+    "checkers_per_post": {
+     "mean": 14.08,
+     "min": 6
+    },
+    "p_unchecked": 8.229143466633823e-07
+   }
+  },
+  "I3_attack_20Mbps": {
+   "searchable_s": {
+    "p50": 0.3290211285427773,
+    "p99": 0.4022275942514284,
+    "max": 0.4476756599599696,
+    "missing": 0
+   },
+   "encodes_per_post_per_box": {
+    "mean": 0.5008174097664544,
+    "p99_box": 0.525
+   },
+   "tx_bytes_per_post_per_box": {
+    "mean": 168750.88622611464,
+    "p99_box": 407991.25,
+    "max_box": 654285.75
+   },
+   "dup_bytes_per_post_per_box": 67339.10329087048,
+   "holders": 9420,
+   "q": 0.00148619957537155,
+   "checkers_per_post": {
+    "mean": 13.4,
+    "min": 7
+   },
+   "p_unchecked": 8.229143466633823e-07,
+   "false_hidden_everywhere_s": {
+    "p50": 1.2436384559136116,
+    "p99": 1.315741789137466,
+    "max": 1.3240577216220686,
+    "caught": 20,
+    "n": 20
+   }
+  },
+  "R1": {
+   "verdict": {
+    "I1": {
+     "pass": true,
+     "fails": [],
+     "p99_box_encodes": 1.0,
+     "tx_mean": 1181461.9267515924
+    },
+    "I2": {
+     "pass": true,
+     "fails": [],
+     "p99_box_encodes": 1.0,
+     "tx_mean": 251354.06581740975
+    },
+    "I3": {
+     "pass": false,
+     "fails": [
+      "R1-2a separation"
+     ],
+     "p99_box_encodes": 0.01,
+     "tx_mean": 77825.04607218684
+    }
+   },
+   "pick": "I2"
+  }
+ },
+ "votes": {
+  "table": {
+   "W1 RLN only": {
+    "one_vote_per_post": false,
+    "rate_limited": true,
+    "unlinkable": true,
+    "publics": 5,
+    "verify_cost_vs_cp14": 1.0,
+    "proofs_per_s_single": 11302.840780649536
+   },
+   "W2 post nullifier only": {
+    "one_vote_per_post": true,
+    "rate_limited": false,
+    "unlinkable": true,
+    "publics": 4,
+    "verify_cost_vs_cp14": 0.9868583162217659,
+    "proofs_per_s_single": 11453.357178893724
+   },
+   "W3 RLN + post nullifier": {
+    "one_vote_per_post": true,
+    "rate_limited": true,
+    "unlinkable": true,
+    "publics": 6,
+    "verify_cost_vs_cp14": 1.013141683778234,
+    "proofs_per_s_single": 11156.22914506754
+   }
+  },
+  "W4": "excluded: CP16 bundles held 1.00 vote; longer windows break Q2 (60 s)",
+  "pick": "W3 RLN + post nullifier",
+  "extra_mults_per_input": 352
+ },
+ "day": {
+  "events": 136817747,
+  "wall_s": 585.7086024284363,
+  "messages_today": 2456,
+  "backlog_items": 7191,
+  "sample_boxes": [
+   683,
+   719,
+   9995,
+   6356,
+   9805,
+   6482,
+   547,
+   4101,
+   9782,
+   9841,
+   4637,
+   6983,
+   6936,
+   7739,
+   7200,
+   2825,
+   771,
+   8088,
+   1693,
+   6763
+  ],
+  "watched": [
+   9995,
+   6356
+  ],
+  "verdict_mismatch_sample_vs_ref": 0,
+  "honest_over_limit": 0,
+  "today_by_kind": {
+   "vote": 2142,
+   "comment": 217,
+   "room": 50,
+   "post": 36,
+   "delete": 10,
+   "slash": 1
+  },
+  "completeness": 1.0,
+  "F1": {
+   "queries": 1000,
+   "hit10": 0.979,
+   "hit1": 0.913,
+   "image_queries": 400,
+   "image_rank1": 0.98,
+   "image_top10": 0.9925,
+   "pass": false
+  },
+  "F2": {
+   "deletes": 10,
+   "violations": 0,
+   "spread_p99_s": 0.351790257124303,
+   "pass": true
+  },
+  "F3": {
+   "room_msgs": 50,
+   "members_in_sample": 2,
+   "members_decrypted_all": true,
+   "nonmember_received": 0,
+   "nonmember_opened": 0,
+   "pass": true
+  },
+  "F4": {
+   "double_votes": [
+    "double_vote",
+    "double_vote",
+    "double_vote"
+   ],
+   "double_vote_reach": [
+    9,
+    8,
+    10
+   ],
+   "rate_verdicts": [
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "ok",
+    "slash",
+    "bad_proof",
+    "bad_proof",
+    "bad_proof",
+    "bad_proof"
+   ],
+   "slash_msgs": 1,
+   "spammer_banned_at_all_sample_boxes": true,
+   "after_slash_reach": [
+    7,
+    7,
+    7,
+    7
+   ],
+   "pass": true
+  },
+  "F5": {
+   "n": 5,
+   "reach": [
+    12,
+    8,
+    7,
+    9,
+    9
+   ],
+   "beyond_first_hop": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "author_degree": [
+    11,
+    7,
+    6,
+    8,
+    8
+   ],
+   "pass": true
+  },
+  "F6": {
+   "items_checked": 132195,
+   "mismatched": 0,
+   "pass": true
+  },
+  "searchable_s": {
+   "text_p99": 0.33274298410746295,
+   "image_p99": 1.8803482174147936,
+   "image_n": 74
+  },
+  "search_latency_ms": {
+   "p50": 1.302958422456868,
+   "p99": 1.3656591781182215,
+   "n": 1015
+  },
+  "work": {
+   "verify": {
+    "peak_hour_util_p50": 3.8842276157882784e-06,
+    "peak_hour_util_p99": 4.1830143554643e-06,
+    "peak_hour_util_max": 4.307508830329309e-06,
+    "day_s_p50": 0.19666143205475717,
+    "day_s_p99": 0.2135130041724848,
+    "ops_day_p99": 2382.0
+   },
+   "enc_text": {
+    "peak_hour_util_p50": 2.27285000032942e-05,
+    "peak_hour_util_p99": 2.3238496556739273e-05,
+    "peak_hour_util_max": 2.378285087740971e-05,
+    "day_s_p50": 0.5881331766118512,
+    "day_s_p99": 0.641358141281575,
+    "ops_day_p99": 244.0
+   },
+   "enc_image": {
+    "peak_hour_util_p50": 5.285833007573728e-06,
+    "peak_hour_util_p99": 5.285833007573728e-06,
+    "peak_hour_util_max": 5.285833007573728e-06,
+    "day_s_p50": 0.07611599530906168,
+    "day_s_p99": 0.07611599530906168,
+    "ops_day_p99": 4.0
+   },
+   "host": {
+    "peak_hour_util_p50": 1.6965748744742037e-05,
+    "peak_hour_util_p99": 1.9287023653643314e-05,
+    "peak_hour_util_max": 2.2275579730966004e-05,
+    "day_s_p50": 0.8307484912067506,
+    "day_s_p99": 0.9080527142251702,
+    "ops_day_p99": 9539.0
+   }
+  },
+  "R3": {
+   "encoder_peak_util_p99_box": 2.8524329564313004e-05,
+   "rule_lt_1pct": true
+  },
+  "energy_mJ_day_p99_box": {
+   "enc": 704.1050533001279,
+   "verify": 163.167
+  }
+ }
+}
