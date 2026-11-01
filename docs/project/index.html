@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
+    <li><b>One box under five scenarios: things break in front of the chip before the chip itself.</b> We ran the re-sized chip in the busiest box of a 1M-user community through an ordinary day, the evening peak, catching up after being offline, a flood of invalid proofs, and spam with valid proofs (see <a href="#scenarios-h">Where a box breaks first</a>). In a 100 Mbps flood of invalid proofs the verify unit is only 85% busy, but checking each signature before the proof needs 3.90–4.61 cores on a 4-core Pi 5-class host. Dropping repeats with one table lookup and then checking the proof first brings the host down to 0.88 cores. New posts are still searchable in 0.18 s, the chip draws 0.87 W and the box 4.7–5.6 W. A box that was off for 8 hours catches up in 14.3 min, but only if live work goes first on the host and the verify unit (otherwise new posts wait 18.9 s). The encoder also has to let search queries in between layers: queries then take 22–42 ms instead of 130–390 ms. The chip can't stop spam that carries valid proofs: 310 identities posting up to their rate limit push new posts past 5 s, and a 32×32 encoder only raises that to 2,682, so this is a job for identity cost and rate limits. On an ordinary day the chip averages 3.4 mW, 0.14% of the idle box's energy. All of these are <span class="k k-est">estimated</span>.</li>
     <li><b>The encoder is re-sized: the chip is half the area.</b> Sized for the load the simulator measured instead of "every box gets every post", an 8×8 INT8 array with 1 MB of SRAM is enough: it clears an 8-hour backlog in 11.3 min, embeds a new post in 125 ms (P99), a search query in 10.9 ms and an image in 143 ms, and holds up for communities of up to 5.3 million users. The encoder goes from 9.22 to <b>3.53 mm²</b> and the chip from 11.3 to <b>5.61 mm²</b> <span class="k k-est">estimated</span>. Text search stays on MiniLM: CLIP's text tower finds a post by its title in the top 10 only 0.776 of the time, against 0.943 for MiniLM <span class="k k-meas">measured</span>. And software can't make every box compute the same image embedding: static INT8 is bit-identical across batch sizes and thread counts, but two runtimes running the same model file disagree (cosine 0.872) <span class="k k-meas">measured</span>. An integer-only encoder with a fixed operation order and rounding is now a candidate requirement for our chip (see <a href="#encoder-h">The encoder</a>).</li>
     <li><b>The box software now runs for real in a simulated day, and the chip sits almost idle.</b> Each box verifies, decrypts, embeds, indexes, searches, ranks a feed, counts votes, forgets deleted posts and keeps private rooms, all in real code, with time taken from the chip models (see <a href="#stack-h">What the box software does in a day</a>). A full day of a 10,000-box community took 586 s on the laptop: forgetting, private rooms, one vote per person per post, penalties for exceeding the rate limit, stopping invalid proofs at the first hop and vote tallies all passed; the image-search check failed on our synthetic test images. Even on the busiest boxes the encoders are busy <b>0.003%</b> of the peak hour, and the chip does 0.86 J of work a day against 2,480 J of idle leakage (about 1,195 J with the encoder re-sized since) <span class="k k-est">simulation model</span>. Two design calls: images spread as a small envelope and the body is fetched (<b>0.21×</b> the uplink of pushing whole images), and each vote's proof adds a per-post tag so nobody votes twice on one post (+1.3% verification cost, <span class="k k-est">estimated</span>). The faster option, shipping the author's image embedding, failed because boxes don't compute the same embedding for the same image.</li>
-    <li><b>First simulator results: a box receives far less than the chip was sized for.</b> The simulator core now generates a community from Reddit-based behavior parameters and spreads its messages over a gossip network (see <a href="#load-h">What one box actually receives</a>). In a community of 1M users (one box each), the busiest 1% of boxes at the peak hour verify <b>4.2 proofs/s</b> and embed <b>0.45 text posts/s</b> and 0.02 images/s <span class="k k-est">simulation model</span>. The old "every box ingests all 10<sup>6</sup> posts a day" assumption (11.6 posts/s) is <b>26×</b> that. Ordinary verification uses <b>0.03%</b> of the verify unit's capacity, so the unit is there for floods; <b>votes are about 90%</b> of the messages that carry a proof. Text posts reach every subscribed box in 0.36 s (P99), but a 177 KB image takes <b>2.1 s</b> over 20 Mbps home uplinks, over our 1 s network budget.</li>
   </ul>
 </section>
 
@@ -166,7 +166,7 @@ footer { font-size: 13px; color: var(--muted); }
 
 <section aria-labelledby="system-h">
   <h2 id="system-h">2. The whole system: a community with everything but the hardware</h2>
-  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done, the simulator's core (which messages reach which box) has results, and the box software on top of it (ingest, search, feeds, votes, forgetting, private rooms) now runs through a whole simulated day, both further down in this section. One question decides the approach: <b>what runs for real, and what is a model?</b></p>
+  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done, the simulator's core (which messages reach which box) has results, and the box software on top of it (ingest, search, feeds, votes, forgetting, private rooms) now runs through a whole simulated day, both further down in this section. One box has also been run through backlog and attack scenarios (<a href="#scenarios-h">section 5</a>). One question decides the approach: <b>what runs for real, and what is a model?</b></p>
   <ul>
     <li><b>Functions run for real (emulation).</b> The box software is real code: real ciphertexts, real signatures, real embeddings, real search results. It runs on the laptop CPU instead of the box's hardware but computes the same thing.</li>
     <li><b>Time and energy are simulated.</b> We can't run hundreds of boxes in real time, so the simulator runs on a virtual clock (discrete events). Each task's time and energy come from our chip models (the verify-unit cycle model, the encoder's Timeloop + Accelergy model) and, for host work, from laptop timings scaled to a Pi 5-class CPU.</li>
@@ -299,7 +299,7 @@ footer { font-size: 13px; color: var(--muted); }
   </table></div>
   <ul class="small">
     <li><b>The encoder was sized for a load no realistic box sees on an ordinary day.</b> With the same behavior rates, a community would need about 24 million box owners (busiest 1% at peak) or 39 million (daily average) to reach 11.6 posts/s per box, if every box stored everything (linear extrapolation). In daily active users that is about 1/19–1/12 of Reddit <span class="k k-est">estimated</span>. We had decided in advance that if real ingest came in under a tenth of the assumption, we would re-decide the encoder toward smaller. It came in at 1/26, so what's left to justify the encoder's size is the backlog after a box has been offline, and images.</li>
-    <li><b>Votes are 89–91% of the messages that carry a proof,</b> because every vote carries its own anonymous rate-limiting proof. This doesn't change chip size (floods set the verify unit). Bundling a user's votes into one proof every 50 s did nothing: each bundle held 1.00 vote on average, since a user rarely votes twice in the same sub-community within 50 s, and it delayed vote counts by 26 s on average (50 s at most) <span class="k k-est">simulation model</span>. One proof covering many votes wouldn't help either: users rarely cast two votes close together, and a longer window would delay counts past the 60 s we allow. So votes stay one proof each (<a href="#votes-h">what a vote's proof carries</a>). Votes may also be the cheapest message for an attacker to imitate in a flood, which the attack scenarios will test.</li>
+    <li><b>Votes are 89–91% of the messages that carry a proof,</b> because every vote carries its own anonymous rate-limiting proof. This doesn't change chip size (floods set the verify unit). Bundling a user's votes into one proof every 50 s did nothing: each bundle held 1.00 vote on average, since a user rarely votes twice in the same sub-community within 50 s, and it delayed vote counts by 26 s on average (50 s at most) <span class="k k-est">simulation model</span>. One proof covering many votes wouldn't help either: users rarely cast two votes close together, and a longer window would delay counts past the 60 s we allow. So votes stay one proof each (<a href="#votes-h">what a vote's proof carries</a>). Votes may also be the cheapest message for an attacker to imitate. The attack scenarios so far used the most expensive content per message instead (an image post with a long body), and votes now have a rate limit of their own (<a href="#scenarios-h">Where a box breaks first</a>).</li>
     <li><b>The event run agrees with the formula.</b> 10,000 boxes, peak hour: every online subscribed box received every message (delivery completeness 1.000). Total deliveries differ from the formula by 6.1%, but that hour has only 166 messages, so random (Poisson) noise of about 8% dominates. Run alone for 2,000 simulated hours, the message generator matches the formula within 1.9% for posts, 0.04% for comments and 0.2% for votes (we required 2%). Duplicate bytes received are 5.6× the unique bytes, because each box forwards right away to its 6 mesh neighbors <span class="k k-est">simulation model</span>.</li>
   </ul>
 
@@ -360,7 +360,7 @@ footer { font-size: 13px; color: var(--muted); }
   <p>On top of the simulator core, every box now does its real job on each message: check the signature and the proof, decrypt, embed, index, answer searches, rank a feed, count votes, forget deleted posts, and keep private rooms. Results (search hits, vote tallies, whether a deleted post is really gone) come from real code. Time comes from the chip models, and host work from laptop timings scaled to a Pi 5-class CPU. We ran a community of 10,000 boxes for one simulated day. Every box forwards gossip, but only 20 sample boxes keep full state (search index, tallies, the vote tags they have seen); the rest reuse the same result for the same message and only count work and time, because a separate index on every box would take several GB for 30 days of posts. The 30 days of older posts are loaded as already synced, and the day's new messages spread by gossip. Post text comes from our 2010 Reddit sample; images are synthetic (we haven't downloaded an image dataset).</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 504" role="img" aria-label="Box software stack: users send posts, comments, votes, deletes and room messages. Each box checks for duplicates, verifies the signature and the proof, decrypts, then embeds and indexes text and images. It keeps posts, an index, vote tallies, penalized identities and deleted posts; answers searches and feeds; forgets deleted posts; and keeps private rooms. A virtual accelerator with one queue per unit computes results for real and takes time from chip models. The run records per-message and per-unit traces.">
+    <svg viewBox="0 0 980 504" role="img" aria-label="Box software stack: users send posts, comments, votes, deletes and room messages. Each box drops repeats, verifies the proof and then the signature, decrypts, then embeds and indexes text and images. It keeps posts, an index, vote tallies, penalized identities and deleted posts; answers searches and feeds; forgets deleted posts; and keeps private rooms. A virtual accelerator with one queue per unit computes results for real and takes time from chip models. The run records per-message and per-unit traces.">
       <defs><marker id="k1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
       <!-- users -->
       <rect class="box" x="10" y="10" width="960" height="66" rx="8"/>
@@ -374,18 +374,18 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="24" y="143" class="mut" font-size="11">Receive, for every incoming message</text>
       <rect class="box" x="24" y="150" width="166" height="74" rx="6"/>
       <text x="36" y="172" font-size="12" font-weight="600">Seen before?</text>
-      <text x="36" y="192" class="mut" font-size="11">drop duplicates; forward</text>
-      <text x="36" y="210" class="mut" font-size="11">to the mesh after checks</text>
+      <text x="36" y="192" class="mut" font-size="11">drop repeats (same tag</text>
+      <text x="36" y="210" class="mut" font-size="11">and post hash); forward later</text>
       <path class="wire" d="M190,187 L210,187" marker-end="url(#k1)"/>
       <rect class="box" x="214" y="150" width="166" height="74" rx="6"/>
-      <text x="226" y="172" font-size="12" font-weight="600">Signature</text>
-      <text x="226" y="192" class="mut" font-size="11">Ed25519</text>
-      <text x="226" y="210" class="mut" font-size="11">one-time key per post</text>
+      <text x="226" y="172" font-size="12" font-weight="600">Proof (chip)</text>
+      <text x="226" y="192" class="mut" font-size="11">rate limit (RLN)</text>
+      <text x="226" y="210" class="mut" font-size="11">+ per-post tag for votes</text>
       <path class="wire" d="M380,187 L400,187" marker-end="url(#k1)"/>
       <rect class="box" x="404" y="150" width="166" height="74" rx="6"/>
-      <text x="416" y="172" font-size="12" font-weight="600">Proof</text>
-      <text x="416" y="192" class="mut" font-size="11">rate limit (RLN)</text>
-      <text x="416" y="210" class="mut" font-size="11">+ per-post tag for votes</text>
+      <text x="416" y="172" font-size="12" font-weight="600">Signature</text>
+      <text x="416" y="192" class="mut" font-size="11">Ed25519, one-time key</text>
+      <text x="416" y="210" class="mut" font-size="11">per post; then the tags</text>
       <path class="wire" d="M570,187 L590,187" marker-end="url(#k1)"/>
       <rect class="box" x="594" y="150" width="166" height="74" rx="6"/>
       <text x="606" y="172" font-size="12" font-weight="600">Decrypt</text>
@@ -424,6 +424,7 @@ footer { font-size: 13px; color: var(--muted); }
     </svg>
   </div>
 
+  <p class="small muted">The simulated day below checked each message's signature before its proof. The scenario runs since showed that this order lets a flood of invalid proofs swamp the host CPU, so the box now drops repeats first, checks the proof on the chip, and only then checks the signature (<a href="#scenarios-h">Where a box breaks first</a>). That is safe because each proof is bound to a hash of the post: a replay with a different signature repeats the same tag and hash and is dropped by the lookup, and a changed post makes the proof fail.</p>
   <details>
     <summary>Modeled cost of each task on one box</summary>
     <div class="tbl"><table>
@@ -487,7 +488,7 @@ footer { font-size: 13px; color: var(--muted); }
   </table></div>
   <ul class="small">
     <li>We decided in advance to take the cheapest design that keeps all three properties; only "both" does. The extra public input costs 32 windows × 11 multiplications. The verify unit's worst-case capacity drops from 13,429 to about <b>13,255 proofs/s</b> (−1.3%), still above the 12,207/s flood <span class="k k-est">estimated</span>.</li>
-    <li>In the simulation the pairing check is a valid/invalid flag with a modeled cost, but the tags and the RLN secret sharing are computed for real (a line y = a<sub>0</sub> + a<sub>1</sub>·x over the BN254 scalar field). Going over the limit within one epoch hands out two points on the same line, which reveal the identity's secret a<sub>0</sub>, and the identity is penalized. The limit is 20 messages per 600 s epoch <span class="k k-est">estimated</span>; no honest user exceeded it during the day.</li>
+    <li>In the simulation the pairing check is a valid/invalid flag with a modeled cost, but the tags and the RLN secret sharing are computed for real (a line y = a<sub>0</sub> + a<sub>1</sub>·x over the BN254 scalar field). Going over the limit within one epoch hands out two points on the same line, which reveal the identity's secret a<sub>0</sub>, and the identity is penalized. The simulated day used a limit of 20 messages per 600 s epoch <span class="k k-est">estimated</span>; no honest user exceeded it. That is generous for attackers too, so the limit is now split by kind: <b>6 posts and comments and 4 votes per 10 minutes</b>, the smallest limits that block at most 1 in 1,000 honest messages at the peak hour of a 1M-user community. Putting the kind in the proof costs another +1.3% of verification <span class="k k-est">estimated</span> (<a href="#scenarios-h">valid spam</a>).</li>
   </ul>
 
   <h3 id="day-h">A simulated day: does it all work?</h3>
@@ -538,7 +539,7 @@ footer { font-size: 13px; color: var(--muted); }
       <li>Searching images with text works only through post titles and bodies: CLIP's text tower wasn't in the simulated day. We have since decided to keep MiniLM for text and use CLIP's text tower only to find images by words (<a href="#encoder-h">The encoder</a>); its quality on that job isn't measured yet.</li>
       <li>Proof pairings aren't executed (valid/invalid flag + modeled cost). Tags and RLN secret sharing are real.</li>
       <li>Only 20 sample boxes keep full state; the others share results per message. A relaying box decides "which of two conflicting messages came first" from a reference order; a real box uses the order it saw.</li>
-      <li>Boxes are either on or off all day; no backlog after being offline yet (scenarios step).</li>
+      <li>Boxes are either on or off all day. Catching up after being offline has since been run for a single box (<a href="#scenarios-h">Where a box breaks first</a>), not yet across the network.</li>
       <li>Not counted: fetching an image body from another box to view it, and sending feed thumbnails. Feed opens (10 per daily user per day), vote direction (90% up) and vote targets (random among the latest 300 posts) are estimates.</li>
       <li>Votes that arrive before their post were avoided by only voting on posts older than 60 s. A real protocol needs a waiting queue.</li>
       <li>Host costs are preliminary laptop timings × the Pi 5 scale <span class="k k-est">estimated</span>.</li>
@@ -576,16 +577,17 @@ footer { font-size: 13px; color: var(--muted); }
   </details>
 
   <h3>What the final report will claim, and what's still missing</h3>
-  <p>Each claim, the evidence we have now, and the gap. The gaps set the order of the next steps (numbered as in <a href="#next-h">What's next</a>).</p>
+  <p>Each claim, the evidence we have now, and the gap. The gaps set the order of the next steps (numbered as in <a href="#next-h">What's next</a>; "open" means no step is planned for it yet).</p>
   <div class="tbl"><table>
     <thead><tr><th>Claim</th><th>Evidence now</th><th>Gap</th><th>Filled in step</th></tr></thead>
     <tbody>
-      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements; simulated message load per box; a simulated 10,000-box day running the real box software, with each box's work per unit</td><td>backlog after being offline, run through the network; boxes on slow (5 Mbps) uplinks miss 5 s for image posts</td><td class="num">1</td></tr>
-      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">2</td></tr>
-      <tr><td>Our chip (5.61 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model; flood power computed with the earlier, larger encoder</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">1 (+ RTL)</td></tr>
-      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model; in the simulated day the chip's work is 0.86 J against 2,480 J of idle leakage, about 1,195 J with the re-sized encoder <span class="k k-est">estimated</span></td><td>chip power not yet recomputed for the re-sized encoder across scenarios</td><td class="num">1</td></tr>
-      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes</td><td>image search failed on synthetic images (needs photos); text-to-image search quality; demo</td><td class="num">3</td></tr>
-      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed); invalid proofs stop at the first hop in the simulated day</td><td>network simulation with flooding attackers (votes may be the cheapest message to imitate)</td><td class="num">1</td></tr>
+      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements; simulated message load per box; a simulated 10,000-box day running the real box software; one box run through peak, backlog and attack scenarios</td><td>backlog and attacks run on one box, not across the network; boxes on slow (5 Mbps) uplinks miss 5 s for image posts; during a 24-hour catch-up, live image posts wait behind backlog downloads (34.9 s, P99)</td><td class="num">open</td></tr>
+      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process) on the same scenarios</td><td class="num">1</td></tr>
+      <tr><td>Our chip (5.61 mm², 45 nm) stops a 100 Mbps flood of invalid proofs at 0.87 W, if the box checks the proof before the signature</td><td>multiplier synthesized; the rest is a cycle model; one-box flood run: verify unit 85% busy, host 0.88 cores, new posts searchable in 0.18 s (P99) <span class="k k-est">estimated</span></td><td>no RTL for the adders or sequencer; utilization assumed; floods spread over many boxes at once not run</td><td class="num">RTL (open)</td></tr>
+      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>busiest box of a 1M-user community, re-sized chip: 3.4 mW average, 292 J a day, 0.14% of the idle box's energy <span class="k k-est">estimated</span></td><td>host idle power is from sources (2.4–3.3 W); wake-up costs and the always-on part of the chip aren't modeled</td><td class="num">done</td></tr>
+      <tr><td>One shared encoder keeps search fast during a backlog and during spam</td><td>with the encoder yielding to queries at layer boundaries: query encoding 22–42 ms (P99), 31 ms during valid spam <span class="k k-est">estimated</span></td><td>the encoder controller that switches tasks between layers isn't designed beyond the model</td><td class="num">1 (ablation)</td></tr>
+      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes</td><td>image search failed on synthetic images (needs photos); text-to-image search quality; demo</td><td class="num">2</td></tr>
+      <tr><td>Spam can't exhaust a box's ingest</td><td>invalid proofs: handled at 0.87 W with proofs checked first, and stopped at the first hop in the simulated day. Valid spam: <b>not met</b>. 310 identities at the rate limit (0.031% of members) break 5 s freshness on the 8×8 encoder; 2,682 on 32×32 <span class="k k-est">estimated</span></td><td>identity cost and per-identity limits (a protocol problem, not a chip one); valid spam spreading across many boxes not run</td><td class="num">open</td></tr>
       <tr><td>Boxes could share identical embeddings only with a fixed integer-only encoder</td><td>static INT8 is bit-identical within one runtime but not across two runtimes (measured)</td><td>an integer-only encoder's quality; other hardware (ARM, NPU) not tested</td><td class="num">open</td></tr>
     </tbody>
   </table></div>
@@ -604,10 +606,10 @@ footer { font-size: 13px; color: var(--muted); }
     <div class="card flood">
       <h3>A spam flood: hard</h3>
       <div class="big">24–181 W</div>
-      <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our chip: 0.48 W if every proof is valid, up to 1.05 W for the worst mix of invalid proofs <span class="k k-est">estimated</span>.</p>
+      <p>on CPUs, to verify every proof in a 100 Mbps flood of 1 KB messages (12,207 msg/s) <span class="k k-est">estimated from measured costs</span>. Our re-sized chip: 0.87 W when every proof is invalid, with the box checking proofs before signatures <span class="k k-est">estimated</span>.</p>
     </div>
   </div>
-  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. The simulator confirms this from the other side: on an ordinary day even the busiest boxes of a 1M-user community verify at most 4.2 proofs/s, 0.03% of the unit's capacity <span class="k k-est">simulation model</span>. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
+  <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. The simulator confirms this from the other side: on an ordinary day even the busiest boxes of a 1M-user community verify at most 4.2 proofs/s, 0.03% of the unit's capacity <span class="k k-est">simulation model</span>. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>). Two limits to this argument came out of the scenario runs (<a href="#scenarios-h">Where a box breaks first</a>): the host CPU in front of the chip gives out first unless the box checks proofs before signatures, and spam that carries valid proofs (real identities posting up to their rate limit) gets past the verify unit and has to be stopped by identity cost, not by the chip.</p>
   <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Our unit stays under that even in the worst case: 0.077 mJ per proof at the worst mix of invalid proofs <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
   <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>. A second candidate: <b>an encoder whose output is bit-identical on every box</b>, which software runtimes don't give (<a href="#encoder-h">The encoder</a>) and which would make image posts searchable faster.</p>
 </section>
@@ -615,7 +617,7 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="design-h">
   <h2 id="design-h">4. Current chip design</h2>
   <h3 style="margin-top:6px">The box: the path of one message</h3>
-  <p>The verify unit sits in front of everything else, so invalid messages are dropped before they reach the host or the encoder.</p>
+  <p>The verify unit sits in front of everything else, so invalid messages are dropped before the host checks a signature or the encoder sees them. The only thing the host does first is one table lookup that drops exact repeats; in a flood, checking signatures first would use up the host before the chip is even busy (<a href="#scenarios-h">Where a box breaks first</a>).</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
     <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the text and image encoder; host, encoder and verify unit use DRAM.">
@@ -626,8 +628,8 @@ footer { font-size: 13px; color: var(--muted); }
       </defs>
       <!-- budget header -->
       <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 5.61 mm² at 45 nm · V and E power-gated when idle (est.)</text>
-      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day: host idle 2.4–3.3 W (source) sets the box total · chip leakage before gating: E 1.36 mW + V 12.4 mW (est.)</text>
-      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W (all valid) – 1.05 W (worst mix), keeps up (est., earlier encoder) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
+      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day: host idle 2.4–3.3 W (source) sets the box total · chip 3.4 mW average on the busiest box (est.)</text>
+      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood of invalid proofs: chip 0.87 W, host 0.88 cores, keeps up (est.) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
       <!-- network -->
       <rect class="box" x="14" y="130" width="126" height="84" rx="8"/>
       <text x="77" y="160" text-anchor="middle" font-weight="600">Network</text>
@@ -637,6 +639,8 @@ footer { font-size: 13px; color: var(--muted); }
       <path class="wire-attack" d="M140,170 L213,170" marker-end="url(#a2)"/>
       <text x="176" y="158" text-anchor="middle" class="mono t-attack" font-size="11">flood</text>
       <text x="176" y="190" text-anchor="middle" class="mono t-attack" font-size="11">12,207/s</text>
+      <text x="176" y="236" text-anchor="middle" class="mut" font-size="10.5">host drops</text>
+      <text x="176" y="250" text-anchor="middle" class="mut" font-size="10.5">repeats first</text>
       <!-- verify unit -->
       <rect class="box-pick" x="218" y="100" width="216" height="150" rx="8"/>
       <text x="326" y="126" text-anchor="middle" font-weight="700">Proof verify unit (V)</text>
@@ -670,8 +674,9 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="866" y="154" text-anchor="middle" font-size="12">FP16 attention · vector unit</text>
       <text x="866" y="172" text-anchor="middle" font-size="12">1 MB SRAM + 32 KB local</text>
       <text x="866" y="198" text-anchor="middle" class="mono" font-size="12">post 125 ms · image 143 ms</text>
-      <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">backlog 11.3 min · 3.53 mm²</text>
-      <text x="866" y="244" text-anchor="middle" class="mut" font-size="11">(est., Timeloop + Accelergy)</text>
+      <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">8 h backlog 14.3 min · 3.53 mm²</text>
+      <text x="866" y="232" text-anchor="middle" class="mut" font-size="11">yields to queries between layers</text>
+      <text x="866" y="252" text-anchor="middle" class="mut" font-size="11">(est., Timeloop + Accelergy)</text>
       <!-- dram -->
       <rect class="box" x="496" y="308" width="472" height="62" rx="8"/>
       <text x="732" y="327" text-anchor="middle" font-weight="600">DRAM</text>
@@ -787,16 +792,17 @@ footer { font-size: 13px; color: var(--muted); }
     </svg>
   </div>
   <div class="tbl"><table>
-    <thead><tr><th>Chip, by workload</th><th>Power</th><th>What it's doing</th><th>Kind</th></tr></thead>
+    <thead><tr><th>Chip, by scenario (busiest box of a 1M-user community)</th><th>Chip, average</th><th>Box</th><th>What it's doing</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>A day at the heaviest per-box load of a 1M-user community (25,889 text posts + 1,143 images)</td><td class="num">271 J of encoder work · 118 J of encoder leakage</td><td>encoder busy 2,041 s of the day; the earlier 32×32 encoder leaked 1,403 J a day</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>100 Mbps flood (12,207 proofs/s), all proofs valid</td><td class="num">0.48 W</td><td>verify unit checks proofs in large batches; computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>100 Mbps flood, worst mix (about 15% invalid)</td><td class="num">1.05 W</td><td>every proof checked alone, and most also pay for the subgroup check; verify unit has 10% headroom; within the 2 W budget; computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Backlog after 8 hours offline (8,630 text posts + 381 images)</td><td class="num">11.3 min</td><td>encoder working through the backlog; chip power not recomputed yet</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Idle</td><td class="num">encoder 1.36 mW + verify unit 12.4 mW before gating · 0 after</td><td>leakage; within our 50 mW idle limit even without gating. In the simulated day this cuts the chip's idle leakage from 2,480 J to about 1,195 J</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Ordinary day, 24 h (239,304 proofs, 25,889 text posts, 1,143 images)</td><td class="num">3.4 mW (292 J a day: encoder 271, verify 21.5)</td><td class="num">2.41–3.31 W</td><td>blocks switched off whenever idle; the chip's work is 0.14% of the idle box's energy</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Evening peak hour</td><td class="num">7.8 mW</td><td class="num">2.41–3.31 W</td><td>live posts and the owner's searches</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Catching up after 8 hours offline (14.3 min)</td><td class="num">0.25 W</td><td class="num">2.77–3.67 W</td><td>encoder working through the backlog while peak traffic continues</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>100 Mbps flood of invalid proofs (12,207/s), proofs checked first</td><td class="num">0.87 W</td><td class="num">4.7–5.6 W</td><td>verify unit 85% busy; host 0.88 cores, including reconnect handshakes; within the 2 W chip budget</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Valid spam at the most the 8×8 encoder can absorb (310 identities)</td><td class="num">0.14 W</td><td class="num">2.6–3.5 W</td><td>encoder nearly saturated (86–98% busy across the encoder sizes we tried, each at its own limit)</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Idle</td><td class="num">encoder 1.36 mW + verify unit 12.4 mW before gating · 0 after</td><td class="num">2.4–3.3 W</td><td>leakage; within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">The flood rows come from the chip with the earlier 32×32 encoder; we will recompute chip power for the re-sized encoder in the scenario runs. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+  <p class="small muted">Box power = host idle 2.4–3.3 W <span class="k k-src">source</span> + 1.63 W per busy host core (Pi 5 under a 4-core stress test, from a source) + the chip. The earlier chip (32×32 encoder, 11.3 mm²) was estimated at 0.48 W in a flood of valid proofs and up to 1.05 W at the worst mix of invalid proofs; with proofs checked first, that worst mix (mostly replayed valid proofs) no longer reaches the verify unit. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
 
   <h3 id="encoder-h">The encoder: sized for latency, backlog and identical embeddings</h3>
   <p>The encoder was first sized for "every box ingests all 10<sup>6</sup> posts a day". The simulator showed that the heaviest boxes get 1/26 of that and the encoder is almost always idle, and image posts joined the workload. So we re-decided it on what the encoder is actually for: answering searches quickly, catching up after a box has been offline, and (if possible) giving every box the same embedding for the same image. Three questions, each with its pass condition written down before the results.</p>
@@ -889,6 +895,7 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>8×8 with 1 MB.</b> The encoder shrinks from 9.22 to 3.53 mm² (−62%) and the chip from 11.3 to <b>5.61 mm²</b> (−50%); encoder leakage drops to about 1/12. It can serve communities of up to 5.3 million users, 5.3× the 1M we required <span class="k k-est">estimated</span>.</li>
     <li><b>The SRAM made the encoder big, not the array.</b> The 2 MB SRAM was 74% of the earlier encoder. The SRAM size isn't set by throughput but by the activations of the single longest post (786 KB at 256 tokens): 1 MB fits, 512 KB doesn't. At 1 MB the backlog batch drops to 1 for the longest text posts and 3 for images, but the time doesn't change, because at 8×8 compute is the bottleneck.</li>
     <li>A day at that load: 271 J of encoder work, busy 2,041 s, 118 J of idle leakage (the 32×32 encoder leaked 1,403 J) <span class="k k-est">estimated</span>.</li>
+    <li>The scenario runs since put this encoder under real scheduling (<a href="#scenarios-h">Where a box breaks first</a>). Catching up after 8 hours takes <b>14.3 min</b> instead of 11.3, because the 8 hours before the evening peak carry 1.19× an average 8 hours and live work goes first. A search query waits for at most one layer (about 21 ms) if the encoder can switch tasks at layer boundaries; that controller is now a requirement <span class="k k-est">estimated</span>.</li>
   </ul>
   <details>
     <summary>Limits of the encoder re-sizing</summary>
@@ -904,19 +911,192 @@ footer { font-size: 13px; color: var(--muted); }
 
 <section aria-labelledby="results-h">
   <h2 id="results-h">5. Key results</h2>
-  <h3 style="margin-top:6px">The whole box, compared with existing combinations</h3>
-  <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped. This comparison was made with the earlier 11.3 mm² chip (32×32 encoder) under the every-box-gets-every-post assumption; we redo it at equal resources, with the re-sized encoder and simulated load, as step 2 in <a href="#next-h">What's next</a>.</p>
+  <h3 id="scenarios-h" style="margin-top:6px">Where a box breaks first: five scenarios on the re-sized chip</h3>
+  <p>We put the re-sized chip (8×8 encoder with 1 MB SRAM, verify unit with 6 multipliers + 6 adders) into one box and ran it event by event: a Pi 5-class host with 4 cores, a 100 Mbps downlink, and the load of the busiest box in a 1M-user community (upper end: every box storing every sub-community). The question was what breaks first (the chip, the host in front of it, or the protocol) and what the cheapest fix is. Before running, we wrote down the targets:</p>
+  <ul class="small">
+    <li>an honest new post is searchable within 5 s (P99); the box gets 4.64 s of that, after 0.36 s of network spreading</li>
+    <li>encoding a search query, waiting included, takes ≤ 50 ms (P99), the encoder's share of a 100 ms search answer</li>
+    <li>an 8-hour backlog is cleared within 60 min</li>
+    <li>during a flood, ingest uses at most 2 of the host's 4 cores; the other 2 are for the owner's own searches and feeds <span class="k k-est">our new target</span></li>
+    <li>the chip stays ≤ 2 W in a flood and ≤ 50 mW idle</li>
+  </ul>
+  <p>And the scenarios: an ordinary 24-hour day (239,304 proofs, 25,889 text posts and 1,143 images); the evening peak hour with the owner searching every 5 s; catching up after being off for 1, 8 or 24 hours while peak traffic continues; a flood that fills the 100 Mbps downlink with 1 KB invalid proofs (12,207/s) for 60 s, 3 random seeds; and spam with valid proofs, where K identities each post up to their rate limit with the most expensive content (a 256-token body plus an image) for an hour. All results here are model outputs <span class="k k-est">estimated</span>; only the cost of a connection handshake was timed on the laptop.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 330" role="img" aria-label="One box in the scenario runs. Messages from neighbors over a 100 Mbps downlink first meet a host table lookup that drops repeats, then the verify unit on the chip checks the proof, then the host checks the signature, tags and decrypts, then the 8×8 encoder embeds text and images, and the host indexes them. Neighbors that send about 10 invalid proofs are penalized and disconnected, and each reconnect costs the host a handshake. Backlog work gets at most 2 of the 4 host cores and verification batches are filled with live proofs first. The owner's search queries go to the encoder ahead of new posts and backlog, and the encoder lets them in at layer boundaries.">
+      <defs>
+        <marker id="q1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="q2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-attack" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text x="14" y="26" font-weight="600">One box, in the order we chose: drop repeats → proof on the chip → signature → embed → index</text>
+      <!-- neighbors -->
+      <rect class="box" x="10" y="48" width="120" height="98" rx="8"/>
+      <text x="70" y="74" text-anchor="middle" font-size="13" font-weight="600">Neighbors</text>
+      <text x="70" y="94" text-anchor="middle" class="mut" font-size="11">100 Mbps down</text>
+      <text x="70" y="110" text-anchor="middle" class="mut" font-size="11">1 KB messages</text>
+      <text x="70" y="128" text-anchor="middle" class="mono t-attack" font-size="11">flood 12,207/s</text>
+      <path class="wire" d="M130,97 L146,97" marker-end="url(#q1)"/>
+      <!-- host lookup -->
+      <rect class="box" x="150" y="48" width="150" height="98" rx="8"/>
+      <text x="225" y="74" text-anchor="middle" font-size="13" font-weight="600">Host: seen before?</text>
+      <text x="225" y="94" text-anchor="middle" class="mut" font-size="11">same tag + post hash</text>
+      <text x="225" y="110" text-anchor="middle" class="mut" font-size="11">→ drop</text>
+      <text x="225" y="128" text-anchor="middle" class="mono" font-size="11">one lookup, 0.013 ms</text>
+      <path class="wire" d="M300,97 L316,97" marker-end="url(#q1)"/>
+      <!-- verify unit -->
+      <rect class="box-pick" x="320" y="48" width="150" height="98" rx="8"/>
+      <text x="395" y="74" text-anchor="middle" font-size="13" font-weight="700">Verify unit 6 + 6</text>
+      <text x="395" y="94" text-anchor="middle" class="mut" font-size="11">proof check on the chip</text>
+      <text x="395" y="110" text-anchor="middle" class="mut" font-size="11">invalid → drop + penalty</text>
+      <text x="395" y="128" text-anchor="middle" class="mono" font-size="11">85% busy in a flood</text>
+      <path class="wire" d="M470,97 L486,97" marker-end="url(#q1)"/>
+      <!-- host signature -->
+      <rect class="box" x="490" y="48" width="160" height="98" rx="8"/>
+      <text x="570" y="74" text-anchor="middle" font-size="13" font-weight="600">Host: signature</text>
+      <text x="570" y="94" text-anchor="middle" class="mut" font-size="11">only for valid proofs</text>
+      <text x="570" y="110" text-anchor="middle" class="mut" font-size="11">then tags, decrypt</text>
+      <text x="570" y="128" text-anchor="middle" class="mono" font-size="11">Ed25519 0.32 ms</text>
+      <path class="wire" d="M650,97 L666,97" marker-end="url(#q1)"/>
+      <!-- encoder -->
+      <rect class="box-path" x="670" y="48" width="170" height="98" rx="8"/>
+      <text x="755" y="74" text-anchor="middle" font-size="13" font-weight="700">Encoder 8×8 · 1 MB</text>
+      <text x="755" y="94" text-anchor="middle" class="mut" font-size="11">query &gt; new post &gt; backlog</text>
+      <text x="755" y="110" text-anchor="middle" class="mut" font-size="11">yields between layers</text>
+      <text x="755" y="128" text-anchor="middle" class="mut" font-size="11">post 70.9 ms · image 143 ms</text>
+      <path class="wire" d="M840,97 L856,97" marker-end="url(#q1)"/>
+      <!-- index -->
+      <rect class="box" x="860" y="48" width="110" height="98" rx="8"/>
+      <text x="915" y="74" text-anchor="middle" font-size="13" font-weight="600">Host: index</text>
+      <text x="915" y="94" text-anchor="middle" class="mut" font-size="11">search · feed</text>
+      <!-- penalties -->
+      <path class="wire-attack" d="M70,146 L70,184" marker-end="url(#q2)"/>
+      <rect class="box-attack" x="10" y="188" width="295" height="80" rx="8"/>
+      <text x="22" y="209" font-size="12" font-weight="600">Penalties → disconnect</text>
+      <text x="22" y="227" class="mut" font-size="11">about 10 invalid proofs per connection</text>
+      <text x="22" y="243" class="mut" font-size="11">each reconnect: a host handshake, 0.59 ms</text>
+      <text x="22" y="259" class="mut" font-size="11">0.2 new connections/s per IP address</text>
+      <!-- backlog -->
+      <rect class="box" x="320" y="188" width="330" height="80" rx="8"/>
+      <text x="332" y="209" font-size="12" font-weight="600">Catching up after being offline</text>
+      <text x="332" y="227" class="mut" font-size="11">backlog work: at most 2 of the 4 host cores</text>
+      <text x="332" y="243" class="mut" font-size="11">verify batches filled with live proofs first</text>
+      <text x="332" y="259" class="mut" font-size="11">live posts stay searchable in 0.16 s (P99)</text>
+      <!-- query -->
+      <path class="wire" d="M755,188 L755,150" marker-end="url(#q1)"/>
+      <rect class="box" x="670" y="188" width="300" height="80" rx="8"/>
+      <text x="682" y="209" font-size="12" font-weight="600">Owner's search query (12 tokens)</text>
+      <text x="682" y="227" class="mut" font-size="11">10.9 ms to encode</text>
+      <text x="682" y="243" class="mut" font-size="11">waits at most one layer (about 21 ms)</text>
+      <text x="682" y="259" class="mut" font-size="11">P99 22–42 ms while catching up</text>
+      <text x="14" y="294" class="mut" font-size="12">Host = Pi 5-class, 4 cores (laptop timings × 2.93) · verify unit from our cycle model · encoder from Timeloop + Accelergy, 45 nm</text>
+      <text x="14" y="314" class="mut" font-size="12">Load: busiest box of a 1M-user community, every box storing every sub-community (upper end) · all timings estimated</text>
+    </svg>
+  </div>
+  <p>What broke first in each scenario, and the fix we chose <span class="k k-est">estimated</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Scenario</th><th>What breaks first</th><th>Fix we chose</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Flood of invalid proofs, 100 Mbps</td><td>the host's signature checks: 3.90–4.61 cores needed on a 4-core host, while the verify unit is only 85% busy</td><td><b>check the proof before the signature</b></td><td class="num">host 0.88 cores · new posts 0.18 s (P99) · chip 0.87 W · box 4.7–5.6 W</td></tr>
+      <tr><td>8 hours offline, catching up</td><td>queues on the host and the verify unit: new posts wait 18.9 s behind 95,000 missed messages</td><td><b>live work first</b> (2 host cores kept for it, batches filled with live proofs)</td><td class="num">new posts 0.16 s · caught up in 14.3 min</td></tr>
+      <tr><td>Searching while catching up</td><td>with priority per task, a query waits for a whole backlog batch or an image: 130–390 ms</td><td><b>encoder yields at layer boundaries</b>, backlog batch 8</td><td class="num">query encoding 22–42 ms (P99)</td></tr>
+      <tr><td>Spam with valid proofs</td><td>the encoder: 310 identities (0.031% of members) posting at their limit push new posts past 5 s</td><td>separate limit: 6 posts and comments per 10 min (+1.3% verify cost)</td><td class="num">32×32 only reaches 2,682 identities → <b>identity cost, not the chip</b></td></tr>
+      <tr><td>Ordinary day</td><td>nothing</td><td>—</td><td class="num">chip 3.4 mW (292 J a day) · box 2.41–3.31 W</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li><b>Check the proof before the signature.</b> With the signature checked first, every invalid proof costs the host an Ed25519 check (0.32 ms on a Pi 5-class core), so a 100 Mbps flood needs 3.90 cores, and 4.61 once penalties make attackers reconnect: more than the host has, and new posts then wait 24 s. The chip is only 85% busy. Dropping repeats with one table lookup and checking the proof first brings the host down to 0.16 cores in the same flood, 0.88 with reconnect handshakes. We had decided to keep the existing order unless it pushed the host past 2 cores, and it did. The new order also ends the earlier worst case, a mostly valid flood made of replayed proofs with about 15% invalid ones: the replays are dropped at the lookup, and the verify unit is only 13% busy.</li>
+    <li><b>The verify unit stays at 6 + 6.</b> With penalties (a connection is cut after about 10 invalid proofs) and 0.2 new connections per second per IP address, an attacker needs <b>6,104 IPv4 addresses</b> to deliver this flood to one box. With that many, the link is the limit, and the unit is 85% busy, 91% of its worst-case 13,429/s. A box-wide cap on new connections would stop the flood too, but it would also keep new honest boxes from joining during an attack, so we keep it as an extra defense only and don't size hardware on it.</li>
+    <li><b>Catching up is a queueing problem before it is an encoder problem.</b> Run as first planned, with the host and verify unit in arrival order, nothing met the targets: new posts waited 3.3 s after 1 hour offline, 18.9 s after 8 hours and 54.5 s after 24 hours. We added "live work first" after seeing that, and kept the planned results. Downloading 8 hours of missed messages (95,000, 43.9 MB) takes 3.5 s; the encoder sets the catch-up time: 14.3 min for 8 hours, 36.3 min for 24 hours.</li>
+    <li><b>Sharing one encoder needs task switches between layers.</b> With priority per task, a search query waits behind a batch of 8 backlog posts (up to 0.36 s) or an image (143 ms). If the encoder can switch at a layer boundary, a query waits at most one layer, about 21 ms. The activations are already in the global SRAM, so the hardware requirement is an encoder controller that can switch tasks at layer boundaries.</li>
+  </ul>
+  <p><b>Spam with valid proofs.</b> Valid proofs pass the verify unit, so spam from real identities is embedded on every subscribed box. We measured the most identities K that can post at their limit for an hour, on top of peak traffic, while honest new posts stay searchable within 4.64 s at the box <span class="k k-est">estimated</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Encoder</th><th>Encoding one spam post (256 tokens + image)</th><th>One limit for everything: 20 / 10 min</th><th>Posts and comments: 6 / 10 min</th><th>Share of 10<sup>6</sup> members (6 / 10 min)</th></tr></thead>
+    <tbody>
+      <tr><td><b>8×8, 1 MB (current)</b></td><td class="num">268 ms</td><td class="num">94</td><td class="num"><b>310</b></td><td class="num">0.031%</td></tr>
+      <tr><td>16×16, 2 MB</td><td class="num">69 ms</td><td class="num">412</td><td class="num">1,376</td><td class="num">0.14%</td></tr>
+      <tr><td>32×32, 2 MB (earlier)</td><td class="num">37 ms</td><td class="num">804</td><td class="num">2,682</td><td class="num">0.27%</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li><b>The chip can't fix this.</b> We decided in advance to grow the encoder only if some size could survive spam from 1% of members (10<sup>4</sup> identities, our own benchmark with no source), and otherwise to keep 8×8 and hand the problem to the protocol. A 32×32 encoder encodes spam 7.3× faster, but the attacker's identities scale linearly, and even 32×32 stops at 2,682. To survive 1% of members on 8×8, each identity could post only about 0.19 times per 10 minutes, far below the 6 honest users need. So identity cost (one of our open problems: what makes an identity expensive) has to come before chip size, or spam has to be filtered before it reaches the encoder.</li>
+    <li><b>A tighter, per-kind limit helps 3.3×.</b> The limit was 20 messages of any kind per 10 minutes, which blocks only 1.4×10<sup>-12</sup> of honest messages, so it is generous to attackers too. The smallest limits that block at most 1 in 1,000 honest messages at the peak hour are 6 posts and comments and 4 votes per 10 minutes. Putting the kind in the proof costs +1.3% of verification <span class="k k-est">estimated</span>.</li>
+    <li><b>Spam breaks freshness, not search.</b> With layer-boundary yielding, query encoding stays at 31 ms (P99) during spam at the limit.</li>
+    <li>If the benchmark were 0.1% of members (1,000 identities), 16×16 would pass and 8×8 still wouldn't; at 10%, nothing passes.</li>
+  </ul>
+  <p><b>Ordinary-day power.</b> On the busiest box of a 1M-user community, the chip averages 3.4 mW over the day (292 J: encoder 271 J, verify unit 21.5 J), 0.14% of the idle box's energy, with idle blocks switched off <span class="k k-est">estimated</span>. We had agreed to rewrite the claim "ordinary-day box power is set by the host's idle power" if this went over 1%; it didn't. The earlier chip's 0.092 W assumed every box ingests all 10<sup>6</sup> posts a day; with simulated load and the new chip it is 1/27 of that. Power in every scenario is in the <a href="#design-h">chip section</a>.</p>
+  <details>
+    <summary>Flood runs: check order and connection policy</summary>
+    <p class="small">100 Mbps (12,207 messages/s) plus peak traffic, 60 s × 3 seeds. "Replays" is the earlier worst case: about 15% invalid proofs mixed with replayed valid ones <span class="k k-est">estimated</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Order</th><th>Connection policy</th><th>Attack</th><th>Host cores</th><th>Verify unit busy</th><th>New post P99</th><th>Chip</th><th>Box</th><th>Targets</th></tr></thead>
+      <tbody>
+        <tr><td>signature first</td><td>no penalties</td><td>all invalid</td><td class="num"><b>3.90</b></td><td class="num">85%</td><td class="num">0.18 s</td><td class="num">0.87 W</td><td class="num">9.6–10.5 W</td><td>host over 2 cores</td></tr>
+        <tr><td>signature first</td><td>penalties + per-IP limit</td><td>all invalid</td><td class="num"><b>4.61</b> (more than it has)</td><td class="num">85%</td><td class="num"><b>24 s</b></td><td class="num">0.87 W</td><td class="num">10.8–11.7 W</td><td>host, 5 s freshness</td></tr>
+        <tr><td>signature first</td><td>no penalties</td><td>replays</td><td class="num"><b>4.03</b></td><td class="num">92%</td><td class="num">1.9 s</td><td class="num">0.98 W</td><td class="num">9.9–10.8 W</td><td>host over 2 cores</td></tr>
+        <tr><td>proof first</td><td>no penalties</td><td>all invalid</td><td class="num">0.16</td><td class="num">85%</td><td class="num">0.18 s</td><td class="num">0.87 W</td><td class="num">3.5–4.4 W</td><td>pass</td></tr>
+        <tr><td><b>proof first (chosen)</b></td><td><b>penalties + per-IP limit</b></td><td><b>all invalid</b></td><td class="num"><b>0.88</b></td><td class="num"><b>85%</b></td><td class="num"><b>0.18 s</b></td><td class="num"><b>0.87 W</b></td><td class="num"><b>4.7–5.6 W</b></td><td><b>pass</b></td></tr>
+        <tr><td>proof first</td><td>penalties + per-IP limit</td><td>replays</td><td class="num">0.88</td><td class="num">13%</td><td class="num">0.17 s</td><td class="num">0.15 W</td><td class="num">4.0–4.9 W</td><td>pass</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">Inputs <span class="k k-est">estimated</span>: one valid proof alone 89.6 µs on the verify unit, 34.1 µs per proof in a batch of 128, one invalid proof alone 69.2 µs; Ed25519 check 0.32 ms on the host. A handshake (three X25519 operations plus an Ed25519 signature and check) took 0.20 ms on the laptop <span class="k k-meas">measured, preliminary</span>, × 2.93 for a Pi 5-class core = 0.59 ms.</p>
+  </details>
+  <details>
+    <summary>Catching up: encoder schedules</summary>
+    <p class="small">With live work first on the host and the verify unit. 8 hours offline <span class="k k-est">estimated</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Encoder schedule</th><th>Peak hour: query P99</th><th>Catch-up time</th><th>New post P99</th><th>Query P99</th></tr></thead>
+      <tbody>
+        <tr><td>one queue, first come first served</td><td class="num">95 ms</td><td class="num">13.6 min</td><td class="num"><b>750 s</b></td><td class="num"><b>749 s</b></td></tr>
+        <tr><td>priority (query &gt; new post &gt; backlog), whole tasks</td><td class="num">95 ms</td><td class="num">14.3 min</td><td class="num">0.41 s</td><td class="num"><b>359 ms</b> (batch 8), 148 ms (batch 1)</td></tr>
+        <tr><td><b>+ yield at layer boundaries, batch 8 (chosen)</b></td><td class="num"><b>22 ms</b></td><td class="num"><b>14.3 min</b></td><td class="num"><b>0.16 s</b></td><td class="num"><b>39 ms</b></td></tr>
+        <tr><td>+ yield at layer boundaries, batch 1</td><td class="num">22 ms</td><td class="num">14.3 min</td><td class="num">0.15 s</td><td class="num">31 ms</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">We decided in advance to take the simplest schedule that meets the freshness, query and backlog targets after 1, 8 and 24 hours offline; batch 8 counts as simpler than batch 1. Layer-boundary yielding with batch 8 keeps new posts and queries within their targets after 1, 8 and 24 hours offline, and clears 8 hours well within 60 min. 8 hours takes 14.3 min instead of the earlier 11.3-minute estimate, because the 8 hours before the evening peak carry 1.19× an average 8 hours and live work goes first. On the ordinary day: new posts searchable in 0.13 s, images in 0.36 s, queries 17 ms (P99, at most 32 ms).</p>
+  </details>
+  <details>
+    <summary>How the rate limits were set</summary>
+    <p class="small">From the behavior model (10<sup>6</sup> users, heavy-tailed activity, peak hour): the smallest limit per 10 minutes at which at most 1 in 1,000 honest messages is blocked <span class="k k-est">simulation model</span>:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Counted together</th><th>Limit chosen (per 10 min)</th><th>Honest messages blocked</th><th>Busiest user's 10-minute average</th></tr></thead>
+      <tbody>
+        <tr><td>all kinds (one limit)</td><td class="num">4</td><td class="num">8.1×10<sup>-4</sup></td><td class="num">4.0</td></tr>
+        <tr><td><b>posts and comments</b></td><td class="num"><b>6</b></td><td class="num">6.8×10<sup>-4</sup></td><td class="num">4.0</td></tr>
+        <tr><td>votes</td><td class="num">4</td><td class="num">5.7×10<sup>-4</sup></td><td class="num">3.9</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">The comparison in the spam table uses the earlier single limit of 20, as planned. A single limit of 4 is also possible, but it may squeeze people who mostly write; we didn't check that separately.</p>
+  </details>
+  <details>
+    <summary>Limits of the scenario runs</summary>
+    <ul class="small">
+      <li>Only one box runs. Neighbors enter only through the connection-policy limits and the earlier result that invalid proofs stop at the first hop. Valid spam using neighbors' uplinks as it spreads, and attacks on many boxes at once, weren't run.</li>
+      <li>During a flood the attack fills the downlink, and honest messages are assumed not to queue on the link (fair sharing between flows).</li>
+      <li>Host costs are preliminary laptop timings × the Pi 5 scale. This run's Ed25519 check measured 73 µs on the laptop against 109 µs earlier; we kept the slower earlier value. The handshake counts only the X25519 and Ed25519 operations (no TCP, no symmetric crypto).</li>
+      <li>With penalties, replayed proofs also pay a reconnect handshake every 10 messages, though replays don't actually trigger the invalid-message penalty; this is on the safe side.</li>
+      <li>Verify-unit batch times are a straight line between a lone check and a batch of 128 <span class="k k-est">estimated</span>. How mixed batches are split is covered only by the earlier throughput curve per invalid share.</li>
+      <li>All text uses our post length distribution (comments are shorter, so this is an upper bound). Spam content is the single most expensive kind (256 tokens + image).</li>
+      <li>While catching up after 24 hours, live image posts wait 34.9 s (P99) behind backlog image downloads on the link. The link needs live-first too. Freshness was judged on text only, so this isn't in the verdict.</li>
+      <li>The 1%-of-members benchmark has no source. The spam table lets anyone redo the verdict with a different benchmark.</li>
+      <li>16×16 and 32×32 were costed with 2 MB of SRAM (only 8×8 was mapped with 1 MB).</li>
+    </ul>
+    <p class="small"><b>Traces.</b> The run writes Perfetto traces of 20 ms of the flood (<a href="https://github.com/Yoonkyu-Lee/asu-eee-598-ahsml-fa26-notes/blob/main/project/results/cp19/trace_flood_20ms.json">flood</a>) and the first 2 s of an 8-hour catch-up (<a href="https://github.com/Yoonkyu-Lee/asu-eee-598-ahsml-fa26-notes/blob/main/project/results/cp19/trace_catchup_2s.json">catch-up</a>), with rows for host cores 0–3, the verify unit and the encoder. Download the JSON and open it at <a href="https://ui.perfetto.dev">ui.perfetto.dev</a>.</p>
+  </details>
+
+  <h3>The whole box, compared with existing combinations</h3>
+  <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped. This comparison was made with the earlier 11.3 mm² chip (32×32 encoder) under the every-box-gets-every-post assumption, and it counts only the chip, not the host's work in a flood. We redo it at equal resources, on the same five scenarios as above, as step 1 in <a href="#next-h">What's next</a>.</p>
   <div class="tbl"><table>
     <thead><tr><th>Box</th><th>Ordinary day</th><th>100 Mbps flood</th><th>Idle</th><th>Basis</th></tr></thead>
     <tbody>
-      <tr><td><b>Pi 5-class host + our chip</b></td><td class="num">2.49–3.39 W</td><td class="num"><b>keeps up</b> at 2.88–3.78 W with valid proofs; chip rises to 1.05 W at the worst mix of invalid proofs</td><td class="num">2.4–3.3 W</td><td><span class="k k-src">source</span> host idle · <span class="k k-est">estimated</span> chip</td></tr>
+      <tr><td><b>Pi 5-class host + our chip</b></td><td class="num">2.49–3.39 W</td><td class="num"><b>keeps up</b> at 2.88–3.78 W with valid proofs; chip rises to 1.05 W at the worst mix of invalid proofs (earlier chip; host work not counted)</td><td class="num">2.4–3.3 W</td><td><span class="k k-src">source</span> host idle · <span class="k k-est">estimated</span> chip</td></tr>
       <tr><td>Pi 5 + Hailo-8L</td><td class="num">2.55–3.50 W (without Hailo idle)</td><td class="num"><b>falls behind</b>: 4 CPU cores top out at 3,854/s</td><td class="num">2.4–3.3 W + Hailo idle (unknown)</td><td><span class="k k-src">source</span> Hailo 121 posts/s, 1.4–1.9 W · <span class="k k-est">estimated</span> CPU</td></tr>
       <tr><td>Jetson Orin Nano</td><td class="num">no published encoder numbers</td><td class="num"><b>falls behind</b>: 6 CPU cores reach 4,095–5,241/s</td><td class="num">2.5–4.7 W</td><td><span class="k k-src">source</span> idle · <span class="k k-est">estimated</span> CPU</td></tr>
       <tr><td>Laptop, Core Ultra 9 185H (NPU + CPU)</td><td class="num">7.43 W</td><td class="num">keeps up, but at 46.3 W</td><td class="num">6.42 W</td><td><span class="k k-meas">measured</span></td></tr>
     </tbody>
   </table></div>
   <ul class="small">
-    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. Our chip does it at 0.48 W, and at no more than 1.05 W whatever share of the proofs is invalid <span class="k k-est">estimated</span>.</li>
+    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. The earlier chip did it at 0.48 W with valid proofs and at most 1.05 W at the worst mix of invalid ones. The re-sized chip, with the box checking proofs before signatures, draws 0.87 W in a flood of nothing but invalid proofs, and the whole box 4.7–5.6 W <span class="k k-est">estimated</span> (<a href="#scenarios-h">scenarios</a>).</li>
     <li><b>On an ordinary day the chip hardly matters.</b> Our box is 0.06–0.11 W below Pi 5 + Hailo-8L, much less than the spread in host idle power (2.4–3.3 W). To lower everyday power further you'd have to work on the host's idle power, which is outside this course project. The simulated 10,000-box day says the same from the chip's side: the busiest box's chip does 0.86 J of work a day against 2,480 J of leakage before gating (about 1,195 J with the re-sized encoder), so on an ordinary day what matters on the chip is power gating <span class="k k-est">simulation model</span>.</li>
     <li><b>Encoder on our chip, not a Hailo-8L.</b> We decided in advance to keep the encoder on our chip only if the chip's ordinary-day power came in under the Hailo-8L's share. It did: 0.092 W vs 0.134–0.182 W (11.6–15.7 mJ per post × 11.6 posts/s, estimated from vendor figures). The Hailo is also fixed at 128 tokens.</li>
   </ul>
@@ -1004,10 +1184,10 @@ footer { font-size: 13px; color: var(--muted); }
   </table></div>
   <p class="small muted">Bold: the smallest unit that keeps up (12,207/s) in each column. Four adders never got close in any column. The key-table columns use 8-bit windows.</p>
   <ul class="small">
-    <li><b>6 multipliers + 6 adders: at least 13,429 proofs/s, 10% headroom.</b> The verify unit goes from 2.69 mm² (the earlier 8 + 8) to <b>2.12 mm²</b> and leaks 12.4 mW. The chip was then <b>11.3 mm²</b> (5.61 mm² since the encoder was re-sized) and draws at most <b>1.05 W</b> in the flood. The worst-case energy is <b>0.077 mJ</b> per proof <span class="k k-est">estimated</span>. Since then, the vote proof gained one public input (<a href="#votes-h">what a vote's proof carries</a>), which costs 1.3%: worst case about 13,255 proofs/s, still above the flood <span class="k k-est">estimated</span>.</li>
+    <li><b>6 multipliers + 6 adders: at least 13,429 proofs/s, 10% headroom.</b> The verify unit goes from 2.69 mm² (the earlier 8 + 8) to <b>2.12 mm²</b> and leaks 12.4 mW. The chip was then <b>11.3 mm²</b> (5.61 mm² since the encoder was re-sized) and drew at most <b>1.05 W</b> in the flood (the re-sized chip: 0.87 W, with the box checking proofs first). The worst-case energy is <b>0.077 mJ</b> per proof <span class="k k-est">estimated</span>. Since then, the vote proof gained one public input (<a href="#votes-h">what a vote's proof carries</a>), which costs 1.3%: worst case about 13,255 proofs/s, still above the flood <span class="k k-est">estimated</span>.</li>
     <li><b>Part of the earlier 8 + 8 was our own model being conservative.</b> Our operation trace counted the final exponentiation's squarings as general squarings and used a plain binary exponent. Counting them the way the arkworks library already computes them gets to 7 × 8 on its own. A simplification that looks "safe" can move the hardware size by a whole step, so we now note such simplifications next to the results.</li>
     <li><b>The biggest gain beyond the library comes from the verifying key being fixed.</b> Its points never change, so a precomputed table turns the public-input multiplication into additions only: 9,111 → 2,115 mults, 16% of the cost to reject a proof. The price is a 3.1 MB table in host DRAM and up to 0.125 GB/s of reads during the flood. The 4-bit-window table is only 368 KB but needs 0.226 GB/s; we took 8-bit windows for fewer reads. The table is rebuilt offline whenever the verifying key changes.</li>
-    <li><b>The worst attack moved from "all invalid" to about 15% invalid.</b> Invalid proofs now skip the subgroup check, so an all-invalid flood is easier (14,633/s on 6 × 6). The worst case is a mostly valid flood with about 15% invalid proofs (13,429/s): batches keep failing, and the valid proofs still pay for the subgroup check. That is why deferring the check raised the worst case only a little (13,306 → 13,429). Deferring is safe: a proof that fails the test is discarded anyway, and every accepted proof still passes the subgroup check, so the set of accepted proofs doesn't change. A proof built to pass the test but fail the subgroup check costs the same as a valid one, which the numbers above already cover.</li>
+    <li><b>The worst attack moved from "all invalid" to about 15% invalid.</b> Invalid proofs now skip the subgroup check, so an all-invalid flood is easier (14,633/s on 6 × 6). The worst case is a mostly valid flood with about 15% invalid proofs (13,429/s): batches keep failing, and the valid proofs still pay for the subgroup check. That is why deferring the check raised the worst case only a little (13,306 → 13,429). Deferring is safe: a proof that fails the test is discarded anyway, and every accepted proof still passes the subgroup check, so the set of accepted proofs doesn't change. A proof built to pass the test but fail the subgroup check costs the same as a valid one, which the numbers above already cover. The scenario runs later removed this worst case at the box level: the valid proofs in such a flood are replays, and a box that drops repeats before the proof check never sends them to the verify unit, which is then only 13% busy (<a href="#scenarios-h">Where a box breaks first</a>).</li>
     <li>On 6 × 6 by invalid share: 0% → 29,704/s (n=128), 1% → 23,304 (n=16), 10% → 15,137 (n=8), 15% → 13,429 (every proof alone), 100% → 14,633 (alone) <span class="k k-est">cycle model</span>.</li>
     <li><b>We keep proofs compressed.</b> Sending them uncompressed (256 B instead of 128 B) skips three square roots but changes the wire format, and it doesn't shrink the unit: 5 × 6 reaches 11,883/s, 97% of the flood. We had agreed to change the wire format only if it saved a multiplier.</li>
     <li><b>Additions are now 4.2× multiplications</b>, so the remaining lever is on the add side. Cutting additions by 7%, or a better adder (for example, multiplying by the constant 9 with one shift-and-add), looks like enough for 5 multipliers, saving 0.28 mm² (2.5% of the chip).</li>
@@ -1024,6 +1204,7 @@ footer { font-size: 13px; color: var(--muted); }
       <li>New connections: go-libp2p's <a href="https://github.com/libp2p/go-libp2p/blob/master/p2p/host/resource-manager/conn_rate_limiter.go">resource manager</a> allows 0.2/s per IPv4 /32, 0.2/s per IPv6 /56 and 0.5/s per IPv6 /48, with no global cap. We didn't find the equivalent limit in nim-libp2p, which nwaku uses.</li>
     </ul>
     <p class="small">So for the earlier unit's 6% limit (about 730 invalid proofs/s), an attacker needs 73 new connections per second, which about 366 IPv4 addresses (or 146 IPv6 /48s) can supply <span class="k k-est">estimated</span>. Penalties limit what one connection can do, not an attacker with many addresses. Having the chip itself survive any share of invalid proofs is the most robust way to keep spam from exhausting ingest.</p>
+    <p class="small">For the full 100 Mbps flood on the current unit, the same penalty and per-address limits mean an attacker needs 6,104 IPv4 addresses to reach one box at link speed <span class="k k-est">estimated</span>. Each reconnect also costs the host a handshake (0.59 ms on a Pi 5-class core). A box-wide cap on new connections would stop such a flood, but it would also keep new honest boxes from joining during an attack, so we treat it as an extra defense and don't size the verify unit on it.</p>
   </details>
 
   <h3>What existing hardware does</h3>
@@ -1059,15 +1240,15 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>Verify unit energy per proof, batched · worst mix of invalid proofs</td><td class="num">0.0317 mJ (multiplies 80%, moving operands 19%) · 0.077 mJ</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Verify unit area · leakage</td><td class="num">2.12 mm² · 12.4 mW with 6 + 6 · the earlier 5 + 4 unit was 1.83 mm² (multipliers 1.42, operand registers 0.30, 32 KB microcode 0.10, adders 0.01) and leaked 10.9 mW</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Latency of one proof, not batched (5-multiplier unit)</td><td class="num">282 µs (4.3× faster than 1.22 ms tuned software on a P-core)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
-      <tr><td><b>Encoder (current): INT8 8×8 array, 1 MB SRAM, 32 KB local buffers, 500 MHz; MiniLM for text, CLIP image tower for images</b></td><td class="num">new post 125 ms (P99) · query 10.9 ms · one image 143 ms, 27.3 mJ · 8-hour backlog in 11.3 min at the heaviest load of a 1M-user community · serves up to 5.3×10<sup>6</sup> users</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td><b>Encoder (current): INT8 8×8 array, 1 MB SRAM, 32 KB local buffers, 500 MHz; MiniLM for text, CLIP image tower for images</b></td><td class="num">new post 125 ms (P99) · query 10.9 ms · one image 143 ms, 27.3 mJ · 8-hour backlog in 11.3 min at the heaviest load of a 1M-user community (14.3 min in the scenario run, with peak traffic continuing and live work first) · serves up to 5.3×10<sup>6</sup> users</td><td class="kind"><span class="k k-est">model</span></td></tr>
       <tr><td>Encoder area · leakage</td><td class="num">3.53 mm² (1 MB SRAM 3.25) · 1.36 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
       <tr><td>Earlier encoder: INT8 32×32 array, 2 MB SRAM, sized for every box ingesting all 10<sup>6</sup> posts a day</td><td class="num">8.05 ms · 7.90 mJ / post · 8-hour backlog of 330k posts in 45 min · 9.22 mm² (2 MB SRAM 6.80, array 1.20, FP16 attention 0.53) · 16.2 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
       <tr><td>Text search quality, finding a post by its title (Hit@10, FP32)</td><td class="num">MiniLM 0.943 · CLIP text tower 0.776</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
       <tr><td>Same image, static INT8 in two runtimes (onnxruntime vs OpenVINO)</td><td class="num">not bit-identical: cosine 0.872 · quality against FP32 as low as 0.798</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
-      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">5.61 mm² · leakage before gating: encoder 1.36 mW + verify unit 12.4 mW · 0.48 W (all valid) to 1.05 W (worst mix) in a 100 Mbps flood, computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">5.61 mm² · leakage before gating: encoder 1.36 mW + verify unit 12.4 mW · 0.87 W in a 100 Mbps flood of invalid proofs, with proofs checked before signatures · 3.4 mW average on an ordinary day (busiest box of a 1M-user community)</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">"Synthesized" means Synopsys Design Compiler with the FreePDK45 (OSU) library, with power computed from simulated switching activity. Everything else on the chip (adders, buffers, sequencer, the whole encoder) is costed with Accelergy's 45 nm tables (CACTI for SRAM, Aladdin for logic), not RTL. The 2 W budget, 10<sup>6</sup> posts/day, 1 KB messages, 100 Mbps flood and 1-hour backlog target are all <b>assumptions</b>.</p>
+  <p class="small muted">"Synthesized" means Synopsys Design Compiler with the FreePDK45 (OSU) library, with power computed from simulated switching activity. Everything else on the chip (adders, buffers, sequencer, the whole encoder) is costed with Accelergy's 45 nm tables (CACTI for SRAM, Aladdin for logic), not RTL. The 2 W budget, 1 KB messages, 100 Mbps flood, 1-hour backlog target and the 2-core host budget during a flood are all <b>assumptions</b>; the per-box load now comes from the simulator.</p>
 
   <details>
     <summary>How the encoder was first sized (every box ingesting all 10<sup>6</sup> posts a day)</summary>
@@ -1142,6 +1323,12 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="dropped-h">
   <h2 id="dropped-h">6. Paths we tried and dropped</h2>
   <ul class="dropped">
+    <li><b>Checking each message's signature before its proof.</b> In a 100 Mbps flood of invalid proofs, the host's Ed25519 checks take 3.90 of its 4 cores, and 4.61 once penalties make attackers reconnect (new posts then wait 24 s), while the chip is only 85% busy <span class="k k-est">estimated</span>. <i>Instead:</i> drop repeats with one lookup, check the proof on the chip, then the signature: 0.88 host cores.</li>
+    <li><b>Catching up in plain arrival order.</b> After 8 hours offline, new posts waited 18.9 s behind 95,000 missed messages on the host and the verify unit, whatever the encoder did <span class="k k-est">estimated</span>. <i>Instead:</i> backlog work gets at most 2 of the 4 host cores, and verification batches are filled with live proofs first (new posts 0.16 s).</li>
+    <li><b>One queue, or priority per whole task, for the shared encoder.</b> With one queue, new posts (750 s) and queries (749 s) waited behind the whole backlog during an 8-hour catch-up; with priority per task, a query still waited behind a backlog batch or an image (359 ms at batch 8) <span class="k k-est">estimated</span>. <i>Instead:</i> the encoder lets queries in at layer boundaries (39 ms).</li>
+    <li><b>A bigger encoder against spam with valid proofs.</b> Growing from 8×8 to 32×32 raises the number of spamming identities a box survives only from 310 to 2,682, against a benchmark of 10,000 (1% of members) <span class="k k-est">estimated</span>. <i>Instead:</i> keep 8×8; identity cost and per-identity limits are a protocol requirement.</li>
+    <li><b>One rate limit of 20 messages of any kind per 10 minutes.</b> It blocks only 1.4×10<sup>-12</sup> of honest messages, so it is just as generous to spammers <span class="k k-est">simulation model</span>. <i>Instead:</i> 6 posts and comments and 4 votes per 10 minutes, which raises the spam the box survives 3.3× for +1.3% verify cost.</li>
+    <li><b>A box-wide cap on new connections as the basis for sizing the verify unit.</b> It would stop a many-address flood, but it would also keep new honest boxes from joining during an attack. <i>Instead:</i> the verify unit is sized for a link-speed flood (6,104 IPv4 addresses with penalties and per-address limits), and the cap is only an extra defense.</li>
     <li><b>Sizing the box for "every box ingests all 10<sup>6</sup> posts a day."</b> Nobody chose that number; it was a hidden assumption. With behavior from Reddit's statistics, the busiest 1% of boxes in a 1M-user community embed 0.45 text posts/s at the peak hour, 1/26 of the 11.6 posts/s we had assumed <span class="k k-est">simulation model</span>. We had decided in advance to re-decide the encoder toward smaller if real ingest fell under a tenth of the assumption. In the simulated day the encoders were busy only 0.003% of the peak hour, even on the busiest boxes. <i>Instead:</i> the encoder is sized by search latency, the backlog after a box has been offline, and images, which brought it from 32×32 with 2 MB of SRAM (9.22 mm²) down to 8×8 with 1 MB (3.53 mm²) <span class="k k-est">estimated</span>.</li>
     <li><b>One CLIP model for both text and images.</b> Fewer models would make a simpler chip, but CLIP's text tower finds a post by its title in the top 10 only 0.776 of the time, against 0.943 for MiniLM <span class="k k-meas">measured</span>; we had allowed a gap of 0.005. It's lower on short posts too, so it isn't only CLIP's 77-token cut. <i>Instead:</i> MiniLM for text, CLIP's image tower for images, and CLIP's text tower only to find images by words. Three models cost DRAM capacity, not chip area.</li>
     <li><b>Static INT8 as a way to make every box compute the same embedding.</b> It is bit-identical across batch sizes and thread counts, but the same model file gives different values in two runtimes (cosine 0.872), and its quality is low (0.798 against FP32) <span class="k k-meas">measured</span>. <i>Instead:</i> image posts keep envelope + fetch, and an integer-only encoder with a fixed operation order and rounding is a candidate chip requirement.</li>
@@ -1157,7 +1344,7 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>Software only.</b> Batched verification on one low-power core: 989 proofs/s, 2.06 mJ/proof <span class="k k-meas">measured</span>. It misses on both energy and throughput.</li>
     <li><b>Wider multipliers (128/256-bit word).</b> They were bigger, slower and used more energy per multiply (table above).</li>
     <li><b>Interleaving independent multiplies through a pipelined multiplier and letting the tool retime it.</b> We had decided up front that it needed a 1.5× clock gain to justify the complexity. The clock rose only 1.20–1.22× (about 360 MHz): the critical path stopped at 2.78 ns inside the retimed multiplier, and we haven't found out why. We gave up a real gain to stick to that call: the 2-way version would have been about 20% smaller (0.91 vs 1.13 mm² for a 4-multiplier unit).</li>
-    <li><b>A 32×32 encoder array with 2 MB of SRAM.</b> We chose it when every box was assumed to ingest all 10<sup>6</sup> posts a day: then 16×16 needed 106 min and 8×8 401 min for an 8-hour backlog, over the 60-minute target <span class="k k-est">model</span>. Under the simulated load, 8×8 clears the backlog in 11.3 min. <i>Instead:</i> 8×8 with 1 MB, 3.53 mm² instead of 9.22 mm² <span class="k k-est">estimated</span>.</li>
+    <li><b>A 32×32 encoder array with 2 MB of SRAM.</b> We chose it when every box was assumed to ingest all 10<sup>6</sup> posts a day: then 16×16 needed 106 min and 8×8 401 min for an 8-hour backlog, over the 60-minute target <span class="k k-est">model</span>. Under the simulated load, 8×8 clears the backlog in 11.3 min (14.3 min when peak traffic continues during the catch-up). <i>Instead:</i> 8×8 with 1 MB, 3.53 mm² instead of 9.22 mm² <span class="k k-est">estimated</span>.</li>
     <li><b>Keeping the 5-multiplier verify unit and relying on smarter batch splitting.</b> It was sized with 2× headroom over a flood of valid proofs, but no splitting strategy can go below the cost of checking every proof alone, and that drops it to 7,469 proofs/s, 61% of the flood, when every proof is invalid (with our first operation count) <span class="k k-est">cycle model</span>. 7 multipliers + 7 adders still came up 5% short, so at first we went to 8 + 8.</li>
     <li><b>An 8 + 8 verify unit.</b> Part of that size came from our own operation count being conservative (general instead of cyclotomic squarings, a plain binary exponent). With the library's real formulas, a precomputed verifying-key table and a deferred subgroup check, the cost to reject an invalid proof fell to 0.65×, and 6 multipliers + 6 adders keep up at any share of invalid proofs (2.12 mm² instead of 2.69 mm²) <span class="k k-est">cycle model</span>.</li>
     <li><b>Sending proofs uncompressed.</b> It skips three square roots per proof but doubles the proof to 256 B and changes the wire format, and the smallest unit that keeps up is still 6 + 6 (5 + 6 reaches 97% of the flood) <span class="k k-est">cycle model</span>. We decided in advance to change the format only if it saved a multiplier.</li>
@@ -1173,23 +1360,24 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Step</th><th>What</th><th>What it leaves behind</th></tr></thead>
     <tbody>
-      <tr><td class="num"><b>1 (next)</b></td><td><b>Scenarios on the new chip</b> (8×8 encoder, 1 MB SRAM): ordinary day, peak, a box catching up after being offline, attacker floods (fake posts, floods of invalid proofs), and the neighbor structure (mesh degree, regional clustering). Find where our targets break first: new posts searchable within 5 s, search answered within 100 ms, an 8-hour backlog cleared within 60 min</td><td>chip size and power re-checked under simulated load and attacks</td></tr>
-      <tr><td class="num">2</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
-      <tr><td class="num">3</td><td>Demo: web UI, a few boxes running in real time; finding images by words with CLIP's text tower</td><td>for the presentation</td></tr>
+      <tr><td class="num"><b>1 (next)</b></td><td><b>Comparison at equal resources, plus ablations.</b> Run the same five scenarios (ordinary day, peak, catching up, invalid-proof flood, valid spam) with the same targets on existing combinations (Pi 5 + Hailo-8L, Jetson, Pi 5 CPU alone) and on our chip. Then switch off one thing at a time: proof-first order, layer-boundary yielding, live work first, encoder size, the verify unit</td><td>the central table of the final report</td></tr>
+      <tr><td class="num">2</td><td>Demo: web UI, a few boxes running in real time; finding images by words with CLIP's text tower</td><td>for the presentation</td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Done since the last update: the encoder re-sized for latency, backlog and identical embeddings (see <a href="#encoder-h">The encoder</a>). Still open from it, outside the numbered steps: the image encoder's precision (static INT8 is at 0.798 against FP32; mixed precision is the next thing to try) and whether an integer-only encoder keeps enough quality. The midterm report will cover the chip results so far plus this system design.</p>
+  <p class="small muted">Done since the last update: one box run through five scenarios on the re-sized chip (see <a href="#scenarios-h">Where a box breaks first</a>). Still open, outside the numbered steps: spam with valid proofs, which the chip can't absorb and which needs a cost per identity; runs with many boxes and neighbors; live-first on the network link while catching up; the image encoder's precision (static INT8 is at 0.798 against FP32; mixed precision is the next thing to try); and whether an integer-only encoder keeps enough quality. The midterm report will cover the chip results so far plus this system design.</p>
 
   <h3>Good places to start (no hardware tools needed)</h3>
   <ul class="help">
     <li><b>The client web UI.</b> A browser client for the community: post text and images, read a feed, search, vote, delete, chat in a private room. It talks to the same client API that the simulated users use, so the same UI works against the simulation and against the demo boxes. No CAD tools or chip knowledge needed.</li>
     <li><b>The behavior parameters we had to estimate.</b> Most come from Reddit's public statistics now (table in <a href="#load-h">section 2</a>), but we found no source for the time-of-day curve, a direct measure of how popularity spreads across sub-communities, post body length, page views per daily user, or any non-Reddit community such as DCInside. Subscriptions per user and the share of boxes online are estimates too. A source for any of these would firm up the per-box load.</li>
     <li><b>Real photos for the image tests.</b> Our image tests use synthetic images, which look too alike to CLIP: the image-search check failed for that reason, and the embedding tolerance, the static-INT8 calibration (quality 0.798 against FP32) and the gap between runtimes may all differ on photos. Text-to-image search also needs photos with captions. Suggesting a small, openly licensed photo set (a few hundred images) would let us rerun all of these.</li>
+    <li><b>What should an identity cost?</b> Spam from real identities posting at their rate limit is the one attack the chip can't absorb: 310 identities (0.031% of a 1M-user community) keep honest posts from being searchable within 5 s on our box, and even a 32×32 encoder array (ours is 8×8) only reaches 2,682 <span class="k k-est">estimated</span>. Prior work on making anonymous identities expensive (money, hardware, time, or compute), or on filtering spam before it gets embedded, would go straight into the design. Protocol thinking, no hardware tools.</li>
     <li><b>Image posts on slow uplinks.</b> With envelope + fetch, an image post is searchable within 2.01 s at 20 Mbps but takes 5.86 s at 5 Mbps (P99), over the 5 s target <span class="k k-est">simulation model</span>. Prior art on moving large payloads through gossip networks, or a delivery trick for slow boxes, is welcome.</li>
   </ul>
 
   <h3>Open hardware questions you could take</h3>
   <ul class="help">
+    <li><b>An encoder controller that switches tasks between layers.</b> One encoder serves search queries, new posts and the backlog. Queries stay fast (22–42 ms instead of 130–390 ms) only if the encoder can stop after any layer, run the query, and resume <span class="k k-est">estimated</span>. The activations already sit in the 1 MB global SRAM; what's missing is the controller: what state it saves, how big the switch overhead is, and whether a query's activations fit alongside a paused 256-token post. A small, self-contained design question.</li>
     <li><b>An integer-only encoder with bit-identical output.</b> The fastest way to deliver image posts needs every box to compute bit-identical embeddings. Dynamic INT8 changes with the batch; static INT8 doesn't, but two runtimes running the same file still disagree (cosine 0.872) <span class="k k-meas">measured</span>. An encoder that defines every operation in integers, including GELU, softmax and LayerNorm, with a fixed order and rounding (as in I-BERT, arXiv 2101.01321), would be a spec a chip can guarantee. How much quality does it keep for CLIP's image tower (it has to reach 0.95 cosine against FP32; plain static INT8 gets 0.798), and what does it add in area? A good self-contained project.</li>
     <li><b>ARM measurements.</b> We have no verification costs on ARM, from measurement or from any source. A real box CPU is likely ARM. Running the Groth16 / Ed25519 / ChaCha20 benchmarks on a Raspberry Pi 5 would fill that gap.</li>
     <li><b>Pi 5 + Hailo measurements.</b> The Hailo numbers are vendor figures on an x86 host with PCIe Gen3 x4, and the Pi 5 has x1. MiniLM power isn't published (we borrowed a vision-model figure), and we don't know its idle power. The input is fixed at 128 tokens, while our median post is 128 tokens and 17% are cut even at 256. Measuring throughput, power, idle power, and the quality loss from truncation would firm up the comparison.</li>
@@ -1200,7 +1388,7 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>A better scheduler.</b> Our scheduler is a simple greedy one in program order, and our throughput assumes the microcode runs independent checks side by side in lock-step. Run one at a time, a lone check on the 6 + 6 unit takes 26,542 cycles, which is 11,303 proofs/s, short of the 12,207/s flood. The utilization we assume also comes from batches, which have fewer additions per multiplication than lone checks. A scheduler that keeps the unit busy on lone checks would confirm 6 + 6; if it can't, 7 multipliers + 6 adders is the fallback.</li>
     <li><b>Adapting the batch size against a changing attacker.</b> Our results pick the batch size knowing the invalid share, which is an upper bound. A real unit has to estimate it from recent failures, and an attacker who switches the share suddenly costs it a few batches. Queueing delay during the flood also isn't modeled.</li>
     <li><b>Is our quality bar right?</b> The strict Recall@10 bar mostly penalizes swaps between near-tied results: the median score gap between the 10th and 11th results is just 0.0033. Changing the bar needs human relevance judgments.</li>
-    <li><b>How big is a real flood?</b> The flood size is an assumption. Peer scoring in gossipsub and Waku penalizes and disconnects peers that send invalid messages, but we found no source that puts a number on how many invalid messages can still reach one node, and we couldn't find nim-libp2p's limit on new connections. A source for either would tell us how much of the worst case the network already absorbs.</li>
+    <li><b>How big is a real flood?</b> The flood size is an assumption. Peer scoring in gossipsub and Waku penalizes and disconnects peers that send invalid messages, but we found no source that puts a number on how many invalid messages can still reach one node, and we couldn't find nim-libp2p's limit on new connections. With go-libp2p's per-address limit and nwaku's penalties, our estimate is that 6,104 IPv4 addresses are enough to flood one box at 100 Mbps. A source for either would tell us how much of the worst case the network already absorbs.</li>
   </ul>
 </section>
 
