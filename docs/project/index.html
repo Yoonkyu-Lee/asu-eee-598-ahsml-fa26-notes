@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Node Box Status</title>
-<meta name="description" content="Status of our EEE 598 project: a low-power home node box that does an operator's job (search and spam-proof verification) for a server-blind, operator-free community.">
+<meta name="description" content="Status of our EEE 598 project: a server-blind, operator-free community built and simulated end to end, and the low-power home node box chip that does the operator's job (search and spam-proof verification).">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap">
@@ -123,7 +123,7 @@ footer { font-size: 13px; color: var(--muted); }
 
 <header>
   <div class="meta">EEE 598 · Hardware and Systems for ML · final project · <a href="../index.html">course notes</a></div>
-  <h1>A home node box that does the moderator's job</h1>
+  <h1>An operator-free community, and the home node box that does the moderator's job</h1>
   <p class="meta" style="margin-top:10px">Last updated: 2026-11-01</p>
   <p class="lede">Project status for the team: what we're building, why, the current design, what we've found, and where you could jump in. About a 5-minute read; the expandable sections hold the details.</p>
   <div class="legend">
@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
+    <li><b>The project now covers the whole community, not just the chip, and image posts are in scope.</b> We'll build everything except physical devices and silicon: the protocol, the node software, the client, the community algorithms, and a simulation of many boxes and users. Chips we can't fabricate plug into that software as cycle and energy models. This step was the design (see <a href="#system-h">The whole system</a>): the boxes' functions run for real (real encryption, signatures, embeddings and search), and time and energy come from the chip models on a virtual clock. It also exposed a hidden assumption: every chip number so far assumes each box receives <b>every</b> post (10<sup>6</sup>/day), 1 KB messages and a 100 Mbps flood <span class="k k-est">assumption</span>. How posts are replicated across boxes is now a knob on chip size, and the simulator will replace those assumptions with per-box load.</li>
     <li><b>Rejecting an invalid proof got 35% cheaper, so the verify unit shrank to 6 multipliers + 6 adders.</b> Throwing away one invalid proof used to cost 43,507 field multiplications; it now costs <b>28,418</b> (0.65×) <span class="k k-meas">counted</span>. Four changes, each checked to give the same results as the original math: cheaper (cyclotomic) squarings and a signed-digit exponent in the final exponentiation, a precomputed table for the verifying key's fixed points (3.1 MB in host DRAM), and running the subgroup check only on proofs that pass the pairing test. The unit now handles at least <b>13,429 proofs/s</b> at any share of invalid proofs (flood: 12,207/s), in <b>2.12 mm²</b>. The chip shrinks to <b>11.3 mm²</b>, and flood power is 0.48 W (all valid) to <b>1.05 W</b> (worst mix) <span class="k k-est">cycle model</span>.</li>
     <li><b>The worst attack is now a mix, not an all-invalid flood.</b> Since invalid proofs skip the subgroup check, sending only invalid proofs is no longer the attacker's best move. The worst case is about <b>15% invalid</b>: most proofs are valid and pay for the subgroup check, yet batches already keep failing. Before this change an all-invalid flood was the worst case, and it had pushed the unit from 5 + 4 to 8 + 8 <span class="k k-est">cycle model</span>.</li>
-    <li><b>First estimate of the whole chip.</b> We put the verify unit and the text encoder on one 45 nm die, both costed with the same tools (Timeloop + Accelergy). The chip is now <b>11.3 mm²</b>. It draws <b>0.092 W</b> on an ordinary day and 0.48–1.05 W during a 100 Mbps spam flood <span class="k k-est">estimated</span>. Our chip keeps up with the flood; a Pi 5 or Jetson CPU handles only 1/3–1/2 of it <span class="k k-est">estimated</span>.</li>
   </ul>
 </section>
 
@@ -161,11 +161,126 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>Crypto, to prove things without revealing them:</b> signature checks, decryption, and anonymous credentials and zero-knowledge proofs.</li>
   </ol>
   <p class="small muted">The target device is an <b>always-on home node box</b>, something you leave running like a router or a NAS. Both ML and crypto are in scope for the course project. The project is not a generic "edge vector-search accelerator"; those already exist. What sets us apart is the conditions that server-blindness creates.</p>
+  <p><b>Scope.</b> What the course grades is the hardware and systems work, but we don't limit what we implement. We build everything except physical devices and silicon: the protocol, the node software, the client, the community algorithms (spam, feeds, forgetting), and a simulation of many boxes and many users. A chip we can't fabricate is replaced by its cycle and energy model and attached to that software. Image posts are in scope too, so the box will also embed images.</p>
+</section>
+
+<section aria-labelledby="system-h">
+  <h2 id="system-h">2. The whole system: a community with everything but the hardware</h2>
+  <p>We're building the community itself, not only the chip: M users and N home node boxes, running on one laptop. The design is done; nothing in this section has results yet. One question decides the approach: <b>what runs for real, and what is a model?</b></p>
+  <ul>
+    <li><b>Functions run for real (emulation).</b> The box software is real code: real ciphertexts, real signatures, real embeddings, real search results. It runs on the laptop CPU instead of the box's hardware but computes the same thing.</li>
+    <li><b>Time and energy are simulated.</b> We can't run hundreds of boxes in real time, so the simulator runs on a virtual clock (discrete events). Each task's time and energy come from our chip models (the verify-unit cycle model, the encoder's Timeloop + Accelergy model) and, for host work, from laptop timings scaled to a Pi 5-class CPU.</li>
+    <li><b>Each message is computed once.</b> When many boxes receive the same post, the result (verification, embedding) is computed once and shared; each box is still charged the modeled time and energy.</li>
+    <li><b>Only the demo runs in real time:</b> a few boxes as real processes, with a web UI to write posts.</li>
+  </ul>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 528" role="img" aria-label="Whole-system design: scenarios of users and attackers drive N node boxes through a client API. Each box has a network layer, ingest and query functions, and a virtual accelerator whose results are computed for real while time and energy come from chip models. The run produces traces at three levels and per-box load that goes back into sizing the chip.">
+      <defs><marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <!-- scenarios -->
+      <rect class="box" x="10" y="10" width="960" height="84" rx="8"/>
+      <text x="24" y="34" font-weight="600">Scenarios: ordinary day · evening peak · backlog after being offline · spam flood</text>
+      <text x="24" y="56" class="mut" font-size="12">M users: log in, post text or images, read, search, vote, delete, chat in private rooms · attackers: invalid proofs, bots</text>
+      <text x="24" y="76" class="mut" font-size="12">Behavior parameters from sources (public Reddit / community statistics, papers); if none, estimated, with a sensitivity sweep</text>
+      <path class="wire" d="M490,94 L490,120" marker-end="url(#s1)"/>
+      <text x="500" y="112" class="mut" font-size="11">client API (the web UI uses the same API)</text>
+      <!-- boxes -->
+      <rect class="box-pick" x="10" y="124" width="960" height="236" rx="8"/>
+      <text x="24" y="148" font-weight="700">Node box × N · functions are real (emulation) · time and energy are modeled (simulation, virtual clock)</text>
+      <rect class="box" x="24" y="162" width="300" height="86" rx="6"/>
+      <text x="36" y="184" font-size="12" font-weight="600">Network</text>
+      <text x="36" y="204" class="mut" font-size="11">gossipsub v1.1 rules: mesh degree,</text>
+      <text x="36" y="222" class="mut" font-size="11">forward only after validation, penalties</text>
+      <text x="36" y="240" class="mut" font-size="11">subs · replication: all / subscribed / +k</text>
+      <rect class="box" x="338" y="162" width="300" height="86" rx="6"/>
+      <text x="350" y="184" font-size="12" font-weight="600">Ingest · query · forgetting · rooms</text>
+      <text x="350" y="204" class="mut" font-size="11">signature → proof → decrypt →</text>
+      <text x="350" y="222" class="mut" font-size="11">text / image encode → index → store</text>
+      <text x="350" y="240" class="mut" font-size="11">search · feed · read · delete · group keys</text>
+      <rect class="box-path" x="652" y="162" width="304" height="86" rx="6"/>
+      <text x="664" y="184" font-size="12" font-weight="600">Virtual accelerator</text>
+      <text x="664" y="204" class="mono mut" font-size="11">verify · encode_text · encode_image</text>
+      <text x="664" y="222" class="mut" font-size="11">results computed for real on the CPU,</text>
+      <text x="664" y="240" class="mut" font-size="11">once per message, shared by all boxes</text>
+      <text x="24" y="274" class="mut" font-size="12">Time and energy: verify unit from our cycle model · encoders from Timeloop + Accelergy (45 nm)</text>
+      <text x="24" y="294" class="mut" font-size="12">Host work (decrypt, index, search): laptop timings scaled to a Pi 5-class CPU</text>
+      <text x="24" y="314" class="mut" font-size="12">Run mode: discrete-event by default (~100–1,000 boxes) · if too slow, real functions on sample boxes only · demo in real time</text>
+      <text x="24" y="334" class="mut" font-size="12">ML: MiniLM for text + CLIP for images, or CLIP for both if it keeps text Recall@10 ≥ 0.95</text>
+      <path class="wire" d="M490,360 L490,386" marker-end="url(#s1)"/>
+      <!-- traces -->
+      <rect class="box" x="10" y="390" width="470" height="126" rx="8"/>
+      <text x="24" y="414" font-weight="600">Traces at three levels (zoom like a waveform)</text>
+      <text x="24" y="436" font-size="12">System: when each message reached which box, and what it became</text>
+      <text x="24" y="456" font-size="12">Box: busy timeline per unit (Perfetto format, opens in a browser)</text>
+      <text x="24" y="476" font-size="12">Unit: a few samples, cycle by cycle (operation issue log)</text>
+      <text x="24" y="498" class="mut" font-size="11">signal-level waveforms only for the multiplier, which has RTL</text>
+      <!-- back to the chip -->
+      <rect class="box-path" x="500" y="390" width="470" height="126" rx="8"/>
+      <text x="514" y="414" font-weight="600">Back to the chip design</text>
+      <text x="514" y="436" font-size="12">Per-box work per second (proofs, tokens, images, queries)</text>
+      <text x="514" y="456" font-size="12">→ take the worst box (P99) at the peak hour</text>
+      <text x="514" y="476" font-size="12">→ re-decide chip size and power with the same rules</text>
+      <text x="514" y="498" class="mut" font-size="11">replaces today's assumptions: every box gets all 10⁶ posts/day, 1 KB, 100 Mbps</text>
+    </svg>
+  </div>
+
+  <h3>The new knob on chip size: who stores what</h3>
+  <p>Until now every chip number assumed that each box receives every public post. That was never written down as a choice. How posts are replicated across boxes decides how much one box has to ingest, so it goes straight into chip size. We'll compare three policies:</p>
+  <ul class="small">
+    <li><b>All:</b> every box receives every public post (what the chip numbers assume today).</li>
+    <li><b>Subscribed:</b> a box receives only the sub-communities its owner subscribes to.</li>
+    <li><b>Subscribed + k:</b> subscriptions plus k random extra sub-communities, held so posts stay available.</li>
+  </ul>
+  <p>For each policy we'll measure per-box ingest, availability (the share of posts still readable while the author's box is off) and search coverage. We decided in advance to take the lightest policy that keeps availability at or above 99%, and to re-size the chip for that policy's 99th-percentile box at the peak hour.</p>
+
+  <details>
+    <summary>Other design choices, and what we decided in advance</summary>
+    <p class="small"><b>How to run it.</b> Three options:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Mode</th><th>Boxes</th><th>What it gives up</th></tr></thead>
+      <tbody>
+        <tr><td>All boxes as real-time processes</td><td class="num">~10</td><td>scale; time is tied to the laptop's speed (used for the demo)</td></tr>
+        <tr><td><b>Discrete events + real functions + results shared per message (default)</b></td><td class="num">~100–1,000</td><td>compute grows with the number of messages</td></tr>
+        <tr><td>Statistics only (no functions, sampled costs)</td><td class="num">~10<sup>5</sup></td><td>functional correctness, and no demo</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="small">
+      <li>If 100 boxes, 10,000 users and one simulated day don't finish within 2 hours on the laptop CPU, most boxes switch to statistics only and a sample of boxes keeps running real functions.</li>
+      <li>Check: the same 5-box scenario, run in real time and in the event simulator, must give the same work counts per box. If not, we fix the simulator.</li>
+    </ul>
+    <p class="small"><b>Network.</b> The simulation implements the gossipsub v1.1 rules itself (mesh degree, forward only after validation, the penalty for invalid messages, disconnecting peers), so every hop can be traced. Real libp2p is a candidate for the demo. Plain flooding is the baseline, to see how much gossip shrinks a flood. Parameters come from source defaults (the gossipsub spec, nwaku); any value without a source is marked as an estimate and swept.</p>
+    <p class="small"><b>Crypto.</b> Signatures and encryption are real (Ed25519, ChaCha20-Poly1305). In the simulation, an anonymous rate-limiting proof is a valid/invalid flag with a modeled verification cost: generating a real proof is the user device's job, not box load. Whether the demo uses real Groth16 proofs is still open. Private rooms use one shared group key for now; key rotation (MLS-style) comes later.</p>
+    <p class="small"><b>ML.</b> Two options for text and images:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Option</th><th>Text</th><th>Images</th><th>Search</th></tr></thead>
+      <tbody>
+        <tr><td>Separate models</td><td>MiniLM (today)</td><td>CLIP ViT-B/32 image tower</td><td>text-to-image search also needs CLIP's text tower: 3 models</td></tr>
+        <tr><td>CLIP for both</td><td>CLIP text tower</td><td>CLIP image tower</td><td>one shared space: 2 models, but text-search quality has to be checked</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">We use CLIP for both if it keeps our existing text-search quality bar (Recall@10 ≥ 0.95 against exact FP32 MiniLM search), since fewer models make a simpler chip. Otherwise, separate models. The image encoder's chip cost will be estimated the same way as the text encoder's (Timeloop + Accelergy).</p>
+    <p class="small"><b>User behavior.</b> Post rate distribution, time-of-day curve, share of image posts, read-to-write ratio, search rate, and how popularity is spread across sub-communities all come from sources (public Reddit and community statistics, papers). Where there is none, we estimate and sweep. The chip is sized at the worst end of that sweep (99th-percentile box, peak hour).</p>
+  </details>
+
+  <h3>What the final report will claim, and what's still missing</h3>
+  <p>Each claim, the evidence we have now, and the gap. The gaps set the order of the next steps (numbered as in <a href="#next-h">What's next</a>).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Claim</th><th>Evidence now</th><th>Gap</th><th>Filled in step</th></tr></thead>
+    <tbody>
+      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements, text only</td><td><b>How much one box actually receives</b> (subscriptions, replication, peak hours) is assumed; no images</td><td class="num">1–2</td></tr>
+      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">5</td></tr>
+      <tr><td>Our chip (11.3 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">4 (+ RTL)</td></tr>
+      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model</td><td>real per-box load (simulation); the image encoder's share</td><td class="num">3–4</td></tr>
+      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td><b>none yet</b></td><td>implementation and demo</td><td class="num">2, 6</td></tr>
+      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed)</td><td>network simulation with attackers in it</td><td class="num">4</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section aria-labelledby="box-h">
-  <h2 id="box-h">2. What the box must do, and why it needs hardware</h2>
-  <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries.</p>
+  <h2 id="box-h">3. What the box must do, and why it needs hardware</h2>
+  <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries. Image posts will add an image encoder to that path; we haven't costed it yet.</p>
+  <p class="small muted">The box and chip numbers in this section and the next two assume each box receives all 10<sup>6</sup> posts/day, messages are 1 KB, and a flood fills a 100 Mbps link <span class="k k-est">assumption</span>. The simulator in section 2 will replace them with the load real boxes see.</p>
   <div class="duo">
     <div class="card">
       <h3>An ordinary day: easy</h3>
@@ -184,7 +299,7 @@ footer { font-size: 13px; color: var(--muted); }
 </section>
 
 <section aria-labelledby="design-h">
-  <h2 id="design-h">3. Current design</h2>
+  <h2 id="design-h">4. Current chip design</h2>
   <h3 style="margin-top:6px">The box: the path of one message</h3>
   <p>The verify unit sits in front of everything else, so invalid messages are dropped before they reach the host or the encoder.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
@@ -366,11 +481,11 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>Idle</td><td class="num">28.7 mW before gating · 0 after</td><td>leakage: encoder 16.2 mW + verify unit 12.4 mW; within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area, and our next step. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. We'll size it together with the image encoder (step 3 in <a href="#next-h">What's next</a>), because images change what the SRAM has to hold. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
 </section>
 
 <section aria-labelledby="results-h">
-  <h2 id="results-h">4. Key results</h2>
+  <h2 id="results-h">5. Key results</h2>
   <h3 style="margin-top:6px">The whole box, compared with existing combinations</h3>
   <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped.</p>
   <div class="tbl"><table>
@@ -604,7 +719,7 @@ footer { font-size: 13px; color: var(--muted); }
 </section>
 
 <section aria-labelledby="dropped-h">
-  <h2 id="dropped-h">5. Paths we tried and dropped</h2>
+  <h2 id="dropped-h">6. Paths we tried and dropped</h2>
   <ul class="dropped">
     <li><b>Plain INT8 encoder.</b> No INT8 variant reached our quality bar (Recall@10 ≥ 0.95 against exact FP32 search); the best was 0.878. Mixed precision needed 83% of weight MACs left in FP32 and was only 1.1× faster. <i>Instead:</i> ingest in INT8 and re-rank the top 20 in FP32 at query time. That gives Recall@10 0.993 and ingest 1.9× faster with 2.2× less energy than FP32 (3.70 ms, 0.25 J/post) <span class="k k-meas">measured</span>, at about 252 ms and 18.7 J per query <span class="k k-est">estimated</span>.</li>
     <li><b>"The laptop NPU is too slow, so we need hardware."</b> Out of the box it was about 3× over the backlog target. But 89% of its time (at 256 tokens) went to a softmax plus broadcast mask that the compiler sent down a slow path. Expanding the mask fixed it: 45 min, Recall@10 0.997 <span class="k k-meas">measured</span>. It was a software problem, so we moved the target to the always-on box and argued from power instead of time.</li>
@@ -624,9 +739,28 @@ footer { font-size: 13px; color: var(--muted); }
 </section>
 
 <section aria-labelledby="next-h">
-  <h2 id="next-h">6. What's next, and where you could help</h2>
-  <p><b>Next: shrink the encoder's SRAM.</b> Of the 11.3 mm² chip, 6.80 mm² is the encoder's 2 MB global SRAM <span class="k k-est">estimated</span>. The weights are streamed from DRAM for every matrix multiply anyway, so the encoder may need only a double buffer plus activations. We'll rerun Timeloop + Accelergy across SRAM sizes for backlog time (≤ 60 min), energy and area, and pick the smallest SRAM that still clears the backlog in time.</p>
-  <h3>Open questions you could take</h3>
+  <h2 id="next-h">7. What's next, and where you could help</h2>
+  <p>The plan is ordered so that each step leaves something usable even if we stop there:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Step</th><th>What</th><th>What it leaves behind</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>1 (next)</b></td><td><b>User behavior parameters + simulator core:</b> event engine, gossip with the gossipsub rules, users, text posts, traces</td><td>how much text each box ingests, for each replication policy</td></tr>
+      <tr><td class="num">2</td><td>Box functions (ingest, query, feed, forgetting, private rooms) + virtual accelerator + image posts</td><td>a working community, and a full work log for every box</td></tr>
+      <tr><td class="num">3</td><td>Image encoder chip cost + encoder SRAM size (Timeloop + Accelergy)</td><td>a chip estimate that includes images</td></tr>
+      <tr><td class="num">4</td><td>Scenarios: ordinary day, peak, backlog, flood (with attackers and a real neighbor structure)</td><td>chip size and power re-decided from simulated load</td></tr>
+      <tr><td class="num">5</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
+      <tr><td class="num">6</td><td>Demo: web UI, a few boxes running in real time</td><td>for the presentation</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Shrinking the encoder's 2 MB SRAM (6.80 mm² of the 11.3 mm² chip <span class="k k-est">estimated</span>), announced earlier as the next step, moved to step 3: image posts change what the SRAM has to hold. The midterm report will cover the chip results so far plus this system design.</p>
+
+  <h3>Good places to start (no hardware tools needed)</h3>
+  <ul class="help">
+    <li><b>The client web UI.</b> A browser client for the community: post text and images, read a feed, search, vote, delete, chat in a private room. It talks to the same client API that the simulated users use, so the same UI works against the simulation and against the demo boxes. No CAD tools or chip knowledge needed.</li>
+    <li><b>The user behavior model.</b> How often people post, when during the day, what share of posts are images, how much they read versus write, how often they search, and how popularity spreads across sub-communities. Each parameter needs a source (public Reddit or community statistics, papers); where there is none, a reasonable range we can sweep. These numbers decide how much load each box sees, and so the chip size.</li>
+  </ul>
+
+  <h3>Open hardware questions you could take</h3>
   <ul class="help">
     <li><b>ARM measurements.</b> We have no verification costs on ARM, from measurement or from any source. A real box CPU is likely ARM. Running the Groth16 / Ed25519 / ChaCha20 benchmarks on a Raspberry Pi 5 would fill that gap.</li>
     <li><b>Pi 5 + Hailo measurements.</b> The Hailo numbers are vendor figures on an x86 host with PCIe Gen3 x4, and the Pi 5 has x1. MiniLM power isn't published (we borrowed a vision-model figure), and we don't know its idle power. The input is fixed at 128 tokens, while our median post is 128 tokens and 17% are cut even at 256. Measuring throughput, power, idle power, and the quality loss from truncation would firm up the comparison.</li>
