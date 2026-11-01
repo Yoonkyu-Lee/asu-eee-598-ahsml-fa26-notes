@@ -40,6 +40,7 @@ project/models/
 project/data/
 project/refs/
 project/*.log
+project/logs/
 # 주제 선정 기록: 교수님 이메일, 팀 토론 원문이 들어 있어 공개하지 않는다.
 project/archive/
 __pycache__/

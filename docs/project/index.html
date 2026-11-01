@@ -138,9 +138,9 @@ footer { font-size: 13px; color: var(--muted); }
 <section class="recent" aria-labelledby="recent-h">
   <h2 id="recent-h">What changed recently</h2>
   <ul>
-    <li><b>The box software now runs for real in a simulated day, and the chip sits almost idle.</b> Each box verifies, decrypts, embeds, indexes, searches, ranks a feed, counts votes, forgets deleted posts and keeps private rooms, all in real code, with time taken from the chip models (see <a href="#stack-h">What the box software does in a day</a>). A full day of a 10,000-box community took 586 s on the laptop: forgetting, private rooms, one vote per person per post, penalties for exceeding the rate limit, stopping invalid proofs at the first hop and vote tallies all passed; the image-search check failed on our synthetic test images. Even on the busiest boxes the encoders are busy <b>0.003%</b> of the peak hour, and the chip does 0.86 J of work a day against 2,480 J of idle leakage <span class="k k-est">simulation model</span>. Two design calls: images spread as a small envelope and the body is fetched (<b>0.21×</b> the uplink of pushing whole images), and each vote's proof adds a per-post tag so nobody votes twice on one post (+1.3% verification cost, <span class="k k-est">estimated</span>). The faster option, shipping the author's image embedding, failed because boxes don't compute the same embedding for the same image.</li>
+    <li><b>The encoder is re-sized: the chip is half the area.</b> Sized for the load the simulator measured instead of "every box gets every post", an 8×8 INT8 array with 1 MB of SRAM is enough: it clears an 8-hour backlog in 11.3 min, embeds a new post in 125 ms (P99), a search query in 10.9 ms and an image in 143 ms, and holds up for communities of up to 5.3 million users. The encoder goes from 9.22 to <b>3.53 mm²</b> and the chip from 11.3 to <b>5.61 mm²</b> <span class="k k-est">estimated</span>. Text search stays on MiniLM: CLIP's text tower finds a post by its title in the top 10 only 0.776 of the time, against 0.943 for MiniLM <span class="k k-meas">measured</span>. And software can't make every box compute the same image embedding: static INT8 is bit-identical across batch sizes and thread counts, but two runtimes running the same model file disagree (cosine 0.872) <span class="k k-meas">measured</span>. An integer-only encoder with a fixed operation order and rounding is now a candidate requirement for our chip (see <a href="#encoder-h">The encoder</a>).</li>
+    <li><b>The box software now runs for real in a simulated day, and the chip sits almost idle.</b> Each box verifies, decrypts, embeds, indexes, searches, ranks a feed, counts votes, forgets deleted posts and keeps private rooms, all in real code, with time taken from the chip models (see <a href="#stack-h">What the box software does in a day</a>). A full day of a 10,000-box community took 586 s on the laptop: forgetting, private rooms, one vote per person per post, penalties for exceeding the rate limit, stopping invalid proofs at the first hop and vote tallies all passed; the image-search check failed on our synthetic test images. Even on the busiest boxes the encoders are busy <b>0.003%</b> of the peak hour, and the chip does 0.86 J of work a day against 2,480 J of idle leakage (about 1,195 J with the encoder re-sized since) <span class="k k-est">simulation model</span>. Two design calls: images spread as a small envelope and the body is fetched (<b>0.21×</b> the uplink of pushing whole images), and each vote's proof adds a per-post tag so nobody votes twice on one post (+1.3% verification cost, <span class="k k-est">estimated</span>). The faster option, shipping the author's image embedding, failed because boxes don't compute the same embedding for the same image.</li>
     <li><b>First simulator results: a box receives far less than the chip was sized for.</b> The simulator core now generates a community from Reddit-based behavior parameters and spreads its messages over a gossip network (see <a href="#load-h">What one box actually receives</a>). In a community of 1M users (one box each), the busiest 1% of boxes at the peak hour verify <b>4.2 proofs/s</b> and embed <b>0.45 text posts/s</b> and 0.02 images/s <span class="k k-est">simulation model</span>. The old "every box ingests all 10<sup>6</sup> posts a day" assumption (11.6 posts/s) is <b>26×</b> that. Ordinary verification uses <b>0.03%</b> of the verify unit's capacity, so the unit is there for floods; <b>votes are about 90%</b> of the messages that carry a proof. Text posts reach every subscribed box in 0.36 s (P99), but a 177 KB image takes <b>2.1 s</b> over 20 Mbps home uplinks, over our 1 s network budget.</li>
-    <li><b>The project now covers the whole community, not just the chip, and image posts are in scope.</b> We'll build everything except physical devices and silicon: the protocol, the node software, the client, the community algorithms, and a simulation of many boxes and users. Chips we can't fabricate plug into that software as cycle and energy models. This step was the design (see <a href="#system-h">The whole system</a>): the boxes' functions run for real (real encryption, signatures, embeddings and search), and time and energy come from the chip models on a virtual clock. It also exposed a hidden assumption: every chip number so far assumes each box receives <b>every</b> post (10<sup>6</sup>/day), 1 KB messages and a 100 Mbps flood <span class="k k-est">assumption</span>. The simulator replaces those assumptions with per-box load (first results in the item above).</li>
   </ul>
 </section>
 
@@ -205,7 +205,7 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="24" y="274" class="mut" font-size="12">Time and energy: verify unit from our cycle model · encoders from Timeloop + Accelergy (45 nm)</text>
       <text x="24" y="294" class="mut" font-size="12">Host work (decrypt, index, search): laptop timings scaled to a Pi 5-class CPU</text>
       <text x="24" y="314" class="mut" font-size="12">Run mode: discrete events · full state on 20 sample boxes, the rest share their results (10⁴ boxes × 1 day in 586 s) · demo in real time</text>
-      <text x="24" y="334" class="mut" font-size="12">ML: MiniLM for text + CLIP for images, or CLIP for both if it keeps text Recall@10 ≥ 0.95</text>
+      <text x="24" y="334" class="mut" font-size="12">ML: MiniLM for text posts and queries · CLIP image tower for images · CLIP text tower only to find images by words</text>
       <path class="wire" d="M490,360 L490,386" marker-end="url(#s1)"/>
       <!-- traces -->
       <rect class="box" x="10" y="390" width="470" height="126" rx="8"/>
@@ -420,7 +420,7 @@ footer { font-size: 13px; color: var(--muted); }
       <!-- records -->
       <rect class="box" x="10" y="434" width="960" height="62" rx="8"/>
       <text x="24" y="458" font-size="12">Records: every message (system) · per-unit busy timeline of the busiest and a median sample box, peak hour (Perfetto)</text>
-      <text x="24" y="480" class="mut" font-size="12">hourly busy time per unit on all 10⁴ boxes → the next step re-sizes the encoder from it</text>
+      <text x="24" y="480" class="mut" font-size="12">hourly busy time per unit on all 10⁴ boxes → used to re-size the encoder</text>
     </svg>
   </div>
 
@@ -431,12 +431,12 @@ footer { font-size: 13px; color: var(--muted); }
       <tbody>
         <tr><td>Proof verification (vote proof format, 6 public inputs)</td><td class="num">89.6 µs (11,156/s)</td><td><span class="k k-est">estimated</span> verify-unit cycle model, one proof at a time, + 1.3% for the extra input</td></tr>
         <tr><td>Text embedding: 164-token post / 12-token query</td><td class="num">8.05 ms / 0.55 ms</td><td><span class="k k-est">estimated</span> Timeloop model, scaled by MAC count</td></tr>
-        <tr><td>Image embedding (CLIP ViT-B/32 image tower, 4.41 GMAC = 2.36× a text post)</td><td class="num">19.0 ms · 18.7 mJ</td><td><span class="k k-est">estimated</span> text-encoder cost × MAC ratio; a proper Timeloop model is next</td></tr>
+        <tr><td>Image embedding (CLIP ViT-B/32 image tower, 4.41 GMAC = 2.36× a text post)</td><td class="num">19.0 ms · 18.7 mJ</td><td><span class="k k-est">estimated</span> text-encoder cost × MAC ratio. The Timeloop model done since gives 22 ms, 19.8 mJ on the same 32×32 encoder (<a href="#encoder-h">The encoder</a>)</td></tr>
         <tr><td>Ed25519 check / rate-limit and tag check / decrypt 650 B</td><td class="num">319 µs / 13 µs / 14 µs</td><td><span class="k k-est">estimated</span> preliminary laptop timing × 2.93 (Pi 5 scale)</td></tr>
         <tr><td>Search (per indexed vector) / feed (per item)</td><td class="num">0.097 µs / 0.69 µs</td><td><span class="k k-est">estimated</span> same</td></tr>
       </tbody>
     </table></div>
-    <p class="small muted">The laptop timings are preliminary: we didn't run our usual power-setup checklist first. The conclusion (no unit gets anywhere near 1% busy) holds even if they are 10× off.</p>
+    <p class="small muted">The simulated day used the earlier 32×32 encoder; the smaller encoder chosen since is slower per task, but even at the heaviest per-box load of a 1M-user community it is busy only 2,041 s a day (<a href="#encoder-h">The encoder</a>) <span class="k k-est">estimated</span>. The laptop timings are preliminary: we didn't run our usual power-setup checklist first. The conclusion (no unit gets anywhere near 1% busy) holds even if they are 10× off.</p>
   </details>
 
   <h3 id="images-h">How images travel</h3>
@@ -470,7 +470,7 @@ footer { font-size: 13px; color: var(--muted); }
   </table></div>
   <ul class="small">
     <li><b>Dynamic INT8 isn't even consistent with itself.</b> The same image gets a different embedding depending on which images share its batch (batch 1 vs 16: cosine as low as 0.977, not bit-identical), because the activation scales are taken over the whole batch. Rerunning the same batch gives identical bits, and FP32 gives identical bits regardless of thread count or batch <span class="k k-meas">measured</span>.</li>
-    <li><b>This points at hardware.</b> If the protocol fixed a standard encoder (fixed integer arithmetic, static quantization that doesn't depend on the batch) and every box produced bit-identical embeddings, the check could demand an exact match, and the fast option would be back: 0.40 s, and 0.01× the image encodings. <b>A deterministic INT8 datapath could become a requirement for our chip</b>; the next step looks at it.</li>
+    <li><b>This points at hardware.</b> If every box produced bit-identical embeddings, the check could demand an exact match, and the fast option would be back: 0.40 s, and 0.01× the image encodings. Static INT8 quantization (fixed activation scales, independent of the batch) isn't enough: two runtimes running the same model file still disagree. So it takes <b>an integer-only encoder whose operation order and rounding are fixed by a spec</b>, which is now a candidate requirement for our chip (<a href="#encoder-h">The encoder</a>).</li>
     <li>Synthetic images look alike to CLIP (median 0.883 between different images). Photos are probably farther apart, which we haven't checked.</li>
   </ul>
 
@@ -527,7 +527,7 @@ footer { font-size: 13px; color: var(--muted); }
     <div class="card">
       <h3>Chip energy per day, P99 box</h3>
       <div class="big">0.86 J</div>
-      <p>of work (encoders 0.70 J, verify 0.16 J), a 0.01 mW average, against 2,480 J of leakage (28.7 mW before gating). Over 99.9% of ordinary-day chip energy is idle, so <b>power gating is the only ordinary-day lever</b> <span class="k k-est">estimated</span>.</p>
+      <p>of work (encoders 0.70 J, verify 0.16 J), a 0.01 mW average, against 2,480 J of leakage (28.7 mW before gating) with the earlier encoder; the re-sized encoder brings that to about 1,195 J. Over 99.9% of ordinary-day chip energy is idle, so <b>power gating is the only ordinary-day lever</b> <span class="k k-est">estimated</span>.</p>
     </div>
   </div>
 
@@ -535,7 +535,7 @@ footer { font-size: 13px; color: var(--muted); }
     <summary>Limits of the simulated day, and the trace</summary>
     <ul class="small">
       <li>Images are synthetic (no dataset downloaded yet). The embedding tolerance and image-search results may differ on photos.</li>
-      <li>Searching images with text works only through post titles and bodies: we don't have CLIP's text tower yet, so "one CLIP model for both text and images" is still undecided.</li>
+      <li>Searching images with text works only through post titles and bodies: CLIP's text tower wasn't in the simulated day. We have since decided to keep MiniLM for text and use CLIP's text tower only to find images by words (<a href="#encoder-h">The encoder</a>); its quality on that job isn't measured yet.</li>
       <li>Proof pairings aren't executed (valid/invalid flag + modeled cost). Tags and RLN secret sharing are real.</li>
       <li>Only 20 sample boxes keep full state; the others share results per message. A relaying box decides "which of two conflicting messages came first" from a reference order; a real box uses the order it saw.</li>
       <li>Boxes are either on or off all day; no backlog after being offline yet (scenarios step).</li>
@@ -567,11 +567,11 @@ footer { font-size: 13px; color: var(--muted); }
     <div class="tbl"><table>
       <thead><tr><th>Option</th><th>Text</th><th>Images</th><th>Search</th></tr></thead>
       <tbody>
-        <tr><td>Separate models</td><td>MiniLM (today)</td><td>CLIP ViT-B/32 image tower</td><td>text-to-image search also needs CLIP's text tower: 3 models</td></tr>
-        <tr><td>CLIP for both</td><td>CLIP text tower</td><td>CLIP image tower</td><td>one shared space: 2 models, but text-search quality has to be checked</td></tr>
+        <tr><td><b>Separate models (chosen)</b></td><td>MiniLM</td><td>CLIP ViT-B/32 image tower</td><td>text-to-image search also needs CLIP's text tower: 3 models</td></tr>
+        <tr><td>CLIP for both</td><td>CLIP text tower</td><td>CLIP image tower</td><td>one shared space: 2 models, but text search came out much worse</td></tr>
       </tbody>
     </table></div>
-    <p class="small">We use CLIP for both if it keeps our existing text-search quality bar (Recall@10 ≥ 0.95 against exact FP32 MiniLM search), since fewer models make a simpler chip. Otherwise, separate models. The image encoder's chip cost will be estimated the same way as the text encoder's (Timeloop + Accelergy).</p>
+    <p class="small">Fewer models would make a simpler chip, so we would have taken CLIP for both if it kept text-search quality. It didn't (<a href="#encoder-h">The encoder</a>).</p>
     <p class="small"><b>User behavior.</b> Post, comment and vote rates, the share of read-only users, how popularity is spread across sub-communities, the share and size of image posts, and the search rate come from sources (mostly Reddit's public statistics, plus papers). Where there is none, we estimate and sweep. The chip is sized at the worst end of that sweep (busiest 1% of boxes, peak hour). The table with every value and its source is under <a href="#load-h">What one box actually receives</a>.</p>
   </details>
 
@@ -580,20 +580,21 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Claim</th><th>Evidence now</th><th>Gap</th><th>Filled in step</th></tr></thead>
     <tbody>
-      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements; simulated message load per box; a simulated 10,000-box day running the real box software, with each box's work per unit</td><td>backlog after being offline; boxes on slow (5 Mbps) uplinks miss 5 s for image posts</td><td class="num">2</td></tr>
-      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">3</td></tr>
-      <tr><td>Our chip (11.3 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">2 (+ RTL)</td></tr>
-      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model; in the simulated day the chip's work is 0.86 J against 2,480 J of idle leakage</td><td>encoder re-sized for search latency and the backlog; the image encoder's chip cost</td><td class="num">1–2</td></tr>
-      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes</td><td>image search failed on synthetic images (needs photos); text-to-image search; demo</td><td class="num">1, 4</td></tr>
-      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed); invalid proofs stop at the first hop in the simulated day</td><td>network simulation with flooding attackers (votes may be the cheapest message to imitate)</td><td class="num">2</td></tr>
+      <tr><td>In a server-blind community, the operator's work moves to each box's ingest (verify, decrypt, encode, index) and queries</td><td>laptop measurements; simulated message load per box; a simulated 10,000-box day running the real box software, with each box's work per unit</td><td>backlog after being offline, run through the network; boxes on slow (5 Mbps) uplinks miss 5 s for image posts</td><td class="num">1</td></tr>
+      <tr><td>Existing box-class hardware handles the ML but can't stop a proof flood</td><td>laptop measurements, sources, chip model</td><td>no fair comparison at equal resources (area, process)</td><td class="num">2</td></tr>
+      <tr><td>Our chip (5.61 mm², 45 nm) stops a 100 Mbps flood at ≤ 1.05 W</td><td>multiplier synthesized; the rest is a cycle model; flood power computed with the earlier, larger encoder</td><td>no RTL for the adders or sequencer; utilization assumed; how a flood reaches one box (number of neighbors) assumed</td><td class="num">1 (+ RTL)</td></tr>
+      <tr><td>On an ordinary day, box power is set by the host's idle power</td><td>chip model; in the simulated day the chip's work is 0.86 J against 2,480 J of idle leakage, about 1,195 J with the re-sized encoder <span class="k k-est">estimated</span></td><td>chip power not yet recomputed for the re-sized encoder across scenarios</td><td class="num">1</td></tr>
+      <tr><td>We give up no usability: search, feeds, images, private rooms, forgetting</td><td>simulated 10,000-box day: forgetting, private rooms, one vote per post, rate-limit penalties, stopping invalid proofs, tallies all pass in real code; text search passes</td><td>image search failed on synthetic images (needs photos); text-to-image search quality; demo</td><td class="num">3</td></tr>
+      <tr><td>Spam can't exhaust a box's ingest</td><td>flood model (flood shape assumed); invalid proofs stop at the first hop in the simulated day</td><td>network simulation with flooding attackers (votes may be the cheapest message to imitate)</td><td class="num">1</td></tr>
+      <tr><td>Boxes could share identical embeddings only with a fixed integer-only encoder</td><td>static INT8 is bit-identical within one runtime but not across two runtimes (measured)</td><td>an integer-only encoder's quality; other hardware (ARM, NPU) not tested</td><td class="num">open</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section aria-labelledby="box-h">
   <h2 id="box-h">3. What the box must do, and why it needs hardware</h2>
-  <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries. Image posts add an image encoder (CLIP ViT-B/32 image tower) to that path. A first estimate scales the text encoder by MAC count: 4.41 GMAC (2.36× a text post), 19.0 ms and 18.7 mJ per image <span class="k k-est">estimated</span>; the next step models it properly.</p>
-  <p class="small muted">The box and chip numbers in this section and the next two assume each box receives all 10<sup>6</sup> posts/day, messages are 1 KB, and a flood fills a 100 Mbps link <span class="k k-est">assumption</span>. The first simulator results (<a href="#load-h">section 2</a>) put the ordinary-day assumption at 26× what the busiest 1% of boxes ingest at the peak hour in a 1M-user community, so the ordinary-day numbers below are pessimistic. The simulated day (<a href="#day-h">section 2</a>) agrees: even the busiest boxes keep their encoders busy only 0.003% of the peak hour. The flood numbers don't depend on it.</p>
+  <p>Each box ingests encrypted posts. For every post it verifies the signature and the anonymous-credential proof, decrypts, runs a small text encoder (MiniLM) to embed the post, and inserts the vector into a local search index. It also answers search queries. Image posts add an image encoder (CLIP ViT-B/32 image tower, 4.41 GMAC, 2.36× a text post) to that path; on our chosen encoder one image takes 143 ms and 27.3 mJ <span class="k k-est">estimated</span>.</p>
+  <p class="small muted">The ordinary-day and flood numbers in this section and in the box comparison (section 5) assume each box receives all 10<sup>6</sup> posts/day, messages are 1 KB, and a flood fills a 100 Mbps link <span class="k k-est">assumption</span>. The first simulator results (<a href="#load-h">section 2</a>) put the ordinary-day assumption at 26× what the busiest 1% of boxes ingest at the peak hour in a 1M-user community, so the ordinary-day numbers below are pessimistic. The simulated day (<a href="#day-h">section 2</a>) agrees: even the busiest boxes keep their encoders busy only 0.003% of the peak hour. The encoder is now sized from the simulated load (<a href="#encoder-h">The encoder</a>). The flood numbers don't depend on it.</p>
   <div class="duo">
     <div class="card">
       <h3>An ordinary day: easy</h3>
@@ -608,7 +609,7 @@ footer { font-size: 13px; color: var(--muted); }
   </div>
   <p><b>Why the flood sets the size of the box:</b> in an anonymous community you can't filter messages by sender. The only way to throw a message away is to verify its anonymous-credential proof first (Groth16 on the BN254 curve, the kind Semaphore/RLN use). If you can't verify fast enough, spam uses up all of the box's ingest capacity. Valid messages are capped by rate-limiting proofs, so the encoder's load stays modest. The simulator confirms this from the other side: on an ordinary day even the busiest boxes of a 1M-user community verify at most 4.2 proofs/s, 0.03% of the unit's capacity <span class="k k-est">simulation model</span>. Invalid proofs, on the other hand, cost an attacker nothing to make, so the hardest floods mix invalid proofs in to break batch verification (see <a href="#invalid-h">Floods of invalid proofs</a>).</p>
   <p><b>The hardware gap:</b> with a 2 W power budget <span class="k k-est">assumption</span>, the box must spend <b>≤ 0.16 mJ per verification</b>. That is about 12× more efficient than batched verification on a CPU and about 90× more efficient than one-at-a-time verification on a P-core <span class="k k-est">estimated</span>. Our unit stays under that even in the worst case: 0.077 mJ per proof at the worst mix of invalid proofs <span class="k k-est">estimated</span>. Existing edge NPUs (Hailo, Coral, RK3588) are 8/16-bit MAC arrays and <b>have no way to do pairings or MSMs</b> <span class="k k-src">source</span>. A Jetson GPU could in principle, but nobody has published ZK numbers for it. The encoder, by contrast, is already handled: a Hailo-8L runs MiniLM at 121 posts/s in a 1.4–1.9 W-class module <span class="k k-src">vendor</span>.</p>
-  <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>.</p>
+  <p class="small muted">So our hardware contribution is <b>proof verifications per watt, on the same chip as the encoder</b>. With a Hailo-8L as the encoder and verification left on a CPU core, verification would be 33% of the box's active energy on an ordinary day <span class="k k-est">estimated</span>. A second candidate: <b>an encoder whose output is bit-identical on every box</b>, which software runtimes don't give (<a href="#encoder-h">The encoder</a>) and which would make image posts searchable faster.</p>
 </section>
 
 <section aria-labelledby="design-h">
@@ -617,16 +618,16 @@ footer { font-size: 13px; color: var(--muted); }
   <p>The verify unit sits in front of everything else, so invalid messages are dropped before they reach the host or the encoder.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the encoder; host, encoder and verify unit use DRAM.">
+    <svg viewBox="0 0 980 380" role="img" aria-label="Node box block diagram: network feeds the proof verify unit; invalid messages are dropped; valid ones go to the host CPU and then the text and image encoder; host, encoder and verify unit use DRAM.">
       <defs>
         <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
         <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-attack" d="M0,0 L10,5 L0,10 z"/></marker>
         <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker>
       </defs>
       <!-- budget header -->
-      <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 11.3 mm² at 45 nm · V and E power-gated when idle (est.)</text>
-      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day, 10⁶ posts: chip 0.092 W (est.) · host idle 2.4–3.3 W (source) sets the box total · chip idle 28.7 mW before gating</text>
-      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W (all valid) – 1.05 W (worst mix), keeps up (est.) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
+      <text x="14" y="32" font-weight="600">Our chip = verify unit (V) + encoder (E) · 5.61 mm² at 45 nm · V and E power-gated when idle (est.)</text>
+      <text x="14" y="52" class="mut" font-size="12.5">Ordinary day: host idle 2.4–3.3 W (source) sets the box total · chip leakage before gating: E 1.36 mW + V 12.4 mW (est.)</text>
+      <text x="14" y="70" class="mut" font-size="12.5">100 Mbps flood: chip 0.48 W (all valid) – 1.05 W (worst mix), keeps up (est., earlier encoder) · Pi 5 / Jetson CPUs reach 1/3–1/2 (est.)</text>
       <!-- network -->
       <rect class="box" x="14" y="130" width="126" height="84" rx="8"/>
       <text x="77" y="160" text-anchor="middle" font-weight="600">Network</text>
@@ -650,8 +651,9 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="326" y="335" text-anchor="middle" font-size="13">invalid → drop</text>
       <!-- valid wire -->
       <path class="wire" d="M434,175 L491,175" marker-end="url(#a1)"/>
-      <text x="462" y="163" text-anchor="middle" class="mono t-path" font-size="11">valid 11.6/s</text>
+      <text x="462" y="163" text-anchor="middle" class="mono t-path" font-size="11">valid 4.2/s</text>
       <text x="462" y="194" text-anchor="middle" class="mut" font-size="10.5">rate-limited</text>
+      <text x="462" y="208" text-anchor="middle" class="mut" font-size="10.5">busiest 1%</text>
       <!-- host -->
       <rect class="box" x="496" y="100" width="210" height="150" rx="8"/>
       <text x="601" y="126" text-anchor="middle" font-weight="600">Host CPU (small cores)</text>
@@ -663,17 +665,17 @@ footer { font-size: 13px; color: var(--muted); }
       <!-- encoder -->
       <path class="wire" d="M706,175 L759,175" marker-end="url(#a1)"/>
       <rect class="box-path" x="764" y="88" width="204" height="174" rx="8"/>
-      <text x="866" y="114" text-anchor="middle" font-weight="700">Text encoder (E)</text>
-      <text x="866" y="136" text-anchor="middle" font-size="12">INT8 32×32 array · 500 MHz</text>
+      <text x="866" y="114" text-anchor="middle" font-weight="700">Encoder (E): text + image</text>
+      <text x="866" y="136" text-anchor="middle" font-size="12">INT8 8×8 array · 500 MHz</text>
       <text x="866" y="154" text-anchor="middle" font-size="12">FP16 attention · vector unit</text>
-      <text x="866" y="172" text-anchor="middle" font-size="12">2 MB SRAM + 32 KB local</text>
-      <text x="866" y="198" text-anchor="middle" class="mono" font-size="12">8.05 ms · 7.90 mJ / post</text>
-      <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">backlog 45 min · 9.22 mm²</text>
+      <text x="866" y="172" text-anchor="middle" font-size="12">1 MB SRAM + 32 KB local</text>
+      <text x="866" y="198" text-anchor="middle" class="mono" font-size="12">post 125 ms · image 143 ms</text>
+      <text x="866" y="216" text-anchor="middle" class="mono" font-size="12">backlog 11.3 min · 3.53 mm²</text>
       <text x="866" y="244" text-anchor="middle" class="mut" font-size="11">(est., Timeloop + Accelergy)</text>
       <!-- dram -->
       <rect class="box" x="496" y="308" width="472" height="62" rx="8"/>
       <text x="732" y="327" text-anchor="middle" font-weight="600">DRAM</text>
-      <text x="732" y="344" text-anchor="middle" class="mut" font-size="12">encoder weights (10.6 MB INT8) streamed per post · search index</text>
+      <text x="732" y="344" text-anchor="middle" class="mut" font-size="12">weights streamed per task: MiniLM 10.6 MB, CLIP image 87 MB · index</text>
       <text x="732" y="361" text-anchor="middle" class="mut" font-size="12">verifying-key table for V (3.1 MB, ≤ 0.125 GB/s in a flood)</text>
       <path class="wire-mem" d="M412,250 L412,339 L492,339" marker-end="url(#a3)"/>
       <path class="wire-mem" d="M601,250 L601,304" marker-end="url(#a3)"/>
@@ -737,7 +739,7 @@ footer { font-size: 13px; color: var(--muted); }
   <p>The box is a Pi 5-class host SoC (network, storage, queries, Ed25519, ChaCha20) with LPDDR4, plus our accelerator chip on PCIe. The chip has two power domains that are switched off whenever they have no work, and a small always-on part.</p>
   <p class="scrollhint">Scroll the diagram sideways →</p>
   <div class="diagram">
-    <svg viewBox="0 0 980 300" role="img" aria-label="Accelerator chip: host SoC with DRAM connects over PCIe to the chip. Inside, an always-on control domain, a verify-unit domain V of 2.12 mm², and an encoder domain E of 9.22 mm² dominated by a 2 MB SRAM.">
+    <svg viewBox="0 0 980 300" role="img" aria-label="Accelerator chip: host SoC with DRAM connects over PCIe to the chip. Inside, an always-on control domain, a verify-unit domain V of 2.12 mm², and an encoder domain E of 3.53 mm² dominated by a 1 MB SRAM.">
       <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head-mem" d="M0,0 L10,5 L0,10 z"/></marker></defs>
       <!-- host -->
       <rect class="box" x="10" y="70" width="170" height="150" rx="8"/>
@@ -751,7 +753,7 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="202" y="135" text-anchor="middle" class="mono mut" font-size="11">PCIe</text>
       <!-- chip outline -->
       <rect x="228" y="14" width="742" height="272" rx="10" style="fill:none;stroke:var(--ink);stroke-width:1.4"/>
-      <text x="244" y="36" font-weight="700">Our chip · 11.3 mm² · 45 nm (est.)</text>
+      <text x="244" y="36" font-weight="700">Our chip · 5.61 mm² · 45 nm (est.)</text>
       <!-- always-on -->
       <rect class="box-plan" x="244" y="56" width="150" height="214" rx="8"/>
       <text x="319" y="84" text-anchor="middle" font-weight="600">Always on</text>
@@ -773,34 +775,137 @@ footer { font-size: 13px; color: var(--muted); }
       <text x="513" y="254" text-anchor="middle" font-size="11.5" class="t-attack">10% headroom at the worst flood</text>
       <!-- E -->
       <rect class="box-path" x="632" y="56" width="324" height="214" rx="8"/>
-      <text x="794" y="84" text-anchor="middle" font-weight="700">E · text encoder</text>
-      <text x="794" y="106" text-anchor="middle" font-size="12">DMA → 2 MB global SRAM (6.80 mm²)</text>
-      <text x="794" y="122" text-anchor="middle" font-size="12">→ input + accumulator buffers</text>
-      <text x="794" y="138" text-anchor="middle" font-size="12">→ INT8 32×32 array (1.20 mm²)</text>
-      <text x="794" y="154" text-anchor="middle" font-size="12">FP16 attention (0.53 mm²) · vector unit</text>
-      <text x="794" y="182" text-anchor="middle" class="mono" font-size="12">9.22 mm² · leak 16.2 mW</text>
-      <text x="794" y="212" text-anchor="middle" font-size="11.5" class="mut">busy 9.3% of an ordinary day → gated</text>
-      <text x="794" y="228" text-anchor="middle" font-size="11.5" class="mut">weights (10.6 MB) streamed from host DRAM</text>
+      <text x="794" y="84" text-anchor="middle" font-weight="700">E · encoder (text + image)</text>
+      <text x="794" y="106" text-anchor="middle" font-size="12">DMA → 1 MB global SRAM (3.25 mm²)</text>
+      <text x="794" y="122" text-anchor="middle" font-size="12">→ input + accumulator buffers (16 + 16 KB)</text>
+      <text x="794" y="138" text-anchor="middle" font-size="12">→ INT8 8×8 array</text>
+      <text x="794" y="154" text-anchor="middle" font-size="12">FP16 attention · vector unit</text>
+      <text x="794" y="182" text-anchor="middle" class="mono" font-size="12">3.53 mm² · leak 1.36 mW</text>
+      <text x="794" y="212" text-anchor="middle" font-size="11.5" class="mut">busy ≤ 2,041 s/day at 10⁶ users → gated</text>
+      <text x="794" y="228" text-anchor="middle" font-size="11.5" class="mut">weights streamed from host DRAM</text>
       <text x="794" y="254" text-anchor="middle" font-size="11.5" class="mut">500 MHz</text>
     </svg>
   </div>
   <div class="tbl"><table>
     <thead><tr><th>Chip, by workload</th><th>Power</th><th>What it's doing</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>Ordinary day (11.6 posts/s)</td><td class="num">0.092 W</td><td>encoder busy 9.3% of the day</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>100 Mbps flood (12,207 proofs/s), all proofs valid</td><td class="num">0.48 W</td><td>verify unit checks proofs in large batches</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>100 Mbps flood, worst mix (about 15% invalid)</td><td class="num">1.05 W</td><td>every proof checked alone, and most also pay for the subgroup check; verify unit has 10% headroom; within the 2 W budget</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Overnight backlog (330k posts in 45 min)</td><td class="num">0.90 W</td><td>encoder working through 8 hours of posts</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
-      <tr><td>Idle</td><td class="num">28.7 mW before gating · 0 after</td><td>leakage: encoder 16.2 mW + verify unit 12.4 mW; within our 50 mW idle limit even without gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>A day at the heaviest per-box load of a 1M-user community (25,889 text posts + 1,143 images)</td><td class="num">271 J of encoder work · 118 J of encoder leakage</td><td>encoder busy 2,041 s of the day; the earlier 32×32 encoder leaked 1,403 J a day</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>100 Mbps flood (12,207 proofs/s), all proofs valid</td><td class="num">0.48 W</td><td>verify unit checks proofs in large batches; computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>100 Mbps flood, worst mix (about 15% invalid)</td><td class="num">1.05 W</td><td>every proof checked alone, and most also pay for the subgroup check; verify unit has 10% headroom; within the 2 W budget; computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Backlog after 8 hours offline (8,630 text posts + 381 images)</td><td class="num">11.3 min</td><td>encoder working through the backlog; chip power not recomputed yet</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td>Idle</td><td class="num">encoder 1.36 mW + verify unit 12.4 mW before gating · 0 after</td><td>leakage; within our 50 mW idle limit even without gating. In the simulated day this cuts the chip's idle leakage from 2,480 J to about 1,195 J</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Most of the encoder's area is the 2 MB global SRAM (74% of the encoder), not the array. Since the weights are streamed from DRAM for every matrix multiply anyway, the SRAM might only need a double buffer plus activations. That is the biggest lever on chip area. We'll size it together with the image encoder (step 1 in <a href="#next-h">What's next</a>), because images change what the SRAM has to hold, and the simulated load says the encoder as a whole can likely shrink. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+  <p class="small muted">The flood rows come from the chip with the earlier 32×32 encoder; we will recompute chip power for the re-sized encoder in the scenario runs. "0 after gating" leaves out the always-on part, wake-up costs and the PCIe link, which we haven't modeled yet.</p>
+
+  <h3 id="encoder-h">The encoder: sized for latency, backlog and identical embeddings</h3>
+  <p>The encoder was first sized for "every box ingests all 10<sup>6</sup> posts a day". The simulator showed that the heaviest boxes get 1/26 of that and the encoder is almost always idle, and image posts joined the workload. So we re-decided it on what the encoder is actually for: answering searches quickly, catching up after a box has been offline, and (if possible) giving every box the same embedding for the same image. Three questions, each with its pass condition written down before the results.</p>
+  <p class="scrollhint">Scroll the diagram sideways →</p>
+  <div class="diagram">
+    <svg viewBox="0 0 980 300" role="img" aria-label="Encoder re-decision: four uses (search queries, new posts, backlog after being offline, author-supplied image embeddings) map to requirements (query encoding within 50 ms, new post within 5 s and one image within 1 s, 8-hour backlog within 60 minutes, bit-identical embeddings on every box), which set three chip knobs: array size, global SRAM size and number of models, plus a possible integer-only datapath.">
+      <defs><marker id="e1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <text x="14" y="26" font-weight="600">Where the encoder is used</text>
+      <text x="350" y="26" font-weight="600">What it must meet</text>
+      <text x="700" y="26" font-weight="600">Chip knob</text>
+      <rect class="box" x="14" y="40" width="290" height="44" rx="6"/>
+      <text x="26" y="67" font-size="12">Search: encode the query (12 tokens)</text>
+      <rect class="box" x="14" y="94" width="290" height="44" rx="6"/>
+      <text x="26" y="121" font-size="12">New post: one text or image (batch 1)</text>
+      <rect class="box" x="14" y="148" width="290" height="44" rx="6"/>
+      <text x="26" y="175" font-size="12">Backlog: a box that was off for 8 hours</text>
+      <rect class="box-attack" x="14" y="202" width="290" height="44" rx="6"/>
+      <text x="26" y="229" font-size="12">Author ships the image embedding</text>
+      <path class="wire" d="M304,62 L340,62" marker-end="url(#e1)"/>
+      <path class="wire" d="M304,116 L340,116" marker-end="url(#e1)"/>
+      <path class="wire" d="M304,170 L340,170" marker-end="url(#e1)"/>
+      <path class="wire" d="M304,224 L340,224" marker-end="url(#e1)"/>
+      <rect class="box" x="344" y="40" width="320" height="44" rx="6"/>
+      <text x="356" y="67" font-size="12" class="mono">query ≤ 50 ms (est. budget)</text>
+      <rect class="box" x="344" y="94" width="320" height="44" rx="6"/>
+      <text x="356" y="121" font-size="12" class="mono">post P99 ≤ 5 s · one image ≤ 1 s</text>
+      <rect class="box" x="344" y="148" width="320" height="44" rx="6"/>
+      <text x="356" y="175" font-size="12" class="mono">8-hour backlog ≤ 60 min (batch ≤ 8)</text>
+      <rect class="box-attack" x="344" y="202" width="320" height="44" rx="6"/>
+      <text x="356" y="229" font-size="12">same image → bit-identical embedding</text>
+      <path class="wire" d="M664,62 L690,110" marker-end="url(#e1)"/>
+      <path class="wire" d="M664,116 L690,116" marker-end="url(#e1)"/>
+      <path class="wire" d="M664,170 L690,124" marker-end="url(#e1)"/>
+      <path class="wire" d="M664,224 L690,224" marker-end="url(#e1)"/>
+      <rect class="box-pick" x="694" y="40" width="272" height="152" rx="6"/>
+      <text x="706" y="66" font-size="12" font-weight="600">Array: 8×8 / 16×16 / 32×32</text>
+      <text x="706" y="88" font-size="12" font-weight="600">Global SRAM: 512 KB / 1 MB / 2 MB</text>
+      <text x="706" y="110" font-size="12" font-weight="600">Models: 3 (MiniLM + CLIP) or 2 (CLIP)</text>
+      <text x="706" y="140" font-size="12" class="mono">chosen: 8×8 · 1 MB · 3 models</text>
+      <text x="706" y="160" font-size="11" class="mut">smallest encoder area that passes,</text>
+      <text x="706" y="176" font-size="11" class="mut">at 500 MHz, 45 nm (Timeloop + Accelergy)</text>
+      <rect class="box-attack" x="694" y="202" width="272" height="44" rx="6"/>
+      <text x="706" y="222" font-size="12" font-weight="600">Integer-only datapath?</text>
+      <text x="706" y="238" font-size="11" class="mut">software can't give it → chip candidate</text>
+      <text x="14" y="282" font-size="11.5" class="mut">Load: heaviest per-box load in a 1M-user community (every box storing every sub-community) · 25,889 text posts + 1,143 images a day · 8-hour backlog = 8,630 + 381</text>
+    </svg>
+  </div>
+
+  <p><b>1. How many models.</b> One CLIP model for both text and images would mean fewer weights and shapes on the chip. Our usual quality bar (Recall@10 against exact FP32 MiniLM search) compares precision variants of one model; a different model is expected to pick different neighbors, so before running it we switched the bar to finding a post by its title (20,000 posts, 1,000 title queries, the same sample as before): CLIP's text tower had to come within 0.5 points of MiniLM in Hit@10 <span class="k k-meas">measured</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Text model (FP32)</th><th>Hit@1</th><th>Hit@10</th><th>MRR</th><th>Hit@10, posts CLIP cuts at 77 tokens (695)</th></tr></thead>
+    <tbody>
+      <tr><td><b>MiniLM (chosen)</b></td><td class="num">0.866</td><td class="num"><b>0.943</b></td><td class="num">0.895</td><td class="num">0.922</td></tr>
+      <tr><td>CLIP text tower</td><td class="num">0.609</td><td class="num"><b>0.776</b></td><td class="num">0.671</td><td class="num">0.744</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li>CLIP is 0.167 lower (the bar was 0.005), so text posts and queries stay on MiniLM, images go to CLIP's image tower, and CLIP's text tower is used only to find images by words. The chip handles three models.</li>
+    <li>CLIP truncates at 77 tokens, which cuts 70.3% of our posts (the median post is exactly 77). But CLIP is lower on short posts too, so it isn't only truncation; we read it as CLIP's text tower not being trained for sentence search.</li>
+    <li>Weights stay in DRAM, so the cost of three models is DRAM capacity, not chip area: INT8 MiniLM 10.6 MB + CLIP image tower 87 MB + text tower about 63 MB <span class="k k-est">estimated</span>.</li>
+  </ul>
+
+  <p><b>2. Can software give every box the same embedding?</b> Same image, compared across batch size, thread count, and two runtimes running the same ONNX file on the laptop CPU (onnxruntime vs OpenVINO, standing in for "a different chip"). CLIP image tower, 48 synthetic images <span class="k k-meas">measured</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Precision</th><th>Batch 1 vs 16</th><th>1 thread vs all</th><th>onnxruntime vs OpenVINO</th><th>Lowest cosine to FP32, same image</th></tr></thead>
+    <tbody>
+      <tr><td>FP32</td><td>identical</td><td>identical</td><td>differs (max difference 1.4×10<sup>-5</sup>, cosine 1.000)</td><td class="num">1</td></tr>
+      <tr><td>Dynamic INT8 (what the simulated day used)</td><td><b>differs</b> (cosine 0.982)</td><td>identical</td><td>differs (cosine 0.990)</td><td class="num">0.941</td></tr>
+      <tr><td>Static INT8 (activation scales fixed in advance from calibration images)</td><td>identical</td><td>identical</td><td><b>differs</b> (max difference 2.07, cosine 0.872)</td><td class="num"><b>0.798</b></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li>We decided in advance: if static INT8 were bit-identical on all three axes, author-supplied image embeddings (checked for an exact match) would become the design goal. Within one runtime it is bit-identical regardless of batch and threads, but <b>the same file gives different values in different runtimes</b>: each runtime fuses the quantization steps and re-rounds at different points. So image posts keep envelope + fetch.</li>
+    <li>What would work is an encoder whose every operation, including GELU, softmax and LayerNorm, is defined in integers with a fixed order and rounding (as in I-BERT, arXiv 2101.01321). A spec, not a model file. That is something a chip (or a protocol spec that chips follow) can guarantee, so it is now a <b>candidate requirement for our chip</b>.</li>
+    <li>But static INT8's quality is too low to use as is: 0.798 against FP32 on the same image, below the 0.95 we set as the floor. The fix to look at next is mixed precision (some layers in FP16). Calibration used 100 synthetic images; photos may do better.</li>
+  </ul>
+
+  <p><b>3. How small can the array and SRAM be?</b> We decided in advance: at 500 MHz, among arrays of 8×8, 16×16 and 32×32 and global SRAMs of 2 MB, 1 MB and 512 KB, take the smallest encoder area (array first, then SRAM) that meets all four limits in the diagram, and go one array size up if it can't serve a 1M-user community (linear extrapolation). Text posts follow our sample's length distribution; an image is 50 tokens <span class="k k-est">estimated</span>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Array</th><th>Global SRAM</th><th>8-hour backlog</th><th>New post P99</th><th>Query</th><th>One image</th><th>Encoder area (SRAM)</th><th>Leakage</th><th>Users it can serve</th><th>Passes</th></tr></thead>
+    <tbody>
+      <tr><td>32×32 (earlier)</td><td class="num">2 MB</td><td class="num">1.5 min</td><td class="num">14 ms</td><td class="num">2.2 ms</td><td class="num">22 ms · 19.8 mJ</td><td class="num">9.22 mm² (6.80)</td><td class="num">16.2 mW</td><td class="num">3.9×10<sup>7</sup></td><td>yes</td></tr>
+      <tr><td>16×16</td><td class="num">2 MB</td><td class="num">3.0 min</td><td class="num">33 ms</td><td class="num">2.7 ms</td><td class="num">37 ms · 22.2 mJ</td><td class="num">7.50 mm² (6.80)</td><td class="num">4.3 mW</td><td class="num">2.0×10<sup>7</sup></td><td>yes</td></tr>
+      <tr><td>8×8</td><td class="num">2 MB</td><td class="num">11.3 min</td><td class="num">125 ms</td><td class="num">10.9 ms</td><td class="num">143 ms · 27.8 mJ</td><td class="num">7.08 mm² (6.80)</td><td class="num">1.4 mW</td><td class="num">5.3×10<sup>6</sup></td><td>yes</td></tr>
+      <tr><td><b>8×8 (chosen)</b></td><td class="num"><b>1 MB</b></td><td class="num"><b>11.3 min</b> (text 10.4 + images 0.9)</td><td class="num"><b>125 ms</b></td><td class="num"><b>10.9 ms</b></td><td class="num"><b>143 ms · 27.3 mJ</b></td><td class="num"><b>3.53 mm²</b> (3.25)</td><td class="num"><b>1.36 mW</b></td><td class="num"><b>5.3×10<sup>6</sup></b></td><td><b>yes</b></td></tr>
+      <tr><td>8×8</td><td class="num">512 KB</td><td colspan="7">the activations of one 256-token post (786 KB) don't fit</td><td>no</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li><b>8×8 with 1 MB.</b> The encoder shrinks from 9.22 to 3.53 mm² (−62%) and the chip from 11.3 to <b>5.61 mm²</b> (−50%); encoder leakage drops to about 1/12. It can serve communities of up to 5.3 million users, 5.3× the 1M we required <span class="k k-est">estimated</span>.</li>
+    <li><b>The SRAM made the encoder big, not the array.</b> The 2 MB SRAM was 74% of the earlier encoder. The SRAM size isn't set by throughput but by the activations of the single longest post (786 KB at 256 tokens): 1 MB fits, 512 KB doesn't. At 1 MB the backlog batch drops to 1 for the longest text posts and 3 for images, but the time doesn't change, because at 8×8 compute is the bottleneck.</li>
+    <li>A day at that load: 271 J of encoder work, busy 2,041 s, 118 J of idle leakage (the 32×32 encoder leaked 1,403 J) <span class="k k-est">estimated</span>.</li>
+  </ul>
+  <details>
+    <summary>Limits of the encoder re-sizing</summary>
+    <ul class="small">
+      <li>Images are synthetic, and so is the static-INT8 calibration set (100 images). Quality (0.798) and the gap between runtimes may differ on photos. Text-to-image search quality isn't measured (we have no photo dataset yet).</li>
+      <li>"A different chip" is two runtimes on the same laptop. Different hardware (ARM, an NPU) wasn't tested.</li>
+      <li>512 KB was ruled out with an activation-size formula, not a Timeloop mapping. Tiling activations out to DRAM could make 512 KB work, at the cost of DRAM traffic and energy, which we didn't evaluate.</li>
+      <li>CLIP's text tower (for queries) wasn't mapped; with 12-token queries we assume it is on the scale of MiniLM's 10.9 ms <span class="k k-est">estimated</span>.</li>
+      <li>The load is the analytic per-box formula (upper end: every box storing every sub-community) with text lengths from our sample. The encoder model keeps the earlier assumptions (weights streamed once per matrix multiply, fixed DRAM bandwidth). The chip area swaps only the encoder; the other blocks weren't re-synthesized.</li>
+    </ul>
+  </details>
 </section>
 
 <section aria-labelledby="results-h">
   <h2 id="results-h">5. Key results</h2>
   <h3 style="margin-top:6px">The whole box, compared with existing combinations</h3>
-  <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped.</p>
+  <p>Same workloads for every row: 10<sup>6</sup> posts/day on an ordinary day, and a 100 Mbps flood of 1 KB messages (12,207 proofs/s) that must all be verified before they can be dropped. This comparison was made with the earlier 11.3 mm² chip (32×32 encoder) under the every-box-gets-every-post assumption; we redo it at equal resources, with the re-sized encoder and simulated load, as step 2 in <a href="#next-h">What's next</a>.</p>
   <div class="tbl"><table>
     <thead><tr><th>Box</th><th>Ordinary day</th><th>100 Mbps flood</th><th>Idle</th><th>Basis</th></tr></thead>
     <tbody>
@@ -811,8 +916,8 @@ footer { font-size: 13px; color: var(--muted); }
     </tbody>
   </table></div>
   <ul class="small">
-    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. One 11.3 mm² chip does it at 0.48 W, and at no more than 1.05 W whatever share of the proofs is invalid <span class="k k-est">estimated</span>.</li>
-    <li><b>On an ordinary day the chip hardly matters.</b> Our box is 0.06–0.11 W below Pi 5 + Hailo-8L, much less than the spread in host idle power (2.4–3.3 W). To lower everyday power further you'd have to work on the host's idle power, which is outside this course project. The simulated 10,000-box day says the same from the chip's side: the busiest box's chip does 0.86 J of work a day against 2,480 J of leakage before gating, so on an ordinary day what matters on the chip is power gating <span class="k k-est">simulation model</span>.</li>
+    <li><b>The flood is where our hardware matters.</b> A Pi 5 or Jetson CPU gets through only 1/3–1/2 of a 100 Mbps flood. The only existing combination that keeps up is the laptop, at 46 W. Our chip does it at 0.48 W, and at no more than 1.05 W whatever share of the proofs is invalid <span class="k k-est">estimated</span>.</li>
+    <li><b>On an ordinary day the chip hardly matters.</b> Our box is 0.06–0.11 W below Pi 5 + Hailo-8L, much less than the spread in host idle power (2.4–3.3 W). To lower everyday power further you'd have to work on the host's idle power, which is outside this course project. The simulated 10,000-box day says the same from the chip's side: the busiest box's chip does 0.86 J of work a day against 2,480 J of leakage before gating (about 1,195 J with the re-sized encoder), so on an ordinary day what matters on the chip is power gating <span class="k k-est">simulation model</span>.</li>
     <li><b>Encoder on our chip, not a Hailo-8L.</b> We decided in advance to keep the encoder on our chip only if the chip's ordinary-day power came in under the Hailo-8L's share. It did: 0.092 W vs 0.134–0.182 W (11.6–15.7 mJ per post × 11.6 posts/s, estimated from vendor figures). The Hailo is also fixed at 128 tokens.</li>
   </ul>
   <p class="small muted">ARM CPU speeds are scaled from our laptop (a Pi 5 Cortex-A76 core ≈ 1/2.93 of a 185H core, from Geekbench 6 scores; a Jetson core ≈ 0.71–0.91× a Pi core), so the Pi and Jetson flood rates are estimates. We couldn't find MiniLM numbers for the Jetson.</p>
@@ -899,7 +1004,7 @@ footer { font-size: 13px; color: var(--muted); }
   </table></div>
   <p class="small muted">Bold: the smallest unit that keeps up (12,207/s) in each column. Four adders never got close in any column. The key-table columns use 8-bit windows.</p>
   <ul class="small">
-    <li><b>6 multipliers + 6 adders: at least 13,429 proofs/s, 10% headroom.</b> The verify unit goes from 2.69 mm² (the earlier 8 + 8) to <b>2.12 mm²</b> and leaks 12.4 mW. The chip is <b>11.3 mm²</b> and draws at most <b>1.05 W</b> in the flood. The worst-case energy is <b>0.077 mJ</b> per proof <span class="k k-est">estimated</span>. Since then, the vote proof gained one public input (<a href="#votes-h">what a vote's proof carries</a>), which costs 1.3%: worst case about 13,255 proofs/s, still above the flood <span class="k k-est">estimated</span>.</li>
+    <li><b>6 multipliers + 6 adders: at least 13,429 proofs/s, 10% headroom.</b> The verify unit goes from 2.69 mm² (the earlier 8 + 8) to <b>2.12 mm²</b> and leaks 12.4 mW. The chip was then <b>11.3 mm²</b> (5.61 mm² since the encoder was re-sized) and draws at most <b>1.05 W</b> in the flood. The worst-case energy is <b>0.077 mJ</b> per proof <span class="k k-est">estimated</span>. Since then, the vote proof gained one public input (<a href="#votes-h">what a vote's proof carries</a>), which costs 1.3%: worst case about 13,255 proofs/s, still above the flood <span class="k k-est">estimated</span>.</li>
     <li><b>Part of the earlier 8 + 8 was our own model being conservative.</b> Our operation trace counted the final exponentiation's squarings as general squarings and used a plain binary exponent. Counting them the way the arkworks library already computes them gets to 7 × 8 on its own. A simplification that looks "safe" can move the hardware size by a whole step, so we now note such simplifications next to the results.</li>
     <li><b>The biggest gain beyond the library comes from the verifying key being fixed.</b> Its points never change, so a precomputed table turns the public-input multiplication into additions only: 9,111 → 2,115 mults, 16% of the cost to reject a proof. The price is a 3.1 MB table in host DRAM and up to 0.125 GB/s of reads during the flood. The 4-bit-window table is only 368 KB but needs 0.226 GB/s; we took 8-bit windows for fewer reads. The table is rebuilt offline whenever the verifying key changes.</li>
     <li><b>The worst attack moved from "all invalid" to about 15% invalid.</b> Invalid proofs now skip the subgroup check, so an all-invalid flood is easier (14,633/s on 6 × 6). The worst case is a mostly valid flood with about 15% invalid proofs (13,429/s): batches keep failing, and the valid proofs still pay for the subgroup check. That is why deferring the check raised the worst case only a little (13,306 → 13,429). Deferring is safe: a proof that fails the test is discarded anyway, and every accepted proof still passes the subgroup check, so the set of accepted proofs doesn't change. A proof built to pass the test but fail the subgroup check costs the same as a valid one, which the numbers above already cover.</li>
@@ -954,22 +1059,25 @@ footer { font-size: 13px; color: var(--muted); }
       <tr><td>Verify unit energy per proof, batched · worst mix of invalid proofs</td><td class="num">0.0317 mJ (multiplies 80%, moving operands 19%) · 0.077 mJ</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Verify unit area · leakage</td><td class="num">2.12 mm² · 12.4 mW with 6 + 6 · the earlier 5 + 4 unit was 1.83 mm² (multipliers 1.42, operand registers 0.30, 32 KB microcode 0.10, adders 0.01) and leaked 10.9 mW</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
       <tr><td>Latency of one proof, not batched (5-multiplier unit)</td><td class="num">282 µs (4.3× faster than 1.22 ms tuned software on a P-core)</td><td class="kind"><span class="k k-est">cycle model</span></td></tr>
-      <tr><td>Encoder: INT8 32×32 array, 2 MB SRAM, 32 KB local buffers, 500 MHz</td><td class="num">8.05 ms · 7.90 mJ / post · 8-hour backlog in 45 min · new post encoded in 14 ms (P99)</td><td class="kind"><span class="k k-est">model</span></td></tr>
-      <tr><td>Encoder area · leakage</td><td class="num">9.22 mm² (2 MB SRAM 6.80, array 1.20, FP16 attention 0.53) · 16.2 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
-      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">11.3 mm² · 0.092 W ordinary day · 0.48 W (all valid) to 1.05 W (worst mix) in a 100 Mbps flood · 0.90 W during the backlog · 28.7 mW idle before gating</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
+      <tr><td><b>Encoder (current): INT8 8×8 array, 1 MB SRAM, 32 KB local buffers, 500 MHz; MiniLM for text, CLIP image tower for images</b></td><td class="num">new post 125 ms (P99) · query 10.9 ms · one image 143 ms, 27.3 mJ · 8-hour backlog in 11.3 min at the heaviest load of a 1M-user community · serves up to 5.3×10<sup>6</sup> users</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td>Encoder area · leakage</td><td class="num">3.53 mm² (1 MB SRAM 3.25) · 1.36 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td>Earlier encoder: INT8 32×32 array, 2 MB SRAM, sized for every box ingesting all 10<sup>6</sup> posts a day</td><td class="num">8.05 ms · 7.90 mJ / post · 8-hour backlog of 330k posts in 45 min · 9.22 mm² (2 MB SRAM 6.80, array 1.20, FP16 attention 0.53) · 16.2 mW</td><td class="kind"><span class="k k-est">model</span></td></tr>
+      <tr><td>Text search quality, finding a post by its title (Hit@10, FP32)</td><td class="num">MiniLM 0.943 · CLIP text tower 0.776</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Same image, static INT8 in two runtimes (onnxruntime vs OpenVINO)</td><td class="num">not bit-identical: cosine 0.872 · quality against FP32 as low as 0.798</td><td class="kind"><span class="k k-meas">measured</span></td></tr>
+      <tr><td>Whole chip (encoder + verify unit)</td><td class="num">5.61 mm² · leakage before gating: encoder 1.36 mW + verify unit 12.4 mW · 0.48 W (all valid) to 1.05 W (worst mix) in a 100 Mbps flood, computed with the earlier encoder</td><td class="kind"><span class="k k-est">estimated</span></td></tr>
     </tbody>
   </table></div>
   <p class="small muted">"Synthesized" means Synopsys Design Compiler with the FreePDK45 (OSU) library, with power computed from simulated switching activity. Everything else on the chip (adders, buffers, sequencer, the whole encoder) is costed with Accelergy's 45 nm tables (CACTI for SRAM, Aladdin for logic), not RTL. The 2 W budget, 10<sup>6</sup> posts/day, 1 KB messages, 100 Mbps flood and 1-hour backlog target are all <b>assumptions</b>.</p>
 
   <details>
-    <summary>Choosing the encoder array size</summary>
-    <p class="small">We decided in advance: at 500 MHz, take the <b>smallest</b> array (8×8, 16×16 or 32×32) that clears an 8-hour backlog in ≤ 60 min and keeps a new post's P99 under 5 s. 1 GHz is shown only as a sensitivity check. Backlog runs use batch 8 sorted by length; energy is shown for batch 1 / batch 8. All from Timeloop mappings + Accelergy 45 nm costs <span class="k k-est">model</span>:</p>
+    <summary>How the encoder was first sized (every box ingesting all 10<sup>6</sup> posts a day)</summary>
+    <p class="small">Superseded by <a href="#encoder-h">the re-sizing on simulated load</a>; kept because it shows why 32×32 was chosen at first. We decided in advance: at 500 MHz, take the <b>smallest</b> array (8×8, 16×16 or 32×32) that clears an 8-hour backlog (330k posts under that assumption) in ≤ 60 min and keeps a new post's P99 under 5 s. 1 GHz is shown only as a sensitivity check. Backlog runs use batch 8 sorted by length; energy is shown for batch 1 / batch 8. All from Timeloop mappings + Accelergy 45 nm costs <span class="k k-est">model</span>:</p>
     <div class="tbl"><table>
       <thead><tr><th>Array</th><th>Clock</th><th>Per post (batch 1)</th><th>Energy, B=1 / B=8</th><th>8-hour backlog</th><th>New post P99</th><th>Area</th><th>Leakage</th></tr></thead>
       <tbody>
         <tr><td>8×8</td><td class="num">500 MHz</td><td class="num">72.0 ms</td><td class="num">9.73 / 9.76 mJ</td><td class="num">401 min</td><td class="num">125 ms</td><td class="num">7.08 mm²</td><td class="num">1.4 mW</td></tr>
         <tr><td>16×16</td><td class="num">500 MHz</td><td class="num">18.9 ms</td><td class="num">8.48 / 7.59 mJ</td><td class="num">106 min</td><td class="num">33 ms</td><td class="num">7.50 mm²</td><td class="num">4.3 mW</td></tr>
-        <tr><td><b>32×32 (chosen)</b></td><td class="num">500 MHz</td><td class="num">8.05 ms</td><td class="num">7.90 / 7.25 mJ</td><td class="num"><b>45 min</b></td><td class="num">14 ms</td><td class="num">9.22 mm²</td><td class="num">16.2 mW</td></tr>
+        <tr><td><b>32×32 (chosen then)</b></td><td class="num">500 MHz</td><td class="num">8.05 ms</td><td class="num">7.90 / 7.25 mJ</td><td class="num"><b>45 min</b></td><td class="num">14 ms</td><td class="num">9.22 mm²</td><td class="num">16.2 mW</td></tr>
         <tr><td>16×16</td><td class="num">1 GHz</td><td class="num">9.45 ms</td><td class="num">8.44 / 7.55 mJ</td><td class="num">53 min</td><td class="num">16 ms</td><td class="num">7.50 mm²</td><td class="num">4.3 mW</td></tr>
         <tr><td>32×32</td><td class="num">1 GHz</td><td class="num">4.04 ms</td><td class="num">7.83 / 7.18 mJ</td><td class="num">22 min</td><td class="num">7 ms</td><td class="num">9.22 mm²</td><td class="num">16.2 mW</td></tr>
       </tbody>
@@ -978,14 +1086,14 @@ footer { font-size: 13px; color: var(--muted); }
   </details>
 
   <details>
-    <summary>How the new encoder estimate compares with our earlier hand model</summary>
+    <summary>How the tool-based encoder estimate compares with our earlier hand model</summary>
     <p class="small">Earlier we estimated the encoder by hand from 45 nm energy-per-operation tables (dynamic energy only): 8.55 mJ per post. The new tool-based estimate is 7.90 mJ, 0.92× the old one <span class="k k-est">model</span>. We had agreed that a gap above 2× would force us to redo the ordinary-day numbers; it stayed well inside that.</p>
     <p class="small">The totals agree, but the parts don't. One INT8 MAC costs 1.27 pJ in the Aladdin tables, 4.2× the 0.3 pJ we used before (INT8 multiply 0.2 + INT32 add 0.1). Memory is cheaper than we assumed: the 2 MB global SRAM is 12.6 pJ/byte (we used 25 pJ/byte from a 1 MB table entry) and DRAM is 64 pJ/byte (we used 160). Our synthesized Montgomery multiplier also came out 4.2× its early estimate, so the logic estimates move in the same direction.</p>
   </details>
 
   <details>
     <summary>Idle power depends on the SRAM cell and on power gating</summary>
-    <p class="small">The default model uses low-standby-power SRAM cells (CACTI's itrs-lstp), which barely leak. With high-performance cells (itrs-hp), the 2 MB SRAM alone leaks <b>1.04 W</b> instead of 0.05 mW, and the whole chip leaks 1.10 W <span class="k k-est">estimated</span>. With gating, that chip still does the ordinary day at 0.19 W, the flood at 0.59 W and the backlog at 1.96 W (just under 2 W). Without gating it burns 1.1 W doing nothing, 22× our 50 mW idle limit. The catch with low-standby cells: a random access to the 2 MB array takes 2.37 ns, longer than the 2 ns cycle at 500 MHz, so it would need banking or two-cycle access, which the model doesn't include.</p>
+    <p class="small">Computed for the earlier chip with the 2 MB SRAM. The default model uses low-standby-power SRAM cells (CACTI's itrs-lstp), which barely leak. With high-performance cells (itrs-hp), the 2 MB SRAM alone leaks <b>1.04 W</b> instead of 0.05 mW, and the whole chip leaks 1.10 W <span class="k k-est">estimated</span>. With gating, that chip still does the ordinary day at 0.19 W, the flood at 0.59 W and the backlog at 1.96 W (just under 2 W). Without gating it burns 1.1 W doing nothing, 22× our 50 mW idle limit. The catch with low-standby cells: a random access to the 2 MB array takes 2.37 ns, longer than the 2 ns cycle at 500 MHz, so it would need banking or two-cycle access, which the model doesn't include.</p>
   </details>
 
   <details>
@@ -997,7 +1105,7 @@ footer { font-size: 13px; color: var(--muted); }
         <tr><td>Low-power E-core, INT8 (measured)</td><td class="num">54 mJ</td><td class="num">7.9 mJ</td><td class="num">0.72 W</td><td class="num">13%</td></tr>
         <tr><td>Laptop NPU with workaround (measured)</td><td class="num">80 mJ</td><td class="num">7.9 mJ</td><td class="num">1.01 W</td><td class="num">9%</td></tr>
         <tr><td>Hailo-8L batch 1 (vendor speed × vision-model power)</td><td class="num">≈16 mJ</td><td class="num">7.9 mJ</td><td class="num">0.28 W</td><td class="num">33%</td></tr>
-        <tr><td>Our chip: 32×32 INT8 encoder + verify unit (model)</td><td class="num">7.90 mJ</td><td class="num">0.0317 mJ</td><td class="num">0.092 W</td><td class="num">&lt; 1%</td></tr>
+        <tr><td>Our earlier chip: 32×32 INT8 encoder + verify unit (model)</td><td class="num">7.90 mJ</td><td class="num">0.0317 mJ</td><td class="num">0.092 W</td><td class="num">&lt; 1%</td></tr>
       </tbody>
     </table></div>
   </details>
@@ -1034,11 +1142,14 @@ footer { font-size: 13px; color: var(--muted); }
 <section aria-labelledby="dropped-h">
   <h2 id="dropped-h">6. Paths we tried and dropped</h2>
   <ul class="dropped">
-    <li><b>Sizing the box for "every box ingests all 10<sup>6</sup> posts a day."</b> Nobody chose that number; it was a hidden assumption. With behavior from Reddit's statistics, the busiest 1% of boxes in a 1M-user community embed 0.45 text posts/s at the peak hour, 1/26 of the 11.6 posts/s we had assumed <span class="k k-est">simulation model</span>. We had decided in advance to re-decide the encoder toward smaller if real ingest fell under a tenth of the assumption. <i>Instead:</i> the encoder's size has to be justified by search latency, the backlog after a box has been offline, and images. In the simulated day the encoders were busy only 0.003% of the peak hour, even on the busiest boxes.</li>
+    <li><b>Sizing the box for "every box ingests all 10<sup>6</sup> posts a day."</b> Nobody chose that number; it was a hidden assumption. With behavior from Reddit's statistics, the busiest 1% of boxes in a 1M-user community embed 0.45 text posts/s at the peak hour, 1/26 of the 11.6 posts/s we had assumed <span class="k k-est">simulation model</span>. We had decided in advance to re-decide the encoder toward smaller if real ingest fell under a tenth of the assumption. In the simulated day the encoders were busy only 0.003% of the peak hour, even on the busiest boxes. <i>Instead:</i> the encoder is sized by search latency, the backlog after a box has been offline, and images, which brought it from 32×32 with 2 MB of SRAM (9.22 mm²) down to 8×8 with 1 MB (3.53 mm²) <span class="k k-est">estimated</span>.</li>
+    <li><b>One CLIP model for both text and images.</b> Fewer models would make a simpler chip, but CLIP's text tower finds a post by its title in the top 10 only 0.776 of the time, against 0.943 for MiniLM <span class="k k-meas">measured</span>; we had allowed a gap of 0.005. It's lower on short posts too, so it isn't only CLIP's 77-token cut. <i>Instead:</i> MiniLM for text, CLIP's image tower for images, and CLIP's text tower only to find images by words. Three models cost DRAM capacity, not chip area.</li>
+    <li><b>Static INT8 as a way to make every box compute the same embedding.</b> It is bit-identical across batch sizes and thread counts, but the same model file gives different values in two runtimes (cosine 0.872), and its quality is low (0.798 against FP32) <span class="k k-meas">measured</span>. <i>Instead:</i> image posts keep envelope + fetch, and an integer-only encoder with a fixed operation order and rounding is a candidate chip requirement.</li>
+    <li><b>A 512 KB encoder SRAM.</b> The activations of one 256-token post (786 KB) don't fit <span class="k k-est">estimated</span>. <i>Instead:</i> 1 MB. Spilling activations to DRAM might make 512 KB work; we haven't weighed the extra DRAM traffic.</li>
     <li><b>Bundling each user's votes into one proof every 50 s.</b> Every vote carries its own proof, and votes are about 90% of proof-carrying messages. Bundling was meant to cut that, but each bundle held 1.00 vote on average and vote counts arrived 26 s later on average <span class="k k-est">simulation model</span>. It technically passed our advance rule (lower verification, counts within 60 s) by 0.1%, which is no real gain. <i>Instead:</i> one proof per vote, carrying both a rate-limiting tag and a per-post tag (+1.3% verification cost <span class="k k-est">estimated</span>).</li>
     <li><b>Vote proofs with only a rate-limiting tag.</b> They cap how often someone votes, but let one person vote several times on the same post within the limit. A per-post tag alone has the opposite gap (no limit across posts). <i>Instead:</i> both tags in one proof, the only design that keeps one vote per post, a rate limit and unlinkability.</li>
     <li><b>Pushing whole images through the gossip network.</b> Every hop sends 177 KB to each mesh neighbor in turn: 1,181 KB of uplink per box per image post on average <span class="k k-est">simulation model</span>. <i>Instead:</i> push a small envelope and fetch the body once, the same number of image encodings at 0.21× the uplink, though not faster (2.01 vs 1.82 s at 20 Mbps).</li>
-    <li><b>Shipping the author's image embedding and spot-checking it.</b> It was by far the fastest (0.40 s at 20 Mbps, 0.01× the image encodings) and caught every fake embedding within 1.32 s <span class="k k-est">simulation model</span>. But the same image gives cosine similarity as low as 0.877 between FP32 and INT8, while two different images reach 0.981 <span class="k k-meas">measured</span>, so no threshold separates an honest box from a fake. <i>Could come back</i> if every box ran a standard, deterministic INT8 encoder with bit-identical output, which the next step looks at as a chip requirement.</li>
+    <li><b>Shipping the author's image embedding and spot-checking it.</b> It was by far the fastest (0.40 s at 20 Mbps, 0.01× the image encodings) and caught every fake embedding within 1.32 s <span class="k k-est">simulation model</span>. But the same image gives cosine similarity as low as 0.877 between FP32 and INT8, while two different images reach 0.981 <span class="k k-meas">measured</span>, so no threshold separates an honest box from a fake. <i>Could come back</i> if every box ran an integer-only encoder with bit-identical output. Static INT8 in software doesn't get there (different runtimes disagree), so that would take a fixed spec that a chip implements.</li>
     <li><b>Plain INT8 encoder.</b> No INT8 variant reached our quality bar (Recall@10 ≥ 0.95 against exact FP32 search); the best was 0.878. Mixed precision needed 83% of weight MACs left in FP32 and was only 1.1× faster. <i>Instead:</i> ingest in INT8 and re-rank the top 20 in FP32 at query time. That gives Recall@10 0.993 and ingest 1.9× faster with 2.2× less energy than FP32 (3.70 ms, 0.25 J/post) <span class="k k-meas">measured</span>, at about 252 ms and 18.7 J per query <span class="k k-est">estimated</span>.</li>
     <li><b>"The laptop NPU is too slow, so we need hardware."</b> Out of the box it was about 3× over the backlog target. But 89% of its time (at 256 tokens) went to a softmax plus broadcast mask that the compiler sent down a slow path. Expanding the mask fixed it: 45 min, Recall@10 0.997 <span class="k k-meas">measured</span>. It was a software problem, so we moved the target to the always-on box and argued from power instead of time.</li>
     <li><b>Doing the crypto on the encoder's INT8 array.</b> 615 proofs/s, 40× short <span class="k k-est">estimated</span>. A weight-stationary array pays off only when one operand stays put, but pairing math is mostly variable × variable, and the array has no integer carry handling.</li>
@@ -1046,13 +1157,13 @@ footer { font-size: 13px; color: var(--muted); }
     <li><b>Software only.</b> Batched verification on one low-power core: 989 proofs/s, 2.06 mJ/proof <span class="k k-meas">measured</span>. It misses on both energy and throughput.</li>
     <li><b>Wider multipliers (128/256-bit word).</b> They were bigger, slower and used more energy per multiply (table above).</li>
     <li><b>Interleaving independent multiplies through a pipelined multiplier and letting the tool retime it.</b> We had decided up front that it needed a 1.5× clock gain to justify the complexity. The clock rose only 1.20–1.22× (about 360 MHz): the critical path stopped at 2.78 ns inside the retimed multiplier, and we haven't found out why. We gave up a real gain to stick to that call: the 2-way version would have been about 20% smaller (0.91 vs 1.13 mm² for a 4-multiplier unit).</li>
-    <li><b>A smaller encoder array (8×8 or 16×16).</b> At 500 MHz, 16×16 clears the 8-hour backlog in 106 min and 8×8 in 401 min, both over the 60-minute target <span class="k k-est">model</span>. 16×16 would pass at 1 GHz (53 min), but we fixed the clock at 500 MHz beforehand and treated 1 GHz only as a sensitivity check.</li>
+    <li><b>A 32×32 encoder array with 2 MB of SRAM.</b> We chose it when every box was assumed to ingest all 10<sup>6</sup> posts a day: then 16×16 needed 106 min and 8×8 401 min for an 8-hour backlog, over the 60-minute target <span class="k k-est">model</span>. Under the simulated load, 8×8 clears the backlog in 11.3 min. <i>Instead:</i> 8×8 with 1 MB, 3.53 mm² instead of 9.22 mm² <span class="k k-est">estimated</span>.</li>
     <li><b>Keeping the 5-multiplier verify unit and relying on smarter batch splitting.</b> It was sized with 2× headroom over a flood of valid proofs, but no splitting strategy can go below the cost of checking every proof alone, and that drops it to 7,469 proofs/s, 61% of the flood, when every proof is invalid (with our first operation count) <span class="k k-est">cycle model</span>. 7 multipliers + 7 adders still came up 5% short, so at first we went to 8 + 8.</li>
     <li><b>An 8 + 8 verify unit.</b> Part of that size came from our own operation count being conservative (general instead of cyclotomic squarings, a plain binary exponent). With the library's real formulas, a precomputed verifying-key table and a deferred subgroup check, the cost to reject an invalid proof fell to 0.65×, and 6 multipliers + 6 adders keep up at any share of invalid proofs (2.12 mm² instead of 2.69 mm²) <span class="k k-est">cycle model</span>.</li>
     <li><b>Sending proofs uncompressed.</b> It skips three square roots per proof but doubles the proof to 256 B and changes the wire format, and the smallest unit that keeps up is still 6 + 6 (5 + 6 reaches 97% of the flood) <span class="k k-est">cycle model</span>. We decided in advance to change the format only if it saved a multiplier.</li>
     <li><b>Caching each proof's Miller loop value to split failed batches faster.</b> Every subtest still pays the fixed cost of a check, so it was no better than simply recomputing, and it needs extra storage (48 KB at n=128) <span class="k k-est">cycle model</span>.</li>
     <li><b>Relying on network-layer peer penalties to stop invalid proofs.</b> Peers that send invalid proofs get penalized and disconnected, but we found no source for a numeric per-node cap, and an attacker with a few hundred IP addresses gets around it <span class="k k-est">estimated</span>. So the chip itself has to survive a flood of nothing but invalid proofs.</li>
-    <li><b>A verify-only chip next to a Hailo-8L.</b> The Hailo's share of ordinary-day power (0.134–0.182 W) is more than our whole chip (0.092 W) <span class="k k-est">estimated</span>, and it truncates posts to 128 tokens.</li>
+    <li><b>A verify-only chip next to a Hailo-8L.</b> The Hailo's share of ordinary-day power (0.134–0.182 W) is more than our whole earlier chip (0.092 W), both under the every-box-gets-every-post assumption <span class="k k-est">estimated</span>, and it truncates posts to 128 tokens.</li>
   </ul>
 </section>
 
@@ -1062,25 +1173,24 @@ footer { font-size: 13px; color: var(--muted); }
   <div class="tbl"><table>
     <thead><tr><th>Step</th><th>What</th><th>What it leaves behind</th></tr></thead>
     <tbody>
-      <tr><td class="num"><b>1 (next)</b></td><td><b>Encoder re-decided.</b> The image encoder's chip cost (Timeloop + Accelergy), and the encoder's size and 2 MB SRAM set by search latency, the backlog after being offline, and determinism (whether every box can produce bit-identical embeddings, which would bring back the fast image delivery) instead of throughput. CLIP's text tower decides whether one model can serve both text and images</td><td>a chip estimate that includes images</td></tr>
-      <tr><td class="num">2</td><td>Scenarios: peak, backlog after being offline, flood (with attackers and a real neighbor structure; votes as the cheapest message to imitate)</td><td>chip size and power re-decided from simulated load</td></tr>
-      <tr><td class="num">3</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
-      <tr><td class="num">4</td><td>Demo: web UI, a few boxes running in real time</td><td>for the presentation</td></tr>
+      <tr><td class="num"><b>1 (next)</b></td><td><b>Scenarios on the new chip</b> (8×8 encoder, 1 MB SRAM): ordinary day, peak, a box catching up after being offline, attacker floods (fake posts, floods of invalid proofs), and the neighbor structure (mesh degree, regional clustering). Find where our targets break first: new posts searchable within 5 s, search answered within 100 ms, an 8-hour backlog cleared within 60 min</td><td>chip size and power re-checked under simulated load and attacks</td></tr>
+      <tr><td class="num">2</td><td>Comparison against existing hardware at equal resources, plus one-factor-at-a-time ablations</td><td>the central table of the final report</td></tr>
+      <tr><td class="num">3</td><td>Demo: web UI, a few boxes running in real time; finding images by words with CLIP's text tower</td><td>for the presentation</td></tr>
     </tbody>
   </table></div>
-  <p class="small muted">Done since the last update: the box software, how images travel and what a vote's proof carries, and a simulated day of 10,000 boxes (see <a href="#stack-h">What the box software does in a day</a>). Shrinking the encoder's 2 MB SRAM (6.80 mm² of the 11.3 mm² chip <span class="k k-est">estimated</span>) is part of step 1, because image posts change what the SRAM has to hold. The midterm report will cover the chip results so far plus this system design.</p>
+  <p class="small muted">Done since the last update: the encoder re-sized for latency, backlog and identical embeddings (see <a href="#encoder-h">The encoder</a>). Still open from it, outside the numbered steps: the image encoder's precision (static INT8 is at 0.798 against FP32; mixed precision is the next thing to try) and whether an integer-only encoder keeps enough quality. The midterm report will cover the chip results so far plus this system design.</p>
 
   <h3>Good places to start (no hardware tools needed)</h3>
   <ul class="help">
     <li><b>The client web UI.</b> A browser client for the community: post text and images, read a feed, search, vote, delete, chat in a private room. It talks to the same client API that the simulated users use, so the same UI works against the simulation and against the demo boxes. No CAD tools or chip knowledge needed.</li>
     <li><b>The behavior parameters we had to estimate.</b> Most come from Reddit's public statistics now (table in <a href="#load-h">section 2</a>), but we found no source for the time-of-day curve, a direct measure of how popularity spreads across sub-communities, post body length, page views per daily user, or any non-Reddit community such as DCInside. Subscriptions per user and the share of boxes online are estimates too. A source for any of these would firm up the per-box load.</li>
-    <li><b>Real photos for the image tests.</b> Our image tests use synthetic images, which look too alike to CLIP: the image-search check failed for that reason, and the embedding tolerance may differ on photos. Suggesting a small, openly licensed photo set (a few hundred images) would let us rerun both.</li>
+    <li><b>Real photos for the image tests.</b> Our image tests use synthetic images, which look too alike to CLIP: the image-search check failed for that reason, and the embedding tolerance, the static-INT8 calibration (quality 0.798 against FP32) and the gap between runtimes may all differ on photos. Text-to-image search also needs photos with captions. Suggesting a small, openly licensed photo set (a few hundred images) would let us rerun all of these.</li>
     <li><b>Image posts on slow uplinks.</b> With envelope + fetch, an image post is searchable within 2.01 s at 20 Mbps but takes 5.86 s at 5 Mbps (P99), over the 5 s target <span class="k k-est">simulation model</span>. Prior art on moving large payloads through gossip networks, or a delivery trick for slow boxes, is welcome.</li>
   </ul>
 
   <h3>Open hardware questions you could take</h3>
   <ul class="help">
-    <li><b>A deterministic INT8 encoder.</b> The fastest way to deliver image posts needs every box to compute bit-identical embeddings. Off-the-shelf dynamic INT8 doesn't: it even changes with the batch (cosine as low as 0.977, batch 1 vs 16) <span class="k k-meas">measured</span>. What would a standard encoder with fixed integer arithmetic and static, batch-independent quantization take, and what would it cost in accuracy and area? This feeds directly into the next step.</li>
+    <li><b>An integer-only encoder with bit-identical output.</b> The fastest way to deliver image posts needs every box to compute bit-identical embeddings. Dynamic INT8 changes with the batch; static INT8 doesn't, but two runtimes running the same file still disagree (cosine 0.872) <span class="k k-meas">measured</span>. An encoder that defines every operation in integers, including GELU, softmax and LayerNorm, with a fixed order and rounding (as in I-BERT, arXiv 2101.01321), would be a spec a chip can guarantee. How much quality does it keep for CLIP's image tower (it has to reach 0.95 cosine against FP32; plain static INT8 gets 0.798), and what does it add in area? A good self-contained project.</li>
     <li><b>ARM measurements.</b> We have no verification costs on ARM, from measurement or from any source. A real box CPU is likely ARM. Running the Groth16 / Ed25519 / ChaCha20 benchmarks on a Raspberry Pi 5 would fill that gap.</li>
     <li><b>Pi 5 + Hailo measurements.</b> The Hailo numbers are vendor figures on an x86 host with PCIe Gen3 x4, and the Pi 5 has x1. MiniLM power isn't published (we borrowed a vision-model figure), and we don't know its idle power. The input is fixed at 128 tokens, while our median post is 128 tokens and 17% are cut even at 256. Measuring throughput, power, idle power, and the quality loss from truncation would firm up the comparison.</li>
     <li><b>Encoder on the Pi 5 CPU.</b> We haven't measured the encoder's energy on a Pi 5 CPU, so we couldn't evaluate the cheapest option (verify-only chip, encoder on the host). If the CPU handles an ordinary day within about 0.09 W, that option comes back.</li>
