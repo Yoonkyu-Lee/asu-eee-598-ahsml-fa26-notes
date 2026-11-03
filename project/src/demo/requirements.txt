@@ -1,0 +1,5 @@
+# Demo box only (CP24): what box_server.py and lan.py import. Python 3.10 or newer.
+numpy>=1.26
+onnxruntime>=1.17
+tokenizers>=0.15
+cryptography>=42

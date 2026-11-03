@@ -1,4 +1,5 @@
-"""Start the demo: five boxes on 127.0.0.1:8601-8605, a few posts and photos already in, until Ctrl+C.
+"""Start the demo: five CP24 boxes on 127.0.0.1:8601-8605 (boxes 0-2 in the old group, 3-4 new), a few posts and
+photos already in, until Ctrl+C. --cp21 starts CP21's boxes instead (CP17 box software, one shared seed).
 
   .venv/Scripts/python.exe src/demo/run_demo.py            then open http://127.0.0.1:8601/ (and 8602-8605)
   .venv/Scripts/python.exe src/demo/run_demo.py --empty    no starting posts
@@ -26,7 +27,7 @@ def call(port: int, path: str, obj: dict | None = None):
 
 
 def main() -> None:
-    cfg = community()
+    cfg = community() if "--cp21" in sys.argv else community(proto="cp24", tiers=["old", "old", "old", "new", "new"])
     LOGS.mkdir(exist_ok=True)
     path = LOGS / "cp21_demo_cfg.json"
     save_cfg(cfg, path)
@@ -42,7 +43,7 @@ def main() -> None:
                 except Exception:
                     time.sleep(0.5)
         if "--empty" not in sys.argv:
-            for i in range(10):
+            for i in range(5):      # one photo per box (the old group may post one per 10 min)
                 call(cfg["ports"][i % cfg["n"]], "/api/post", {"topic": 0, "title": "", "body": "", "photo": True})
             for i, (t, b) in enumerate([("Welcome to sub A", "Every box here keeps its own copy and its own index."),
                                         ("No operator", "Delete your post and every box drops it."),

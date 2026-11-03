@@ -32,18 +32,24 @@ canvas { width:100%; border-radius:4px; display:block; }
 table { border-collapse:collapse; font-size:13px; }
 td { padding:2px 10px 2px 0; }
 .err { color:var(--warn); }
+.banner { margin:10px 16px 0; padding:8px 12px; border-radius:6px; border:1px solid var(--warn); color:var(--warn); }
+.budget span { display:inline-block; margin-right:12px; font-size:13px; }
+.wide { grid-column:1 / -1; }
 </style>
 </head>
 <body>
 <header><h1 id="who">Home node box</h1><span id="sub"></span></header>
+<div id="banner"></div>
 <main>
   <section>
     <h2>Write</h2>
     <div class="row"><select id="topic"><option value="0">sub A</option><option value="1">sub B</option></select>
-      <label><input type="checkbox" id="photo"> attach a photo (COCO)</label></div>
-    <input type="text" id="title" placeholder="Title (empty + photo = the photo's caption)">
+      <label id="cocolabel"><input type="checkbox" id="photo"> any photo (COCO)</label>
+      <label>my photo <input type="file" id="file" accept="image/*"></label></div>
+    <input type="text" id="title" placeholder="Title (empty + COCO photo = the photo's caption)">
     <textarea id="body" placeholder="Body"></textarea>
     <div class="row"><button onclick="post()">Post</button><span id="postmsg" class="m"></span></div>
+    <div class="budget m" id="budget"></div>
   </section>
   <section>
     <h2>Search</h2>
@@ -63,6 +69,14 @@ td { padding:2px 10px 2px 0; }
   <section>
     <h2>This box's work <button class="ghost" onclick="stats()">refresh</button></h2>
     <div id="stats"></div>
+  </section>
+  <section id="limits" hidden>
+    <h2>Limits and slashing</h2>
+    <p class="m">No operator bans anyone. Every message spends numbered slots of your identity in this window (zero-knowledge
+      rate limit, RLN). Spend one slot twice and anyone holding both messages can compute your identity secret, publish it,
+      and every box drops you.</p>
+    <div class="row"><button onclick="misbehave()">Break the limit (two posts on one slot)</button><span id="mismsg" class="m"></span></div>
+    <div id="notices"></div>
   </section>
 </main>
 <script>
@@ -100,12 +114,37 @@ async function searchImg() {
   $("results").innerHTML = `<div class="grid">${rows.map(it => `<figure id="g${it.mid}"><figcaption>${esc(it.title)}</figcaption></figure>`).join("")}</div>`;
   rows.forEach(it => draw(it.mid, $("g" + it.mid)));
 }
-async function post() {
-  const r = await send("/api/post", {topic: +$("topic").value, title: $("title").value, body: $("body").value, photo: $("photo").checked});
-  $("postmsg").textContent = r.mid ? "posted" : (r.error || "error");
-  $("title").value = $("body").value = ""; setTimeout(feed, 800);
+function rgbOf(file) {     // centre crop to 224 x 224, RGB bytes as base64 (what the box encodes with CLIP)
+  return new Promise((ok, bad) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); c.width = c.height = 224;
+      const s = Math.min(img.width, img.height);
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 224, 224);
+      const d = ctx.getImageData(0, 0, 224, 224).data;
+      let bin = "";
+      for (let i = 0; i < d.length; i += 4) bin += String.fromCharCode(d[i], d[i+1], d[i+2]);
+      URL.revokeObjectURL(img.src); ok(btoa(bin));
+    };
+    img.onerror = bad; img.src = URL.createObjectURL(file);
+  });
 }
-async function vote(mid, d) { await send("/api/vote", {mid, dir:d}); setTimeout(feed, 500); }
+async function post() {
+  const f = $("file").files[0];
+  const b = {topic: +$("topic").value, title: $("title").value, body: $("body").value, photo: $("photo").checked};
+  if (f) b.rgb = await rgbOf(f);
+  const r = await send("/api/post", b);
+  $("postmsg").textContent = r.mid ? "posted" : (r.error || "error");
+  if (r.mid) { $("title").value = $("body").value = ""; $("file").value = ""; }
+  setTimeout(feed, 800); setTimeout(stats, 800);
+}
+async function misbehave() {
+  const r = await send("/api/misbehave", {});
+  $("mismsg").textContent = r.mids ? "sent; watch the notices on every box" : (r.error || "error");
+  setTimeout(stats, 1500);
+}
+async function vote(mid, d) { const r = await send("/api/vote", {mid, dir:d}); if (r.error) alert(r.error); setTimeout(feed, 500); }
 async function del(mid) { const r = await send("/api/delete", {mid}); if (r.error) alert(r.error); setTimeout(feed, 500); }
 async function room() {
   const r = await get("/api/room");
@@ -116,12 +155,24 @@ async function roomSend() { const r = await send("/api/room", {body: $("roomtext
 async function stats() {
   const s = await get("/api/stats");
   $("who").textContent = "Home node box " + s.box;
-  $("sub").textContent = `holds ${s.topics.length} topics · ${s.items} items · ${s.index.text} text / ${s.index.image} photo vectors · ${s.banned} banned identities`;
+  $("sub").textContent = `identity ${s.identity}… · ${s.tier} group · holds ${s.topics.length} topics · ${s.items} items · ${s.index.text} text / ${s.index.image} photo vectors · ${s.banned} banned identities`;
+  $("cocolabel").hidden = !s.coco;
+  $("banner").innerHTML = s.slashed ? `<div class="banner">Your identity was revealed for breaking the limit and removed from the group: other boxes now drop your messages (their proof no longer verifies). Restart the box for a new identity.</div>` : "";
+  if (s.budget) {
+    const B = s.budget, w = x => x.window_s >= 3600 ? "hour" : (x.window_s / 60) + " min";
+    $("budget").innerHTML = `<span>text slots left ${B.t.left}/${B.t.limit} per ${w(B.t)}</span><span>photos ${B.p.left}/${B.p.limit} per ${w(B.p)}</span>` +
+      `<span>votes/deletes ${B.a.left}/${B.a.limit} per ${w(B.a)}</span><span>(a short post = 1 text slot, 82+ tokens = 2)</span>`;
+    $("limits").hidden = false;
+    $("notices").innerHTML = s.notices.map(x => `<div class="item">identity ${esc(x.identity)}… revealed and removed${x.mine ? " <b>(you)</b>" : ""} · ${new Date(x.t * 1000).toLocaleTimeString()}</div>`).join("");
+  }
+  const peers = Object.entries(s.peers_seen_s_ago || {});
+  if (peers.length) $("sub").textContent += " · heard from " + peers.map(([p, a]) => `box ${p} ${a}s ago`).join(", ");
   const rows = Object.entries(s.count).sort();
   $("stats").innerHTML = `<table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join("")}` +
     `<tr><td>chip time (model)</td><td>${s.chip_virtual_ms.toFixed(1)} ms</td></tr></table>`;
 }
 stats(); feed(); room();
+setInterval(() => { stats(); feed(); room(); }, 5000);
 </script>
 </body>
 </html>
