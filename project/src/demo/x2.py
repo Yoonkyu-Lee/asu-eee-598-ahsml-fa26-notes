@@ -2,6 +2,10 @@
 operation by operation (CP15 rule X2), then the demo function checks D1-D6 on the real boxes.
 
   .venv/Scripts/python.exe src/demo/x2.py          -> results/cp21/cp21.json   (box logs in logs/cp21_box*.log)
+  .venv/Scripts/python.exe src/demo/x2.py --cp24   -> results/cp24/x2.json     (CP24 box and DayNet24; logs/cp24_box*.log)
+
+CP24 mode: boxes 0-2 in the old group, 3-4 in the new one; the honest client waits for the next window when its
+indices are used up; the reuse scene re-spends the last text index; added checks D7 (limits), D8 (F1), D9 (O-b).
 """
 from __future__ import annotations
 
@@ -27,11 +31,16 @@ from bench_cp1 import load_posts  # noqa: E402
 from node import Encoder  # noqa: E402
 from sim.box import Shared, World, h, sub_key  # noqa: E402
 from sim.stack import Accel, Cost, DayNet  # noqa: E402
+from sim import proto24 as p24  # noqa: E402
 
+CP24 = "--cp24" in sys.argv
 ROOT = HERE.parents[1]
-OUT = ROOT / "results" / "cp21"
+OUT = ROOT / "results" / ("cp24" if CP24 else "cp21")
 LOGS = ROOT / "logs"
-OPS = ("ed25519", "proof", "rln", "decrypt", "text", "image", "insert", "tally", "delete", "query", "send", "pull", "dup")
+TAG = "cp24" if CP24 else "cp21"
+OPS = (("lookup",) if CP24 else ()) + ("ed25519", "proof", "rln", "decrypt", "text", "image", "insert", "tally",
+                                       "delete", "query", "send", "pull", "dup")
+TIERS = ["old", "old", "old", "new", "new"]
 N_PRELOAD = 100
 T0 = time.time()
 
@@ -44,7 +53,7 @@ def log(*a):
 
 def scenario(cfg: dict) -> tuple[World, list, dict]:
     n = cfg["n"]
-    W = World(n, seed=cfg["seed"])
+    W = p24.World24(n, seed=cfg["seed"], tiers=cfg["tiers"]) if CP24 else World(n, seed=cfg["seed"])
     coco = Coco()
     tok = Encoder("int8").tok
     room_key = bytes.fromhex(cfg["room_key"])
@@ -58,8 +67,14 @@ def scenario(cfg: dict) -> tuple[World, list, dict]:
         clock[0] += 30.0
         text = ((body.get("title") or "") + "\n\n" + (body.get("body") or "")).strip()
         key = room_key if topic == ROOM else sub_key(topic)
-        m = W.make(user, kind, topic, clock[0], body, 400 + len(json.dumps(body)), key,
-                   tokens=len(tok.encode(text).ids) if text else 0, **kw)
+        while True:
+            try:
+                m = W.make(user, kind, topic, clock[0], body, 400 + len(json.dumps(body)), key,
+                           tokens=len(tok.encode(text).ids) if text else 0, **kw)
+                break
+            except p24.Over as e:                    # the honest client waits for the next window
+                W.waits += 1
+                clock[0] = e.until + 1.0
         acts.append(("msg", m.mid, user))
         title_of[m.mid] = body.get("title") or body.get("body") or ""
         if tag:
@@ -105,11 +120,27 @@ def scenario(cfg: dict) -> tuple[World, list, dict]:
     add(1, "comment", A, {"body": "this one carries a proof that does not verify"}, "bad_proof", proof_ok=False)
     # rate-limit breach: user 3 reuses the message index it just used in this epoch -> its secret is revealed
     m1 = add(3, "comment", A, {"body": "an ordinary comment"}, "before_reuse")
-    k = W.counter[(3, m1.epoch)] - 1
-    clock[0] -= 29.0                                  # same epoch as m1
-    add(3, "comment", A, {"body": "a second comment on the same share"}, "reuse", reuse_k=k)
+    if CP24:
+        clock[0] = m1.t0 - 30.0                       # same window as m1
+        add(3, "comment", A, {"body": "a second comment on the same share"}, "reuse", reuse=True)
+    else:
+        k = W.counter[(3, m1.epoch)] - 1
+        clock[0] -= 29.0                              # same epoch as m1
+        add(3, "comment", A, {"body": "a second comment on the same share"}, "reuse", reuse_k=k)
     W.members.discard(W.ids[3].commit)               # the group drops the revealed identity
     add(3, "post", A, {"title": "posted after being slashed", "body": "should be refused"}, "after_slash")
+    if CP24:     # D9: someone replays post 6 with a fresh signature (same epoch, nullifier and x) from box 4
+        import copy
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+        r = copy.copy(posts[6])
+        sk = Ed25519PrivateKey.generate()
+        r.mid, r.epub = len(W.msgs), sk.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+        r.sig = sk.sign(r.header() + r.nonce + r.ct)
+        r.truth = {**posts[6].truth, "replay_of": posts[6].mid}
+        W.msgs.append(r)
+        acts.append(("msg", r.mid, 4))
+        tags["replay"].append(r.mid)
     for j, m in enumerate(posts[:5]):
         acts.append(("search", j % n, title_of[m.mid]))
     exp_votes = {mid: c for mid, c in voters.items()}
@@ -140,11 +171,11 @@ def quiet(ports: list[int]) -> None:
 
 def e1(cfg: dict, W: World, acts: list) -> dict:
     LOGS.mkdir(exist_ok=True)
-    cfg_path = LOGS / "cp21_cfg.json"          # holds the demo room key: kept out of git
+    cfg_path = LOGS / f"{TAG}_cfg.json"          # holds the demo room key: kept out of git
     save_cfg(cfg, cfg_path)
     py = sys.executable
     procs = [subprocess.Popen([py, str(HERE / "box_server.py"), "--cfg", str(cfg_path), "--id", str(i)],
-                              stdout=open(LOGS / f"cp21_box{i}.log", "w"), stderr=subprocess.STDOUT)
+                              stdout=open(LOGS / f"{TAG}_box{i}.log", "w"), stderr=subprocess.STDOUT)
              for i in range(cfg["n"])]
     ports = cfg["ports"]
     try:
@@ -188,7 +219,7 @@ class CountAccel(Accel):
         return super().run(box, unit, t, dur, name)
 
 
-class CountNet(DayNet):
+class CountNet(p24.DayNet24 if CP24 else DayNet):
     def _send(self, frm, to, nbytes, t_ready, fn, *args):
         self.a.names[frm]["pull" if getattr(fn, "__name__", "") == "got_full" else "send"] += 1
         return super()._send(frm, to, nbytes, t_ready, fn, *args)
@@ -290,12 +321,27 @@ def checks(cfg, W, info, r1) -> dict:
     allowed = {author, *cfg["mesh"][str(m.topic)][str(author)]}
     who = [b for b in range(cfg["n"]) if str(bad) in dbg[b]["verified"]]
     out["D6"] = {"verified_by": who, "allowed": sorted(allowed), "pass": set(who) <= allowed}
+    if CP24:
+        st = r1["stats"]
+        banned_ids = {x for b in range(cfg["n"]) for x in dbg[b]["banned"]}
+        honest_text = [m for m in W.msgs if m.kind in p24.TEXT_KINDS and m.mid not in tags["reuse"]]
+        out["D7"] = {"honest_waits": W.waits, "banned": len(banned_ids),
+                     "pass": W.waits > 0 and banned_ids == {str(h("id", W.ids[3].a0))}
+                     and all(m.n_t == p24.text_indices(m.tokens) for m in honest_text)}
+        long_ = sum(m.tokens > p24.F1_TOKENS for m in honest_text)
+        out["D8"] = {"enc_tokens_max": [s["enc_tokens_max"] for s in st], "messages_over_128": long_,
+                     "pass": long_ > 0 and max(s["enc_tokens_max"] for s in st) <= p24.F1_TOKENS}
+        rep = tags["replay"][0]
+        who = [b for b in range(cfg["n"]) if str(rep) in dbg[b]["verified"]]
+        verdicts = sorted({v for b in range(cfg["n"]) for t, mid, v in dbg[b]["log"] if mid == str(rep)})
+        out["D9"] = {"proof_checked_by": who, "verdicts": verdicts,
+                     "pass": not who and verdicts == ["dup_lookup"]}
     return out
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    cfg = community()
+    cfg = community(proto="cp24", tiers=TIERS) if CP24 else community()
     W, acts, info = scenario(cfg)
     log("scenario", len(acts), "actions,", len(W.msgs), "messages")
     r1 = e1(cfg, W, acts)
@@ -319,7 +365,7 @@ def main() -> None:
         res["chip_virtual_ms"] = [s["chip_virtual_ms"] for s in r1["stats"]]
         for k, v in res["checks"].items():
             log(k, v)
-        (OUT / "cp21.json").write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
+        (OUT / ("x2.json" if CP24 else "cp21.json")).write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
         log("wrote")
     finally:
         for p in r1["procs"]:

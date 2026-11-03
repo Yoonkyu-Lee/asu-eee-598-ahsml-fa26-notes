@@ -80,9 +80,16 @@ class Msg:
     tokens: int = 0
     pull_bytes: float = 0.0   # image body fetched after the envelope (I2)
     truth: dict = field(default_factory=dict)   # world-only ground truth, never read by boxes
+    tier: str = ""            # CP24 (proto24): age group, text / picture index counts, the shares after the first
+    n_t: int = 0
+    n_p: int = 0
+    shares: list = field(default_factory=list)
 
     def header(self) -> bytes:
-        return f"{self.kind}|{self.topic}|{self.epoch}|{self.x}|{self.y}|{self.nul}|{self.vnul}".encode()
+        base = f"{self.kind}|{self.topic}|{self.epoch}|{self.x}|{self.y}|{self.nul}|{self.vnul}"
+        if self.tier:
+            base += f"|{self.tier}|{self.n_t}|{self.n_p}|" + ",".join(f"{a}:{b}" for a, b in self.shares)
+        return base.encode()
 
 
 class Shared:

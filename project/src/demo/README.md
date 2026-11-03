@@ -1,11 +1,14 @@
-# 데모: 박스 다섯 대 (CP21)
+# 데모: 박스 다섯 대 (CP21 → CP24)
 
-진짜 박스 프로세스 다섯 개가 `127.0.0.1:8601`–`8605`에 떠서 서로 메시지를 주고받는다 (Ed25519, 증명, RLN, 복호화, MiniLM·CLIP 임베딩). 운영자 서버는 없다. 설계와 결과는 [cp/CP21.md](../../cp/CP21.md).
+진짜 박스 프로세스 다섯 개가 `127.0.0.1:8601`–`8605`에 떠서 서로 메시지를 주고받는다 (Ed25519, 증명, RLN, 복호화, MiniLM·CLIP 임베딩). 운영자 서버는 없다. 설계와 결과는 [cp/CP21.md](../../cp/CP21.md), [cp/CP24.md](../../cp/CP24.md).
+
+- CP24부터 박스는 설계대로 돈다: 증명 먼저(O-b), 텍스트 단위 + 사진 개수 한도(I5), 실시간 128토큰(F1), 인코더 우선순위(텍스트 먼저, 오래된 그룹 먼저). 박스 0–2는 오래된 그룹, 3–4는 새 그룹. 신원은 박스가 직접 뽑는다. CP21 박스는 `--cp21`.
+- **여러 컴퓨터에서 각자 박스 하나씩**: [LAN.md](LAN.md) (영어, 팀원용).
 
 ## 준비 (git에 없는 것)
-- `project/.venv` (`requirements` 설치된 것)
-- `project/models/all-MiniLM-L6-v2`, `project/models/clip-vit-base-patch32`
-- `project/data/coco/val2017_224.npy`, `val2017_index.json` (첨부 사진)
+- `project/.venv` (데모만이면 `src/demo/requirements.txt`)
+- `project/models/all-MiniLM-L6-v2`, `project/models/clip-vit-base-patch32` (`src/demo/fetch_models.py`가 받고 SHA-256 확인)
+- `project/data/coco/val2017_224.npy`, `val2017_index.json` ("아무 사진" 단추와 장면 실행기용. 없어도 화면에서 내 사진 파일을 올릴 수 있음)
 - 포트 8601–8605가 비어 있을 것. CPU만 쓴다 (박스마다 1스레드).
 
 ## 실행
@@ -25,14 +28,16 @@
 | 말로 사진 찾기 | Search → Photos by words | CLIP으로 찾은 사진 격자 |
 | 방 R | Room R | 박스 1, 2, 3만 읽음. 나머지는 "키가 없어 못 읽음" |
 | 이 박스의 작업 | This box's work | 작업 종류별 개수와 가상 칩 시간 (추정: 칩 모델) |
-
-화면에 없는 것: 벌칙(한도 넘긴 재사용 → 비밀 공개 → 알림)과 CP22 스팸 방어(무게 한도, 사진 뒤로, 나이 그룹). 벌칙은 아래 장면 실행기에서만 돈다.
+| 남은 몫 | Write 아래 | 이 창에서 남은 텍스트 번호·사진·투표 (CP24) |
+| 한도 넘기기 | Limits and slashing | 같은 번호에 글 두 개 → 다른 박스가 비밀을 복원해 알림, 이 박스는 빨간 배너, 이후 글은 버려짐 (CP24) |
 
 ## 장면 실행기 (화면 없음, 약 2분)
 ```
-.venv/Scripts/python.exe src/demo/x2.py
+.venv/Scripts/python.exe src/demo/x2.py           # CP21 박스 → results/cp21/cp21.json
+.venv/Scripts/python.exe src/demo/x2.py --cp24    # CP24 박스와 DayNet24, D7–D9 추가 → results/cp24/x2.json
+.venv/Scripts/python.exe src/demo/lan_check.py    # 여러 컴퓨터 모드를 이 컴퓨터의 사설 IP로 (L1–L7) → results/cp24/lan_check.json
 ```
-박스 다섯 개에 장면 145개를 넣고 같은 장면을 시뮬레이터로도 돌려, 박스별 작업 수를 비교하고 기능 시험 D1–D6을 돌린다 → `results/cp21/cp21.json`.
+박스 다섯 개에 장면 145개(CP24는 146개)를 넣고 같은 장면을 시뮬레이터로도 돌려, 박스별 작업 수를 비교하고 기능 시험을 돌린다.
 
 ## 확인한 것 (2026-11-01, 두 번째 PC, CPU만)
 다섯 박스가 약 10초 만에 떴다. API로 확인했다:

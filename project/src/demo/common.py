@@ -24,11 +24,17 @@ COCO = ROOT / "data" / "coco"
 IMG_BYTES = 224 * 224 * 3
 
 
-def community(n: int = 5, D: int = 2, seed: int = 21, base_port: int = 8601) -> dict:
-    holders = {A: list(range(n)), B: [0, 2, 4][: max(1, min(3, n))], ROOM: [1, 2, 3][: max(1, min(3, n - 1))],
-               MEMB: list(range(n))}
+def community(n: int = 5, D: int = 2, seed: int = 21, base_port: int = 8601, *, proto: str = "cp21",
+              hosts: list[str] | None = None, room: list[int] | None = None, tiers: list[str] | None = None) -> dict:
+    """proto "cp24" = the design's box (sim.proto24). hosts: one address per box (several computers, each box on
+    base_port); otherwise every box is on 127.0.0.1 with its own port. room: the room's members (default 1-3)."""
+    holders = {A: list(range(n)), B: [i for i in (0, 2, 4) if i < n],
+               ROOM: room if room is not None else [i for i in (1, 2, 3) if i < n], MEMB: list(range(n))}
     mesh = meshes({t: np.array(h) for t, h in holders.items()}, D, np.random.default_rng(seed))
-    return {"n": n, "D": D, "seed": seed, "ports": [base_port + i for i in range(n)],
+    ports = [base_port] * n if hosts else [base_port + i for i in range(n)]
+    return {"n": n, "D": D, "seed": seed, "proto": proto, "ports": ports,
+            "addr": [f"{hosts[i] if hosts else '127.0.0.1'}:{ports[i]}" for i in range(n)],
+            "tiers": tiers or (["new"] * n),
             "holders": {str(t): h for t, h in holders.items()},
             "mesh": {str(t): {str(b): [int(x) for x in p] for b, p in m.items()} for t, m in mesh.items()},
             "room_key": os.urandom(32).hex()}
@@ -42,18 +48,24 @@ def msg_to_json(m: Msg) -> dict:
     return {"mid": m.mid, "kind": m.kind, "topic": m.topic, "t0": m.t0, "size": m.size, "epub": m.epub.hex(),
             "sig": m.sig.hex(), "nonce": m.nonce.hex(), "ct": m.ct.hex(), "epoch": m.epoch, "x": str(m.x),
             "y": str(m.y), "nul": str(m.nul), "vnul": None if m.vnul is None else str(m.vnul), "proof_ok": m.proof_ok,
-            "image": m.image, "tokens": m.tokens, "pull_bytes": m.pull_bytes}
+            "image": m.image, "tokens": m.tokens, "pull_bytes": m.pull_bytes, "tier": m.tier, "n_t": m.n_t, "n_p": m.n_p,
+            "shares": [[str(a), str(b)] for a, b in m.shares]}
 
 
 def msg_from_json(d: dict) -> Msg:
     return Msg(int(d["mid"]), d["kind"], int(d["topic"]), float(d["t0"]), float(d["size"]), bytes.fromhex(d["epub"]),
                bytes.fromhex(d["sig"]), bytes.fromhex(d["nonce"]), bytes.fromhex(d["ct"]), int(d["epoch"]),
                int(d["x"]), int(d["y"]), int(d["nul"]), None if d["vnul"] is None else int(d["vnul"]),
-               bool(d["proof_ok"]), d["image"], int(d["tokens"]), float(d["pull_bytes"]))
+               bool(d["proof_ok"]), d["image"], int(d["tokens"]), float(d["pull_bytes"]), {}, d.get("tier", ""),
+               int(d.get("n_t", 0)), int(d.get("n_p", 0)), [[int(a), int(b)] for a, b in d.get("shares", [])])
 
 
 class Coco:
     """COCO val2017 pixels (224 x 224, data/coco/val2017_224.npy) and captions; images 0-299 were CP20's calibration."""
+
+    @staticmethod
+    def available() -> bool:
+        return (COCO / "val2017_224.npy").exists() and (COCO / "val2017_index.json").exists()
 
     def __init__(self):
         self.px = np.load(COCO / "val2017_224.npy", mmap_mode="r")
