@@ -157,7 +157,7 @@ async function stats() {
   $("who").textContent = "Home node box " + s.box;
   $("sub").textContent = `identity ${s.identity}… · ${s.tier} group · holds ${s.topics.length} topics · ${s.items} items · ${s.index.text} text / ${s.index.image} photo vectors · ${s.banned} banned identities`;
   $("cocolabel").hidden = !s.coco;
-  $("banner").innerHTML = s.slashed ? `<div class="banner">Your identity was revealed for breaking the limit and removed from the group: other boxes now drop your messages (their proof no longer verifies). Restart the box for a new identity.</div>` : "";
+  $("banner").innerHTML = s.slashed ? `<div class="banner">Your identity was revealed for breaking the limit and removed from the group: other boxes now drop your messages (their proof no longer verifies). ${s.kept_on_disk ? "Start the box again with --new-identity for a new one (your posts stay)." : "Restart the box for a new identity."}</div>` : "";
   if (s.budget) {
     const B = s.budget, w = x => x.window_s >= 3600 ? "hour" : (x.window_s / 60) + " min";
     $("budget").innerHTML = `<span>text slots left ${B.t.left}/${B.t.limit} per ${w(B.t)}</span><span>photos ${B.p.left}/${B.p.limit} per ${w(B.p)}</span>` +

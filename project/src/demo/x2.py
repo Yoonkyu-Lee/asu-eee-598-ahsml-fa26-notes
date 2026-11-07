@@ -3,6 +3,7 @@ operation by operation (CP15 rule X2), then the demo function checks D1-D6 on th
 
   .venv/Scripts/python.exe src/demo/x2.py          -> results/cp21/cp21.json   (box logs in logs/cp21_box*.log)
   .venv/Scripts/python.exe src/demo/x2.py --cp24   -> results/cp24/x2.json     (CP24 box and DayNet24; logs/cp24_box*.log)
+  ... --cp24 --out results/cp25/x2_tokfix.json      (CP25: rerun after the token count fix, CP24's file kept)
 
 CP24 mode: boxes 0-2 in the old group, 3-4 in the new one; the honest client waits for the next window when its
 indices are used up; the reuse scene re-spends the last text index; added checks D7 (limits), D8 (F1), D9 (O-b).
@@ -56,6 +57,7 @@ def scenario(cfg: dict) -> tuple[World, list, dict]:
     W = p24.World24(n, seed=cfg["seed"], tiers=cfg["tiers"]) if CP24 else World(n, seed=cfg["seed"])
     coco = Coco()
     tok = Encoder("int8").tok
+    tok.no_padding()          # CP25 fix: tokenizer.json pads to 128, so every text message was counted as 128 tokens
     room_key = bytes.fromhex(cfg["room_key"])
     hold = {int(t): v for t, v in cfg["holders"].items()}
     acts: list = []
@@ -365,7 +367,9 @@ def main() -> None:
         res["chip_virtual_ms"] = [s["chip_virtual_ms"] for s in r1["stats"]]
         for k, v in res["checks"].items():
             log(k, v)
-        (OUT / ("x2.json" if CP24 else "cp21.json")).write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
+        out_path = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else OUT / ("x2.json" if CP24 else "cp21.json")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
         log("wrote")
     finally:
         for p in r1["procs"]:

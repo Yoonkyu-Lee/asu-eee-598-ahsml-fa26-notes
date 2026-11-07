@@ -1,6 +1,6 @@
 """CP24 R3: three lan.py boxes on this computer, called over its network address as if on three computers.
 
-  .venv/Scripts/python.exe src/demo/lan_check.py [address]     -> results/cp24/lan_check.json   (about 2 min)
+  .venv/Scripts/python.exe src/demo/lan_check.py [address] [out.json]     -> results/cp24/lan_check.json   (about 2 min)
 
 Boxes 0 and 1 know the room password, box 2 only relays the room. Box 2 starts late (catch-up by sync). Checks:
 L1 a post and an uploaded photo reach every box, L2 votes and the author's delete reach every box, L3 room R only
@@ -13,6 +13,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -72,9 +73,11 @@ def main() -> None:
     LOGS.mkdir(exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
     py = sys.executable
+    state = LOGS / "cp24_lan_state"                     # CP25: lan.py keeps state; every run starts from empty boxes
+    shutil.rmtree(state, ignore_errors=True)
 
     def start(i, room):
-        args = [py, str(HERE / "lan.py"), "--hosts", hosts, "--me", str(i)] + (["--room-pass", "said in person"] if room else [])
+        args = [py, str(HERE / "lan.py"), "--hosts", hosts, "--me", str(i), "--state", str(state / f"box{i}")] +             (["--room-pass", "said in person"] if room else [])
         return subprocess.Popen(args, stdout=open(LOGS / f"cp24_lan_box{i}.log", "w"), stderr=subprocess.STDOUT)
 
     procs = [start(0, True), start(1, True)]
@@ -131,7 +134,7 @@ def main() -> None:
         res["pass"] = all(v["pass"] for v in C.values())
         for k, v in C.items():
             print(k, v["pass"], {x: y for x, y in v.items() if x != "pass"})
-        (OUT / "lan_check.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+        (Path(sys.argv[2]) if len(sys.argv) > 2 else OUT / "lan_check.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
         print("pass" if res["pass"] else "FAIL")
     finally:
         for pr in procs:

@@ -10,6 +10,11 @@ identity drawn in this process, photos uploaded from the screen, and several com
 on --bind, answers owner calls only from this computer and peer calls only from the listed addresses, and with
 cfg "sync" asks its peers for what it missed (start, then every 20 s).
 
+CP25 (--state DIR, set by lan.py): the box keeps its identity, the indices it used, its one-time keys, the messages it
+took and the pictures on disk (store.py), and takes them back in arrival order when it starts again. A deleted post is
+forgotten on disk and in /sync too, and a copy that comes back later from a stale box is dropped. events.jsonl logs
+times for remote_report.py (no plaintext).
+
   .venv/Scripts/python.exe src/demo/box_server.py --cfg results/cp21/cfg.json --id 0
 Peers:   POST /gossip {msg, frm}    GET /pull?mid=&frm=    GET /hello    GET /sync?after=    POST /inject {msg}
 Owner:   GET / (screen)  /api/stats  /api/feed  /api/search?q=  /api/search_image?q=  /api/img?mid=  /api/debug
@@ -44,6 +49,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import A, B, IMG_BYTES, MEMB, ROOM, TOPIC_NAMES, Coco, msg_from_json, msg_to_json  # noqa: E402
 from sim.box import Box, Msg, Shared, World, h, sub_key  # noqa: E402
 from sim import proto24 as p24  # noqa: E402
+from store import Store  # noqa: E402
 
 UI = Path(__file__).resolve().parent / "ui.html"
 CHIP = {"proof_s": 89.6e-6, "image_s": 0.552}     # CP19 verify unit (single proof), CP20 FP16 image tower (추정)
@@ -55,7 +61,7 @@ def log(*a):
 
 
 class BoxNode:
-    def __init__(self, cfg: dict, bid: int, load_models: bool = True):
+    def __init__(self, cfg: dict, bid: int, load_models: bool = True, state: str | None = None):
         self.cfg, self.bid, self.n = cfg, bid, cfg["n"]
         self.p24 = cfg.get("proto") == "cp24"
         self.holders = {int(t): v for t, v in cfg["holders"].items()}
@@ -92,6 +98,13 @@ class BoxNode:
         self.notices: list[dict] = []
         self.enc_tokens_max = 0
         self.peer_seen: dict[int, float] = {}
+        self.st = Store(Path(state)) if state and self.p24 else None
+        self.replaying = False
+        self.replayed: set[int] = set()
+        self.tomb: dict[int, set] = {}           # deleted post -> the author's one-time public keys (hex)
+        if self.st:
+            self._restore_identity()
+            self.commit = self.W.ids[bid].commit
         self.pool = ThreadPoolExecutor(16)
         self.coco = Coco() if Coco.available() else None
         if load_models:
@@ -110,7 +123,93 @@ class BoxNode:
         self.seq = itertools.count()
         if self.p24:
             threading.Thread(target=self._encoder, daemon=True).start()
+        self.restored = self._replay() if self.st else 0
         self.ready = True
+
+    # ---- the box's state on disk (CP25)
+    def _restore_identity(self) -> None:
+        d = self.st.identity()
+        if d is None:                                          # first start: keep the identity drawn above
+            self._save_identity()
+            return
+        me = self.W.ids[self.bid]
+        self.W.members.discard(me.commit)
+        me.a0 = int(d["a0"])
+        me.commit = h("id", me.a0)
+        self.W.members.add(me.commit)
+        if d["tier"] != self.tier:
+            log(f"this identity is in the {d['tier']} group (kept; the address list says {self.tier})")
+        self.tier = self.W.tier[self.bid] = d["tier"]
+        for sp, e, k in d["used"]:
+            self.W.used[(self.bid, sp, int(e))] = int(k)
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        for mid, raw in self.st.keys().items():
+            self.W.keys[int(mid)] = Ed25519PrivateKey.from_private_bytes(bytes.fromhex(raw))
+            self.own.add(int(mid))
+        self.tomb = self.st.tomb()
+
+    def _save_identity(self) -> None:
+        used = {(sp, e): k for (u, sp, e), k in self.W.used.items() if u == self.bid}
+        self.st.save_identity(self.W.ids[self.bid].a0, self.tier, used)
+
+    def _save_keys(self) -> None:
+        from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat
+        self.st.save_keys({str(mid): sk.private_bytes(Encoding.Raw, PrivateFormat.Raw, NoEncryption()).hex()
+                           for mid, sk in self.W.keys.items()})
+
+    def _replay(self) -> int:
+        """Take the stored messages again, in arrival order: same checks, same index; nothing is sent."""
+        t0 = time.perf_counter()
+        rows = self.st.messages()
+        self.replaying = True
+        try:
+            for d in rows:
+                m = msg_from_json(d)
+                pic = self.st.picture(m.mid)
+                if pic is not None:
+                    self.full[m.mid] = pic
+                self.replayed.add(m.mid)
+                self.deliver(m, int(d.get("_frm", -1)))
+        finally:
+            self.replaying = False
+        ms = (time.perf_counter() - t0) * 1e3
+        self.st.ev("start", restored=len(rows), ms=ms, identity=hex(self.commit)[2:10], tier=self.tier)
+        if rows:
+            log(f"restored {len(rows)} messages from {self.st.dir} in {ms / 1e3:.1f} s (encoding continues in the background)")
+        return len(rows)
+
+    def _have_picture(self, mid: int, data: bytes) -> None:
+        self.full[mid] = data
+        if self.st:
+            self.st.save_picture(mid, data)
+
+    def _after_delete(self, m: Msg) -> None:
+        """Forgetting (CP25): a delete by the author removes the post's envelope and picture here, on disk and from
+        /sync. A delete that comes before its post leaves a tombstone, so the post is dropped when it comes."""
+        body = self.S.open(m, self.key_for(m.topic)) if self.key_for(m.topic) else None
+        if body is None:
+            return
+        tgt = int(body["target"])
+        it = self.box.items.get(tgt)
+        if it is not None and it["epub"] != m.epub:            # someone else's delete: Box.apply refused it
+            return
+        self.tomb.setdefault(tgt, set()).add(m.epub.hex())
+        self.st.save_tomb(self.tomb)
+        if it is None:
+            return
+        self.msgs.pop(tgt, None)
+        self.full.pop(tgt, None)
+        self.S.plain = {k: v for k, v in self.S.plain.items() if k[0] != tgt}
+        self.S.emb.pop(tgt, None)
+        self.S.img.pop(tgt, None)
+        it["title"] = None
+        for kind, ids in self.box.idx_ids.items():
+            keep = [i for i, x in enumerate(ids) if x != tgt]
+            self.box.idx_ids[kind] = [ids[i] for i in keep]
+            self.box.idx_vec[kind] = [self.box.idx_vec[kind][i] for i in keep]
+        if not self.replaying:
+            self.st.forget(tgt)
+            self.st.ev("forget", mid=str(tgt))
 
     # ---- helpers
     def _inc(self, k: int = 1) -> None:
@@ -155,14 +254,19 @@ class BoxNode:
         return ((body.get("title") or "") + "\n\n" + (body.get("body") or "")).strip()
 
     # ---- the ingest path (mirrors sim.stack.DayNet.deliver / sim.proto24.DayNet24.deliver, same operation names)
-    def deliver(self, m: Msg, frm: int) -> None:
+    def deliver(self, m: Msg, frm: int, via: str = "gossip") -> None:
         with self.lock:
             if m.mid in self.got:
                 self.count["dup"] += 1
                 return
             self.got.add(m.mid)
+            if m.epub.hex() in self.tomb.get(m.mid, ()):           # deleted by its author: forgotten (CP25)
+                self.count["forgotten"] += 1
+                return
             self.msgs[m.mid] = m
-            if frm >= 0:
+            if self.st and not self.replaying:
+                self.st.add_message(msg_to_json(m), frm)
+            if frm >= 0 and not self.replaying:
                 self.peer_seen[frm] = time.time()
             t = time.time()
             if self.p24:
@@ -180,13 +284,15 @@ class BoxNode:
                     self.verified.append(m.mid)
                     self.chip_s += CHIP["proof_s"]
                 v = self.box.validate(m)
+            if self.st and not self.replaying:
+                self.st.ev("recv", mid=str(m.mid), frm=frm, kind=m.kind, via=via, verdict=v[0])
             if v[0] != "ok" and frm >= 0:                       # a relay drops it; the author's box sends anyway
-                if v[0] == "slash":
+                if v[0] == "slash" and not self.replaying:
                     self.publish_slash(v[1])
                 self.box.apply(m, t, v)
                 return
             for peer in self.mesh.get(m.topic, {}).get(self.bid, ()):
-                if peer != frm:
+                if peer != frm and not self.replaying:
                     self.send(peer, m)
             if v[0] != "ok":
                 self.box.apply(m, t, v)
@@ -236,12 +342,12 @@ class BoxNode:
             self._enqueue(1 if m.tier == "old" else 3, ("text", m.mid, feed))
             if m.image is not None and m.kind == "post":
                 self.full_ev.setdefault(m.mid, threading.Event())
-                if frm < 0:
-                    if m.mid not in self.full:
-                        self.full[m.mid] = self.coco.pixels(m.image).tobytes()
+                if frm < 0 and m.mid not in self.full and self.coco is not None:
+                    self._have_picture(m.mid, self.coco.pixels(m.image).tobytes())
+                if m.mid in self.full:                          # mine, or stored (CP25)
                     self.full_ev[m.mid].set()
                     self._enqueue(4 if m.tier == "old" else 5, ("image", m.mid))
-                else:
+                elif frm >= 0:
                     self.parent[m.mid] = frm
                     self._request(m.mid)
             return
@@ -250,6 +356,8 @@ class BoxNode:
             self.count["tally"] += 1
         elif m.kind == "delete":
             self.count["delete"] += 1
+            if self.st:
+                self._after_delete(m)
 
     def _enqueue(self, cls: int, job: tuple) -> None:
         self._inc()
@@ -262,7 +370,9 @@ class BoxNode:
             try:
                 if job[0] == "text":
                     mid, feed = job[1], job[2]
+                    t0 = time.perf_counter()
                     e = self.text_enc.encode_tokens(feed)[0]
+                    ms = (time.perf_counter() - t0) * 1e3
                     nt = int(feed["attention_mask"].sum())
                     with self.lock:
                         self.S.emb[mid] = e
@@ -272,6 +382,9 @@ class BoxNode:
                         self.count["insert"] += 1
                         if mid in self.box.items and mid not in self.box.deleted:
                             self.box.index("text", mid)
+                            if self.st:
+                                self.st.ev("index", mid=str(mid), what="text", ms=ms, tokens=nt,
+                                           replay=mid in self.replayed)
                 else:
                     self._index_image(job[1])
             except Exception:
@@ -324,7 +437,9 @@ class BoxNode:
                         log(f"pull {mid} from box {peer} failed:", e)
                         continue
                     with self.lock:
-                        self.full[mid] = data
+                        if mid in self.tomb:
+                            return
+                        self._have_picture(mid, data)
                         self.full_ev[mid].set()
                         if self.p24:
                             self._enqueue(4 if self.msgs[mid].tier == "old" else 5, ("image", mid))
@@ -337,6 +452,8 @@ class BoxNode:
 
     def serve_pull(self, mid: int) -> bytes | None:
         with self.lock:
+            if mid in self.tomb:
+                return None
             ev = self.full_ev.setdefault(mid, threading.Event())
             if mid not in self.full and mid in self.parent:
                 self._request(mid)
@@ -346,8 +463,13 @@ class BoxNode:
             return self.full.get(mid)
 
     def _index_image(self, mid: int) -> None:
-        px = np.frombuffer(self.full[mid], np.uint8).reshape(1, 224, 224, 3)
+        data = self.full.get(mid)
+        if data is None:                                        # forgotten while it waited (CP25)
+            return
+        px = np.frombuffer(data, np.uint8).reshape(1, 224, 224, 3)
+        t0 = time.perf_counter()
         e = self.img_enc.encode(px)[0]
+        ms = (time.perf_counter() - t0) * 1e3
         with self.lock:
             self.S.img[mid] = e
             self.chip_s += CHIP["image_s"]
@@ -355,6 +477,8 @@ class BoxNode:
             self.count["insert"] += 1
             if mid in self.box.items and mid not in self.box.deleted:
                 self.box.index("image", mid)
+                if self.st:
+                    self.st.ev("index", mid=str(mid), what="image", ms=ms, replay=mid in self.replayed)
 
     # ---- catching up (several computers): every message a peer holds, in its arrival order
     def sync_from(self, peer: int) -> int:
@@ -365,7 +489,7 @@ class BoxNode:
             if m.mid in self.got:
                 continue
             new += 1
-            self.deliver(m, peer)
+            self.deliver(m, peer, via="sync")
         self.peer_seen[peer] = time.time()
         return new
 
@@ -375,7 +499,15 @@ class BoxNode:
                 if peer == self.bid:
                     continue
                 try:
+                    if self.st:                                  # round trip and clock offset (NTP style, CP25)
+                        t0 = time.time()
+                        r = json.loads(urllib.request.urlopen(self._url(peer, "/hello"), timeout=10).read())
+                        t1 = time.time()
+                        self.st.ev("peer", peer=peer, rtt_ms=(t1 - t0) * 1e3,
+                                   offset_ms=(r.get("t", (t0 + t1) / 2) - (t0 + t1) / 2) * 1e3)
                     k = self.sync_from(peer)
+                    if self.st:
+                        self.st.ev("sync", peer=peer, new=k)
                     if k:
                         log(f"sync: {k} new messages from box {peer}")
                 except Exception as e:
@@ -417,7 +549,10 @@ class BoxNode:
         kw = {}
         if self.p24:
             text = ((body.get("title") or "") + "\n\n" + (body.get("body") or "")).strip()
-            kw = {"reuse": reuse, "tokens": len(self.text_enc.tok.encode(text).ids) if kind in p24.TEXT_KINDS else 0}
+            # attention mask, not len(ids): tokenizer.json pads to 128 until the first tokenize() (CP25 fix: a fresh
+            # box's first post was counted as 128 tokens and spent two text indices)
+            ntok = int(self.text_enc.tokenize([text])["attention_mask"].sum()) if kind in p24.TEXT_KINDS else 0
+            kw = {"reuse": reuse, "tokens": ntok}
         with self.lock:
             m = self.W.make(self.bid, kind, topic, time.time(), body, size, key, target=target, image=image,
                             pull_bytes=IMG_BYTES if image is not None else 0.0, **kw)
@@ -426,7 +561,12 @@ class BoxNode:
             m.mid = new
             self.own.add(new)
             if rgb is not None:
-                self.full[new] = rgb
+                self._have_picture(new, rgb)
+            if self.st:                                     # before it leaves: a restart never reuses an index
+                self._save_identity()
+                self._save_keys()
+                self.st.ev("write", mid=str(new), kind=kind, topic=topic, tokens=kw.get("tokens", 0),
+                           photo=image is not None)
         self.deliver(m, -1)
         return str(new)
 
@@ -439,7 +579,8 @@ class BoxNode:
                    "topics": sorted(self.box.topics), "room": ROOM in self.box.room_keys, "proto": self.cfg.get("proto", "cp21"),
                    "tier": self.tier, "identity": hex(self.commit)[2:10], "slashed": self.slashed,
                    "notices": self.notices[-10:], "enc_tokens_max": self.enc_tokens_max, "coco": self.coco is not None,
-                   "addr": self.addr, "peers_seen_s_ago": {str(p): round(now - t, 1) for p, t in self.peer_seen.items()}}
+                   "addr": self.addr, "peers_seen_s_ago": {str(p): round(now - t, 1) for p, t in self.peer_seen.items()},
+                   "kept_on_disk": self.st is not None, "restored": self.restored}
             if self.p24:
                 out["budget"] = self.W.budget(self.bid, now)
             return out
@@ -477,7 +618,7 @@ def handler(node: BoxNode):
             if u.path == "/":
                 return self.reply(UI.read_bytes(), ctype="text/html; charset=utf-8")
             if u.path == "/hello":
-                return self.reply({"box": node.bid, "proto": node.cfg.get("proto", "cp21"), "n": node.n})
+                return self.reply({"box": node.bid, "proto": node.cfg.get("proto", "cp21"), "n": node.n, "t": time.time()})
             if u.path == "/sync":
                 return self.reply(node.sync_list())
             if u.path == "/pull":
@@ -578,9 +719,10 @@ def main() -> None:
     ap.add_argument("--cfg", required=True)
     ap.add_argument("--id", type=int, required=True)
     ap.add_argument("--bind", default="127.0.0.1", help="0.0.0.0 to take peers from other computers")
+    ap.add_argument("--state", help="keep the box's state in this folder (CP25; CP24 boxes only)")
     a = ap.parse_args()
     cfg = json.loads(Path(a.cfg).read_text(encoding="utf-8"))
-    node = BoxNode(cfg, a.id)
+    node = BoxNode(cfg, a.id, state=a.state)
     port = int(node.addr[a.id].rsplit(":", 1)[1])
     srv = ThreadingHTTPServer((a.bind, port), handler(node))
     srv.daemon_threads = True

@@ -1,0 +1,136 @@
+{
+ "address": "private network address of this computer",
+ "checks": {
+  "L5_late_box_caught_up": {
+   "feed": [
+    "a photo from box 1",
+    "hello from box 0"
+   ],
+   "pass": true
+  },
+  "L1_post_and_photo_everywhere": {
+   "pass": true
+  },
+  "L2_votes_and_delete": {
+   "scores": [
+    2,
+    2,
+    2
+   ],
+   "non_author_delete": 403,
+   "pass": true
+  },
+  "L3_room": {
+   "members": [
+    true,
+    true,
+    false
+   ],
+   "notes": [
+    1,
+    1,
+    0
+   ],
+   "box2_send": 403,
+   "pass": true
+  },
+  "L4_access": {
+   "owner_get_from_network": 403,
+   "owner_post_from_network": 403,
+   "peer_hello": 200,
+   "pass": true
+  },
+  "L6_slashing": {
+   "notices": [
+    1,
+    1,
+    1
+   ],
+   "slashed": [
+    false,
+    false,
+    true
+   ],
+   "after_seen_by": [],
+   "pass": true
+  },
+  "L7_picture_limit": {
+   "codes": [
+    null,
+    null,
+    429
+   ],
+   "budget": {
+    "left": 0,
+    "limit": 2,
+    "window_s": 3600.0,
+    "resets_in_s": 2070.964796066284
+   },
+   "pass": true
+  }
+ },
+ "stats": {
+  "0": {
+   "count": {
+    "lookup": 8,
+    "proof": 8,
+    "ed25519": 9,
+    "rln": 8,
+    "send": 12,
+    "decrypt": 7,
+    "text": 4,
+    "insert": 5,
+    "image": 1,
+    "pull": 1,
+    "tally": 2,
+    "dup": 4,
+    "delete": 1,
+    "slash_published": 1
+   },
+   "items": 4,
+   "proto": "cp24",
+   "tier": "new"
+  },
+  "1": {
+   "count": {
+    "lookup": 8,
+    "proof": 8,
+    "ed25519": 9,
+    "rln": 8,
+    "send": 11,
+    "decrypt": 7,
+    "text": 4,
+    "insert": 5,
+    "pull": 1,
+    "image": 1,
+    "dup": 8,
+    "tally": 2,
+    "delete": 1,
+    "slash_published": 1
+   },
+   "items": 4,
+   "proto": "cp24",
+   "tier": "new"
+  },
+  "2": {
+   "count": {
+    "lookup": 8,
+    "proof": 8,
+    "ed25519": 9,
+    "rln": 8,
+    "send": 12,
+    "decrypt": 7,
+    "text": 3,
+    "insert": 4,
+    "image": 1,
+    "tally": 2,
+    "dup": 3,
+    "delete": 1
+   },
+   "items": 3,
+   "proto": "cp24",
+   "tier": "new"
+  }
+ },
+ "pass": true
+}

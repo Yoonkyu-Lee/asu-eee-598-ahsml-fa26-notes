@@ -41,6 +41,8 @@ project/data/
 project/refs/
 project/*.log
 project/logs/
+# CP25: 데모 박스의 상태 (신원 비밀, 일회용 키, 받은 메시지). 비밀이 들어 있어 올리지 않는다.
+project/state/
 # 주제 선정 기록: 교수님 이메일, 팀 토론 원문이 들어 있어 공개하지 않는다.
 project/archive/
 __pycache__/

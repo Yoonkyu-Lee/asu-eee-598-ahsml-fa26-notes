@@ -1,5 +1,7 @@
 # Joining the community from your own laptop (CP24)
 
+> Can't meet in person? See [REMOTE.md](REMOTE.md) to join from home over Tailscale (CP25). Set up as below first.
+
 Each of us runs **one home node box** on our own laptop. The three laptops talk to each other directly. There is no server and no operator. Each box keeps its own copy of the posts, its own search index (MiniLM text embeddings and CLIP photo embeddings), and its own identity secret. Design and results: [cp/CP24.md](../../cp/CP24.md) (in Korean).
 
 ## Before we meet: set up once, about 10 minutes plus a ~720 MB download
@@ -40,8 +42,8 @@ Check that the models are in place: `.venv/bin/python src/demo/fetch_models.py -
 | Search → Text / Photos by words | Your box searches its own index. Nothing leaves your laptop. |
 | Room R | Only boxes started with the password can read it. |
 | Write a lot | New identities get 18 text slots and 2 photos per hour. A short post uses 1 slot; a post of 82 or more tokens uses 2. When the slots run out, the client tells you to wait. |
-| **Break the limit** (bottom right) | Your box sends two posts on the same slot. The other boxes compute your identity secret from the two posts, publish it, and drop you. Your screen shows a red banner. Restart your box to get a new identity. |
-| Stop a box, keep posting, then restart it | The restarted box catches up from the others within about 20 s. Restarting gives it a new identity, so it cannot delete its old posts. |
+| **Break the limit** (bottom right) | Your box sends two posts on the same slot. The other boxes compute your identity secret from the two posts, publish it, and drop you. Your screen shows a red banner. Start your box once with `--new-identity` to get a new identity (CP25). |
+| Stop a box, keep posting, then restart it | The restarted box catches up from the others within about 20 s. Since CP25 it keeps its identity, posts and keys in `state/box<i>/`, so it can still delete its old posts. |
 
 ## What is real and what is not
 
@@ -54,7 +56,7 @@ Check that the models are in place: `.venv/bin/python src/demo/fetch_models.py -
 - **Not real:**
   - The zero-knowledge proof itself. Each message carries a "proof ok" flag instead of a Groth16 proof. The flag is false once your identity is removed from the group. Real proofs are planned for a later checkpoint.
   - The "chip time" on the work panel. It comes from our chip model; the laptop is not the chip.
-- Your identity secret is created when your box starts and is never sent anywhere. It is lost when the box stops.
+- Your identity secret is created the first time your box starts and is never sent anywhere. Since CP25 it is kept in `state/box<i>/identity.json` on your laptop (not in git).
 
 ## If something does not work
 

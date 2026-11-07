@@ -10,6 +10,11 @@ Then open http://127.0.0.1:8601/ on this computer. The mesh and the subs come fr
 around). Your identity secret is drawn by your box and never leaves it. The room key is derived from the room password:
 whoever was told the password can read room R, the other boxes only relay it. Everyone starts in the new group
 (the community was formed today); --old 0,2 puts those boxes in the old group (must be the same on every computer).
+
+CP25: the box keeps its state in state/box<me>/ (identity, keys, messages, pictures; git-ignored), so stopping and
+starting it again keeps the same identity and posts. --new-identity retires the stored identity (e.g. after it was
+revealed for breaking the limit); the posts it holds stay. Over Tailscale, use everyone's 100.x.y.z address
+(--whoami lists it when Tailscale is running).
 """
 from __future__ import annotations
 
@@ -17,7 +22,9 @@ import argparse
 import hashlib
 import json
 import socket
+import subprocess
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -42,7 +49,25 @@ def addresses() -> list[str]:
         out |= {a[4][0] for a in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET)}
     except OSError:
         pass
-    return sorted(a for a in out if not a.startswith("127."))
+    return sorted((a for a in out | set(tailscale_ip()) if not a.startswith("127.")), key=lambda a: (is_tailscale(a), a))
+
+
+def is_tailscale(a: str) -> bool:
+    """Tailscale hands out addresses in 100.64.0.0/10."""
+    p = a.split(".")
+    return len(p) == 4 and p[0] == "100" and 64 <= int(p[1]) <= 127
+
+
+def tailscale_ip() -> list[str]:
+    for exe in ("tailscale", "/Applications/Tailscale.app/Contents/MacOS/Tailscale",
+                r"C:\Program Files\Tailscale\tailscale.exe"):
+        try:
+            r = subprocess.run([exe, "ip", "-4"], capture_output=True, text=True, timeout=5)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if r.returncode == 0:
+            return [x.strip() for x in r.stdout.split() if x.strip()]
+    return []
 
 
 def check(cfg: dict, me: int) -> bool:
@@ -71,11 +96,15 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=8601)
     ap.add_argument("--room-pass", default="", help="room R password (empty: this box only relays the room)")
     ap.add_argument("--old", default="", help="boxes in the old group, e.g. 0,2")
+    ap.add_argument("--state", help="state folder (default state/box<me>)")
+    ap.add_argument("--new-identity", action="store_true", help="retire the stored identity and draw a new one")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--whoami", action="store_true")
     a = ap.parse_args()
     if a.whoami:
-        print("this computer:", ", ".join(addresses()) or "no network address found")
+        found = addresses()
+        print("this computer:", ", ".join(x + (" (Tailscale)" if is_tailscale(x) else "") for x in found)
+              or "no network address found")
         return
     if a.hosts is None or a.me is None:
         ap.error("--hosts and --me are needed")
@@ -99,10 +128,18 @@ def main() -> None:
     LOGS.mkdir(exist_ok=True)
     path = LOGS / f"lan_cfg_box{a.me}.json"           # holds the room key: kept out of git
     save_cfg(cfg, path)
-    print(f"box {a.me} of {n}, {cfg['tiers'][a.me]} group, room R: {'member' if a.room_pass else 'relay only'}")
+    state = Path(a.state) if a.state else ROOT / "state" / f"box{a.me}"
+    if a.new_identity:
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        for name in ("identity.json", "keys.json"):
+            if (state / name).exists():
+                (state / name).rename(state / f"retired-{stamp}-{name}")
+        print(f"retired the stored identity in {state}; a new one is drawn now")
+    print(f"box {a.me} of {n}, {cfg['tiers'][a.me]} group, room R: {'member' if a.room_pass else 'relay only'}, "
+          f"state kept in {state}")
     print(f"open http://127.0.0.1:{ports[a.me]}/ on this computer (Ctrl+C stops the box)", flush=True)
     import box_server                                  # same process, so Ctrl+C (or closing the window) stops the box
-    sys.argv = [sys.argv[0], "--cfg", str(path), "--id", str(a.me), "--bind", "0.0.0.0"]
+    sys.argv = [sys.argv[0], "--cfg", str(path), "--id", str(a.me), "--bind", "0.0.0.0", "--state", str(state)]
     try:
         box_server.main()
     except KeyboardInterrupt:
