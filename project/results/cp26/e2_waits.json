@@ -1,0 +1,92 @@
+[
+ {
+  "scene": "C-a",
+  "n": 10,
+  "catch_up_n": 28,
+  "catch_up_p99_s": 0.10041600000015023,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-a",
+  "n": 30,
+  "catch_up_n": 50,
+  "catch_up_p99_s": 0.10041600000113249,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "catch_up_n": 206,
+  "catch_up_p99_s": 0.10161599999992177,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-b",
+  "n": 10,
+  "catch_up_n": 23,
+  "catch_up_p99_s": 0.10632800000224961,
+  "catch_up_waited_n": 2,
+  "catch_up_waited_p50_s": 5084.778226755669,
+  "catch_up_waited_max_s": 5789.66322734367,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-b",
+  "n": 30,
+  "catch_up_n": 61,
+  "catch_up_p99_s": 0.12073599997675045,
+  "catch_up_waited_n": 1,
+  "catch_up_waited_p50_s": 3261.009901013371,
+  "catch_up_waited_max_s": 3261.009901013371,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "catch_up_n": 205,
+  "catch_up_p99_s": 0.17921599998953752,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-c",
+  "n": 10,
+  "catch_up_n": 16,
+  "catch_up_p99_s": 0.10691599998026505,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-c",
+  "n": 30,
+  "catch_up_n": 60,
+  "catch_up_p99_s": 0.11476399999126442,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ },
+ {
+  "scene": "C-c",
+  "n": 100,
+  "catch_up_n": 184,
+  "catch_up_p99_s": 0.1666279999731341,
+  "catch_up_waited_n": 0,
+  "catch_up_waited_p50_s": null,
+  "catch_up_waited_max_s": null,
+  "missing_frac": 0.0
+ }
+]

@@ -15,6 +15,9 @@ CP25: the box keeps its state in state/box<me>/ (identity, keys, messages, pictu
 starting it again keeps the same identity and posts. --new-identity retires the stored identity (e.g. after it was
 revealed for breaking the limit); the posts it holds stay. Over Tailscale, use everyone's 100.x.y.z address
 (--whoami lists it when Tailscale is running).
+
+CP26: boxes exchange by events (--exchange x2, default): a box that comes on offers what it took last time and gets
+what it missed from one box; nothing is polled. --exchange poll is the CP24 way (every 20 s, every box, everything).
 """
 from __future__ import annotations
 
@@ -98,6 +101,8 @@ def main() -> None:
     ap.add_argument("--old", default="", help="boxes in the old group, e.g. 0,2")
     ap.add_argument("--state", help="state folder (default state/box<me>)")
     ap.add_argument("--new-identity", action="store_true", help="retire the stored identity and draw a new one")
+    ap.add_argument("--exchange", choices=("x2", "poll"), default="x2",
+                    help="x2: catch up when the box comes on (CP26); poll: ask every box for everything every 20 s (CP24)")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--whoami", action="store_true")
     a = ap.parse_args()
@@ -119,7 +124,8 @@ def main() -> None:
                     tiers=["old" if i in old else "new" for i in range(n)])
     cfg["ports"], cfg["addr"] = ports, [f"{x}:{p}" for x, p in zip(hosts, ports)]
     cfg["room_key"] = hashlib.blake2b(b"room-R|" + a.room_pass.encode(), digest_size=32).hexdigest() if a.room_pass else None
-    cfg["sync"] = True
+    cfg["sync"] = True                                  # several computers: a picture is pulled from any box
+    cfg["exchange"] = a.exchange
     if a.check:
         sys.exit(0 if check(cfg, a.me) else 1)
     mine = set(addresses())

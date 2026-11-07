@@ -168,7 +168,9 @@ def main() -> None:
         res["pass"] = all(v["pass"] for v in C.values())
         for k, v in C.items():
             print(k, v["pass"], {x: y for x, y in v.items() if x != "pass"})
-        (OUT / "persist_check.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+        out = Path(sys.argv[2]) if len(sys.argv) > 2 else OUT / "persist_check.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(res, indent=1), encoding="utf-8")
         print("pass" if res["pass"] else "FAIL")
     finally:
         for pr in procs.values():

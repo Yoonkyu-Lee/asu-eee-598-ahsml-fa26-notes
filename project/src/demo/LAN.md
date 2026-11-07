@@ -43,7 +43,7 @@ Check that the models are in place: `.venv/bin/python src/demo/fetch_models.py -
 | Room R | Only boxes started with the password can read it. |
 | Write a lot | New identities get 18 text slots and 2 photos per hour. A short post uses 1 slot; a post of 82 or more tokens uses 2. When the slots run out, the client tells you to wait. |
 | **Break the limit** (bottom right) | Your box sends two posts on the same slot. The other boxes compute your identity secret from the two posts, publish it, and drop you. Your screen shows a red banner. Start your box once with `--new-identity` to get a new identity (CP25). |
-| Stop a box, keep posting, then restart it | The restarted box catches up from the others within about 20 s. Since CP25 it keeps its identity, posts and keys in `state/box<i>/`, so it can still delete its old posts. |
+| Stop a box, keep posting, then restart it | The restarted box gets what it missed from a box that is on, right after it starts (CP26; it used to ask every box for everything every 20 s). Since CP25 it keeps its identity, posts and keys in `state/box<i>/`, so it can still delete its old posts. |
 
 ## What is real and what is not
 

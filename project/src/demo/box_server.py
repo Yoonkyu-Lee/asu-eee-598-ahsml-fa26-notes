@@ -15,8 +15,16 @@ took and the pictures on disk (store.py), and takes them back in arrival order w
 forgotten on disk and in /sync too, and a copy that comes back later from a stale box is dropped. events.jsonl logs
 times for remote_report.py (no plaintext).
 
+CP26 exchange (cfg "exchange"): "x2" = event-driven, as chosen on the model (sim.exchange X2): push to the mesh; when
+the box comes on (start, or a clock jump after the laptop slept) it offers the ids it took in its last session to one
+peer (that peer asks only for what it lacks) and asks that peer for everything published since it went off minus
+60 s (GET /since). The answer carries the peer's coverage start; a gap is asked of another peer. A peer that has not
+caught up yet only claims its own session. Nothing runs on a timer except a local clock check. "poll" = the CP24
+exchange (every 20 s every listed box is asked for its whole list), kept to compare.
+
   .venv/Scripts/python.exe src/demo/box_server.py --cfg results/cp21/cfg.json --id 0
-Peers:   POST /gossip {msg, frm}    GET /pull?mid=&frm=    GET /hello    GET /sync?after=    POST /inject {msg}
+Peers:   POST /gossip {msg, frm}    GET /pull?mid=&frm=    GET /hello    GET /sync    POST /inject {msg}
+         GET /since?lo=&hi=&frm=   POST /ihave {ids, frm}   (CP26 x2)
 Owner:   GET / (screen)  /api/stats  /api/feed  /api/search?q=  /api/search_image?q=  /api/img?mid=  /api/debug
          POST /api/post {topic, title, body, photo | rgb}  /api/vote {mid, dir}  /api/delete {mid}  /api/room {body}
               /api/misbehave {}  (CP24: two posts on one message index -> the identity is revealed)
@@ -54,6 +62,8 @@ from store import Store  # noqa: E402
 UI = Path(__file__).resolve().parent / "ui.html"
 CHIP = {"proof_s": 89.6e-6, "image_s": 0.552}     # CP19 verify unit (single proof), CP20 FP16 image tower (추정)
 LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1"}
+W_S = 60.0               # CP26: catch-up margin and the model's window (sim.exchange.Scene.w_s)
+TICK_S, JUMP_S = 5.0, 30.0   # local clock check: a jump over JUMP_S means the computer slept
 
 
 def log(*a):
@@ -99,6 +109,17 @@ class BoxNode:
         self.enc_tokens_max = 0
         self.peer_seen: dict[int, float] = {}
         self.st = Store(Path(state)) if state and self.p24 else None
+        self.exchange = cfg.get("exchange", "poll" if cfg.get("sync") else None)
+        meta = self.st.meta() if self.st else {}
+        self.cov = meta.get("cov")                 # coverage start (None: holds nothing yet)
+        self.last_off = meta.get("alive")          # last time this box was seen alive (end of the last session)
+        self.prev_session = meta.get("session")    # start of the last session
+        self.session = time.time()
+        self.ready = self.exchange != "x2"         # caught up in this session
+        self.cov_before, self.gap_lo, self.offered, self.stalled = self.cov, 0.0, False, False
+        self.t_come_on = self.session
+        self.catch_lock = threading.Lock()
+        self.down: set[int] = set()                # peers found unreachable and not heard from since (rule 2)
         self.replaying = False
         self.replayed: set[int] = set()
         self.tomb: dict[int, set] = {}           # deleted post -> the author's one-time public keys (hex)
@@ -234,14 +255,31 @@ class BoxNode:
                 for i in range(3):
                     try:
                         self._post(peer, "/gossip", payload)
+                        self.down.discard(peer)
                         return
                     except Exception as e:
                         if i == 2:
                             log(f"gossip to box {peer} ({self.addr[peer]}) failed:", e)
+                            self.down.add(peer)
                         time.sleep(0.5 * (i + 1))
             finally:
                 self._inc(-1)
         self.pool.submit(go)
+
+    def targets(self, topic: int) -> list[int]:
+        """The topic's mesh peers. With the x2 exchange (rule 2, graft): leave out peers found unreachable and fill
+        up to D from the topic's other holders, most recently heard from first."""
+        mesh = [int(p) for p in self.mesh.get(topic, {}).get(self.bid, ())]
+        if self.exchange != "x2":
+            return mesh
+        out = [p for p in mesh if p not in self.down]
+        D = self.cfg.get("D", 2)
+        if len(out) < D:
+            more = [int(p) for p in self.holders.get(topic, ()) if int(p) != self.bid and int(p) not in out
+                    and int(p) not in self.down]
+            more.sort(key=lambda p: -self.peer_seen.get(p, 0.0))
+            out += more[:D - len(out)]
+        return out
 
     def key_for(self, topic: int) -> bytes | None:
         return self.box.key_for(topic)
@@ -268,6 +306,7 @@ class BoxNode:
                 self.st.add_message(msg_to_json(m), frm)
             if frm >= 0 and not self.replaying:
                 self.peer_seen[frm] = time.time()
+                self.down.discard(frm)
             t = time.time()
             if self.p24:
                 v = self.box.validate(m)
@@ -291,8 +330,8 @@ class BoxNode:
                     self.publish_slash(v[1])
                 self.box.apply(m, t, v)
                 return
-            for peer in self.mesh.get(m.topic, {}).get(self.bid, ()):
-                if peer != frm and not self.replaying:
+            for peer in self.targets(m.topic):
+                if peer != frm and not self.replaying and via != "catch":    # caught-up messages are not news
                     self.send(peer, m)
             if v[0] != "ok":
                 self.box.apply(m, t, v)
@@ -482,7 +521,11 @@ class BoxNode:
 
     # ---- catching up (several computers): every message a peer holds, in its arrival order
     def sync_from(self, peer: int) -> int:
-        data = json.loads(urllib.request.urlopen(self._url(peer, f"/sync?frm={self.bid}"), timeout=60).read())
+        raw = urllib.request.urlopen(self._url(peer, f"/sync?frm={self.bid}"), timeout=60).read()
+        data = json.loads(raw)
+        self.count["sync_req"] += 1
+        self.count["sync_env"] += len(data)
+        self.count["sync_bytes"] += len(raw)
         new = 0
         for d in data:
             m = msg_from_json(d)
@@ -517,6 +560,160 @@ class BoxNode:
     def sync_list(self) -> list[dict]:
         with self.lock:
             return [msg_to_json(m) for m in self.msgs.values()]
+
+    # ---- CP26 x2: event-driven exchange (sim.exchange X2)
+    def claim(self) -> float:
+        """The coverage start this box may claim: its own once it has caught up in this session, else only this
+        session (it has everything pushed since it came on). A box that could not fill its gap stays at that."""
+        return self.cov if self.ready and self.cov is not None else self.session
+
+    def hello_info(self) -> dict:
+        return {"box": self.bid, "proto": self.cfg.get("proto", "cp21"), "n": self.n, "t": time.time(),
+                "cov": self.claim(), "exchange": self.exchange}
+
+    def since(self, lo: float, hi: float) -> dict:
+        with self.lock:
+            rows = [msg_to_json(m) for m in self.msgs.values() if lo <= m.t0 < hi]
+            return {"cov": self.claim(), "msgs": rows}
+
+    def ihave(self, ids: list) -> list[str]:
+        with self.lock:
+            return [x for x in ids if int(x) not in self.got]
+
+    def _hello(self, peer: int) -> dict | None:
+        try:
+            t0 = time.time()
+            r = json.loads(urllib.request.urlopen(self._url(peer, f"/hello?frm={self.bid}"), timeout=10).read())
+            t1 = time.time()
+        except Exception as e:
+            log(f"box {peer} ({self.addr[peer]}) not reachable:", type(e).__name__)
+            self.down.add(peer)
+            return None
+        self.down.discard(peer)
+        self.peer_seen[peer] = time.time()
+        self.count["hello"] += 1
+        if self.st:
+            self.st.ev("peer", peer=peer, rtt_ms=(t1 - t0) * 1e3, offset_ms=(r.get("t", (t0 + t1) / 2) - (t0 + t1) / 2) * 1e3)
+        return r
+
+    def _save_meta(self) -> None:
+        if self.st:
+            self.st.save_meta({"cov": self.cov if self.ready else self.cov_before, "session": self.session,
+                               "alive": time.time()})
+
+    def come_on(self, last_off: float | None, prev_session: float | None) -> None:
+        """Rule 3: this box came on (start, or the computer woke). The gap to fill starts W_S before it went off."""
+        with self.lock:
+            self.cov_before = self.cov
+            self.gap_lo = 0.0 if self.cov is None or last_off is None else max(last_off - W_S, 0.0)
+            self.prev_session, self.last_off = prev_session, last_off
+            self.offered, self.stalled, self.t_come_on = False, False, time.time()
+        self.catch_up()
+
+    def peer_appeared(self) -> None:
+        """A box said hello: if this box had nobody to ask when it came on, it asks now."""
+        if self.stalled:
+            self.stalled = False
+            threading.Thread(target=self.catch_up, daemon=True).start()
+
+    def catch_up(self) -> None:
+        """Offer my last session's ids to one peer, then get what was published in [gap_lo, now) from a peer whose
+        claim reaches back that far; if its claim starts later, ask another peer for the part before it."""
+        if not self.catch_lock.acquire(blocking=False):
+            return
+        try:
+            lo = self.gap_lo
+            mesh = sorted({int(p) for m in self.mesh.values() for p in m.get(self.bid, ())})
+            order = mesh + [p for p in range(self.n) if p != self.bid and p not in mesh]
+            with ThreadPoolExecutor(8) as ex:
+                hello = {p: r for p, r in zip(order, ex.map(self._hello, order)) if r is not None}
+                if self.st:          # measurement only (events.jsonl): 4 more round trips per peer, so the clock
+                    list(ex.map(self._hello, [q for q in hello for _ in range(4)]))   # offset uses the shortest
+            claim = lambda q: hello[q]["cov"]
+            tried, hi, reach = set(), float("inf"), None
+            while True:
+                cands = [q for q in order if q in hello and q not in tried]
+                if not cands:
+                    break
+                good = [q for q in cands if q in mesh and claim(q) <= lo] or [q for q in cands if claim(q) <= lo]
+                p = good[0] if good else min(cands, key=claim)
+                if not self.offered:
+                    self.offered = True
+                    self._offer(p, self.prev_session, self.last_off)
+                tried.add(p)
+                try:
+                    raw = urllib.request.urlopen(self._url(p, f"/since?lo={lo}&hi={hi}&frm={self.bid}"), timeout=300).read()
+                except Exception as e:
+                    log(f"catch-up from box {p} failed:", type(e).__name__)
+                    continue
+                d = json.loads(raw)
+                self.count["catch_req"] += 1
+                self.count["catch_env"] += len(d["msgs"])
+                self.count["catch_bytes"] += len(raw)
+                for row in d["msgs"]:
+                    self.deliver(msg_from_json(row), p, via="catch")
+                reach = d["cov"] if reach is None else min(reach, d["cov"])
+                if reach > lo and any(q not in tried and claim(q) < reach for q in hello):
+                    hi = reach
+                    continue
+                break
+            if reach is None:                                  # nobody answered: wait for a box to appear
+                self.stalled = True
+                log("nobody to catch up from; claiming this session only until a box appears")
+                return
+            with self.lock:
+                if reach <= lo:
+                    self.cov = lo if self.cov_before is None else self.cov_before
+                else:                                          # [lo, reach) is nowhere on: claim what is held
+                    self.cov = min(reach, self.session)
+                self.ready = True
+                missing = [mid for mid, m in self.msgs.items() if m.image is not None and m.kind == "post"
+                           and mid not in self.full and mid in self.parent]
+                for mid in missing:                            # picture bodies a failed pull left behind (rule 4)
+                    self.asked.discard(mid)
+                    self._request(mid)
+            self._save_meta()
+            ms = (time.time() - self.t_come_on) * 1e3
+            if self.st:
+                self.st.ev("catch_done", lo=lo, ms=ms, asked=sorted(tried), cov=self.cov)
+            log(f"caught up {ms / 1e3:.1f} s after coming on, from {sorted(tried)}; coverage from {self.cov}")
+        finally:
+            self.catch_lock.release()
+
+    def _offer(self, p: int, prev_session: float | None, last_off: float | None) -> None:
+        if prev_session is None or last_off is None or not self.st:
+            return
+        # arrivals in the last session = from its start until this session began (nothing arrives while off; the
+        # last-alive time is saved only every TICK_S, so it would cut the last seconds)
+        ids = [r["mid"] for r in self.st.messages_meta() if prev_session <= r["_at"] < self.session]
+        if not ids:
+            return
+        self.count["offer_ids"] += len(ids)
+        try:
+            req = urllib.request.Request(self._url(p, "/ihave"), data=json.dumps({"ids": ids, "frm": self.bid}).encode(),
+                                         headers={"Content-Type": "application/json"})
+            want = json.loads(urllib.request.urlopen(req, timeout=60).read())["want"]
+        except Exception as e:
+            log(f"offer to box {p} failed:", type(e).__name__)
+            return
+        with self.lock:
+            rows = [self.msgs[int(x)] for x in want if int(x) in self.msgs]
+        for m in rows:                                          # it lacks these: push them (it forwards them on)
+            self.send(p, m)
+
+    def alive_loop(self) -> None:
+        """Local only: keep the last-alive time, and treat a clock jump (the computer slept) as coming on again."""
+        last = time.time()
+        while True:
+            time.sleep(TICK_S)
+            now = time.time()
+            if now - last > JUMP_S:
+                log(f"the clock jumped {now - last:.0f} s (asleep?): catching up")
+                with self.lock:
+                    prev, self.session, self.ready = self.session, now, False
+                self.come_on(last, prev)
+            last = now
+            self._save_meta()
 
     # ---- the owner's side
     def query_text(self, q: str, k: int = 10) -> list[dict]:
@@ -608,7 +805,7 @@ def handler(node: BoxNode):
             ip = self.client_address[0]
             if ip in LOOPBACK:
                 return True
-            return path in ("/gossip", "/pull", "/hello", "/sync") and ip in node.peer_ips
+            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave") and ip in node.peer_ips
 
         def do_GET(self):
             u = urlparse(self.path)
@@ -618,7 +815,13 @@ def handler(node: BoxNode):
             if u.path == "/":
                 return self.reply(UI.read_bytes(), ctype="text/html; charset=utf-8")
             if u.path == "/hello":
-                return self.reply({"box": node.bid, "proto": node.cfg.get("proto", "cp21"), "n": node.n, "t": time.time()})
+                if "frm" in q:                                  # a box that came on says hello
+                    node.down.discard(int(q["frm"]))
+                    node.peer_seen[int(q["frm"])] = time.time()
+                    node.peer_appeared()
+                return self.reply(node.hello_info())
+            if u.path == "/since":
+                return self.reply(node.since(float(q.get("lo", 0)), float(q.get("hi", "inf"))))
             if u.path == "/sync":
                 return self.reply(node.sync_list())
             if u.path == "/pull":
@@ -669,6 +872,9 @@ def handler(node: BoxNode):
             if path == "/gossip":
                 node.deliver(msg_from_json(d["msg"]), int(d["frm"]))
                 return self.reply({"ok": True})
+            if path == "/ihave":
+                node.count["want_ids"] += len(want := node.ihave(d["ids"]))
+                return self.reply({"want": want})
             if path == "/inject":
                 m = msg_from_json(d["msg"])
                 node.own.add(m.mid)
@@ -728,8 +934,13 @@ def main() -> None:
     srv.daemon_threads = True
     log(f"box {a.id} ({cfg.get('proto', 'cp21')}, {node.tier} group, identity {hex(node.commit)[2:10]}) "
         f"listening on {a.bind}:{port}; open http://127.0.0.1:{port}/ on this computer")
-    if cfg.get("sync"):
+    if node.exchange == "poll":
         threading.Thread(target=node.sync_loop, daemon=True).start()
+    elif node.exchange == "x2":
+        def come_on():
+            node.come_on(node.last_off, node.prev_session)
+            node.alive_loop()
+        threading.Thread(target=come_on, daemon=True).start()
     srv.serve_forever()
 
 
