@@ -29,6 +29,7 @@ DAY = 86400.0
 ENV = 1000.0            # bytes per envelope (추정, CP16: header + proof + text)
 ID = 8.0                # bytes per message id
 HDR = 40.0              # bytes per request / answer header (추정)
+FRAME = 16.0            # CP27: bytes around one id in an IHAVE / IWANT / IDONTWANT (추정)
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,10 @@ class Scene:
     t_d: float = 10.0                   # X3
     w_s: float = 60.0                   # X2 offer window, X3 digest window, catch-up margin
     hb_s: float = 1.0                   # heartbeat: graft delay after losing a peer
+    push: str = "eager"                 # CP27 A: eager (P0, P1 = D 3) / lazy (P2) / tree (P3) / idontwant (P4)
+    eager_n: int = 2                    # tree: peers that get the envelope at once (the rest get the id)
+    lazy_wait_s: float = 0.5            # tree: ask for an announced envelope that has not come by then
+    req_timeout_s: float = 1.0          # lazy, tree: ask the next announcer if the asked one does not answer
     seed: int = 26
 
 
@@ -226,20 +231,87 @@ class Exchange:
         self.eng.at(self.up_free[frm] + self.sc.hop_s, fn, *args)
 
     def _push(self, b: int, m: int, frm: int) -> None:
-        for p in self.mesh[b]:
-            if p != frm:
-                if self.rng.random() < self.sc.p_loss:
-                    continue
+        mode = self.sc.push
+        peers = [p for p in self.mesh[b] if p != frm]
+        if mode == "lazy":
+            eager, lazy = [], peers
+        elif mode == "tree":                     # a fixed pseudo-random pick per (box, message): the tree's edges
+            peers.sort(key=lambda p: (p * 2654435761 + m * 40503 + b) % 1000003)
+            eager, lazy = peers[:self.sc.eager_n], peers[self.sc.eager_n:]
+        else:
+            eager, lazy = peers, []
+        for p in eager:
+            if self.rng.random() < self.sc.p_loss:
+                continue
+            if mode == "idontwant":
+                self._send_dw(b, p, m)
+            else:
                 self._send(b, ENV, self._recv_push, p, m, b)
+        for p in lazy:
+            if self.rng.random() < self.sc.p_loss:
+                continue
+            self._send(b, ID + FRAME, self._recv_ihave_one, p, m, b)
 
     def _recv_push(self, b: int, m: int, frm: int) -> None:
         if not self.on[b]:
             self.lost_offline += 1
             return
+        self.ops[b]["env_rx"] += 1
         if self._take(b, m, "push"):
+            if self.sc.push == "idontwant":
+                for q in self.mesh[b]:
+                    if q != frm:
+                        self._send(b, ID + FRAME, self._recv_dontwant, q, m, b)
             self._push(b, m, frm)
         else:
             self.dup[b] += ENV
+
+    # ---- CP27 A: lazy push (ids first), tree (envelope to a few, ids to the rest), IDONTWANT
+    def _recv_ihave_one(self, b: int, m: int, frm: int) -> None:
+        if not self.on[b]:
+            return
+        self.over[b] += ID + FRAME
+        self.ops[b]["ihave_rx"] += 1
+        if self.got[m, b]:
+            return
+        ann = self.__dict__.setdefault("_ann", {})
+        lst = ann.setdefault((m, b), [])
+        lst.append(frm)
+        if len(lst) == 1:                         # first announcer: ask now (lazy) or after a wait (tree)
+            wait = self.sc.lazy_wait_s if self.sc.push == "tree" else 0.0
+            self.eng.at(self.eng.t + wait, self._iwant_next, b, m, 0)
+
+    def _iwant_next(self, b: int, m: int, i: int) -> None:
+        if not self.on[b] or self.got[m, b]:
+            return
+        lst = self._ann.get((m, b), [])
+        if i >= len(lst):
+            return
+        frm = lst[i]
+        self.over[frm] += ID + FRAME              # the IWANT, received by the announcer
+        self.reqs[b] += 1
+        self.eng.at(self.eng.t + self.sc.hop_s, self._serve_iwant, frm, b, m)
+        self.eng.at(self.eng.t + self.sc.req_timeout_s, self._iwant_next, b, m, i + 1)
+
+    def _serve_iwant(self, frm: int, b: int, m: int) -> None:
+        if self.on[frm] and self.got[m, frm]:
+            self._send(frm, ENV, self._recv_push, b, m, frm)
+
+    def _send_dw(self, b: int, p: int, m: int) -> None:
+        """Eager send that is dropped at departure if p already said it does not want m (IDONTWANT)."""
+        start = max(self.eng.t, self.up_free[b])
+        self.up_free[b] = start + ENV * 8 / self.sc.uplink_bps
+        self.eng.at(start, self._depart_dw, b, p, m, self.up_free[b] + self.sc.hop_s)
+
+    def _depart_dw(self, b: int, p: int, m: int, arrive: float) -> None:
+        if (p, m) in self.__dict__.setdefault("_dw", {}).get(b, set()):
+            self.up_free[b] = max(self.eng.t, self.up_free[b] - ENV * 8 / self.sc.uplink_bps)
+            return
+        self.eng.at(arrive, self._recv_push, p, m, b)
+
+    def _recv_dontwant(self, q: int, m: int, frm: int) -> None:
+        self.over[q] += ID + FRAME
+        self.__dict__.setdefault("_dw", {}).setdefault(q, set()).add((frm, m))
 
     # ---- whole-list polling (X1, X1m)
     def _poll(self, b: int) -> None:
@@ -354,6 +426,7 @@ class Exchange:
     def _recv_iwant(self, p: int, want: list, frm: int) -> None:
         if not self.on[p]:
             return
+        self.ops[p]["env_rx"] += len(want)
         for m in want:
             if self._take(p, m, "repair"):
                 self._push(p, m, frm)

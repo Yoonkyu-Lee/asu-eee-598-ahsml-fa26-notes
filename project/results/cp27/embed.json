@@ -1,0 +1,163 @@
+{
+ "pairs": {
+  "fp32->fp16": {
+   "cos_min": 0.9999962825851056,
+   "cos_q1e-4": 0.9999979009989806,
+   "cos_q1e-3": 0.9999985365317788,
+   "cos_p50": 0.9999993956758761
+  },
+  "fp32->int8_dyn_hf": {
+   "cos_min": 0.9669116721618461,
+   "cos_q1e-4": 0.9684159474052599,
+   "cos_q1e-3": 0.9784077768320674,
+   "cos_p50": 0.9926865488712001
+  },
+  "fp32->int8_pc": {
+   "cos_min": 0.975458350560956,
+   "cos_q1e-4": 0.9811157146586306,
+   "cos_q1e-3": 0.9844198617390086,
+   "cos_p50": 0.9944517502305088
+  },
+  "fp16->fp32": {
+   "cos_min": 0.9999962825851056,
+   "cos_q1e-4": 0.9999979009989806,
+   "cos_q1e-3": 0.9999985365317788,
+   "cos_p50": 0.9999993956758761
+  },
+  "fp16->int8_dyn_hf": {
+   "cos_min": 0.9667161644927853,
+   "cos_q1e-4": 0.9684162767047217,
+   "cos_q1e-3": 0.9783891751887691,
+   "cos_p50": 0.9926848951825302
+  },
+  "fp16->int8_pc": {
+   "cos_min": 0.9756707053247544,
+   "cos_q1e-4": 0.9811578916157566,
+   "cos_q1e-3": 0.9844473608920028,
+   "cos_p50": 0.9944533963267359
+  },
+  "int8_dyn_hf->fp32": {
+   "cos_min": 0.9669116721618461,
+   "cos_q1e-4": 0.9684159474052599,
+   "cos_q1e-3": 0.9784077768320674,
+   "cos_p50": 0.9926865488712001
+  },
+  "int8_dyn_hf->fp16": {
+   "cos_min": 0.9667161644927853,
+   "cos_q1e-4": 0.9684162767047217,
+   "cos_q1e-3": 0.9783891751887691,
+   "cos_p50": 0.9926848951825302
+  },
+  "int8_dyn_hf->int8_pc": {
+   "cos_min": 0.961715253835993,
+   "cos_q1e-4": 0.9653274008009932,
+   "cos_q1e-3": 0.9746897552125013,
+   "cos_p50": 0.9910103583733572
+  },
+  "int8_pc->fp32": {
+   "cos_min": 0.975458350560956,
+   "cos_q1e-4": 0.9811157146586306,
+   "cos_q1e-3": 0.9844198617390086,
+   "cos_p50": 0.9944517502305088
+  },
+  "int8_pc->fp16": {
+   "cos_min": 0.9756707053247544,
+   "cos_q1e-4": 0.9811578916157566,
+   "cos_q1e-3": 0.9844473608920028,
+   "cos_p50": 0.9944533963267359
+  },
+  "int8_pc->int8_dyn_hf": {
+   "cos_min": 0.961715253835993,
+   "cos_q1e-4": 0.9653274008009932,
+   "cos_q1e-3": 0.9746897552125013,
+   "cos_p50": 0.9910103583733572
+  }
+ },
+ "n_posts": 20000,
+ "n_queries": 1000,
+ "tau": 0.9653274008009932,
+ "B1": {
+  "theta_deg": 15.131909207084698,
+  "pairs_sampled": 200000,
+  "in_top10_honest": 0.00048,
+  "in_top10_with_turn": 0.10866,
+  "gain_x": 226.375,
+  "score_gain_p50": 0.25986558355713596,
+  "score_gain_max": 0.2633347648868475,
+  "s10_p50": 0.41920611751705905
+ },
+ "B1_curve": [
+  {
+   "tau": 0.965,
+   "theta_deg": 15.203604093293013,
+   "in_top10_with_turn": 0.110485,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 1.0,
+   "honest_pass fp32->int8_dyn_hf": 1.0,
+   "honest_pass int8_pc->int8_dyn_hf": 0.9999
+  },
+  {
+   "tau": 0.98,
+   "theta_deg": 11.478340954533579,
+   "in_top10_with_turn": 0.03696,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 0.99995,
+   "honest_pass fp32->int8_dyn_hf": 0.99735,
+   "honest_pass int8_pc->int8_dyn_hf": 0.99375
+  },
+  {
+   "tau": 0.99,
+   "theta_deg": 8.109614455994183,
+   "in_top10_with_turn": 0.0112,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 0.9747,
+   "honest_pass fp32->int8_dyn_hf": 0.81685,
+   "honest_pass int8_pc->int8_dyn_hf": 0.637
+  },
+  {
+   "tau": 0.995,
+   "theta_deg": 5.731967965197727,
+   "in_top10_with_turn": 0.004515,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 0.3472,
+   "honest_pass fp32->int8_dyn_hf": 0.10395,
+   "honest_pass int8_pc->int8_dyn_hf": 0.0224
+  },
+  {
+   "tau": 0.999,
+   "theta_deg": 2.562558733123139,
+   "in_top10_with_turn": 0.001325,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 0.0,
+   "honest_pass fp32->int8_dyn_hf": 0.0,
+   "honest_pass int8_pc->int8_dyn_hf": 0.0
+  },
+  {
+   "tau": 0.9995,
+   "theta_deg": 1.811927138073909,
+   "in_top10_with_turn": 0.00099,
+   "honest_pass fp32->fp16": 1.0,
+   "honest_pass fp32->int8_pc": 0.0,
+   "honest_pass fp32->int8_dyn_hf": 0.0,
+   "honest_pass int8_pc->int8_dyn_hf": 0.0
+  }
+ ],
+ "B2": {
+  "author fp32, query fp32": 1.0,
+  "author fp32, query fp16": 0.9992000000000001,
+  "author fp32, query int8_dyn_hf": 0.9040000000000001,
+  "author fp32, query int8_pc": 0.9099,
+  "author fp16, query fp32": 0.9989000000000001,
+  "author fp16, query fp16": 0.9989,
+  "author fp16, query int8_dyn_hf": 0.9037000000000001,
+  "author fp16, query int8_pc": 0.9098000000000002,
+  "author int8_dyn_hf, query fp32": 0.8940000000000002,
+  "author int8_dyn_hf, query fp16": 0.8940000000000002,
+  "author int8_dyn_hf, query int8_dyn_hf": 0.8619000000000001,
+  "author int8_dyn_hf, query int8_pc": 0.8603000000000002,
+  "author int8_pc, query fp32": 0.9154000000000001,
+  "author int8_pc, query fp16": 0.9154000000000001,
+  "author int8_pc, query int8_dyn_hf": 0.8742000000000003,
+  "author int8_pc, query int8_pc": 0.8776000000000002
+ }
+}

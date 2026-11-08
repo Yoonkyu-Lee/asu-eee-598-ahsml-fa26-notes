@@ -56,6 +56,7 @@
 3. 기존 하드웨어로 충분하지 않다는 근거가 **측정이나 출처**로 있는가?
 4. 6번의 공정한 비교 규칙으로 평가할 수 있는가?
 5. 남은 학기와 3명으로 끝낼 수 있는가? 아니면 무엇을 잘라 내는지 적었는가?
+6. 하드웨어로 줄이려는 일을 알고리즘·프로토콜로 착취할 수 있는 만큼 착취했는가? (2026-11-07 결정. 먼저 의심할 것: 사건 대신 타이머, 차이 대신 전체, 이웃 대신 모두, 같은 것을 여러 번, 모두가 같은 계산을 반복)
 
 하나라도 "아니오"면 그 이유를 `CHECKPOINT.md`의 해당 CP에 적고 진행한다. 이유 없이 넘어가지 않는다.
 
@@ -65,4 +66,4 @@
 - 범용 "엣지 벡터 검색 가속기"도 아니다. 그건 이미 있다 (CP0: RoCR, IKS 등). 우리 차별점은 server-blind가 만드는 조건(수집 마감, 검색 중 삽입, 암호와 ML의 공존, 오프라인 후 밀린 수집)이다.
 
 ---
-English, for teammates and reviewers: *Replace the operator with compute on users' own devices, so a community can be operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. Our course contribution is hardware that makes that compute cheap, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest. The main workload is chosen by measurement, and every design is compared at equal recall and equal resources.*
+English, for teammates and reviewers: *Replace the operator with compute on users' own devices, so a community can be operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. Our course contribution is hardware that makes that compute cheap, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest. The main workload is chosen by measurement, and every design is compared at equal recall and equal resources. A hardware claim counts only after the algorithm and protocol have been squeezed as far as they go.*
