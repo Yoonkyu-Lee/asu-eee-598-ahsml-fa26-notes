@@ -67,6 +67,17 @@ from store import Store  # noqa: E402
 UI = Path(__file__).resolve().parent / "ui.html"
 CHIP = {"proof_s": 89.6e-6, "image_s": 0.552}     # CP19 verify unit (single proof), CP20 FP16 image tower (추정)
 LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1"}
+
+
+class Fp16Text:
+    """The chip's MiniLM time at FP16 text (CP28: sim_cp28.fp16_text, per table instead of patching the class)."""
+
+    def __init__(self, table, x: float):
+        self.table, self.x = table, x
+
+    def text1(self, L: int):
+        s, J = self.table.text1(L)
+        return s * self.x, J * self.x
 REQ_TIMEOUT_S = 1.0      # CP28 lazy push: ask the next announcer after this (sim.exchange Scene.req_timeout_s)
 W_S = 60.0               # CP26: catch-up margin and the model's window (sim.exchange.Scene.w_s)
 TICK_S, JUMP_S = 5.0, 30.0   # local clock check: a jump over JUMP_S means the computer slept
@@ -151,7 +162,10 @@ class BoxNode:
                     self.text_enc = ml.Encoder("fp32", threads=1)
             self.img_enc = ml.ImageEncoder("fp32", threads=1)    # FP32 = the FP16 tower's quality (CP20)
             self.clip_text = ClipText(threads=1)
-            self.chip_table = sim_cp19.EncTable(8, 1024)
+            if cfg.get("text") == "fp32":       # CP28 chip: 16x16, 2 MB, FP16 text = INT8 x CP20 FP16/INT8 (추정)
+                self.chip_table = Fp16Text(sim_cp19.EncTable(16, 2048), 0.545 / 0.136)
+            else:                               # CP19 chip: 8x8, 1 MB, INT8 text
+                self.chip_table = sim_cp19.EncTable(8, 1024)
         self.encq: queue.PriorityQueue = queue.PriorityQueue()
         self.seq = itertools.count()
         if self.p24:
