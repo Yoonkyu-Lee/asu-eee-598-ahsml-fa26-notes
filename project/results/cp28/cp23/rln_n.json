@@ -1,0 +1,104 @@
+{
+  "bench": "cp23 RLN-n (arkworks 0.5, BN254 Groth16, single thread)",
+  "merkle_depth": 20,
+  "poseidon": {
+    "alpha": 5,
+    "constants": "seeded stand-ins (constraint count only)",
+    "full_rounds": 8,
+    "partial_rounds": 57,
+    "t": 3
+  },
+  "range_bits": 16,
+  "rows": [
+    {
+      "constraints": 5909,
+      "n": 1,
+      "proof_bytes": 128,
+      "prove_us": 363311.60000000003,
+      "public_inputs": 5,
+      "publics_bytes": 160,
+      "setup_s": 0.4268953,
+      "verify_us": 1340.7
+    },
+    {
+      "constraints": 6397,
+      "n": 2,
+      "proof_bytes": 128,
+      "prove_us": 454901.7,
+      "public_inputs": 7,
+      "publics_bytes": 224,
+      "setup_s": 0.4787279,
+      "verify_us": 1482.8
+    },
+    {
+      "constraints": 6885,
+      "n": 3,
+      "proof_bytes": 128,
+      "prove_us": 447881.8,
+      "public_inputs": 9,
+      "publics_bytes": 288,
+      "setup_s": 0.5217986,
+      "verify_us": 1637.8
+    },
+    {
+      "constraints": 7373,
+      "n": 4,
+      "proof_bytes": 128,
+      "prove_us": 460572.6,
+      "public_inputs": 11,
+      "publics_bytes": 352,
+      "setup_s": 0.6498414,
+      "verify_us": 1809.0
+    },
+    {
+      "constraints": 8349,
+      "n": 6,
+      "proof_bytes": 128,
+      "prove_us": 537366.0,
+      "public_inputs": 15,
+      "publics_bytes": 480,
+      "setup_s": 0.6158687,
+      "verify_us": 2028.4
+    },
+    {
+      "constraints": 9325,
+      "n": 8,
+      "proof_bytes": 128,
+      "prove_us": 595097.6,
+      "public_inputs": 19,
+      "publics_bytes": 608,
+      "setup_s": 0.6959986,
+      "verify_us": 2316.9
+    },
+    {
+      "constraints": 11277,
+      "n": 12,
+      "proof_bytes": 128,
+      "prove_us": 775151.7,
+      "public_inputs": 27,
+      "publics_bytes": 864,
+      "setup_s": 0.8975527,
+      "verify_us": 3016.6
+    },
+    {
+      "constraints": 13229,
+      "n": 16,
+      "proof_bytes": 128,
+      "prove_us": 846643.1,
+      "public_inputs": 35,
+      "publics_bytes": 1120,
+      "setup_s": 0.9062882,
+      "verify_us": 3538.5
+    },
+    {
+      "constraints": 17133,
+      "n": 24,
+      "proof_bytes": 128,
+      "prove_us": 1161291.8,
+      "public_inputs": 51,
+      "publics_bytes": 1632,
+      "setup_s": 1.2735499,
+      "verify_us": 4832.8
+    }
+  ]
+}

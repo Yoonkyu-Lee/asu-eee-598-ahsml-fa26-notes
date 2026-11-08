@@ -30,7 +30,8 @@ PORTS = [8631, 8632, 8633, 8634, 8635]
 lan_check.PORTS = PORTS
 own, up = lan_check.own, lan_check.up
 KEYS = ("catch_req", "catch_env", "offer_ids", "want_ids", "sync_req", "sync_env", "sync_bytes", "catch_bytes", "hello",
-        "send", "dup")
+        "send", "dup", "ihave_rx", "env_rx", "ihave_sent")
+PUSH = "--eager" not in sys.argv          # CP28: ids first (lan.py default); --eager = CP26's run
 
 # (action, box): on / off / post. Box 0 is the always-on box; it has one outage while boxes 1 and 3 write.
 SCENE = [("on", 0), ("on", 1), ("post", 0), ("post", 1), ("off", 1),
@@ -49,7 +50,7 @@ def run(ip: str, exchange: str) -> dict:
 
     def start(i):
         args = [py, str(HERE / "lan.py"), "--hosts", hosts, "--me", str(i), "--state", str(state / f"box{i}"),
-                "--exchange", exchange]
+                "--exchange", exchange, "--push", "lazy" if PUSH else "eager"]
         procs[i] = subprocess.Popen(args, stdout=open(LOGS / f"cp26_check_{exchange}_box{i}.log", "a"),
                                     stderr=subprocess.STDOUT)
         up(i)
@@ -90,7 +91,7 @@ def run(ip: str, exchange: str) -> dict:
 
 def model(script: list) -> dict:
     end = script[-1][0] + 60
-    x = Exchange(Scene(n=5, days=end / 86400, p_loss=0.0, grace_s=1.0), "X2",
+    x = Exchange(Scene(n=5, days=end / 86400, p_loss=0.0, grace_s=1.0, push="lazy" if PUSH else "eager"), "X2",
                  script=[(round(t, 3), k, b) for t, k, b in script])
     r = x.run()
     return {"per_box": {b: dict(x.ops[b]) for b in range(5)}, "missing_pairs": r["missing_pairs"]}
@@ -100,20 +101,23 @@ def main() -> None:
     ip = sys.argv[1] if len(sys.argv) > 1 else addresses()[0]
     LOGS.mkdir(exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
-    res = {"address": "this computer's network address", "x2": run(ip, "x2")}
+    res = {"address": "this computer's network address", "push": "lazy" if PUSH else "eager", "x2": run(ip, "x2")}
     res["model"] = model(res["x2"]["script"])
-    res["poll"] = run(ip, "poll")
+    res["poll"] = run(ip, "poll") if "--no-poll" not in sys.argv else None
     diff = []
     for b in range(5):
-        for k in ("catch_req", "catch_env", "offer_ids", "want_ids"):
+        for k in ("catch_req", "catch_env", "offer_ids", "want_ids") + (("ihave_rx", "env_rx") if PUSH else ()):
             demo, mod = res["x2"]["per_box"][b].get(k, 0), res["model"]["per_box"][b].get(k, 0)
             if demo != mod:
                 diff.append([b, k, demo, mod])
     res["x2_vs_model_differences"] = diff
-    res["pass"] = {"x2_complete": all(res["x2"]["feeds_complete"]), "poll_complete": all(res["poll"]["feeds_complete"]),
+    res["pass"] = {"x2_complete": all(res["x2"]["feeds_complete"]),
+                   "poll_complete": res["poll"] is None or all(res["poll"]["feeds_complete"]),
                    "model_complete": res["model"]["missing_pairs"] == 0, "x2_equals_model": not diff}
-    (OUT / "exchange_check.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
-    for k in ("x2", "poll"):
+    out = Path(next((a for a in sys.argv[2:] if a.endswith(".json")), OUT / "exchange_check.json"))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(res, indent=1), encoding="utf-8")
+    for k in ("x2",) + (("poll",) if res["poll"] else ()):
         print(k, res[k]["feeds_complete"], {b: {kk: v for kk, v in c.items() if v} for b, c in res[k]["per_box"].items()})
     print("model", res["model"])
     print("differences", diff)

@@ -22,6 +22,11 @@ peer (that peer asks only for what it lacks) and asks that peer for everything p
 caught up yet only claims its own session. Nothing runs on a timer except a local clock check. "poll" = the CP24
 exchange (every 20 s every listed box is asked for its whole list), kept to compare.
 
+CP28 (cfg "push" = "lazy", cfg "text" = "fp32"): ids first (CP27 P2): a box tells its mesh peers a message's id
+(POST /ihave1); a peer that lacks it answers "want" to the first announcer only, and if the envelope has not come
+1 s later it fetches it from the next announcer (GET /env). Text is encoded by FP32 MiniLM (the CP3 contract; FP16
+grade, CP27 B2).
+
   .venv/Scripts/python.exe src/demo/box_server.py --cfg results/cp21/cfg.json --id 0
 Peers:   POST /gossip {msg, frm}    GET /pull?mid=&frm=    GET /hello    GET /sync    POST /inject {msg}
          GET /since?lo=&hi=&frm=   POST /ihave {ids, frm}   (CP26 x2)
@@ -62,6 +67,7 @@ from store import Store  # noqa: E402
 UI = Path(__file__).resolve().parent / "ui.html"
 CHIP = {"proof_s": 89.6e-6, "image_s": 0.552}     # CP19 verify unit (single proof), CP20 FP16 image tower (추정)
 LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1"}
+REQ_TIMEOUT_S = 1.0      # CP28 lazy push: ask the next announcer after this (sim.exchange Scene.req_timeout_s)
 W_S = 60.0               # CP26: catch-up margin and the model's window (sim.exchange.Scene.w_s)
 TICK_S, JUMP_S = 5.0, 30.0   # local clock check: a jump over JUMP_S means the computer slept
 
@@ -119,10 +125,13 @@ class BoxNode:
         self.cov_before, self.gap_lo, self.offered, self.stalled = self.cov, 0.0, False, False
         self.t_come_on = self.session
         self.catch_lock = threading.Lock()
-        self.down: set[int] = set()                # peers found unreachable and not heard from since (rule 2)
+        self.up: set[int] = set()                  # peers known to be on: they said hello, answered or sent (rule 2;
+                                                   # CP28: the mesh is the boxes that are on, as in sim.exchange)
+        self.announcers: dict[int, list] = {}      # CP28 lazy push: mid -> boxes that announced it, in order
         self.replaying = False
         self.replayed: set[int] = set()
         self.tomb: dict[int, set] = {}           # deleted post -> the author's one-time public keys (hex)
+        self.gone: set[int] = set()              # posts held here and then forgotten (CP28)
         if self.st:
             self._restore_identity()
             self.commit = self.W.ids[bid].commit
@@ -132,11 +141,14 @@ class BoxNode:
             from bench_cp18 import ClipText
             from sim import ml
             import sim_cp19
-            try:
-                self.text_enc = ml.Encoder("int8", threads=1)
-            except Exception:                                  # e.g. an ONNX Runtime build without the INT8 kernels
-                log("MiniLM INT8 failed, using FP32:", traceback.format_exc(limit=1).strip().splitlines()[-1])
+            if cfg.get("text") == "fp32":                      # CP28: contract precision (CP3, CP27)
                 self.text_enc = ml.Encoder("fp32", threads=1)
+            else:
+                try:
+                    self.text_enc = ml.Encoder("int8", threads=1)
+                except Exception:                              # e.g. an ONNX Runtime build without the INT8 kernels
+                    log("MiniLM INT8 failed, using FP32:", traceback.format_exc(limit=1).strip().splitlines()[-1])
+                    self.text_enc = ml.Encoder("fp32", threads=1)
             self.img_enc = ml.ImageEncoder("fp32", threads=1)    # FP32 = the FP16 tower's quality (CP20)
             self.clip_text = ClipText(threads=1)
             self.chip_table = sim_cp19.EncTable(8, 1024)
@@ -199,6 +211,12 @@ class BoxNode:
             log(f"restored {len(rows)} messages from {self.st.dir} in {ms / 1e3:.1f} s (encoding continues in the background)")
         return len(rows)
 
+    def forgotten(self, mid: int) -> bool:
+        """Held here, then deleted by its author (or dropped on arrival by a matching tombstone). A tombstone alone is
+        not enough: a forged delete leaves one too (another key), and the real post must still come in. An id alone
+        has no key to compare, so only posts known gone are refused (CP28: ids and picture pulls checked the mid)."""
+        return mid in self.gone
+
     def _have_picture(self, mid: int, data: bytes) -> None:
         self.full[mid] = data
         if self.st:
@@ -218,6 +236,7 @@ class BoxNode:
         self.st.save_tomb(self.tomb)
         if it is None:
             return
+        self.gone.add(tgt)
         self.msgs.pop(tgt, None)
         self.full.pop(tgt, None)
         self.S.plain = {k: v for k, v in self.S.plain.items() if k[0] != tgt}
@@ -245,38 +264,87 @@ class BoxNode:
                                      headers={"Content-Type": "application/json"})
         urllib.request.urlopen(req, timeout=120).read()
 
-    def send(self, peer: int, m: Msg) -> None:
+    def send(self, peer: int, m: Msg, direct: bool = False) -> None:
+        """Push m to peer: the envelope (CP17), or with cfg "push" = "lazy" its id first (CP28), unless the peer
+        already asked for it (direct)."""
         self.count["send"] += 1
         self._inc()
         payload = {"msg": msg_to_json(m), "frm": self.bid}
+        lazy = self.cfg.get("push") == "lazy" and not direct
+
+        # ids first: no retries. A peer that missed an id hears it from another announcer (REQ_TIMEOUT_S) or gets it
+        # when it comes on (catch-up); retrying an off box only lands late after it restarts (CP28 D, run 3)
+        tries = 1 if lazy else 3
 
         def go():
             try:
-                for i in range(3):
+                for i in range(tries):
                     try:
-                        self._post(peer, "/gossip", payload)
-                        self.down.discard(peer)
+                        if lazy:
+                            self.count["ihave_sent"] += 1
+                            req = urllib.request.Request(self._url(peer, "/ihave1"),
+                                                         data=json.dumps({"mid": str(m.mid), "frm": self.bid}).encode(),
+                                                         headers={"Content-Type": "application/json"})
+                            want = json.loads(urllib.request.urlopen(req, timeout=60).read())["want"]
+                            if want:
+                                self._post(peer, "/gossip", payload)
+                        else:
+                            self._post(peer, "/gossip", payload)
+                        self.up.add(peer)
                         return
                     except Exception as e:
-                        if i == 2:
+                        if i == tries - 1:
                             log(f"gossip to box {peer} ({self.addr[peer]}) failed:", e)
-                            self.down.add(peer)
+                            self.up.discard(peer)
+                            return
                         time.sleep(0.5 * (i + 1))
             finally:
                 self._inc(-1)
         self.pool.submit(go)
 
+    def ihave1(self, mid: int, frm: int) -> bool:
+        """An id was announced. Want it from the first announcer only; check again after REQ_TIMEOUT_S."""
+        with self.lock:
+            self.count["ihave_rx"] += 1
+            self.up.add(frm)
+            if mid in self.got or self.forgotten(mid):
+                return False
+            ann = self.announcers.setdefault(mid, [])
+            ann.append(frm)
+            if len(ann) > 1:
+                return False
+        threading.Timer(REQ_TIMEOUT_S, self._lazy_check, (mid, 1)).start()
+        return True
+
+    def _lazy_check(self, mid: int, i: int) -> None:
+        with self.lock:
+            if mid in self.got:
+                return
+            ann = self.announcers.get(mid, [])
+            if i >= len(ann):
+                return
+            frm = ann[i]
+        try:
+            d = json.loads(urllib.request.urlopen(self._url(frm, f"/env?mid={mid}&frm={self.bid}"), timeout=60).read())
+            if d.get("msg"):
+                self.count["env_rx"] += 1
+                self.deliver(msg_from_json(d["msg"]), frm)
+                return
+        except Exception as e:
+            log(f"envelope {mid} from box {frm} failed:", type(e).__name__)
+        threading.Timer(REQ_TIMEOUT_S, self._lazy_check, (mid, i + 1)).start()
+
     def targets(self, topic: int) -> list[int]:
-        """The topic's mesh peers. With the x2 exchange (rule 2, graft): leave out peers found unreachable and fill
-        up to D from the topic's other holders, most recently heard from first."""
+        """The topic's mesh peers. With the x2 exchange (rule 2, graft): only peers known to be on, filled up to D
+        from the topic's other holders that are on, most recently heard from first."""
         mesh = [int(p) for p in self.mesh.get(topic, {}).get(self.bid, ())]
         if self.exchange != "x2":
             return mesh
-        out = [p for p in mesh if p not in self.down]
+        out = [p for p in mesh if p in self.up]
         D = self.cfg.get("D", 2)
         if len(out) < D:
             more = [int(p) for p in self.holders.get(topic, ()) if int(p) != self.bid and int(p) not in out
-                    and int(p) not in self.down]
+                    and int(p) in self.up]
             more.sort(key=lambda p: -self.peer_seen.get(p, 0.0))
             out += more[:D - len(out)]
         return out
@@ -300,13 +368,14 @@ class BoxNode:
             self.got.add(m.mid)
             if m.epub.hex() in self.tomb.get(m.mid, ()):           # deleted by its author: forgotten (CP25)
                 self.count["forgotten"] += 1
+                self.gone.add(m.mid)
                 return
             self.msgs[m.mid] = m
             if self.st and not self.replaying:
                 self.st.add_message(msg_to_json(m), frm)
             if frm >= 0 and not self.replaying:
                 self.peer_seen[frm] = time.time()
-                self.down.discard(frm)
+                self.up.add(frm)
             t = time.time()
             if self.p24:
                 v = self.box.validate(m)
@@ -476,7 +545,7 @@ class BoxNode:
                         log(f"pull {mid} from box {peer} failed:", e)
                         continue
                     with self.lock:
-                        if mid in self.tomb:
+                        if self.forgotten(mid):
                             return
                         self._have_picture(mid, data)
                         self.full_ev[mid].set()
@@ -491,7 +560,7 @@ class BoxNode:
 
     def serve_pull(self, mid: int) -> bytes | None:
         with self.lock:
-            if mid in self.tomb:
+            if self.forgotten(mid):
                 return None
             ev = self.full_ev.setdefault(mid, threading.Event())
             if mid not in self.full and mid in self.parent:
@@ -587,9 +656,9 @@ class BoxNode:
             t1 = time.time()
         except Exception as e:
             log(f"box {peer} ({self.addr[peer]}) not reachable:", type(e).__name__)
-            self.down.add(peer)
+            self.up.discard(peer)
             return None
-        self.down.discard(peer)
+        self.up.add(peer)
         self.peer_seen[peer] = time.time()
         self.count["hello"] += 1
         if self.st:
@@ -698,8 +767,8 @@ class BoxNode:
             return
         with self.lock:
             rows = [self.msgs[int(x)] for x in want if int(x) in self.msgs]
-        for m in rows:                                          # it lacks these: push them (it forwards them on)
-            self.send(p, m)
+        for m in rows:                                          # it asked for these: the envelopes (it forwards them on)
+            self.send(p, m, direct=True)
 
     def alive_loop(self) -> None:
         """Local only: keep the last-alive time, and treat a clock jump (the computer slept) as coming on again."""
@@ -805,7 +874,8 @@ def handler(node: BoxNode):
             ip = self.client_address[0]
             if ip in LOOPBACK:
                 return True
-            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave") and ip in node.peer_ips
+            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave", "/ihave1", "/env") \
+                and ip in node.peer_ips
 
         def do_GET(self):
             u = urlparse(self.path)
@@ -816,10 +886,14 @@ def handler(node: BoxNode):
                 return self.reply(UI.read_bytes(), ctype="text/html; charset=utf-8")
             if u.path == "/hello":
                 if "frm" in q:                                  # a box that came on says hello
-                    node.down.discard(int(q["frm"]))
+                    node.up.add(int(q["frm"]))
                     node.peer_seen[int(q["frm"])] = time.time()
                     node.peer_appeared()
                 return self.reply(node.hello_info())
+            if u.path == "/env":
+                with node.lock:
+                    m = node.msgs.get(int(q["mid"]))
+                    return self.reply({"msg": msg_to_json(m) if m is not None else None})
             if u.path == "/since":
                 return self.reply(node.since(float(q.get("lo", 0)), float(q.get("hi", "inf"))))
             if u.path == "/sync":
@@ -870,8 +944,11 @@ def handler(node: BoxNode):
 
         def post(self, path: str, d: dict):
             if path == "/gossip":
+                node.count["env_rx"] += 1
                 node.deliver(msg_from_json(d["msg"]), int(d["frm"]))
                 return self.reply({"ok": True})
+            if path == "/ihave1":
+                return self.reply({"want": node.ihave1(int(d["mid"]), int(d["frm"]))})
             if path == "/ihave":
                 node.count["want_ids"] += len(want := node.ihave(d["ids"]))
                 return self.reply({"want": want})

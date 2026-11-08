@@ -101,6 +101,10 @@ def main() -> None:
     ap.add_argument("--old", default="", help="boxes in the old group, e.g. 0,2")
     ap.add_argument("--state", help="state folder (default state/box<me>)")
     ap.add_argument("--new-identity", action="store_true", help="retire the stored identity and draw a new one")
+    ap.add_argument("--push", choices=("lazy", "eager"), default="lazy",
+                    help="lazy: ids first, envelopes only on request (CP27 P2, CP28); eager: envelopes to every peer")
+    ap.add_argument("--text", choices=("fp32", "int8"), default="fp32",
+                    help="fp32: contract precision (CP3, CP27); int8: CP21-CP26 boxes")
     ap.add_argument("--exchange", choices=("x2", "poll"), default="x2",
                     help="x2: catch up when the box comes on (CP26); poll: ask every box for everything every 20 s (CP24)")
     ap.add_argument("--check", action="store_true")
@@ -120,12 +124,13 @@ def main() -> None:
     if not 0 <= a.me < n:
         ap.error(f"--me must be 0..{n - 1}")
     old = {int(x) for x in a.old.split(",") if x.strip()}
-    cfg = community(n, D=2, seed=24, base_port=a.port, proto="cp24", hosts=hosts, room=list(range(n)),
+    cfg = community(n, D=6, seed=24, base_port=a.port, proto="cp24", hosts=hosts, room=list(range(n)),
                     tiers=["old" if i in old else "new" for i in range(n)])
     cfg["ports"], cfg["addr"] = ports, [f"{x}:{p}" for x, p in zip(hosts, ports)]
     cfg["room_key"] = hashlib.blake2b(b"room-R|" + a.room_pass.encode(), digest_size=32).hexdigest() if a.room_pass else None
     cfg["sync"] = True                                  # several computers: a picture is pulled from any box
     cfg["exchange"] = a.exchange
+    cfg["push"], cfg["text"] = a.push, a.text          # CP28; mesh D = 6 as in DayNet (all peers for n <= 7)
     if a.check:
         sys.exit(0 if check(cfg, a.me) else 1)
     mine = set(addresses())
