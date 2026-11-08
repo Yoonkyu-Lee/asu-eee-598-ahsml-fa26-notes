@@ -1,0 +1,10 @@
+#!/bin/sh
+# Strip AI co-author trailers from commit messages (e.g. "Co-Authored-By: Claude ...").
+# Enable once per clone:  git config core.hooksPath .githooks
+msg="$1"
+tmp="$msg.tmp"
+grep -v -i -E '^co-authored-by:.*(claude|anthropic)' "$msg" > "$tmp"
+# drop trailing blank lines left behind
+sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$tmp" > "$msg"
+rm -f "$tmp"
+exit 0
