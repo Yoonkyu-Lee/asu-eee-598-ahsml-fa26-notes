@@ -1,0 +1,127 @@
+{
+ "scenes": [
+  {
+   "scene": "come on with 3 peers: each missing post comes once (K)",
+   "model_scene": "K, come-on duplicates",
+   "pass": true,
+   "seconds": 0.1,
+   "dup_after_start": 0,
+   "fetched": 6,
+   "envelopes_in": 0,
+   "offer_want": 0
+  },
+  {
+   "scene": "held session, change meanwhile: fence keeps clean(1) off",
+   "model_scene": "F fence (layer 2: third-party change)",
+   "pass": true,
+   "fence_held_delta": 1,
+   "box0_clean_has_1": false,
+   "box1_got_W_s": 33.3
+  },
+  {
+   "scene": "same with the fence off (mutation): clean(1) set wrongly",
+   "model_scene": "mutation of F",
+   "pass": true,
+   "fence_held_delta": 0,
+   "box0_clean_has_1": true,
+   "box1_got_W_s": 41.4
+  },
+  {
+   "scene": "quiet: some floor checks skipped (F')",
+   "model_scene": "F clean, then quiet (F' re-checks silent pairs)",
+   "pass": true,
+   "floor_sessions": {
+    "0": 4,
+    "1": 2,
+    "2": 3,
+    "3": 4
+   },
+   "floor_skips": {
+    "0": 8,
+    "1": 10,
+    "2": 9,
+    "3": 8
+   }
+  }
+ ],
+ "final_sets_equal": true,
+ "per_box": {
+  "0": {
+   "verified": 8,
+   "verified_twice": 0,
+   "recon": {
+    "recon_sessions": 28,
+    "recon_b": 4,
+    "recon_bytes": 8009,
+    "recon_fetched": 0,
+    "recon_pushed": 2,
+    "recon_a": 1,
+    "recon_rx": 25,
+    "recon_f": 21,
+    "recon_t": 2
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "1": {
+   "verified": 8,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 24,
+    "recon_sessions": 14,
+    "recon_a": 2,
+    "recon_bytes": 2337,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_b": 4,
+    "recon_f": 7,
+    "recon_e": 1
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "2": {
+   "verified": 8,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 18,
+    "recon_sessions": 23,
+    "recon_b": 4,
+    "recon_bytes": 3360,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_a": 3,
+    "recon_f": 14,
+    "recon_e": 2
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "3": {
+   "verified": 8,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 22,
+    "recon_sessions": 20,
+    "recon_a": 3,
+    "recon_bytes": 8845,
+    "recon_fetched": 6,
+    "recon_pushed": 0,
+    "recon_f": 14,
+    "recon_e": 2,
+    "recon_b": 1
+   },
+   "rejected": {},
+   "dup": 0
+  }
+ },
+ "all_pass": true,
+ "settings": {
+  "boxes": 4,
+  "pae_s": [
+   20.0,
+   40.0
+  ],
+  "probe_max_s": 20.0
+ }
+}

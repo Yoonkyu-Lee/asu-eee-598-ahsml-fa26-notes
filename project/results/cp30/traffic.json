@@ -1,0 +1,383 @@
+[
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S0",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 6144,
+  "dup_env": 3540,
+  "dup_ratio": 0.576171875,
+  "exch_kb_box_day": 24.7958,
+  "recon_kb": 0.0,
+  "probe_kb": 6.3878,
+  "fetch_kb": 0.0,
+  "push_ctl_kb": 1.48434,
+  "over_over_needed": 0.8230625,
+  "sent_kb_box_day": 56.00448,
+  "miss": 0,
+  "miss_pairs": 293,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {
+   "L1": 158,
+   "F1": 120
+  },
+  "world_trace": 2597997183,
+  "floor_skip": 0,
+  "triggers": {},
+  "secs": 0.2
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S2c",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 5673,
+  "dup_env": 0,
+  "dup_ratio": 0.0,
+  "exch_kb_box_day": 4.421085,
+  "recon_kb": 1.863005,
+  "probe_kb": 2.196,
+  "fetch_kb": 0.36207999999999996,
+  "push_ctl_kb": 0.48932,
+  "over_over_needed": 0.15452864445619602,
+  "sent_kb_box_day": 32.748205,
+  "miss": 0,
+  "miss_pairs": 293,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {},
+  "world_trace": 2597997183,
+  "floor_skip": 588,
+  "triggers": {
+   "recon_b": 224,
+   "recon_e": 800,
+   "recon_f": 256,
+   "recon_a": 517,
+   "recon_d": 58
+  },
+  "secs": 0.2
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S2",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 5673,
+  "dup_env": 11729,
+  "dup_ratio": 2.0675127798343027,
+  "exch_kb_box_day": 78.90244,
+  "recon_kb": 2.86546,
+  "probe_kb": 13.8728,
+  "fetch_kb": 1.17338,
+  "push_ctl_kb": 1.2121199999999999,
+  "over_over_needed": 2.7260553499030493,
+  "sent_kb_box_day": 105.68956,
+  "miss": 0,
+  "miss_pairs": 293,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {},
+  "world_trace": 2597997183,
+  "floor_skip": 0,
+  "triggers": {
+   "recon_b": 514,
+   "recon_f": 448,
+   "recon_e": 922,
+   "recon_a": 516
+  },
+  "secs": 0.5
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S0",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 88286,
+  "dup_env": 41940,
+  "dup_ratio": 0.4750470063203679,
+  "exch_kb_box_day": 225.864,
+  "recon_kb": 0.0,
+  "probe_kb": 7.776,
+  "fetch_kb": 0.0,
+  "push_ctl_kb": 16.858919999999998,
+  "over_over_needed": 0.5196393086106518,
+  "sent_kb_box_day": 670.81438,
+  "miss": 0,
+  "miss_pairs": 2343,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {
+   "L1": 1556,
+   "F1": 118
+  },
+  "world_trace": 894983649,
+  "floor_skip": 0,
+  "triggers": {},
+  "secs": 1.0
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S0",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 18798,
+  "dup_env": 11,
+  "dup_ratio": 0.0005851686349611661,
+  "exch_kb_box_day": 0.8312,
+  "recon_kb": 0.0,
+  "probe_kb": 0.774,
+  "fetch_kb": 0.0,
+  "push_ctl_kb": 38.10872,
+  "over_over_needed": 0.4551267156080434,
+  "sent_kb_box_day": 136.76736,
+  "miss": 3,
+  "miss_pairs": 26053,
+  "live_p99_s": 0.6000000000349246,
+  "violations": {
+   "L1": 685,
+   "F1": 4770
+  },
+  "world_trace": 901955064,
+  "floor_skip": 0,
+  "triggers": {},
+  "secs": 1.3
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S2c",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 77921,
+  "dup_env": 0,
+  "dup_ratio": 0.0,
+  "exch_kb_box_day": 16.689284999999998,
+  "recon_kb": 9.683785,
+  "probe_kb": 2.4948,
+  "fetch_kb": 4.5107,
+  "push_ctl_kb": 6.41498,
+  "over_over_needed": 0.04040057237458451,
+  "sent_kb_box_day": 405.34526500000004,
+  "miss": 0,
+  "miss_pairs": 2344,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {},
+  "world_trace": 1006229284,
+  "floor_skip": 110,
+  "triggers": {
+   "recon_b": 221,
+   "recon_e": 1196,
+   "recon_f": 259,
+   "recon_a": 511,
+   "recon_d": 77
+  },
+  "secs": 1.7
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S2",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 77929,
+  "dup_env": 131902,
+  "dup_ratio": 1.6925919747462435,
+  "exch_kb_box_day": 728.813935,
+  "recon_kb": 16.628794999999997,
+  "probe_kb": 13.4926,
+  "fetch_kb": 12.80214,
+  "push_ctl_kb": 12.966719999999999,
+  "over_over_needed": 1.8172830525221677,
+  "sent_kb_box_day": 1097.740255,
+  "miss": 0,
+  "miss_pairs": 2344,
+  "live_p99_s": 0.15000000000873115,
+  "violations": {},
+  "world_trace": 671099185,
+  "floor_skip": 0,
+  "triggers": {
+   "recon_b": 512,
+   "recon_f": 269,
+   "recon_e": 1195,
+   "recon_a": 511,
+   "recon_d": 2
+  },
+  "secs": 1.9
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S2c",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 18800,
+  "dup_env": 0,
+  "dup_ratio": 0.0,
+  "exch_kb_box_day": 30.606165,
+  "recon_kb": 25.122945,
+  "probe_kb": 5.46232,
+  "fetch_kb": 0.0209,
+  "push_ctl_kb": 42.9039,
+  "over_over_needed": 0.8125772872340425,
+  "sent_kb_box_day": 170.38226500000002,
+  "miss": 0,
+  "miss_pairs": 26053,
+  "live_p99_s": 0.45000000002619345,
+  "violations": {},
+  "world_trace": 901955064,
+  "floor_skip": 29917,
+  "triggers": {
+   "recon_f": 53116,
+   "recon_a": 4721,
+   "recon_b": 871,
+   "recon_e": 6196
+  },
+  "secs": 3.5
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S2",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 1.0
+  },
+  "needed_env": 18800,
+  "dup_env": 652,
+  "dup_ratio": 0.03468085106382979,
+  "exch_kb_box_day": 39.980425000000004,
+  "recon_kb": 34.323605,
+  "probe_kb": 2.1258000000000004,
+  "fetch_kb": 0.14062,
+  "push_ctl_kb": 41.9029,
+  "over_over_needed": 0.9013460106382979,
+  "sent_kb_box_day": 178.72652499999998,
+  "miss": 0,
+  "miss_pairs": 26053,
+  "live_p99_s": 0.5999999998603016,
+  "violations": {},
+  "world_trace": 901955064,
+  "floor_skip": 0,
+  "triggers": {
+   "recon_a": 1733,
+   "recon_b": 1120,
+   "recon_f": 81871,
+   "recon_e": 6516
+  },
+  "secs": 3.6
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S0",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 199375,
+  "dup_env": 6622,
+  "dup_ratio": 0.033213793103448276,
+  "exch_kb_box_day": 35.3726,
+  "recon_kb": 0.0,
+  "probe_kb": 0.9382,
+  "fetch_kb": 0.0,
+  "push_ctl_kb": 395.6316,
+  "over_over_needed": 0.4690582068965517,
+  "sent_kb_box_day": 1464.4674,
+  "miss": 33,
+  "miss_pairs": 265253,
+  "live_p99_s": 0.6000000000349246,
+  "violations": {
+   "L1": 5971,
+   "F1": 4770
+  },
+  "world_trace": 1912634924,
+  "floor_skip": 0,
+  "triggers": {},
+  "secs": 10.4
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S2",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 199397,
+  "dup_env": 7254,
+  "dup_ratio": 0.0363796847495198,
+  "exch_kb_box_day": 81.00710000000001,
+  "recon_kb": 39.226459999999996,
+  "probe_kb": 3.2904,
+  "fetch_kb": 0.76944,
+  "push_ctl_kb": 425.28641999999996,
+  "over_over_needed": 0.5369030827946258,
+  "sent_kb_box_day": 1532.26932,
+  "miss": 0,
+  "miss_pairs": 265162,
+  "live_p99_s": 0.45000000002619345,
+  "violations": {},
+  "world_trace": 1912634924,
+  "floor_skip": 0,
+  "triggers": {
+   "recon_a": 1984,
+   "recon_b": 1791,
+   "recon_f": 72966,
+   "recon_e": 11261,
+   "recon_d": 82
+  },
+  "secs": 21.8
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S2c",
+  "seed": 1,
+  "extra": {
+   "msgs_per_day": 10.0
+  },
+  "needed_env": 199397,
+  "dup_env": 0,
+  "dup_ratio": 0.0,
+  "exch_kb_box_day": 47.170025,
+  "recon_kb": 40.159345,
+  "probe_kb": 6.8939200000000005,
+  "fetch_kb": 0.11676,
+  "push_ctl_kb": 454.6594,
+  "over_over_needed": 0.533735437343591,
+  "sent_kb_box_day": 1529.111225,
+  "miss": 0,
+  "miss_pairs": 265162,
+  "live_p99_s": 0.45000000002619345,
+  "violations": {},
+  "world_trace": 1912634924,
+  "floor_skip": 1582,
+  "triggers": {
+   "recon_f": 64908,
+   "recon_a": 4999,
+   "recon_e": 12525,
+   "recon_b": 1630,
+   "recon_d": 82
+  },
+  "secs": 22.5
+ }
+]

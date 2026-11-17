@@ -1,0 +1,190 @@
+{
+ "scenes": [
+  {
+   "scene": "silent link return (H1 class)",
+   "model_scene": "silent link return / H1",
+   "pass": true,
+   "seconds": 1.0
+  },
+  {
+   "scene": "silent loss, then idle",
+   "model_scene": "silent loss, then idle",
+   "pass": true,
+   "seconds": 14.2,
+   "floor_sessions_box1": 1
+  },
+  {
+   "scene": "skewed author, receiver was off (H3 class)",
+   "model_scene": "H3 skew beyond the catch-up margin",
+   "pass": true,
+   "seconds": 0.0
+  },
+  {
+   "scene": "forged and bad-signature copies first (H8)",
+   "model_scene": "H8 squatting liar, invalid first",
+   "pass": true,
+   "seconds": 3.1,
+   "rej_id": 1,
+   "rej_bad_sig": 1,
+   "held_forged": false
+  },
+  {
+   "scene": "delete before its post",
+   "model_scene": "delete arrives before its post",
+   "pass": true,
+   "gone_on_arrival": true,
+   "held_anywhere": [
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "scene": "partition heals",
+   "model_scene": "partition heals",
+   "pass": true,
+   "seconds": 0.1
+  },
+  {
+   "scene": "author crashes after posting, restarts",
+   "model_scene": "H5 class (holder off, then on)",
+   "pass": true,
+   "seconds": 0.0
+  },
+  {
+   "scene": "crash and restart",
+   "model_scene": "H2 class",
+   "pass": true,
+   "seconds": 0.0
+  },
+  {
+   "scene": "come on with 3 peers: each missing post comes once (K)",
+   "model_scene": "K, come-on duplicates",
+   "pass": true,
+   "seconds": 0.1,
+   "dup_after_start": 0,
+   "fetched": 0,
+   "envelopes_in": 6,
+   "offer_want": 6
+  },
+  {
+   "scene": "change during a session (fence), push lost",
+   "model_scene": "F fence (layer 2: third-party change)",
+   "pass": true,
+   "seconds": 3.1,
+   "fence_held": 0
+  },
+  {
+   "scene": "quiet: floor sessions skipped (F)",
+   "model_scene": "F clean, then a quiet day",
+   "pass": false,
+   "floor_sessions": {
+    "0": 4,
+    "1": 5,
+    "2": 3,
+    "3": 4
+   },
+   "floor_skips": {
+    "0": 8,
+    "1": 8,
+    "2": 9,
+    "3": 8
+   }
+  },
+  {
+   "scene": "fence off (mutation): box 1 misses W while cut from 2 and 3",
+   "model_scene": "mutation of F",
+   "pass": false,
+   "seconds": 61.8
+  },
+  {
+   "scene": "  ... and gets it once the links come back",
+   "model_scene": "",
+   "pass": true,
+   "seconds": 0.0
+  }
+ ],
+ "final_sets_equal": true,
+ "per_box": {
+  "0": {
+   "verified": 19,
+   "verified_twice": 0,
+   "recon": {
+    "recon_sessions": 34,
+    "recon_b": 11,
+    "recon_bytes": 13852,
+    "recon_fetched": 1,
+    "recon_pushed": 3,
+    "recon_rx": 39,
+    "recon_f": 21,
+    "recon_t": 2
+   },
+   "rejected": {},
+   "dup": 1
+  },
+  "1": {
+   "verified": 18,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 42,
+    "recon_sessions": 32,
+    "recon_a": 3,
+    "recon_bytes": 19948,
+    "recon_fetched": 3,
+    "recon_pushed": 6,
+    "recon_b": 11,
+    "recon_f": 16,
+    "recon_e": 2
+   },
+   "rejected": {
+    "rej_id": 1,
+    "rej_bad_sig": 1
+   },
+   "dup": 0
+  },
+  "2": {
+   "verified": 18,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 24,
+    "recon_sessions": 24,
+    "recon_a": 3,
+    "recon_bytes": 5349,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_b": 3,
+    "recon_f": 16,
+    "recon_e": 2
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "3": {
+   "verified": 18,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 20,
+    "recon_sessions": 23,
+    "recon_a": 3,
+    "recon_bytes": 6754,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_f": 16,
+    "recon_b": 2,
+    "recon_e": 2
+   },
+   "rejected": {},
+   "dup": 0
+  }
+ },
+ "all_pass": false,
+ "settings": {
+  "boxes": 4,
+  "pae_s": [
+   20.0,
+   40.0
+  ],
+  "probe_max_s": 20.0
+ }
+}

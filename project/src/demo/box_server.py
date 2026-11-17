@@ -80,6 +80,7 @@ class Fp16Text:
         s, J = self.table.text1(L)
         return s * self.x, J * self.x
 REQ_TIMEOUT_S = 1.0      # CP28 lazy push: ask the next announcer after this (sim.exchange Scene.req_timeout_s)
+OFFER_TIMEOUT_S = 30.0   # CP30 K: an offered id that has not come by then is released (and its session runs again)
 W_S = 60.0               # CP26: catch-up margin and the model's window (sim.exchange.Scene.w_s)
 TICK_S, JUMP_S = 5.0, 30.0   # local clock check: a jump over JUMP_S means the computer slept
 
@@ -155,8 +156,15 @@ class BoxNode:
         self.next_floor: dict[int, float] = {}
         self.recon_busy: set[int] = set()
         self.gone_t: dict[int, float] = {}       # forgotten id -> its t_key (kept until now - R - 2 sigma)
-        self.fault = {"drop": set(), "offset": 0.0, "silent": 0}
+        self.fault = {"drop": set(), "offset": 0.0, "silent": 0, "stall": None, "no_fence": False}
         self.silent_mids: set[int] = set()       # test-only: envelopes this box "took" and lost (nobody notices)
+        # CP30 (cp/CP30.md): K one fetch per id at a time, F floor only for pairs that changed (with the fence)
+        self.fetching: dict[int, int] = {}       # id -> the peer a session is fetching it from
+        self.skipped: dict[int, set] = {}        # id -> peers whose session skipped it (in flight elsewhere)
+        self.again: set[int] = set()             # reconcile again with these when the running session ends
+        self.clean: set[int] = set()             # peers p with clean(p): no difference at my last session with p
+        self.ver = 0                             # mutation generation of my set (the fence)
+        self.lazy_pending: set[int] = set()      # ids a lazy push is still bringing (CP28 IHAVE1/IWANT)
         self.pmax = float(cfg.get("probe_max_s", 300.0))
         if self.st:
             self._restore_identity()
@@ -358,23 +366,34 @@ class BoxNode:
         with self.lock:
             self.count["ihave_rx"] += 1
             self.up.add(frm)
+            self.peer_seen[frm] = time.time()
             if mid in self.got or self.forgotten(mid):
+                return False
+            if self.exchange == "recon" and mid in self.fetching:   # CP30 K: a session is fetching it
+                self.skipped.setdefault(mid, set()).add(frm)
                 return False
             ann = self.announcers.setdefault(mid, [])
             ann.append(frm)
             if len(ann) > 1:
                 return False
+            self.lazy_pending.add(mid)
         threading.Timer(REQ_TIMEOUT_S, self._lazy_check, (mid, 1)).start()
         return True
 
     def _lazy_check(self, mid: int, i: int) -> None:
         with self.lock:
             if mid in self.got or mid in self.silent_mids:
+                self.lazy_pending.discard(mid)
                 return
             ann = self.announcers.get(mid, [])
-            if i >= len(ann):
-                return
-            frm = ann[i]
+            exhausted = i >= len(ann)
+            if exhausted:
+                self.lazy_pending.discard(mid)
+            else:
+                frm = ann[i]
+        if exhausted:                                          # CP30 K: the push never came; skipped sessions
+            self._release(mid)                                 # run again
+            return
         try:
             self._cut(frm)
             d = json.loads(urllib.request.urlopen(self._url(frm, f"/env?mid={mid}&frm={self.bid}"), timeout=60).read())
@@ -388,6 +407,9 @@ class BoxNode:
             with self.lock:                                    # (c) announced, never obtained: reconcile
                 self.dirty.update(self.announcers.get(mid, []))
             threading.Thread(target=self.recon_with, args=(frm, "c"), daemon=True).start()
+            with self.lock:
+                self.lazy_pending.discard(mid)
+            self._release(mid)
         threading.Timer(REQ_TIMEOUT_S, self._lazy_check, (mid, i + 1)).start()
 
     def targets(self, topic: int) -> list[int]:
@@ -479,6 +501,11 @@ class BoxNode:
             self.got.add(m.mid)
             self.msgs[m.mid] = m
             self.keys.add((int(tk), m.mid))
+            self.ver += 1                                          # CP30 F: my set changed; only the sender
+            self.clean = (self.clean & {frm}) if frm >= 0 else set()   # still matches me
+            self.fetching.pop(m.mid, None)
+            self.skipped.pop(m.mid, None)
+            self.lazy_pending.discard(m.mid)
             if self.st and not self.replaying:
                 self.st.add_message(msg_to_json(m), frm)
             if frm >= 0 and not self.replaying:
@@ -775,6 +802,37 @@ class BoxNode:
         with self.lock:
             return [x for x in ids if int(x) not in self.got]
 
+    def offer(self, frm: int, ids: list) -> list[str]:
+        """CP30 K: a peer's session found these missing here. Want what is not held and not on its way; what is
+        on its way from someone else is noted (if that fails, a session with frm runs again)."""
+        want = []
+        with self.lock:
+            self.up.add(frm)
+            for x in ids:
+                i = int(x)
+                if i in self.got or i in self.gone:
+                    continue
+                if i in self.fetching or (i in self.lazy_pending and i not in self.silent_mids):
+                    self.skipped.setdefault(i, set()).add(frm)
+                    continue
+                self.fetching[i] = frm
+                want.append(x)
+        if want:
+            threading.Timer(OFFER_TIMEOUT_S, self._offer_timeout, (frm, [int(x) for x in want])).start()
+        return want
+
+    def _offer_timeout(self, frm: int, ids: list) -> None:
+        with self.lock:
+            done = [i for i in ids if self.fetching.get(i) == frm]
+            for i in done:
+                del self.fetching[i]
+        for i in done:
+            if i not in self.got:
+                with self.lock:
+                    self.dirty.add(frm)
+                threading.Thread(target=self.recon_with, args=(frm, "c"), daemon=True).start()
+            self._release(i)
+
     def _hello(self, peer: int) -> dict | None:
         try:
             self._cut(peer)
@@ -944,6 +1002,21 @@ class BoxNode:
         with self.lock:
             return [msg_to_json(self.msgs[int(x)]) for x in mids if int(x) in self.msgs]
 
+    def _release(self, mid: int) -> None:
+        """CP30 K: an id stopped being in flight. If it is still missing, the sessions that skipped it run again
+        (c); one that is running gets a second session when it ends."""
+        with self.lock:
+            peers = self.skipped.pop(mid, ())
+            if mid in self.got or mid in self.gone or mid in self.silent_mids:
+                return
+            now_busy = [q for q in peers if q in self.recon_busy]
+            for q in peers:
+                self.dirty.add(q)
+            self.again.update(now_busy)
+            go = [q for q in peers if q not in now_busy]
+        for q in go:
+            threading.Thread(target=self.recon_with, args=(q, "c"), daemon=True).start()
+
     def recon_with(self, p: int, why: str) -> bool:
         """One session with peer p: find both differences, fetch mine, push theirs. False if the peer failed."""
         with self.lock:
@@ -952,12 +1025,14 @@ class BoxNode:
             self.recon_busy.add(p)
         t_start = time.time()
         nbytes = 0
+        take: list = []
         try:
             now = self.now()
             lo, hi = (int(now - self.R + 2 * self.sigma), -1), (int(now + 2 * self.sigma) + 1, -1)
             with self.lock:
                 s = Session(self.keys, "S2")
                 msg = s.initiate(lo, hi)
+                ver0 = self.ver                                    # CP30 F: the fence
             theirs, rounds = set(), 0
             while msg and rounds < 64:
                 self._cut(p)
@@ -970,11 +1045,26 @@ class BoxNode:
                 theirs |= {(int(t), int(i)) for t, i in r["need"]}
                 reply = self._dec(r["reply"])
                 rounds += 1
+                st = self.fault.get("stall")
+                if st and int(st["peer"]) == p and rounds == 1:   # test-only: hold the session after round 1
+                    self.fault["stall"] = None
+                    time.sleep(float(st["s"]))
                 if not reply:
                     break
                 with self.lock:
                     msg = s.process(reply)
-            mine = sorted(s.need)
+            full = sorted(s.need)
+            with self.lock:                                        # CP30 K: skip what is held or in flight
+                for t, i in full:
+                    if i in self.got or i in self.gone:
+                        continue
+                    pushing = i in self.lazy_pending and i not in self.silent_mids
+                    if i in self.fetching or pushing:
+                        self.skipped.setdefault(i, set()).add(p)
+                        continue
+                    self.fetching[i] = p
+                    take.append((t, i))
+            mine = take
             got = 0
             if mine:
                 self._cut(p)
@@ -989,7 +1079,18 @@ class BoxNode:
                     self.deliver(msg_from_json(d), p, via="recon")
                 got = len(rows)
             with self.lock:
-                push = [self.msgs[i] for _, i in sorted(theirs) if i in self.msgs]
+                offer = [i for _, i in sorted(theirs) if i in self.msgs]
+            push = []
+            if offer:                                              # CP30 K: ids first, they take what they lack
+                self._cut(p)                                       # and is not already on its way
+                body = json.dumps({"frm": self.bid, "ids": [str(i) for i in offer]}).encode()
+                req = urllib.request.Request(self._url(p, "/offer"), data=body,
+                                             headers={"Content-Type": "application/json"})
+                raw = urllib.request.urlopen(req, timeout=60).read()
+                nbytes += len(body) + len(raw)
+                want = {int(x) for x in json.loads(raw)["want"]}
+                with self.lock:
+                    push = [self.msgs[i] for i in offer if i in want and i in self.msgs]
             for m in push:                                         # they lack these: the envelopes, directly
                 self._post(p, "/gossip", {"msg": msg_to_json(m), "frm": self.bid})
                 nbytes += 1500
@@ -998,6 +1099,11 @@ class BoxNode:
                 self.probe.pop(p, None)
                 self.up.add(p)
                 self.last_recon[p] = time.time()
+                if (self.cfg.get("floor_skip") and not full and not theirs
+                        and (self.ver == ver0 or self.fault.get("no_fence"))):
+                    self.clean.add(p)                              # CP30 F': no difference, no change since I began
+                elif not full and not theirs:
+                    self.count["fence_held"] += 1
                 self.count["recon_sessions"] += 1
                 self.count["recon_" + why] += 1
                 self.count["recon_bytes"] += nbytes
@@ -1015,7 +1121,16 @@ class BoxNode:
             return False
         finally:
             with self.lock:
+                done = [i for _, i in take if self.fetching.get(i) == p]
+                for i in done:
+                    del self.fetching[i]
                 self.recon_busy.discard(p)
+                rerun = p in self.again
+                self.again.discard(p)
+            for i in done:
+                self._release(i)
+            if rerun:
+                threading.Thread(target=self.recon_with, args=(p, "c"), daemon=True).start()
 
     def mark_down(self, p: int) -> None:
         """A transfer to p failed: probe it with backoff until it answers, then reconcile (c); and (e) reconcile with
@@ -1023,6 +1138,7 @@ class BoxNode:
         with self.lock:
             was = p in self.up
             self.up.discard(p)
+            self.clean.discard(p)
             self.dirty.add(p)
             if p not in self.probe:
                 self.probe[p] = [5.0, time.time() + 5.0]
@@ -1035,6 +1151,8 @@ class BoxNode:
         """(b) a peer said hello: if it was down, unknown or dirty here, reconcile with it."""
         with self.lock:
             new = p not in self.up or p in self.dirty or p in self.probe
+            if new:
+                self.clean.discard(p)
             self.up.add(p)
             self.probe.pop(p, None)
             self.peer_seen[p] = time.time()
@@ -1044,6 +1162,8 @@ class BoxNode:
     def recon_come_on(self) -> None:
         """(a) this box came on (start, or the laptop woke): hello every listed box, reconcile with each that answers."""
         self.t_come_on = time.time()
+        with self.lock:
+            self.clean.clear()
         others = [p for p in range(self.n) if p != self.bid]
         with ThreadPoolExecutor(8) as ex:
             alive = [p for p, r in zip(others, ex.map(self._hello, others)) if r is not None]
@@ -1073,6 +1193,12 @@ class BoxNode:
                 floor = []
                 for p in list(self.up):
                     nxt = self.next_floor.setdefault(p, self.last_recon.get(p, now) + rng.uniform(*self.pae))
+                    heard = max(self.peer_seen.get(p, 0.0), self.last_recon.get(p, 0.0))
+                    if now >= nxt and p in self.clean and now - heard <= self.pae[1]:   # CP30 F': nothing changed
+                                                                   # since a clean session, and p spoke lately
+                        self.count["floor_skip"] += 1
+                        self.next_floor[p] = now + rng.uniform(*self.pae)
+                        continue
                     if now >= nxt:
                         if now - self.last_recon.get(p, 0.0) >= self.pae[0]:
                             floor.append(p)
@@ -1129,13 +1255,21 @@ class BoxNode:
                 self.fault["offset"] = float(d["offset"])
             if "silent" in d:
                 self.fault["silent"] = int(d["silent"])
+            if "stall" in d:                                       # CP30: {"peer": p, "s": seconds}, one session
+                self.fault["stall"] = d["stall"]
+            if "no_fence" in d:                                    # CP30: the fence off (to show it matters)
+                self.fault["no_fence"] = bool(d["no_fence"])
+        if "recon_now" in d:                                       # CP30: start a session with this peer now
+            threading.Thread(target=self.recon_with, args=(int(d["recon_now"]), "t"), daemon=True).start()
+        with self.lock:
             return {"drop": sorted(self.fault["drop"]), "offset": self.fault["offset"], "silent": self.fault["silent"]}
 
     def holds(self) -> dict:
         """Test/debug: the reconciled set, the held envelopes and the forgotten ids (ids only)."""
         with self.lock:
             return {"keys": [[t, str(i)] for t, i in self.keys.keys], "msgs": [str(x) for x in self.msgs],
-                    "gone": [str(x) for x in self.gone], "count": dict(self.count)}
+                    "gone": [str(x) for x in self.gone], "count": dict(self.count),
+                    "clean": sorted(self.clean), "fetching": len(self.fetching), "busy": sorted(self.recon_busy)}
 
     # ---- the owner's side
     def query_text(self, q: str, k: int = 10) -> list[dict]:
@@ -1235,7 +1369,7 @@ def handler(node: BoxNode):
             ip = self.client_address[0]
             if ip in LOOPBACK:
                 return True
-            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave", "/ihave1", "/env", "/recon", "/envs") \
+            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave", "/ihave1", "/env", "/recon", "/envs", "/offer") \
                 and ip in node.peer_ips
 
         def do_GET(self):
@@ -1334,6 +1468,9 @@ def handler(node: BoxNode):
                 return self.reply({"want": node.ihave1(int(d["mid"]), int(d["frm"]))})
             if path == "/ihave":
                 node.count["want_ids"] += len(want := node.ihave(d["ids"]))
+                return self.reply({"want": want})
+            if path == "/offer":
+                node.count["offer_want"] += len(want := node.offer(int(d["frm"]), d["ids"]))
                 return self.reply({"want": want})
             if path == "/inject":
                 m = msg_from_json(d["msg"])

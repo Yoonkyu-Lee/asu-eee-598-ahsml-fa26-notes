@@ -51,7 +51,7 @@ def accept(held: frozenset, item: str, mode: str) -> frozenset:
 
 def keyset(held: frozenset) -> frozenset:
     """What a box reconciles on: held messages plus the forgotten target of each delete it holds."""
-    ks = set(h for h in held if h in VALID)
+    ks = set(h for h in held if h in VALID or h == "P3")    # P3: CP30 check_clean only
     if "D1" in ks:
         ks.add("P1")
     return frozenset(ks)
@@ -155,4 +155,120 @@ def check(mode: str, max_states: int = 2_000_000) -> dict:
                     return {"mode": mode, "states": len(seen), "transitions": n_trans, "truncated": True,
                             "violations": dict(count), "examples": viol}
     return {"mode": mode, "states": len(seen), "transitions": n_trans, "truncated": False,
+            "violations": dict(count), "examples": viol}
+
+
+def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
+    """CP30 F: the same search (S1/S2 accept rules) with the one-sided clean flags c01 (box 0 about box 1) and c10.
+
+    A session started by box i sets c_ij when it finds no difference; any change to box i's set that did not come
+    from box j clears c_ij (publishing, an adversary delivery, incl. P3: a valid post by the adversary, so that a
+    third party can bring what the peer lacks); a box coming on clears its own flags, and a flag
+    may be cleared at any time (a peer noticed as down, a restart). Links come back silently (flags untouched).
+    Invariant: c_ij => keys(i) is a subset of keys(j). With both flags set the two sets are equal, so a pair whose
+    floor checks are both skipped has no difference. Sessions are atomic here; a session that runs while the set
+    changes is covered by the generation fence (layer 2 and 4 scenes).
+    mutate (to show the check can fail): "keep_on_publish" (publishing does not clear the flag), "keep_on_adversary"
+    (a third-party delivery does not clear it), "set_on_difference" (a session sets the flag even after fetching)."""
+    mode = "S12"
+    start = (frozenset(), frozenset(), frozenset(), (False, False, False), (True, True, True), (False, False))
+    seen = {start}
+    q = deque([start])
+    viol: dict[str, list] = {}
+    count: dict[str, int] = {}
+    n_trans = 0
+
+    def bad(p, s, note=""):
+        viol.setdefault(p, [])
+        count[p] = count.get(p, 0) + 1
+        if len(viol[p]) < 3:
+            viol[p].append({"state": str(s), "note": note})
+
+    while q:
+        s = q.popleft()
+        h0, h1, pub, on, link, cl = s
+        H = (h0, h1)
+        k0, k1 = keyset(h0), keyset(h1)
+        if cl[0] and not k0 <= k1:
+            bad("clean01", s, f"{sorted(k0)} not in {sorted(k1)}")
+        if cl[1] and not k1 <= k0:
+            bad("clean10", s, f"{sorted(k1)} not in {sorted(k0)}")
+        for i, h in enumerate(H):
+            if h - set(VALID) - {"P3"}:
+                bad("S1", s, f"box {i}")
+            if "P1" in h and "D1" in h:
+                bad("S2", s, f"box {i}")
+
+        def st(hh0, hh1, c, p=pub, o=on, lk=link):
+            return (hh0, hh1, p, o, lk, tuple(c))
+
+        nxt = []
+        for i in range(3):                                  # on/off; coming on clears that box's flags
+            o = list(on)
+            o[i] = not o[i]
+            c = list(cl)
+            if i < 2 and o[i]:
+                c[i] = False
+            nxt.append(st(h0, h1, c, o=tuple(o)))
+        for j in range(3):                                  # links (silent return: flags untouched)
+            lk = list(link)
+            lk[j] = not lk[j]
+            nxt.append(st(h0, h1, cl, lk=tuple(lk)))
+        for i in range(2):                                  # a flag cleared at any time
+            if cl[i]:
+                c = list(cl)
+                c[i] = False
+                nxt.append(st(h0, h1, c))
+        for it in VALID:                                    # publishing changes the author's set (from nobody)
+            au = AUTHOR[it]
+            if it in pub or not on[au]:
+                continue
+            if it in ("D1", "C1") and "P1" not in H[au]:
+                continue
+            hh = list(H)
+            hh[au] = accept(H[au], it, mode)
+            c = list(cl)
+            if hh[au] != H[au] and mutate != "keep_on_publish":
+                c[au] = False
+            nxt.append(st(hh[0], hh[1], c, p=pub | {it}))
+        if on[0] and on[1] and link[0]:
+            for src, dst in ((0, 1), (1, 0)):              # a push: dst's change came from src, its flag stays
+                for it in H[src]:
+                    hh = list(H)
+                    hh[dst] = accept(H[dst], it, mode)
+                    if hh[dst] != H[dst]:
+                        nxt.append(st(hh[0], hh[1], cl))
+            same = k0 == k1
+            a, b = reconcile(h0, h1, mode)
+            for ini in (0, 1):                              # a session started by either box
+                c = list(cl)
+                if same:
+                    c[ini] = True
+                nxt.append(st(a, b, c))
+                if not same:                                # its fetches silently lost: nothing changes
+                    c = list(cl)
+                    if mutate == "set_on_difference":
+                        c[ini] = True
+                    nxt.append(st(h0, h1, c))
+        if on[2]:                                           # adversary deliveries: a change from a third party
+            for i, j in ((0, 1), (1, 2)):
+                if not (on[i] and link[j]):
+                    continue
+                for it in ("XS", "FD", "P3") + tuple(sorted(pub)):
+                    hh = list(H)
+                    hh[i] = accept(H[i], it, mode)
+                    if hh[i] != H[i]:
+                        c = list(cl)
+                        if mutate != "keep_on_adversary":
+                            c[i] = False
+                        nxt.append(st(hh[0], hh[1], c))
+        for t in nxt:
+            n_trans += 1
+            if t not in seen:
+                seen.add(t)
+                q.append(t)
+                if len(seen) > max_states:
+                    return {"mode": "S12c", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": True,
+                            "violations": dict(count), "examples": viol}
+    return {"mode": "S12c", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": False,
             "violations": dict(count), "examples": viol}

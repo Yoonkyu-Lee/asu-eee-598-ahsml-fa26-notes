@@ -1,7 +1,10 @@
 """CP29 layer 4: the recon exchange on real box processes, with faults injected (link cuts, a lost envelope nobody
 notices, clock offsets, process kills, forged envelopes, a delete before its post, a partition).
+CP30 adds scenes 9-12 (fetch dedupe on come-on, the clean-flag fence, floor skips, the fence switched off).
 
-  .venv/Scripts/python.exe src/demo/sync_check.py      -> results/cp29/sync_check.json   (about 15 min)
+  .venv/Scripts/python.exe src/demo/sync_check.py      -> results/cp30/sync_check.json   (about 25 min)
+  CP30_SCENES=0 ...                                    -> scenes 1-8 only (the CP29 run)
+  CP30_ONLY=1 ...                                      -> scenes 9-12 only            -> results/cp30/sync_check_30.json
 
 Four lan.py boxes on this computer (ports 8641-8644), --exchange recon --faults, floor period 20-40 s and probe cap
 20 s so that a scene takes a minute, not half an hour (the rules are the same; cp/CP29.md layer 4). Each scene says
@@ -11,6 +14,7 @@ verified message was verified once (no message is verified twice), recon session
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -24,7 +28,8 @@ import lan_check  # noqa: E402
 
 ROOT = HERE.parents[1]
 LOGS = ROOT / "logs"
-OUT = ROOT / "results" / "cp29"
+CP30 = os.environ.get("CP30_SCENES", "1") == "1"
+OUT = ROOT / "results" / ("cp30" if CP30 else "cp29")
 PORTS = [8641, 8642, 8643, 8644]
 lan_check.PORTS = PORTS
 own = lan_check.own
@@ -40,7 +45,7 @@ def log(*a):
 
 class Run:
     def __init__(self):
-        self.state = LOGS / "cp29_check"
+        self.state = LOGS / ("cp30_check" if CP30 else "cp29_check")
         shutil.rmtree(self.state, ignore_errors=True)
         self.procs = {}
         self.drop = {i: set() for i in range(N)}
@@ -49,8 +54,8 @@ class Run:
     def start(self, i):
         args = [sys.executable, str(HERE / "lan.py"), "--hosts", self.hosts, "--me", str(i),
                 "--state", str(self.state / f"box{i}"), "--exchange", "recon", "--push", "lazy", "--faults",
-                "--pae", f"{PAE[0]},{PAE[1]}", "--probe-max", str(PMAX), "--room-pass", "cp29-test"]
-        self.procs[i] = subprocess.Popen(args, stdout=open(LOGS / f"cp29_check_box{i}.log", "a"),
+                "--pae", f"{PAE[0]},{PAE[1]}", "--probe-max", str(PMAX), "--room-pass", "cp29-test"] +                (["--floor-skip"] if CP30 else [])
+        self.procs[i] = subprocess.Popen(args, stdout=open(LOGS / f"{'cp30' if CP30 else 'cp29'}_check_box{i}.log", "a"),
                                          stderr=subprocess.STDOUT)
         lan_check.up(i)
         if self.drop[i]:
@@ -197,6 +202,73 @@ def scenes(R: Run) -> list[dict]:
     R.start(2)
     t = R.wait(lambda: R.has(2, r1) and R.has(2, r2), 60)
     rec("crash and restart", "H2 class", t is not None, seconds=t)
+    if not CP30:
+        return out
+    return out + scenes30(R)
+
+
+def scenes30(R: Run) -> list[dict]:
+    out = []
+
+    def rec(name, model, ok, **info):
+        out.append({"scene": name, "model_scene": model, "pass": bool(ok), **info})
+        log(f"{name:44s} {'PASS' if ok else 'FAIL'} {info}")
+
+    # 9. CP30 K: a box comes on while three peers hold six posts it lacks; every one comes once
+    R.kill(3)
+    new = [R.post(i, f"9 while box 3 is down ({i}.{j})") for i in (0, 1, 2) for j in (0, 1)]
+    time.sleep(2)
+    R.start(3)
+    c0 = R.holds(3)["count"]
+    t = R.wait(lambda: all(R.has(3, x) for x in new), 60)
+    time.sleep(5)
+    c1 = R.holds(3)["count"]
+    rx = c1.get("env_rx", 0)
+    rec("come on with 3 peers: each missing post comes once (K)", "K, come-on duplicates",
+        t is not None and c1.get("dup", 0) == c0.get("dup", 0), seconds=t, dup_after_start=c1.get("dup", 0),
+        fetched=c1.get("recon_fetched", 0), envelopes_in=rx, offer_want=c1.get("offer_want", 0))
+
+    # 10/12. CP30 F', the fence: box 1 is cut from 2 and 3 (and has settled); box 0's session with box 1 is held after
+    # round 1 ("equal"); meanwhile box 0 takes W from box 2 (and its push to box 1 is lost). Judged on box 0's state:
+    # with the fence the session must not set clean(1) (fence_held + 1); with the fence off it sets it (the mutation).
+    def held_session(tag, no_fence):
+        own(0, "/fault", {"no_fence": no_fence})
+        for j in (2, 3):
+            R.cut(1, j)
+        time.sleep(2 * PAE[1] + 2 * PMAX)                  # (e) sessions after the cut are over; pairs settle
+        R.wait(lambda: 1 not in R.holds(0)["busy"], 60)
+        h0 = R.holds(0)["count"].get("fence_held", 0)
+        own(1, "/fault", {"silent": 1})
+        own(0, "/fault", {"stall": {"peer": 1, "s": 8}, "recon_now": 1})
+        time.sleep(2)
+        w = R.post(2, f"{tag} during a held session")
+        time.sleep(10)                                     # the held session has ended
+        h = R.holds(0)
+        st = {"fence_held_delta": h["count"].get("fence_held", 0) - h0, "box0_clean_has_1": 1 in h["clean"]}
+        t = R.wait(lambda: R.has(1, w), 3 * PAE[1] + PMAX)
+        st["box1_got_W_s"] = t
+        own(0, "/fault", {"no_fence": False})
+        for j in (2, 3):
+            R.cut(1, j, on=False)
+        R.wait(lambda: R.has(1, w), 3 * (PMAX + PAE[1]))
+        return st
+
+    st = held_session("10", False)
+    rec("held session, change meanwhile: fence keeps clean(1) off", "F fence (layer 2: third-party change)",
+        st["fence_held_delta"] >= 1 and not st["box0_clean_has_1"], **st)
+    st = held_session("12", True)
+    rec("same with the fence off (mutation): clean(1) set wrongly", "mutation of F",
+        st["fence_held_delta"] == 0 and st["box0_clean_has_1"], **st)
+
+    # 11. CP30 F': a quiet spell: floor checks are skipped for pairs that spoke lately (sessions only for quiet pairs)
+    time.sleep(2 * PAE[1])
+    f0 = {i: R.holds(i)["count"].get("recon_f", 0) for i in range(N)}
+    s0 = {i: R.holds(i)["count"].get("floor_skip", 0) for i in range(N)}
+    time.sleep(3 * PAE[1])
+    f1 = {i: R.holds(i)["count"].get("recon_f", 0) - f0[i] for i in range(N)}
+    s1 = {i: R.holds(i)["count"].get("floor_skip", 0) - s0[i] for i in range(N)}
+    rec("quiet: some floor checks skipped (F')", "F clean, then quiet (F' re-checks silent pairs)",
+        sum(s1.values()) > 0, floor_sessions=f1, floor_skips=s1)
     return out
 
 
@@ -208,7 +280,7 @@ def main() -> None:
         for i in range(N):
             R.start(i)
         time.sleep(5)
-        res = scenes(R)
+        res = scenes30(R) if os.environ.get("CP30_ONLY") else scenes(R)
         time.sleep(PAE[1] + 5)
         sets = {i: sorted(map(tuple, R.holds(i)["keys"])) for i in range(N)}
         same = all(sets[i] == sets[0] for i in range(N))
@@ -226,7 +298,7 @@ def main() -> None:
     out = {"scenes": res, "final_sets_equal": same, "per_box": per_box,
            "all_pass": all(s["pass"] for s in res) and same and all(b["verified_twice"] == 0 for b in per_box.values()),
            "settings": {"boxes": N, "pae_s": PAE, "probe_max_s": PMAX}}
-    (OUT / "sync_check.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    (OUT / ("sync_check_30.json" if os.environ.get("CP30_ONLY") else "sync_check.json")).write_text(json.dumps(out, indent=1), encoding="utf-8")
     log("final sets equal:", same, "| verified twice:", {i: b["verified_twice"] for i, b in per_box.items()})
     log("ALL PASS" if out["all_pass"] else "SOME FAILED")
 
