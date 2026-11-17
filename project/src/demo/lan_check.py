@@ -77,7 +77,7 @@ def main() -> None:
     shutil.rmtree(state, ignore_errors=True)
 
     def start(i, room):
-        args = [py, str(HERE / "lan.py"), "--hosts", hosts, "--me", str(i), "--state", str(state / f"box{i}")] +             (["--room-pass", "said in person"] if room else [])
+        args = [py, str(HERE / "lan.py"), "--hosts", hosts, "--me", str(i), "--state", str(state / f"box{i}")] +             (["--room-pass", "said in person"] if room else []) +             (["--exchange", os.environ["CP29_EXCHANGE"]] if os.environ.get("CP29_EXCHANGE") else [])
         return subprocess.Popen(args, stdout=open(LOGS / f"cp24_lan_box{i}.log", "w"), stderr=subprocess.STDOUT)
 
     procs = [start(0, True), start(1, True)]

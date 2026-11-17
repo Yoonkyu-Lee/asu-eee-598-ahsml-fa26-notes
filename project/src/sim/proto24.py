@@ -84,7 +84,7 @@ class World24(World):
 
     def make(self, user: int, kind: str, topic: int, t: float, body: dict, size: float, key: bytes, *,
              target: int | None = None, reuse: bool = False, proof_ok: bool = True, image: int | None = None,
-             tokens: int = 0, pull_bytes: float = 0.0, truth: dict | None = None) -> Msg:
+             tokens: int = 0, pull_bytes: float = 0.0, truth: dict | None = None, ref: str = "") -> Msg:
         ident, tier = self.ids[user], self.tier[user]
         spend = need(kind, tokens, image is not None and kind == "post")
         plan = []
@@ -109,6 +109,7 @@ class World24(World):
                 b"", epoch, x, ys[0][0], ys[0][1], vnul, proof_ok and ident.commit in self.members, image, tokens,
                 pull_bytes, {"user": user, "commit": ident.commit, "target": target, **(truth or {})},
                 tier, spend.get("t", 0), spend.get("p", 0), [[nul, y] for y, nul in ys[1:]])
+        m.ref = ref
         m.ct = ChaCha20Poly1305(key).encrypt(nonce, plain, m.header())
         m.sig = sk.sign(m.header() + nonce + m.ct)
         self.keys[mid] = sk

@@ -1,0 +1,1390 @@
+[
+ {
+  "scene": "H1 failed push, nobody comes on",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H1 failed push, nobody comes on",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H1 failed push, nobody comes on",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H1 failed push, nobody comes on",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H1 failed push, nobody comes on",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H2 gap never retried",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false,
+   "box2 holds X": false
+  },
+  "violations": {
+   "L1": 2
+  },
+  "report": null,
+  "examples": {
+   "L1": [
+    {
+     "t": 2920.1,
+     "pair": [
+      0,
+      2
+     ],
+     "key": [
+      100,
+      4707102020110389360
+     ],
+     "kind": "post",
+     "since": 700.1
+    },
+    {
+     "t": 2920.1,
+     "pair": [
+      0,
+      1
+     ],
+     "key": [
+      100,
+      4707102020110389360
+     ],
+     "kind": "post",
+     "since": 700.1
+    }
+   ]
+  }
+ },
+ {
+  "scene": "H2 gap never retried",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H2 gap never retried",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H2 gap never retried",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H2 gap never retried",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H3 skew beyond the catch-up margin",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {
+   "L1": 1
+  },
+  "report": null,
+  "examples": {
+   "L1": [
+    {
+     "t": 2520.1,
+     "pair": [
+      0,
+      1
+     ],
+     "key": [
+      100,
+      172035780114239352
+     ],
+     "kind": "post",
+     "since": 300.1
+    }
+   ]
+  }
+ },
+ {
+  "scene": "H3 skew beyond the catch-up margin",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H3 skew beyond the catch-up margin",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H3 skew beyond the catch-up margin",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H3 skew beyond the catch-up margin",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H4 liar claims coverage",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {
+   "L1": 1
+  },
+  "report": null,
+  "examples": {
+   "L1": [
+    {
+     "t": 2520.1,
+     "pair": [
+      0,
+      1
+     ],
+     "key": [
+      60,
+      7816072895495289249
+     ],
+     "kind": "post",
+     "since": 300.1
+    }
+   ]
+  }
+ },
+ {
+  "scene": "H4 liar claims coverage",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H4 liar claims coverage",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H4 liar claims coverage",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H4 liar claims coverage",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H5 offer to one box that leaves",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H5 offer to one box that leaves",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H5 offer to one box that leaves",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H5 offer to one box that leaves",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H5 offer to one box that leaves",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H6 tombstone expiry, no resurrection",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {
+   "F1": 2
+  },
+  "report": null,
+  "examples": {
+   "F1": [
+    {
+     "t": 90000.0,
+     "box": 0,
+     "oldest": 100,
+     "now": 90000
+    },
+    {
+     "t": 90000.0,
+     "box": 1,
+     "oldest": 100,
+     "now": 90000
+    }
+   ]
+  }
+ },
+ {
+  "scene": "H6 tombstone expiry, no resurrection",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H6 tombstone expiry, no resurrection",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H6 tombstone expiry, no resurrection",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H6 tombstone expiry, no resurrection",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H8 squatting liar, invalid first",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": false
+  },
+  "violations": {
+   "S1": 1
+  },
+  "report": null,
+  "examples": {
+   "S1": [
+    {
+     "t": 100.3,
+     "box": 1,
+     "mid": 4002138148983125655,
+     "kind": "post"
+    }
+   ]
+  }
+ },
+ {
+  "scene": "H8 squatting liar, invalid first",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H8 squatting liar, invalid first",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H8 squatting liar, invalid first",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "H8 squatting liar, invalid first",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent loss, then idle",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent loss, then idle",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent loss, then idle",
+  "variant": "S1e",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent loss, then idle",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent loss, then idle",
+  "variant": "S2e",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent link return",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": false
+  },
+  "violations": {
+   "L1": 1
+  },
+  "report": null,
+  "examples": {
+   "L1": [
+    {
+     "t": 2620.0,
+     "pair": [
+      0,
+      1
+     ],
+     "key": [
+      100,
+      172035780114239352
+     ],
+     "kind": "post",
+     "since": 400
+    }
+   ]
+  }
+ },
+ {
+  "scene": "silent link return",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent link return",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent link return",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "silent link return",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "partition heals",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": false,
+   "box3 holds X": false
+  },
+  "violations": {
+   "L1": 4
+  },
+  "report": null,
+  "examples": {
+   "L1": [
+    {
+     "t": 3220.0,
+     "pair": [
+      0,
+      2
+     ],
+     "key": [
+      200,
+      8205594667245929221
+     ],
+     "kind": "post",
+     "since": 1000
+    },
+    {
+     "t": 3220.0,
+     "pair": [
+      0,
+      3
+     ],
+     "key": [
+      200,
+      8205594667245929221
+     ],
+     "kind": "post",
+     "since": 1000
+    }
+   ]
+  }
+ },
+ {
+  "scene": "partition heals",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "partition heals",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "partition heals",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "partition heals",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "delete arrives before its post",
+  "variant": "S0",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "delete arrives before its post",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "delete arrives before its post",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "delete arrives before its post",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "delete arrives before its post",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "comment before its post",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": false,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "comment before its post",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "comment before its post",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "comment before its post",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "comment before its post",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "future edge: +2 sigma received by a box sigma behind",
+  "variant": "S0",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "future edge: +2 sigma received by a box sigma behind",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "future edge: +2 sigma received by a box sigma behind",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "future edge: +2 sigma received by a box sigma behind",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "future edge: +2 sigma received by a box sigma behind",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "lower edge: item leaves the band",
+  "variant": "S0",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "lower edge: item leaves the band",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "lower edge: item leaves the band",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "lower edge: item leaves the band",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "lower edge: item leaves the band",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "dishonest stamps: -6 h and +3 sigma",
+  "variant": "S0",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": true,
+   "far future: held by box1": true
+  },
+  "examples": {}
+ },
+ {
+  "scene": "dishonest stamps: -6 h and +3 sigma",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  },
+  "examples": {}
+ },
+ {
+  "scene": "dishonest stamps: -6 h and +3 sigma",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  },
+  "examples": {}
+ },
+ {
+  "scene": "dishonest stamps: -6 h and +3 sigma",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  },
+  "examples": {}
+ },
+ {
+  "scene": "dishonest stamps: -6 h and +3 sigma",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  },
+  "examples": {}
+ },
+ {
+  "scene": "foreign delete",
+  "variant": "S0",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {
+   "S1": 2
+  },
+  "report": null,
+  "examples": {
+   "S1": [
+    {
+     "t": 200.15,
+     "box": 0,
+     "mid": 3788541499417403122,
+     "kind": "post"
+    },
+    {
+     "t": 200.15,
+     "box": 1,
+     "mid": 3788541499417403122,
+     "kind": "post"
+    }
+   ]
+  }
+ },
+ {
+  "scene": "foreign delete",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "foreign delete",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "foreign delete",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "foreign delete",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null,
+  "examples": {}
+ },
+ {
+  "scene": "tombstone invariant (offsets +-sigma)",
+  "variant": "S1",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": [],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (offsets +-sigma)",
+  "variant": "S1e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": [],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (offsets +-sigma)",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": [],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (offsets +-sigma)",
+  "variant": "S2e",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": [],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (injected offset 3 sigma)",
+  "variant": "S1",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": [
+   {
+    "t": 86741.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86742.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86743.0,
+    "dropped_at": 0,
+    "accepts": 1
+   }
+  ],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (injected offset 3 sigma)",
+  "variant": "S1e",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": [
+   {
+    "t": 86741.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86742.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86743.0,
+    "dropped_at": 0,
+    "accepts": 1
+   }
+  ],
+  "violations": {
+   "L2": 46,
+   "L1": 46
+  }
+ },
+ {
+  "scene": "tombstone invariant (injected offset 3 sigma)",
+  "variant": "S2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": [
+   {
+    "t": 86741.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86742.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86743.0,
+    "dropped_at": 0,
+    "accepts": 1
+   }
+  ],
+  "violations": {}
+ },
+ {
+  "scene": "tombstone invariant (injected offset 3 sigma)",
+  "variant": "S2e",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": [
+   {
+    "t": 86741.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86742.0,
+    "dropped_at": 0,
+    "accepts": 1
+   },
+   {
+    "t": 86743.0,
+    "dropped_at": 0,
+    "accepts": 1
+   }
+  ],
+  "violations": {
+   "L2": 46,
+   "L1": 46
+  }
+ }
+]

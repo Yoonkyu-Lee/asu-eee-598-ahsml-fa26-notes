@@ -1,0 +1,139 @@
+{
+ "scenes": [
+  {
+   "scene": "silent link return (H1 class)",
+   "model_scene": "silent link return / H1",
+   "pass": true,
+   "seconds": 1.0
+  },
+  {
+   "scene": "silent loss, then idle",
+   "model_scene": "silent loss, then idle",
+   "pass": true,
+   "seconds": 6.0,
+   "floor_sessions_box1": 1
+  },
+  {
+   "scene": "skewed author, receiver was off (H3 class)",
+   "model_scene": "H3 skew beyond the catch-up margin",
+   "pass": true,
+   "seconds": 0.0
+  },
+  {
+   "scene": "forged and bad-signature copies first (H8)",
+   "model_scene": "H8 squatting liar, invalid first",
+   "pass": true,
+   "seconds": 4.0,
+   "rej_id": 1,
+   "rej_bad_sig": 1,
+   "held_forged": false
+  },
+  {
+   "scene": "delete before its post",
+   "model_scene": "delete arrives before its post",
+   "pass": true,
+   "gone_on_arrival": true,
+   "held_anywhere": [
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "scene": "partition heals",
+   "model_scene": "partition heals",
+   "pass": true,
+   "seconds": 1.0
+  },
+  {
+   "scene": "author crashes after posting, restarts",
+   "model_scene": "H5 class (holder off, then on)",
+   "pass": true,
+   "seconds": 0.0
+  },
+  {
+   "scene": "crash and restart",
+   "model_scene": "H2 class",
+   "pass": true,
+   "seconds": 0.0
+  }
+ ],
+ "final_sets_equal": true,
+ "per_box": {
+  "0": {
+   "verified": 11,
+   "verified_twice": 0,
+   "recon": {
+    "recon_sessions": 32,
+    "recon_b": 10,
+    "recon_bytes": 9103,
+    "recon_fetched": 0,
+    "recon_pushed": 3,
+    "recon_rx": 34,
+    "recon_f": 22
+   },
+   "rejected": {},
+   "dup": 1
+  },
+  "1": {
+   "verified": 10,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 39,
+    "recon_sessions": 30,
+    "recon_a": 3,
+    "recon_bytes": 12962,
+    "recon_fetched": 2,
+    "recon_pushed": 4,
+    "recon_b": 6,
+    "recon_f": 21
+   },
+   "rejected": {
+    "rej_id": 1,
+    "rej_bad_sig": 1
+   },
+   "dup": 4
+  },
+  "2": {
+   "verified": 10,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 9,
+    "recon_sessions": 6,
+    "recon_a": 3,
+    "recon_bytes": 2052,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_f": 3
+   },
+   "rejected": {},
+   "dup": 4
+  },
+  "3": {
+   "verified": 10,
+   "verified_twice": 0,
+   "recon": {
+    "recon_sessions": 7,
+    "recon_a": 3,
+    "recon_bytes": 10440,
+    "recon_fetched": 0,
+    "recon_pushed": 5,
+    "recon_rx": 5,
+    "recon_b": 1,
+    "recon_f": 3
+   },
+   "rejected": {},
+   "dup": 0
+  }
+ },
+ "all_pass": true,
+ "settings": {
+  "boxes": 4,
+  "pae_s": [
+   20.0,
+   40.0
+  ],
+  "probe_max_s": 20.0
+ }
+}

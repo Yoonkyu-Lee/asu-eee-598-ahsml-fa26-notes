@@ -1,0 +1,654 @@
+[
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S0",
+  "needed_bytes": 21185000,
+  "exchange_bytes": 479596,
+  "exchange_over_needed": 0.02263847061600189,
+  "push_over_needed": 1.4342648100070805,
+  "tx": {
+   "probe": 163840,
+   "since_env": 278600,
+   "since": 31520,
+   "iwant": 1085396,
+   "ihave": 7591584,
+   "env": 21707920,
+   "offer": 169372,
+   "want": 104
+  },
+  "violations": {
+   "L1": 990,
+   "F1": 4764
+  },
+  "secs": 2.8
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S0",
+  "needed_bytes": 5318000,
+  "exchange_bytes": 7292960,
+  "exchange_over_needed": 1.3713726965024444,
+  "push_over_needed": 0.10741256111320045,
+  "tx": {
+   "probe": 1174240,
+   "since": 11080,
+   "since_env": 7253080,
+   "iwant": 16848,
+   "ihave": 217412,
+   "env": 336960,
+   "offer": 28800
+  },
+  "violations": {
+   "L1": 91,
+   "F1": 108
+  },
+  "secs": 0.4
+ },
+ {
+  "scene": "C-b",
+  "n": 300,
+  "variant": "S0",
+  "needed_bytes": 55458000,
+  "exchange_bytes": 103318100,
+  "exchange_over_needed": 1.8629972231238054,
+  "push_over_needed": 0.16276043131739334,
+  "tx": {
+   "probe": 8611560,
+   "since": 45760,
+   "since_env": 102973840,
+   "iwant": 144768,
+   "ihave": 5986240,
+   "env": 2895360,
+   "offer": 298396,
+   "want": 104
+  },
+  "violations": {
+   "L1": 971,
+   "F1": 312
+  },
+  "secs": 3.8
+ },
+ {
+  "scene": "C-b",
+  "n": 100,
+  "variant": "S2",
+  "needed_bytes": 4858000,
+  "exchange_bytes": 18290309,
+  "exchange_over_needed": 3.7649874433923425,
+  "push_over_needed": 0.12500123507616304,
+  "tx": {
+   "probe": 2840600,
+   "recon": 532793,
+   "iwant": 17784,
+   "ihave": 233792,
+   "fetched": 14718840,
+   "env": 355680,
+   "fetch": 198076
+  },
+  "violations": {},
+  "secs": 1.0
+ },
+ {
+  "scene": "C-c",
+  "n": 100,
+  "variant": "S0",
+  "needed_bytes": 13235000,
+  "exchange_bytes": 9934260,
+  "exchange_over_needed": 0.7506052134491877,
+  "push_over_needed": 1.01206890819796,
+  "tx": {
+   "probe": 272720,
+   "since_env": 9820560,
+   "since": 23560,
+   "iwant": 450580,
+   "ihave": 3932552,
+   "env": 9011600,
+   "offer": 90140
+  },
+  "violations": {
+   "L1": 707,
+   "F1": 2430
+  },
+  "secs": 1.5
+ },
+ {
+  "scene": "C-a",
+  "n": 30,
+  "variant": "S0",
+  "needed_bytes": 1740000,
+  "exchange_bytes": 50252,
+  "exchange_over_needed": 0.02888045977011494,
+  "push_over_needed": 1.4299701149425288,
+  "tx": {
+   "probe": 53000,
+   "since_env": 25400,
+   "iwant": 86892,
+   "ihave": 663416,
+   "env": 1737840,
+   "since": 9400,
+   "offer": 15452
+  },
+  "violations": {
+   "F1": 1432
+  },
+  "secs": 0.3
+ },
+ {
+  "scene": "C-a",
+  "n": 30,
+  "variant": "S2",
+  "needed_bytes": 1560000,
+  "exchange_bytes": 2229177,
+  "exchange_over_needed": 1.4289596153846154,
+  "push_over_needed": 1.4451666666666667,
+  "tx": {
+   "probe": 124840,
+   "recon": 2019801,
+   "iwant": 77896,
+   "ihave": 618644,
+   "env": 1557920,
+   "fetched": 80800,
+   "fetch": 3736
+  },
+  "violations": {},
+  "secs": 1.4
+ },
+ {
+  "scene": "C-b",
+  "n": 30,
+  "variant": "S0",
+  "needed_bytes": 384000,
+  "exchange_bytes": 395696,
+  "exchange_over_needed": 1.0304583333333333,
+  "push_over_needed": 0.11713541666666667,
+  "tx": {
+   "probe": 83080,
+   "since": 2600,
+   "since_env": 390640,
+   "ihave": 8944,
+   "env": 34320,
+   "iwant": 1716,
+   "offer": 2404,
+   "want": 52
+  },
+  "violations": {
+   "L1": 7,
+   "F1": 66
+  },
+  "secs": 0.0
+ },
+ {
+  "scene": "C-b",
+  "n": 30,
+  "variant": "S2",
+  "needed_bytes": 743000,
+  "exchange_bytes": 2166011,
+  "exchange_over_needed": 2.915223418573351,
+  "push_over_needed": 0.11106864064602961,
+  "tx": {
+   "probe": 484280,
+   "recon": 78355,
+   "iwant": 3276,
+   "ihave": 13728,
+   "fetched": 1579040,
+   "env": 65520,
+   "fetch": 24336
+  },
+  "violations": {},
+  "secs": 0.1
+ },
+ {
+  "scene": "C-b",
+  "n": 300,
+  "variant": "S2",
+  "needed_bytes": 49991000,
+  "exchange_bytes": 281290489,
+  "exchange_over_needed": 5.626822608069452,
+  "push_over_needed": 0.1644026324738453,
+  "tx": {
+   "probe": 14073280,
+   "recon": 6150781,
+   "iwant": 132704,
+   "ihave": 5439148,
+   "fetched": 257760320,
+   "env": 2646800,
+   "fetch": 3306108
+  },
+  "violations": {},
+  "secs": 7.3
+ },
+ {
+  "scene": "C-c",
+  "n": 30,
+  "variant": "S0",
+  "needed_bytes": 1419000,
+  "exchange_bytes": 1464840,
+  "exchange_over_needed": 1.0323044397463002,
+  "push_over_needed": 0.955568710359408,
+  "tx": {
+   "probe": 68000,
+   "since_env": 1448600,
+   "since": 6600,
+   "iwant": 44044,
+   "ihave": 431028,
+   "env": 880880,
+   "offer": 9640
+  },
+  "violations": {
+   "L1": 24,
+   "F1": 740
+  },
+  "secs": 0.3
+ },
+ {
+  "scene": "C-a",
+  "n": 10,
+  "variant": "S0",
+  "needed_bytes": 110000,
+  "exchange_bytes": 6324,
+  "exchange_over_needed": 0.05749090909090909,
+  "push_over_needed": 1.313709090909091,
+  "tx": {
+   "probe": 9600,
+   "since_env": 2680,
+   "ihave": 36400,
+   "env": 102960,
+   "iwant": 5148,
+   "since": 2680,
+   "offer": 964
+  },
+  "violations": {
+   "F1": 440
+  },
+  "secs": 0.0
+ },
+ {
+  "scene": "C-a",
+  "n": 10,
+  "variant": "S2",
+  "needed_bytes": 110000,
+  "exchange_bytes": 652267,
+  "exchange_over_needed": 5.9297,
+  "push_over_needed": 1.3572,
+  "tx": {
+   "probe": 23840,
+   "recon": 616415,
+   "ihave": 42276,
+   "env": 101920,
+   "iwant": 5096,
+   "fetched": 11440,
+   "fetch": 572
+  },
+  "violations": {},
+  "secs": 0.3
+ },
+ {
+  "scene": "C-b",
+  "n": 10,
+  "variant": "S0",
+  "needed_bytes": 7000,
+  "exchange_bytes": 7420,
+  "exchange_over_needed": 1.06,
+  "push_over_needed": 0.014857142857142857,
+  "tx": {
+   "probe": 6480,
+   "since_env": 6600,
+   "ihave": 104,
+   "since": 560,
+   "offer": 208,
+   "want": 52
+  },
+  "violations": {
+   "F1": 48
+  },
+  "secs": 0.0
+ },
+ {
+  "scene": "C-b",
+  "n": 10,
+  "variant": "S2",
+  "needed_bytes": 43000,
+  "exchange_bytes": 156709,
+  "exchange_over_needed": 3.644395348837209,
+  "push_over_needed": 0.19711627906976745,
+  "tx": {
+   "probe": 79920,
+   "recon": 7757,
+   "ihave": 832,
+   "fetched": 67120,
+   "iwant": 364,
+   "fetch": 1912,
+   "env": 7280
+  },
+  "violations": {},
+  "secs": 0.0
+ },
+ {
+  "scene": "C-c",
+  "n": 10,
+  "variant": "S0",
+  "needed_bytes": 50000,
+  "exchange_bytes": 44364,
+  "exchange_over_needed": 0.88728,
+  "push_over_needed": 0.83096,
+  "tx": {
+   "probe": 12080,
+   "since_env": 42440,
+   "ihave": 9880,
+   "env": 30160,
+   "iwant": 1508,
+   "since": 1440,
+   "offer": 484
+  },
+  "violations": {
+   "F1": 220
+  },
+  "secs": 0.0
+ },
+ {
+  "scene": "C-c",
+  "n": 10,
+  "variant": "S2",
+  "needed_bytes": 57000,
+  "exchange_bytes": 344509,
+  "exchange_over_needed": 6.044017543859649,
+  "push_over_needed": 0.7882105263157895,
+  "tx": {
+   "probe": 86160,
+   "recon": 155973,
+   "ihave": 8892,
+   "env": 34320,
+   "fetched": 99600,
+   "iwant": 1716,
+   "fetch": 2776
+  },
+  "violations": {},
+  "secs": 0.1
+ },
+ {
+  "scene": "C-c",
+  "n": 30,
+  "variant": "S2",
+  "needed_bytes": 988000,
+  "exchange_bytes": 3369685,
+  "exchange_over_needed": 3.410612348178138,
+  "push_over_needed": 0.969421052631579,
+  "tx": {
+   "probe": 567400,
+   "recon": 1031669,
+   "iwant": 31460,
+   "ihave": 297128,
+   "env": 629200,
+   "fetched": 1743880,
+   "fetch": 26736
+  },
+  "violations": {},
+  "secs": 0.8
+ },
+ {
+  "scene": "C-c",
+  "n": 100,
+  "variant": "S2",
+  "needed_bytes": 11990000,
+  "exchange_bytes": 22419290,
+  "exchange_over_needed": 1.8698323603002502,
+  "push_over_needed": 1.0319723102585487,
+  "tx": {
+   "probe": 2194480,
+   "recon": 4097030,
+   "iwant": 417872,
+   "ihave": 3598036,
+   "env": 8357440,
+   "fetched": 15908560,
+   "fetch": 219220
+  },
+  "violations": {},
+  "secs": 5.0
+ },
+ {
+  "scene": "C-a",
+  "n": 100,
+  "variant": "S2",
+  "needed_bytes": 18498000,
+  "exchange_bytes": 8130444,
+  "exchange_over_needed": 0.4395309763217645,
+  "push_over_needed": 1.4711547194291275,
+  "tx": {
+   "probe": 459040,
+   "recon": 6950812,
+   "iwant": 947492,
+   "ihave": 7316088,
+   "env": 18949840,
+   "fetch": 26352,
+   "fetched": 694240
+  },
+  "violations": {},
+  "secs": 9.3
+ },
+ {
+  "scene": "C-c",
+  "n": 300,
+  "variant": "S0",
+  "needed_bytes": 124305000,
+  "exchange_bytes": 106669152,
+  "exchange_over_needed": 0.8581243875950284,
+  "push_over_needed": 0.9728955070190258,
+  "tx": {
+   "probe": 859360,
+   "since_env": 105874800,
+   "since": 65720,
+   "iwant": 4124120,
+   "ihave": 34329256,
+   "env": 82482400,
+   "offer": 728516,
+   "want": 116
+  },
+  "violations": {
+   "L1": 2419,
+   "F1": 7322,
+   "L2": 40
+  },
+  "secs": 13.4
+ },
+ {
+  "scene": "C-a",
+  "n": 300,
+  "variant": "S0",
+  "needed_bytes": 174563000,
+  "exchange_bytes": 15441868,
+  "exchange_over_needed": 0.08846014332934242,
+  "push_over_needed": 1.4302417350755887,
+  "tx": {
+   "probe": 527040,
+   "since_env": 14147680,
+   "iwant": 8989136,
+   "ihave": 60895432,
+   "env": 179782720,
+   "since": 98120,
+   "offer": 1195280,
+   "want": 788
+  },
+  "violations": {
+   "L1": 7493,
+   "L2": 165,
+   "F1": 14302
+  },
+  "secs": 29.2
+ },
+ {
+  "scene": "C-c",
+  "n": 300,
+  "variant": "S2",
+  "needed_bytes": 107381000,
+  "exchange_bytes": 137926887,
+  "exchange_over_needed": 1.284462679617437,
+  "push_over_needed": 1.0318673880854154,
+  "tx": {
+   "probe": 5812520,
+   "recon": 13419767,
+   "iwant": 3769948,
+   "ihave": 31634044,
+   "env": 75398960,
+   "fetched": 117181640,
+   "fetch": 1512960
+  },
+  "violations": {},
+  "secs": 31.9
+ },
+ {
+  "scene": "C-b",
+  "n": 1000,
+  "variant": "S0",
+  "needed_bytes": 586503000,
+  "exchange_bytes": 1279827304,
+  "exchange_over_needed": 2.1821325790319914,
+  "push_over_needed": 0.15241596377171132,
+  "tx": {
+   "probe": 42531520,
+   "since_env": 1276985080,
+   "since": 172400,
+   "iwant": 1413360,
+   "ihave": 59718100,
+   "env": 28260960,
+   "offer": 2667916,
+   "want": 1908
+  },
+  "violations": {
+   "L1": 4648,
+   "F1": 964
+  },
+  "secs": 34.1
+ },
+ {
+  "scene": "C-b",
+  "n": 1000,
+  "variant": "S2",
+  "needed_bytes": 533880000,
+  "exchange_bytes": 2164753781,
+  "exchange_over_needed": 4.054757213231437,
+  "push_over_needed": 0.15328672360830148,
+  "tx": {
+   "probe": 57952240,
+   "recon": 39336661,
+   "iwant": 1418144,
+   "ihave": 52055692,
+   "env": 28362880,
+   "fetched": 2041997400,
+   "fetch": 25467480
+  },
+  "violations": {},
+  "secs": 54.2
+ },
+ {
+  "scene": "C-a",
+  "n": 300,
+  "variant": "S2",
+  "needed_bytes": 192296000,
+  "exchange_bytes": 31878272,
+  "exchange_over_needed": 0.16577709364729376,
+  "push_over_needed": 1.4688710113574905,
+  "tx": {
+   "probe": 1687840,
+   "recon": 21908300,
+   "iwant": 9909224,
+   "ihave": 74364316,
+   "env": 198184480,
+   "fetched": 8083680,
+   "fetch": 198452
+  },
+  "violations": {},
+  "secs": 71.1
+ },
+ {
+  "scene": "C-c",
+  "n": 1000,
+  "variant": "S0",
+  "needed_bytes": 1266486000,
+  "exchange_bytes": 1078408684,
+  "exchange_over_needed": 0.8514967271647693,
+  "push_over_needed": 0.9835769333415451,
+  "tx": {
+   "probe": 2976200,
+   "since_env": 1070384800,
+   "since": 219680,
+   "iwant": 42877380,
+   "ihave": 345262476,
+   "env": 857546560,
+   "offer": 7802664,
+   "want": 1540
+  },
+  "violations": {
+   "L1": 42924,
+   "L2": 180,
+   "F1": 24350
+  },
+  "secs": 129.0
+ },
+ {
+  "scene": "C-c",
+  "n": 1000,
+  "variant": "S2",
+  "needed_bytes": 1116271000,
+  "exchange_bytes": 1269259535,
+  "exchange_over_needed": 1.1370532200514032,
+  "push_over_needed": 1.043041680738817,
+  "tx": {
+   "probe": 20073400,
+   "recon": 56834871,
+   "iwant": 39771056,
+   "ihave": 329125004,
+   "env": 795421120,
+   "fetched": 1177871240,
+   "fetch": 14480024
+  },
+  "violations": {},
+  "secs": 216.4
+ },
+ {
+  "scene": "C-a",
+  "n": 1000,
+  "variant": "S0",
+  "needed_bytes": 1961698000,
+  "exchange_bytes": 90879168,
+  "exchange_over_needed": 0.046326788323177166,
+  "push_over_needed": 1.4274430722771803,
+  "tx": {
+   "probe": 1822880,
+   "since_env": 77555000,
+   "iwant": 101357412,
+   "ihave": 671716968,
+   "env": 2027137840,
+   "since": 324680,
+   "offer": 12992164,
+   "want": 7324
+  },
+  "violations": {
+   "L1": 71668,
+   "L2": 605,
+   "F1": 47670
+  },
+  "secs": 248.8
+ },
+ {
+  "scene": "C-a",
+  "n": 1000,
+  "variant": "S2",
+  "needed_bytes": 1945948000,
+  "exchange_bytes": 164634391,
+  "exchange_over_needed": 0.08460369495998865,
+  "push_over_needed": 1.4707534836491005,
+  "tx": {
+   "probe": 6374160,
+   "recon": 78659111,
+   "iwant": 100521096,
+   "ihave": 751068864,
+   "env": 2010419840,
+   "fetched": 78227760,
+   "fetch": 1373360
+  },
+  "violations": {},
+  "secs": 430.6
+ }
+]

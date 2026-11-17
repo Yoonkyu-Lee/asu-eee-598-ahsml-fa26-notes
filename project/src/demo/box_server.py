@@ -60,7 +60,8 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import A, B, IMG_BYTES, MEMB, ROOM, TOPIC_NAMES, Coco, msg_from_json, msg_to_json  # noqa: E402
-from sim.box import Box, Msg, Shared, World, h, sub_key  # noqa: E402
+from sim.box import Box, Msg, Shared, World, content_id, h, ref_target, sub_key, target_ref  # noqa: E402
+from sim.recon import FP, HAVE, IDS, KeySet, Session  # noqa: E402
 from sim import proto24 as p24  # noqa: E402
 from store import Store  # noqa: E402
 
@@ -143,6 +144,20 @@ class BoxNode:
         self.replayed: set[int] = set()
         self.tomb: dict[int, set] = {}           # deleted post -> the author's one-time public keys (hex)
         self.gone: set[int] = set()              # posts held here and then forgotten (CP28)
+        # CP29 "recon": the reconciled set (t_key, id), windows, triggers, test-only faults
+        self.keys = KeySet()
+        self.R = float(cfg.get("R_s", 7 * 86400.0))
+        self.sigma = float(cfg.get("sigma_s", 120.0))
+        self.pae = tuple(cfg.get("pae_s", (600.0, 1800.0)))
+        self.probe = {}                          # peer -> [backoff s, next probe time]
+        self.dirty: set[int] = set()
+        self.last_recon: dict[int, float] = {}
+        self.next_floor: dict[int, float] = {}
+        self.recon_busy: set[int] = set()
+        self.gone_t: dict[int, float] = {}       # forgotten id -> its t_key (kept until now - R - 2 sigma)
+        self.fault = {"drop": set(), "offset": 0.0, "silent": 0}
+        self.silent_mids: set[int] = set()       # test-only: envelopes this box "took" and lost (nobody notices)
+        self.pmax = float(cfg.get("probe_max_s", 300.0))
         if self.st:
             self._restore_identity()
             self.commit = self.W.ids[bid].commit
@@ -239,10 +254,19 @@ class BoxNode:
     def _after_delete(self, m: Msg) -> None:
         """Forgetting (CP25): a delete by the author removes the post's envelope and picture here, on disk and from
         /sync. A delete that comes before its post leaves a tombstone, so the post is dropped when it comes."""
-        body = self.S.open(m, self.key_for(m.topic)) if self.key_for(m.topic) else None
-        if body is None:
-            return
-        tgt = int(body["target"])
+        if self.exchange == "recon":                           # the target from the signed header (relays too)
+            rt = ref_target(m)
+            if rt is None:
+                return
+            tgt = rt[0]
+            self.keys.add((int(rt[1]), tgt))                   # its key stays in the set as a forgotten id
+            self.gone_t[tgt] = rt[1]
+            self.gone.add(tgt)
+        else:
+            body = self.S.open(m, self.key_for(m.topic)) if self.key_for(m.topic) else None
+            if body is None:
+                return
+            tgt = int(body["target"])
         it = self.box.items.get(tgt)
         if it is not None and it["epub"] != m.epub:            # someone else's delete: Box.apply refused it
             return
@@ -266,6 +290,15 @@ class BoxNode:
             self.st.ev("forget", mid=str(tgt))
 
     # ---- helpers
+    def now(self) -> float:
+        """This box's clock (a test-only offset can be set through /fault)."""
+        return time.time() + self.fault["offset"]
+
+    def _cut(self, peer: int) -> None:
+        """Test-only link cut (/fault drop): calls to that peer fail like a dead link."""
+        if peer in self.fault["drop"]:
+            raise ConnectionError(f"link to box {peer} is cut (test)")
+
     def _inc(self, k: int = 1) -> None:
         with self.lock:
             self.pending += k
@@ -274,6 +307,7 @@ class BoxNode:
         return f"http://{self.addr[peer]}{path}"
 
     def _post(self, peer: int, path: str, payload: dict) -> None:
+        self._cut(peer)
         req = urllib.request.Request(self._url(peer, path), data=json.dumps(payload).encode(),
                                      headers={"Content-Type": "application/json"})
         urllib.request.urlopen(req, timeout=120).read()
@@ -295,6 +329,7 @@ class BoxNode:
                 for i in range(tries):
                     try:
                         if lazy:
+                            self._cut(peer)
                             self.count["ihave_sent"] += 1
                             req = urllib.request.Request(self._url(peer, "/ihave1"),
                                                          data=json.dumps({"mid": str(m.mid), "frm": self.bid}).encode(),
@@ -310,6 +345,8 @@ class BoxNode:
                         if i == tries - 1:
                             log(f"gossip to box {peer} ({self.addr[peer]}) failed:", e)
                             self.up.discard(peer)
+                            if self.exchange == "recon":
+                                self.mark_down(peer)
                             return
                         time.sleep(0.5 * (i + 1))
             finally:
@@ -332,13 +369,14 @@ class BoxNode:
 
     def _lazy_check(self, mid: int, i: int) -> None:
         with self.lock:
-            if mid in self.got:
+            if mid in self.got or mid in self.silent_mids:
                 return
             ann = self.announcers.get(mid, [])
             if i >= len(ann):
                 return
             frm = ann[i]
         try:
+            self._cut(frm)
             d = json.loads(urllib.request.urlopen(self._url(frm, f"/env?mid={mid}&frm={self.bid}"), timeout=60).read())
             if d.get("msg"):
                 self.count["env_rx"] += 1
@@ -346,13 +384,17 @@ class BoxNode:
                 return
         except Exception as e:
             log(f"envelope {mid} from box {frm} failed:", type(e).__name__)
+        if self.exchange == "recon" and i + 1 >= len(self.announcers.get(mid, [])):
+            with self.lock:                                    # (c) announced, never obtained: reconcile
+                self.dirty.update(self.announcers.get(mid, []))
+            threading.Thread(target=self.recon_with, args=(frm, "c"), daemon=True).start()
         threading.Timer(REQ_TIMEOUT_S, self._lazy_check, (mid, i + 1)).start()
 
     def targets(self, topic: int) -> list[int]:
         """The topic's mesh peers. With the x2 exchange (rule 2, graft): only peers known to be on, filled up to D
         from the topic's other holders that are on, most recently heard from first."""
         mesh = [int(p) for p in self.mesh.get(topic, {}).get(self.bid, ())]
-        if self.exchange != "x2":
+        if self.exchange not in ("x2", "recon"):
             return mesh
         out = [p for p in mesh if p in self.up]
         D = self.cfg.get("D", 2)
@@ -375,6 +417,8 @@ class BoxNode:
 
     # ---- the ingest path (mirrors sim.stack.DayNet.deliver / sim.proto24.DayNet24.deliver, same operation names)
     def deliver(self, m: Msg, frm: int, via: str = "gossip") -> None:
+        if self.exchange == "recon":
+            return self._deliver_recon(m, frm, via)
         with self.lock:
             if m.mid in self.got:
                 self.count["dup"] += 1
@@ -390,9 +434,64 @@ class BoxNode:
             if frm >= 0 and not self.replaying:
                 self.peer_seen[frm] = time.time()
                 self.up.add(frm)
+            self._take(m, frm, via)
+
+    def _deliver_recon(self, m: Msg, frm: int, via: str) -> None:
+        """CP29: check everything a receiver can check BEFORE the id enters the set, the disk or any served list."""
+        with self.lock:
+            if m.mid in self.gone:                                 # deleted by its author: a stale copy (CP25)
+                self.count["forgotten"] += 1
+                return
+            if m.mid in self.got:
+                self.count["dup"] += 1
+                return
+            if content_id(m) != m.mid:                             # someone else's id, or altered on the way
+                self.count["rej_id"] += 1
+                return
+            tk = m.t0
+            if m.kind == "delete":
+                rt = ref_target(m)
+                if rt is None:                                     # the target header is not bound to this key
+                    self.count["rej_ref"] += 1
+                    return
+                tk = rt[1]
+            now = self.now()
+            if not (now - self.R <= tk <= now + 2 * self.sigma):
+                self.count["refuse_window"] += 1
+                return
+            if m.epub.hex() in self.tomb.get(m.mid, ()):           # its delete came first
+                self.count["forgotten"] += 1
+                self.gone.add(m.mid)
+                return
+            v = self.box.validate(m)
+            if v[0] != "ok":                                       # counted and refused; nothing is stored or served
+                self.count["rej_" + v[0]] += 1
+                if self.st and not self.replaying:
+                    self.st.ev("recv", mid=str(m.mid), frm=frm, kind=m.kind, via=via, verdict=v[0])
+                if v[0] == "slash" and frm >= 0 and not self.replaying:
+                    self.publish_slash(v[1])
+                if frm >= 0:
+                    self.box.apply(m, time.time(), v)
+                elif not self.replaying:                           # my own (the /api/misbehave demo): it goes out
+                    for peer in self.targets(m.topic):             # anyway, as an envelope (not stored, so no id)
+                        self.send(peer, m, direct=True)
+                return
+            self.got.add(m.mid)
+            self.msgs[m.mid] = m
+            self.keys.add((int(tk), m.mid))
+            if self.st and not self.replaying:
+                self.st.add_message(msg_to_json(m), frm)
+            if frm >= 0 and not self.replaying:
+                self.peer_seen[frm] = time.time()
+                self.up.add(frm)
+            self._take(m, frm, via, v)
+
+    def _take(self, m: Msg, frm: int, via: str, v0: tuple | None = None) -> None:
+        """The rest of ingest (called with the lock held): stages, forwarding, decryption, encoding, apply."""
+        if True:
             t = time.time()
             if self.p24:
-                v = self.box.validate(m)
+                v = v0 if v0 is not None else self.box.validate(m)
                 for op in p24.stages(m, v[0]):
                     self.count[op] += 1
                     if op == "proof":
@@ -405,7 +504,7 @@ class BoxNode:
                     self.count["rln"] += 1
                     self.verified.append(m.mid)
                     self.chip_s += CHIP["proof_s"]
-                v = self.box.validate(m)
+                v = v0 if v0 is not None else self.box.validate(m)
             if self.st and not self.replaying:
                 self.st.ev("recv", mid=str(m.mid), frm=frm, kind=m.kind, via=via, verdict=v[0])
             if v[0] != "ok" and frm >= 0:                       # a relay drops it; the author's box sends anyway
@@ -532,12 +631,25 @@ class BoxNode:
         self.slash_sent.add(a0)
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
         from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-        sk = Ed25519PrivateKey.generate()
-        nonce = os.urandom(12)
-        s = Msg(mid, "slash", MEMB, time.time(), 400.0, sk.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw),
+        t0 = self.now()
+        if self.exchange == "recon":
+            # CP29: ids are content hashes, so the notice is made the same on every finder (key, nonce and the hour
+            # are drawn from a0; Ed25519 signatures are deterministic): finders in the same hour publish one message
+            import hashlib
+            seed = hashlib.blake2b(b"slash|" + str(a0).encode(), digest_size=44).digest()
+            sk, nonce = Ed25519PrivateKey.from_private_bytes(seed[:32]), seed[32:]
+            t0 = float(int(t0 // 3600) * 3600)
+        else:
+            sk = Ed25519PrivateKey.generate()
+            nonce = os.urandom(12)
+        s = Msg(mid, "slash", MEMB, t0, 400.0, sk.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw),
                 b"", nonce, b"", 0, 0, 0, 0, None, True)
         s.ct = json.dumps({"a0": str(a0)}).encode()
         s.sig = sk.sign(s.header() + nonce + s.ct)
+        if self.exchange == "recon":
+            s.mid = content_id(s)
+            if s.mid in self.got:                                  # someone's identical notice is already here
+                return
         self.count["slash_published"] += 1
         self.deliver(s, -1)
 
@@ -665,6 +777,7 @@ class BoxNode:
 
     def _hello(self, peer: int) -> dict | None:
         try:
+            self._cut(peer)
             t0 = time.time()
             r = json.loads(urllib.request.urlopen(self._url(peer, f"/hello?frm={self.bid}"), timeout=10).read())
             t1 = time.time()
@@ -792,11 +905,237 @@ class BoxNode:
             now = time.time()
             if now - last > JUMP_S:
                 log(f"the clock jumped {now - last:.0f} s (asleep?): catching up")
-                with self.lock:
-                    prev, self.session, self.ready = self.session, now, False
-                self.come_on(last, prev)
+                if self.exchange == "recon":
+                    self.recon_come_on()
+                else:
+                    with self.lock:
+                        prev, self.session, self.ready = self.session, now, False
+                    self.come_on(last, prev)
             last = now
             self._save_meta()
+
+    # ---- CP29 "recon": set reconciliation on every contact (sim/recon.py S2, the model's rules in sim/sync.py)
+    @staticmethod
+    def _enc(msg) -> list:
+        k = lambda x: [x[0], str(x[1])]
+        out = []
+        for lo, hi, mode, pay in msg:
+            out.append([k(lo), k(hi), mode, [str(pay[0]), pay[1]] if mode == FP else [k(x) for x in pay]])
+        return out
+
+    @staticmethod
+    def _dec(rows) -> list:
+        k = lambda x: (int(x[0]), int(x[1]))
+        return [(k(lo), k(hi), mode, (int(pay[0]), int(pay[1])) if mode == FP else [k(x) for x in pay])
+                for lo, hi, mode, pay in rows]
+
+    def recon_serve(self, frm: int, rows: list) -> dict:
+        """Answer one round of a peer's session (stateless: what I need here goes back with the reply)."""
+        with self.lock:
+            self.count["recon_rx"] += 1
+            self.up.add(frm)
+            self.peer_seen[frm] = time.time()
+            s = Session(self.keys, "S2")
+            out = s.process(self._dec(rows))
+            need = sorted(s.need)
+        return {"reply": self._enc(out), "need": [[t, str(i)] for t, i in need]}
+
+    def envs(self, mids: list) -> list:
+        with self.lock:
+            return [msg_to_json(self.msgs[int(x)]) for x in mids if int(x) in self.msgs]
+
+    def recon_with(self, p: int, why: str) -> bool:
+        """One session with peer p: find both differences, fetch mine, push theirs. False if the peer failed."""
+        with self.lock:
+            if p in self.recon_busy or p == self.bid:
+                return True
+            self.recon_busy.add(p)
+        t_start = time.time()
+        nbytes = 0
+        try:
+            now = self.now()
+            lo, hi = (int(now - self.R + 2 * self.sigma), -1), (int(now + 2 * self.sigma) + 1, -1)
+            with self.lock:
+                s = Session(self.keys, "S2")
+                msg = s.initiate(lo, hi)
+            theirs, rounds = set(), 0
+            while msg and rounds < 64:
+                self._cut(p)
+                body = json.dumps({"frm": self.bid, "msg": self._enc(msg)}).encode()
+                req = urllib.request.Request(self._url(p, "/recon"), data=body,
+                                             headers={"Content-Type": "application/json"})
+                raw = urllib.request.urlopen(req, timeout=60).read()
+                nbytes += len(body) + len(raw)
+                r = json.loads(raw)
+                theirs |= {(int(t), int(i)) for t, i in r["need"]}
+                reply = self._dec(r["reply"])
+                rounds += 1
+                if not reply:
+                    break
+                with self.lock:
+                    msg = s.process(reply)
+            mine = sorted(s.need)
+            got = 0
+            if mine:
+                self._cut(p)
+                body = json.dumps({"frm": self.bid, "mids": [str(i) for _, i in mine]}).encode()
+                req = urllib.request.Request(self._url(p, "/envs"), data=body,
+                                             headers={"Content-Type": "application/json"})
+                raw = urllib.request.urlopen(req, timeout=120).read()
+                nbytes += len(body) + len(raw)
+                rows = json.loads(raw)
+                rows.sort(key=lambda d: d["kind"] != "delete")     # deletes first
+                for d in rows:
+                    self.deliver(msg_from_json(d), p, via="recon")
+                got = len(rows)
+            with self.lock:
+                push = [self.msgs[i] for _, i in sorted(theirs) if i in self.msgs]
+            for m in push:                                         # they lack these: the envelopes, directly
+                self._post(p, "/gossip", {"msg": msg_to_json(m), "frm": self.bid})
+                nbytes += 1500
+            with self.lock:
+                self.dirty.discard(p)
+                self.probe.pop(p, None)
+                self.up.add(p)
+                self.last_recon[p] = time.time()
+                self.count["recon_sessions"] += 1
+                self.count["recon_" + why] += 1
+                self.count["recon_bytes"] += nbytes
+                self.count["recon_fetched"] += got
+                self.count["recon_pushed"] += len(push)
+            if self.st:
+                self.st.ev("recon", peer=p, why=why, rounds=rounds, need=len(mine), gave=len(push), bytes=nbytes,
+                           ms=(time.time() - t_start) * 1e3)
+            if mine or push:
+                log(f"recon ({why}) with box {p}: got {got}, gave {len(push)}, {rounds} rounds, {nbytes} B")
+            return True
+        except Exception as e:
+            log(f"recon ({why}) with box {p} failed:", type(e).__name__)
+            self.mark_down(p)
+            return False
+        finally:
+            with self.lock:
+                self.recon_busy.discard(p)
+
+    def mark_down(self, p: int) -> None:
+        """A transfer to p failed: probe it with backoff until it answers, then reconcile (c); and (e) reconcile with
+        the peers that are still up, since what p was relaying may now come from them."""
+        with self.lock:
+            was = p in self.up
+            self.up.discard(p)
+            self.dirty.add(p)
+            if p not in self.probe:
+                self.probe[p] = [5.0, time.time() + 5.0]
+            others = [q for q in self.up if q != p]
+        if was:
+            for q in others:
+                threading.Thread(target=self.recon_with, args=(q, "e"), daemon=True).start()
+
+    def recon_peer_appeared(self, p: int) -> None:
+        """(b) a peer said hello: if it was down, unknown or dirty here, reconcile with it."""
+        with self.lock:
+            new = p not in self.up or p in self.dirty or p in self.probe
+            self.up.add(p)
+            self.probe.pop(p, None)
+            self.peer_seen[p] = time.time()
+        if new:
+            threading.Thread(target=self.recon_with, args=(p, "b"), daemon=True).start()
+
+    def recon_come_on(self) -> None:
+        """(a) this box came on (start, or the laptop woke): hello every listed box, reconcile with each that answers."""
+        self.t_come_on = time.time()
+        others = [p for p in range(self.n) if p != self.bid]
+        with ThreadPoolExecutor(8) as ex:
+            alive = [p for p, r in zip(others, ex.map(self._hello, others)) if r is not None]
+            if self.st:                   # measurement only (events.jsonl): more round trips for the clock offset
+                list(ex.map(self._hello, [q for q in alive for _ in range(4)]))
+            list(ex.map(lambda q: self.recon_with(q, "a"), alive))
+        with self.lock:
+            for p in others:
+                if p not in alive and p not in self.probe:
+                    self.probe[p] = [5.0, time.time() + 5.0]
+        if self.st:
+            self.st.ev("catch_done", ms=(time.time() - self.t_come_on) * 1e3, asked=alive)
+        log(f"came on: reconciled with {alive}")
+
+    def recon_loop(self) -> None:
+        """Probes of down peers (backoff 5 s .. 300 s) and the slow floor: a quiet pair is checked every P_AE."""
+        import random
+        rng = random.Random()
+        while True:
+            time.sleep(1.0)
+            now = time.time()
+            with self.lock:
+                due = [p for p, (b, t) in self.probe.items() if t <= now]
+                for p in due:
+                    b = self.probe[p][0]
+                    self.probe[p] = [min(2 * b, self.pmax), now + min(2 * b, self.pmax)]
+                floor = []
+                for p in list(self.up):
+                    nxt = self.next_floor.setdefault(p, self.last_recon.get(p, now) + rng.uniform(*self.pae))
+                    if now >= nxt:
+                        if now - self.last_recon.get(p, 0.0) >= self.pae[0]:
+                            floor.append(p)
+                            self.next_floor[p] = now + rng.uniform(*self.pae)
+                        else:
+                            self.next_floor[p] = self.last_recon[p] + rng.uniform(*self.pae)
+            for p in due:
+                if self._hello(p) is not None:
+                    self.recon_peer_appeared(p)
+            for p in floor:
+                threading.Thread(target=self.recon_with, args=(p, "f"), daemon=True).start()
+
+    def expiry_loop(self) -> None:
+        """Windows (cp/CP29.md): a message is dropped when t_key < now - R; a delete and a forgotten id when
+        t_key < now - R - 2 sigma."""
+        while True:
+            time.sleep(float(self.cfg.get("expiry_every_s", 60.0)))
+            now = self.now()
+            cut, cut2 = now - self.R, now - self.R - 2 * self.sigma
+            drop, drop_del = [], []
+            with self.lock:
+                for mid, m in list(self.msgs.items()):
+                    if m.kind == "delete":
+                        rt = ref_target(m)
+                        if rt is not None and rt[1] < cut2:
+                            drop_del.append((mid, rt))
+                    elif m.t0 < cut:
+                        drop.append(mid)
+                for mid in drop:
+                    m = self.msgs.pop(mid)
+                    if mid not in self.gone:
+                        self.keys.discard((int(m.t0), mid))
+                    self.got.discard(mid)
+                    self.full.pop(mid, None)
+                    self.count["expired"] += 1
+                for mid, (tgt, t0) in drop_del:
+                    self.msgs.pop(mid, None)
+                    self.got.discard(mid)
+                    self.keys.discard((int(t0), mid))
+                    self.keys.discard((int(t0), tgt))
+                    self.gone.discard(tgt)
+                    self.tomb.pop(tgt, None)
+                    self.count["expired_tomb"] += 1
+            if self.st:
+                for mid in drop + [m for m, _ in drop_del]:
+                    self.st.forget(mid)
+
+    def set_fault(self, d: dict) -> dict:
+        """Test-only (cfg "faults"): cut links to listed peers, shift this box's clock, swallow the next envelopes."""
+        with self.lock:
+            if "drop" in d:
+                self.fault["drop"] = {int(x) for x in d["drop"]}
+            if "offset" in d:
+                self.fault["offset"] = float(d["offset"])
+            if "silent" in d:
+                self.fault["silent"] = int(d["silent"])
+            return {"drop": sorted(self.fault["drop"]), "offset": self.fault["offset"], "silent": self.fault["silent"]}
+
+    def holds(self) -> dict:
+        """Test/debug: the reconciled set, the held envelopes and the forgotten ids (ids only)."""
+        with self.lock:
+            return {"keys": [[t, str(i)] for t, i in self.keys.keys], "msgs": [str(x) for x in self.msgs],
+                    "gone": [str(x) for x in self.gone], "count": dict(self.count)}
 
     # ---- the owner's side
     def query_text(self, q: str, k: int = 10) -> list[dict]:
@@ -834,9 +1173,17 @@ class BoxNode:
             ntok = int(self.text_enc.tokenize([text])["attention_mask"].sum()) if kind in p24.TEXT_KINDS else 0
             kw = {"reuse": reuse, "tokens": ntok}
         with self.lock:
-            m = self.W.make(self.bid, kind, topic, time.time(), body, size, key, target=target, image=image,
+            if self.exchange == "recon" and kind == "delete":
+                tm = self.msgs.get(target)
+                if tm is None:
+                    raise KeyError("the post is not held here")
+                kw["ref"] = target_ref(tm)
+            m = self.W.make(self.bid, kind, topic, self.now(), body, size, key, target=target, image=image,
                             pull_bytes=IMG_BYTES if image is not None else 0.0, **kw)
-            new = int.from_bytes(os.urandom(6), "big") + (1 << 48)        # this process's ids must not collide
+            if self.exchange == "recon":                                   # CP29: the id is the content's hash
+                new = content_id(m)
+            else:
+                new = int.from_bytes(os.urandom(6), "big") + (1 << 48)    # this process's ids must not collide
             self.W.keys[new] = self.W.keys.pop(m.mid)
             m.mid = new
             self.own.add(new)
@@ -888,7 +1235,7 @@ def handler(node: BoxNode):
             ip = self.client_address[0]
             if ip in LOOPBACK:
                 return True
-            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave", "/ihave1", "/env") \
+            return path in ("/gossip", "/pull", "/hello", "/sync", "/since", "/ihave", "/ihave1", "/env", "/recon", "/envs") \
                 and ip in node.peer_ips
 
         def do_GET(self):
@@ -896,13 +1243,18 @@ def handler(node: BoxNode):
             if not self.allowed(u.path):
                 return self.reply({"error": "owner calls are answered only on this computer"}, 403)
             q = {k: v[0] for k, v in parse_qs(u.query).items()}
+            if "frm" in q and int(q["frm"]) in node.fault["drop"]:
+                return self.reply({"error": "link cut (test)"}, 503)
             if u.path == "/":
                 return self.reply(UI.read_bytes(), ctype="text/html; charset=utf-8")
             if u.path == "/hello":
                 if "frm" in q:                                  # a box that came on says hello
-                    node.up.add(int(q["frm"]))
-                    node.peer_seen[int(q["frm"])] = time.time()
-                    node.peer_appeared()
+                    if node.exchange == "recon":
+                        node.recon_peer_appeared(int(q["frm"]))
+                    else:
+                        node.up.add(int(q["frm"]))
+                        node.peer_seen[int(q["frm"])] = time.time()
+                        node.peer_appeared()
                 return self.reply(node.hello_info())
             if u.path == "/env":
                 with node.lock:
@@ -917,6 +1269,8 @@ def handler(node: BoxNode):
                 return self.reply(data, ctype="application/octet-stream") if data else self.reply({"error": "none"}, 404)
             if u.path == "/api/stats":
                 return self.reply(node.stats())
+            if u.path == "/api/holds":
+                return self.reply(node.holds())
             if u.path == "/api/feed":
                 with node.lock:
                     return self.reply([node.item(mid) for mid in node.box.feed(25)])
@@ -948,6 +1302,8 @@ def handler(node: BoxNode):
             if not self.allowed(u.path):
                 return self.reply({"error": "owner calls are answered only on this computer"}, 403)
             d = self.body()
+            if "frm" in d and int(d["frm"]) in node.fault["drop"]:
+                return self.reply({"error": "link cut (test)"}, 503)
             try:
                 return self.post(u.path, d)
             except p24.Over as e:
@@ -959,8 +1315,21 @@ def handler(node: BoxNode):
         def post(self, path: str, d: dict):
             if path == "/gossip":
                 node.count["env_rx"] += 1
+                if node.fault["silent"] > 0:                       # test-only: acked, then lost (no retry either)
+                    node.fault["silent"] -= 1
+                    node.count["silent_dropped"] += 1
+                    node.silent_mids.add(int(d["msg"]["mid"]))
+                    return self.reply({"ok": True})
                 node.deliver(msg_from_json(d["msg"]), int(d["frm"]))
                 return self.reply({"ok": True})
+            if path == "/recon":
+                return self.reply(node.recon_serve(int(d["frm"]), d["msg"]))
+            if path == "/envs":
+                return self.reply(node.envs(d["mids"]))
+            if path == "/fault":
+                if not node.cfg.get("faults"):
+                    return self.reply({"error": "faults are off"}, 403)
+                return self.reply(node.set_fault(d))
             if path == "/ihave1":
                 return self.reply({"want": node.ihave1(int(d["mid"]), int(d["frm"]))})
             if path == "/ihave":
@@ -1032,6 +1401,13 @@ def main() -> None:
             node.come_on(node.last_off, node.prev_session)
             node.alive_loop()
         threading.Thread(target=come_on, daemon=True).start()
+    elif node.exchange == "recon":                              # CP29
+        def come_on():
+            node.recon_come_on()
+            node.alive_loop()
+        threading.Thread(target=come_on, daemon=True).start()
+        threading.Thread(target=node.recon_loop, daemon=True).start()
+        threading.Thread(target=node.expiry_loop, daemon=True).start()
     srv.serve_forever()
 
 

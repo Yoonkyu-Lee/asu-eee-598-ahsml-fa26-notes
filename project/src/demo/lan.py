@@ -105,8 +105,13 @@ def main() -> None:
                     help="lazy: ids first, envelopes only on request (CP27 P2, CP28); eager: envelopes to every peer")
     ap.add_argument("--text", choices=("fp32", "int8"), default="fp32",
                     help="fp32: contract precision (CP3, CP27); int8: CP21-CP26 boxes")
-    ap.add_argument("--exchange", choices=("x2", "poll"), default="x2",
-                    help="x2: catch up when the box comes on (CP26); poll: ask every box for everything every 20 s (CP24)")
+    ap.add_argument("--exchange", choices=("x2", "poll", "recon"), default="x2",
+                    help="x2: catch up when the box comes on (CP26); poll: ask every box for everything every 20 s (CP24);"
+                         " recon: set reconciliation on every contact (CP29)")
+    ap.add_argument("--pae", default="", help="recon: anti-entropy floor period range in s, e.g. 20,40 (default 600,1800)")
+    ap.add_argument("--retention", type=float, default=0.0, help="recon: R in s (default 7 days)")
+    ap.add_argument("--faults", action="store_true", help="test only: accept /fault (link cuts, clock offset, losses)")
+    ap.add_argument("--probe-max", type=float, default=0.0, help="recon: cap of the down-peer probe backoff in s (300)")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--whoami", action="store_true")
     a = ap.parse_args()
@@ -131,6 +136,13 @@ def main() -> None:
     cfg["sync"] = True                                  # several computers: a picture is pulled from any box
     cfg["exchange"] = a.exchange
     cfg["push"], cfg["text"] = a.push, a.text          # CP28; mesh D = 6 as in DayNet (all peers for n <= 7)
+    if a.pae:
+        cfg["pae_s"] = [float(x) for x in a.pae.split(",")]
+    if a.retention:
+        cfg["R_s"] = a.retention
+    cfg["faults"] = a.faults
+    if a.probe_max:
+        cfg["probe_max_s"] = a.probe_max
     if a.check:
         sys.exit(0 if check(cfg, a.me) else 1)
     mine = set(addresses())

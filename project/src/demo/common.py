@@ -49,7 +49,7 @@ def msg_to_json(m: Msg) -> dict:
             "sig": m.sig.hex(), "nonce": m.nonce.hex(), "ct": m.ct.hex(), "epoch": m.epoch, "x": str(m.x),
             "y": str(m.y), "nul": str(m.nul), "vnul": None if m.vnul is None else str(m.vnul), "proof_ok": m.proof_ok,
             "image": m.image, "tokens": m.tokens, "pull_bytes": m.pull_bytes, "tier": m.tier, "n_t": m.n_t, "n_p": m.n_p,
-            "shares": [[str(a), str(b)] for a, b in m.shares]}
+            "shares": [[str(a), str(b)] for a, b in m.shares], "ref": m.ref}
 
 
 def msg_from_json(d: dict) -> Msg:
@@ -57,7 +57,8 @@ def msg_from_json(d: dict) -> Msg:
                bytes.fromhex(d["sig"]), bytes.fromhex(d["nonce"]), bytes.fromhex(d["ct"]), int(d["epoch"]),
                int(d["x"]), int(d["y"]), int(d["nul"]), None if d["vnul"] is None else int(d["vnul"]),
                bool(d["proof_ok"]), d["image"], int(d["tokens"]), float(d["pull_bytes"]), {}, d.get("tier", ""),
-               int(d.get("n_t", 0)), int(d.get("n_p", 0)), [[int(a), int(b)] for a, b in d.get("shares", [])])
+               int(d.get("n_t", 0)), int(d.get("n_p", 0)), [[int(a), int(b)] for a, b in d.get("shares", [])],
+               d.get("ref", ""))
 
 
 class Coco:

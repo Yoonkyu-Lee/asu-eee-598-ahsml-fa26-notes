@@ -84,31 +84,67 @@ class Msg:
     n_t: int = 0
     n_p: int = 0
     shares: list = field(default_factory=list)
+    ref: str = ""             # CP29: a delete's target header in the clear (see content_id), signed with the rest
 
     def header(self) -> bytes:
-        base = f"{self.kind}|{self.topic}|{self.epoch}|{self.x}|{self.y}|{self.nul}|{self.vnul}"
+        # CP29 (H9): the author's stamp t0 is signed too; before, a relay could re-stamp a message without breaking it
+        base = f"{self.kind}|{self.topic}|{self.t0!r}|{self.epoch}|{self.x}|{self.y}|{self.nul}|{self.vnul}"
         if self.tier:
             base += f"|{self.tier}|{self.n_t}|{self.n_p}|" + ",".join(f"{a}:{b}" for a, b in self.shares)
+        if self.ref:
+            base += "|ref:" + self.ref
         return base.encode()
+
+
+ID_MASK = (1 << 62) - 1
+
+
+def content_id(m: Msg) -> int:
+    """CP29: a message's id is the hash of what it says (header incl. t0, one-time key, nonce, ciphertext hash), so two
+    boxes that agree on an id agree on the message and nobody can take another message's id."""
+    return h("mid", m.header(), m.epub, m.nonce, hashlib.blake2b(m.ct, digest_size=32).digest()) & ID_MASK
+
+
+def target_ref(t: Msg) -> str:
+    """What a delete carries about its target: enough to recompute the target's id with the delete's own key."""
+    return json.dumps({"mid": str(content_id(t)), "t0": repr(t.t0), "h": t.header().hex(), "nonce": t.nonce.hex(),
+                       "cth": hashlib.blake2b(t.ct, digest_size=32).hexdigest()}, separators=(",", ":"))
+
+
+def ref_target(m: Msg) -> tuple[int, float] | None:
+    """A delete's (target id, target t0) if its ref binds the target to the delete's key, else None."""
+    try:
+        r = json.loads(m.ref)
+        hb = bytes.fromhex(r["h"])
+        tid = h("mid", hb, m.epub, bytes.fromhex(r["nonce"]), bytes.fromhex(r["cth"])) & ID_MASK
+        t0 = float(r["t0"])
+        if tid != int(r["mid"]) or hb.decode().split("|")[2] != repr(t0):
+            return None
+        return tid, t0
+    except Exception:
+        return None
 
 
 class Shared:
     """Results of pure functions, computed the first time any box asks (real code), reused after."""
 
     def __init__(self):
-        self.sig: dict[int, bool] = {}
+        self.sig: dict[tuple, bool] = {}
         self.plain: dict[tuple, dict | None] = {}
         self.emb: dict[int, np.ndarray] = {}      # text embedding (posts, comments, image captions)
         self.img: dict[int, np.ndarray] = {}      # image embedding
 
     def sig_ok(self, m: Msg) -> bool:
-        if m.mid not in self.sig:
+        # CP29 (H10): the cache key includes the signature. Keyed by id alone, a copy with a broken signature that
+        # came first poisoned the id, and the real message was refused without being checked (found in layer 4).
+        k = (m.mid, m.sig)
+        if k not in self.sig:
             try:
                 Ed25519PublicKey.from_public_bytes(m.epub).verify(m.sig, m.header() + m.nonce + m.ct)
-                self.sig[m.mid] = True
+                self.sig[k] = True
             except InvalidSignature:
-                self.sig[m.mid] = False
-        return self.sig[m.mid]
+                self.sig[k] = False
+        return self.sig[k]
 
     def open(self, m: Msg, key: bytes) -> dict | None:
         k = (m.mid, key)
@@ -135,7 +171,8 @@ class World:
 
     def make(self, user: int, kind: str, topic: int, t: float, body: dict, size: float, key: bytes, *,
              target: int | None = None, reuse_k: int | None = None, proof_ok: bool = True,
-             image: int | None = None, tokens: int = 0, pull_bytes: float = 0.0, truth: dict | None = None) -> Msg:
+             image: int | None = None, tokens: int = 0, pull_bytes: float = 0.0, truth: dict | None = None,
+             ref: str = "") -> Msg:
         ident = self.ids[user]
         epoch = int(t // self.epoch_s)
         if reuse_k is None:
@@ -159,6 +196,7 @@ class World:
         m = Msg(mid, kind, topic, t, size, sk.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw), b"", nonce,
                 b"", epoch, x, y, nul, vnul, proof_ok and ident.commit in self.members, image, tokens, pull_bytes,
                 {"user": user, "commit": ident.commit, "target": target, **(truth or {})})
+        m.ref = ref
         m.ct = ChaCha20Poly1305(key).encrypt(nonce, plain, m.header())
         m.sig = sk.sign(m.header() + nonce + m.ct)
         self.keys[mid] = sk

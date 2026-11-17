@@ -1,0 +1,65 @@
+[
+ {
+  "mode": "S12",
+  "states": 2496,
+  "transitions": 16992,
+  "truncated": false,
+  "violations": {},
+  "examples": {}
+ },
+ {
+  "mode": "S0",
+  "states": 18432,
+  "transitions": 128640,
+  "truncated": false,
+  "violations": {
+   "S1": 23424,
+   "S4": 6144,
+   "L1": 384
+  },
+  "examples": {
+   "S1": [
+    {
+     "state": "(frozenset({'XS'}), frozenset(), False, False, frozenset(), (True, False, True), (True, True, True))",
+     "note": "box 0 holds ['XS']"
+    },
+    {
+     "state": "(frozenset({'FD'}), frozenset(), False, False, frozenset(), (True, False, True), (True, True, True))",
+     "note": "box 0 holds ['FD']"
+    },
+    {
+     "state": "(frozenset(), frozenset({'XS'}), False, False, frozenset(), (False, True, True), (True, True, True))",
+     "note": "box 1 holds ['XS']"
+    }
+   ],
+   "S4": [
+    {
+     "state": "(frozenset({'XS'}), frozenset(), False, False, frozenset({'P1'}), (True, False, True), (True, True, True))",
+     "note": "box 0 cannot accept P1"
+    },
+    {
+     "state": "(frozenset({'P1'}), frozenset({'XS'}), True, False, frozenset({'P1'}), (True, True, True), (True, True, True))",
+     "note": "box 1 cannot accept P1"
+    },
+    {
+     "state": "(frozenset({'XS'}), frozenset(), False, False, frozenset({'P1'}), (True, True, True), (True, True, True))",
+     "note": "box 0 cannot accept P1"
+    }
+   ],
+   "L1": [
+    {
+     "state": "(frozenset({'P1'}), frozenset({'XS'}), True, False, frozenset({'P1'}), (True, True, True), (True, True, True))",
+     "note": "after session ['P1'] vs []"
+    },
+    {
+     "state": "(frozenset({'P1'}), frozenset({'XS'}), True, False, frozenset({'P1'}), (True, True, True), (True, False, True))",
+     "note": "after session ['P1'] vs []"
+    },
+    {
+     "state": "(frozenset({'P1'}), frozenset({'XS', 'P2'}), True, False, frozenset({'P1', 'P2'}), (True, True, True), (True, True, True))",
+     "note": "after session ['P1', 'P2'] vs ['P2']"
+    }
+   ]
+  }
+ }
+]
