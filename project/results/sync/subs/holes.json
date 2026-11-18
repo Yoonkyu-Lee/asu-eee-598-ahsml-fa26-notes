@@ -1,0 +1,144 @@
+[
+ {
+  "scene": "D1 a foreign sub never arrives",
+  "mode": "leak",
+  "pass": false,
+  "predicted": "fail",
+  "as_predicted": true,
+  "checks": {
+   "box2 holds PB": true,
+   "box1 never holds PB": false
+  },
+  "violations": {
+   "S5": 1
+  },
+  "report": null
+ },
+ {
+  "scene": "D1 a foreign sub never arrives",
+  "mode": "sub",
+  "pass": true,
+  "predicted": "pass",
+  "as_predicted": true,
+  "checks": {
+   "box2 holds PB": true,
+   "box1 never holds PB": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "D2 the sub's two holders are not neighbours",
+  "mode": "leak",
+  "pass": false,
+  "predicted": null,
+  "as_predicted": null,
+  "checks": {
+   "box7 holds X within t_bound": true
+  },
+  "violations": {
+   "S5": 6
+  },
+  "report": null
+ },
+ {
+  "scene": "D2 the sub's two holders are not neighbours",
+  "mode": "sub",
+  "pass": true,
+  "predicted": "pass",
+  "as_predicted": true,
+  "checks": {
+   "box7 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "D3 a delete in sub B",
+  "mode": "leak",
+  "pass": false,
+  "predicted": "fail",
+  "as_predicted": true,
+  "checks": {
+   "box2 forgot PB, holds DB": true,
+   "box1 holds neither": false
+  },
+  "violations": {
+   "S5": 1
+  },
+  "report": null
+ },
+ {
+  "scene": "D3 a delete in sub B",
+  "mode": "sub",
+  "pass": true,
+  "predicted": "pass",
+  "as_predicted": true,
+  "checks": {
+   "box2 forgot PB, holds DB": true,
+   "box1 holds neither": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "D4 a sub with one holder",
+  "mode": "leak",
+  "pass": false,
+  "predicted": null,
+  "as_predicted": null,
+  "checks": {
+   "box3: no sessions": false,
+   "box3: <= 100 hellos a day": true
+  },
+  "violations": {
+   "S5": 9
+  },
+  "report": {
+   "box3_sessions": 157,
+   "box3_hellos": 3
+  }
+ },
+ {
+  "scene": "D4 a sub with one holder",
+  "mode": "sub",
+  "pass": true,
+  "predicted": "pass",
+  "as_predicted": true,
+  "checks": {
+   "box3: no sessions": true,
+   "box3: <= 100 hellos a day": true
+  },
+  "violations": {},
+  "report": {
+   "box3_sessions": 0,
+   "box3_hellos": 0
+  }
+ },
+ {
+  "scene": "D5 a 2 h partition inside a sub, heal, post crosses",
+  "mode": "leak",
+  "pass": false,
+  "predicted": null,
+  "as_predicted": null,
+  "checks": {
+   "boxes 6, 7 hold X": true
+  },
+  "violations": {
+   "S5": 4
+  },
+  "report": null
+ },
+ {
+  "scene": "D5 a 2 h partition inside a sub, heal, post crosses",
+  "mode": "sub",
+  "pass": true,
+  "predicted": "pass",
+  "as_predicted": true,
+  "checks": {
+   "boxes 6, 7 hold X": true
+  },
+  "violations": {},
+  "report": null
+ }
+]

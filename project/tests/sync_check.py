@@ -1,6 +1,8 @@
 """CP29 layer 4: the recon exchange on real box processes, with faults injected (link cuts, a lost envelope nobody
 notices, clock offsets, process kills, forged envelopes, a delete before its post, a partition).
 CP30 adds scenes 9-12 (fetch dedupe on come-on, the clean-flag fence, floor skips, the fence switched off).
+CP33 adds scenes 13-14 (sub B stays in sub B; sub B's two members cut apart with only non-members between them) and
+judges the end state per sub (journal/cp/CP33.md). CP33_ONLY=1 runs 13-14 only -> results/tests/sync_check_33.json.
 
   .venv/Scripts/python.exe tests/sync_check.py      -> results/tests/sync_check.json   (about 25 min)
   CP30_SCENES=0 ...                                    -> scenes 1-8 only (the CP29 run)
@@ -72,8 +74,8 @@ class Run:
             if self.procs.get(x) and self.procs[x].poll() is None:
                 own(x, "/fault", {"drop": sorted(self.drop[x])})
 
-    def post(self, i, title):
-        r = own(i, "/api/post", {"topic": 0, "title": title, "body": "cp29 check"})
+    def post(self, i, title, topic=0):
+        r = own(i, "/api/post", {"topic": topic, "title": title, "body": "cp29 check"})
         return r["mid"]
 
     def holds(self, i):
@@ -205,7 +207,36 @@ def scenes(R: Run) -> list[dict]:
     rec("crash and restart", "H2 class", t is not None, seconds=t)
     if not CP30:
         return out
-    return out + scenes30(R)
+    return out + scenes30(R) + scenes33(R)
+
+
+def scenes33(R: Run) -> list[dict]:
+    """CP33: sub B (topic 1) is held by boxes 0 and 2 only (common.community)."""
+    out = []
+
+    def rec(name, model, ok, **info):
+        out.append({"scene": name, "model_scene": model, "pass": bool(ok), **info})
+        log(f"{name:44s} {'PASS' if ok else 'FAIL'} {info}")
+
+    rj = {i: R.holds(i)["count"].get("rej_sub", 0) for i in (1, 3)}
+    w = R.post(0, "13 in sub B", topic=1)
+    t = R.wait(lambda: R.has(2, w), 10)
+    time.sleep(2 * PAE[1])
+    outside = [i for i in (1, 3) if R.has(i, w)]
+    rec("sub B post stays in sub B", "D1 a foreign sub never arrives", t is not None and not outside,
+        seconds=t, held_outside=outside, rej_sub_delta={i: R.holds(i)["count"].get("rej_sub", 0) - rj[i] for i in (1, 3)})
+
+    R.cut(0, 2)
+    x = R.post(0, "14 sub B while 0-2 is cut", topic=1)
+    time.sleep(30)
+    reached = R.has(2, x)
+    R.cut(0, 2, on=False)
+    t = R.wait(lambda: R.has(2, x), 3 * (PMAX + PAE[1]))
+    outside = [i for i in (1, 3) if R.has(i, x)]
+    rec("sub B members cut apart, non-members between", "D2/D5 (members only)",
+        not reached and t is not None and not outside, reached_during_cut=reached, after_link_back_s=t,
+        held_outside=outside)
+    return out
 
 
 def scenes30(R: Run) -> list[dict]:
@@ -281,10 +312,16 @@ def main() -> None:
         for i in range(N):
             R.start(i)
         time.sleep(5)
-        res = scenes30(R) if os.environ.get("CP30_ONLY") else scenes(R)
+        res = (scenes30(R) if os.environ.get("CP30_ONLY") else scenes33(R) if os.environ.get("CP33_ONLY")
+               else scenes(R))
         time.sleep(PAE[1] + 5)
-        sets = {i: sorted(map(tuple, R.holds(i)["keys"])) for i in range(N)}
-        same = all(sets[i] == sets[0] for i in range(N))
+        hs = {i: R.holds(i) for i in range(N)}         # CP33: per sub, members equal and non-members hold none
+        subs = sorted({s for i in range(N) for s in hs[i]["subs"]})
+        same = True
+        for s in subs:
+            mem = [i for i in range(N) if s in hs[i]["subs"]]
+            ks = {i: sorted(map(tuple, hs[i]["keys_by_sub"].get(str(s), []))) for i in range(N)}
+            same &= all(ks[i] == ks[mem[0]] for i in mem) and all(not ks[i] for i in range(N) if i not in mem)
         per_box = {}
         for i in range(N):
             dbg = own(i, "/api/debug")
@@ -299,7 +336,9 @@ def main() -> None:
     out = {"scenes": res, "final_sets_equal": same, "per_box": per_box,
            "all_pass": all(s["pass"] for s in res) and same and all(b["verified_twice"] == 0 for b in per_box.values()),
            "settings": {"boxes": N, "pae_s": PAE, "probe_max_s": PMAX}}
-    (OUT / ("sync_check_30.json" if os.environ.get("CP30_ONLY") else "sync_check.json")).write_text(json.dumps(out, indent=1), encoding="utf-8")
+    name = ("sync_check_30.json" if os.environ.get("CP30_ONLY") else "sync_check_33.json" if os.environ.get("CP33_ONLY")
+            else "sync_check.json")
+    (OUT / name).write_text(json.dumps(out, indent=1), encoding="utf-8")
     log("final sets equal:", same, "| verified twice:", {i: b["verified_twice"] for i, b in per_box.items()})
     log("ALL PASS" if out["all_pass"] else "SOME FAILED")
 

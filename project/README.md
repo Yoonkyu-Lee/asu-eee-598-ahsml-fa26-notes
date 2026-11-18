@@ -20,7 +20,7 @@ Why this direction and what may not change: [NORTHSTAR.md](NORTHSTAR.md).
 | Chip load | Each valid message is verified and encoded exactly once per box, so the chip's work is what the box receives | counted in the model | [docs/protocol.md](docs/protocol.md) |
 
 Known gaps:
-- **H12 (found in CP32):** sync reconciles every message regardless of sub, so a box also receives, verifies and stores the subs it never joined (it cannot read them without their key, so they never show). The design replicates only joined subs (CP16). Next: CP33.
+- Sync: per-sub reconciliation (CP33) fixed H12 (every box received every sub). Two always-on scenes keep a P99 delivery tail of 60-188 s, and CP33's random layer was still running at commit.
 - The 16 × 16 FP16 encoder was not mapped, so the area is a lower bound.
 - Power was not re-estimated for it.
 - Only the multiplier has RTL.
@@ -40,7 +40,7 @@ See the "Open" section of [docs/chip.md](docs/chip.md).
 | [experiments/](experiments/) | scripts that reproduce the conclusions | re-run a result |
 | [tests/](tests/) | real box processes with faults injected | check the box still behaves |
 | [results/](results/) | `chip/`, `sync/`, `bench/`, `tests/`: the numbers behind the conclusions | read the raw numbers |
-| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP32), plus a plain-Korean walkthrough | follow how we got here (Korean) |
+| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP33), plus a plain-Korean walkthrough | follow how we got here (Korean) |
 | [legacy/](legacy/) | code and results the conclusions no longer need, frozen at tag `cp30` | reproduce an old checkpoint |
 
 ## Try it (CPU only, a few minutes)

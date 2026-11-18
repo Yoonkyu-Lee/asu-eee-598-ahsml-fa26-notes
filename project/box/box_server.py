@@ -61,7 +61,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import A, B, IMG_BYTES, MEMB, ROOM, TOPIC_NAMES, Coco, msg_from_json, msg_to_json  # noqa: E402
 from sim.box import Box, Msg, Shared, World, content_id, h, ref_target, sub_key, target_ref  # noqa: E402
-from sim.recon import FP, HAVE, IDS, KeySet, Session  # noqa: E402
+from sim.recon import FP, HAVE, IDS, Session, TopicKeySet  # noqa: E402
 from sim import proto24 as p24  # noqa: E402
 from store import Store  # noqa: E402
 from chip.model import chip as CHIPM  # noqa: E402   the latest chip's numbers (CP31: one source)
@@ -138,7 +138,7 @@ class BoxNode:
         self.tomb: dict[int, set] = {}           # deleted post -> the author's one-time public keys (hex)
         self.gone: set[int] = set()              # posts held here and then forgotten (CP28)
         # CP29 "recon": the reconciled set (t_key, id), windows, triggers, test-only faults
-        self.keys = KeySet()
+        self.keys = TopicKeySet()                # CP33: by sub; a session covers the subs both boxes hold
         self.R = float(cfg.get("R_s", 7 * 86400.0))
         self.sigma = float(cfg.get("sigma_s", 120.0))
         self.pae = tuple(cfg.get("pae_s", (600.0, 1800.0)))
@@ -258,7 +258,7 @@ class BoxNode:
             if rt is None:
                 return
             tgt = rt[0]
-            self.keys.add((int(rt[1]), tgt))                   # its key stays in the set as a forgotten id
+            self.keys.add((int(rt[1]), tgt), m.topic)          # its key stays in the set as a forgotten id
             self.gone_t[tgt] = rt[1]
             self.gone.add(tgt)
         else:
@@ -461,6 +461,9 @@ class BoxNode:
             if content_id(m) != m.mid:                             # someone else's id, or altered on the way
                 self.count["rej_id"] += 1
                 return
+            if m.topic not in self.box.topics:                     # CP33: not my sub (header), before verifying
+                self.count["rej_sub"] += 1
+                return
             tk = m.t0
             if m.kind == "delete":
                 rt = ref_target(m)
@@ -491,7 +494,7 @@ class BoxNode:
                 return
             self.got.add(m.mid)
             self.msgs[m.mid] = m
-            self.keys.add((int(tk), m.mid))
+            self.keys.add((int(tk), m.mid), m.topic)
             self.ver += 1                                          # CP30 F: my set changed; only the sender
             self.clean = (self.clean & {frm}) if frm >= 0 else set()   # still matches me
             self.fetching.pop(m.mid, None)
@@ -978,13 +981,19 @@ class BoxNode:
         return [(k(lo), k(hi), mode, (int(pay[0]), int(pay[1])) if mode == FP else [k(x) for x in pay])
                 for lo, hi, mode, pay in rows]
 
-    def recon_serve(self, frm: int, rows: list) -> dict:
+    def common(self, p: int) -> set:
+        """CP33: the subs this box and peer p both hold (the holders table: the config here, a sub's member list in a
+        real deployment)."""
+        return {t for t in self.box.topics if p in self.holders.get(t, ())}
+
+    def recon_serve(self, frm: int, rows: list, topics: list | None = None) -> dict:
         """Answer one round of a peer's session (stateless: what I need here goes back with the reply)."""
         with self.lock:
             self.count["recon_rx"] += 1
             self.up.add(frm)
             self.peer_seen[frm] = time.time()
-            s = Session(self.keys, "S2")
+            cm = self.common(frm) if topics is None else {int(x) for x in topics} & set(self.box.topics)
+            s = Session(self.keys.view(cm), "S2")
             out = s.process(self._dec(rows))
             need = sorted(s.need)
         return {"reply": self._enc(out), "need": [[t, str(i)] for t, i in need]}
@@ -1013,6 +1022,9 @@ class BoxNode:
         with self.lock:
             if p in self.recon_busy or p == self.bid:
                 return True
+            cm = self.common(p)
+            if not cm:                                             # CP33: no sub in common, nothing to reconcile
+                return True
             self.recon_busy.add(p)
         t_start = time.time()
         nbytes = 0
@@ -1021,13 +1033,13 @@ class BoxNode:
             now = self.now()
             lo, hi = (int(now - self.R + 2 * self.sigma), -1), (int(now + 2 * self.sigma) + 1, -1)
             with self.lock:
-                s = Session(self.keys, "S2")
+                s = Session(self.keys.view(cm), "S2")
                 msg = s.initiate(lo, hi)
                 ver0 = self.ver                                    # CP30 F: the fence
             theirs, rounds = set(), 0
             while msg and rounds < 64:
                 self._cut(p)
-                body = json.dumps({"frm": self.bid, "msg": self._enc(msg)}).encode()
+                body = json.dumps({"frm": self.bid, "msg": self._enc(msg), "topics": sorted(cm)}).encode()
                 req = urllib.request.Request(self._url(p, "/recon"), data=body,
                                              headers={"Content-Type": "application/json"})
                 raw = urllib.request.urlopen(req, timeout=60).read()
@@ -1259,6 +1271,8 @@ class BoxNode:
         """Test/debug: the reconciled set, the held envelopes and the forgotten ids (ids only)."""
         with self.lock:
             return {"keys": [[t, str(i)] for t, i in self.keys.keys], "msgs": [str(x) for x in self.msgs],
+                    "keys_by_sub": {str(s): [[t, str(i)] for t, i in ks.keys] for s, ks in self.keys.by.items()},
+                    "subs": sorted(self.box.topics),
                     "gone": [str(x) for x in self.gone], "count": dict(self.count),
                     "clean": sorted(self.clean), "fetching": len(self.fetching), "busy": sorted(self.recon_busy)}
 
@@ -1448,7 +1462,7 @@ def handler(node: BoxNode):
                 node.deliver(msg_from_json(d["msg"]), int(d["frm"]))
                 return self.reply({"ok": True})
             if path == "/recon":
-                return self.reply(node.recon_serve(int(d["frm"]), d["msg"]))
+                return self.reply(node.recon_serve(int(d["frm"]), d["msg"], d.get("topics")))
             if path == "/envs":
                 return self.reply(node.envs(d["mids"]))
             if path == "/fault":

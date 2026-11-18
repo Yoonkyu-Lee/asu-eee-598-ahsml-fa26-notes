@@ -1,0 +1,107 @@
+[
+ {
+  "mode": "subs",
+  "mutate": null,
+  "states": 2304,
+  "transitions": 17280,
+  "truncated": false,
+  "violations": {},
+  "examples": {}
+ },
+ {
+  "mode": "subs",
+  "mutate": "accept_any",
+  "states": 14720,
+  "transitions": 122304,
+  "truncated": false,
+  "violations": {
+   "S5": 16768
+  },
+  "examples": {
+   "S5": [
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, True, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    },
+    {
+     "state": "((frozenset({'PB'}), frozenset({'PB'}), frozenset()), frozenset({'PB'}), (True, True, True), (True, True, True))",
+     "note": "box 1 holds ['PB']"
+    },
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, False, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    }
+   ]
+  }
+ },
+ {
+  "mode": "subs",
+  "mutate": "recon_all+accept_any",
+  "states": 14720,
+  "transitions": 122304,
+  "truncated": false,
+  "violations": {
+   "S5": 16768
+  },
+  "examples": {
+   "S5": [
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, True, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    },
+    {
+     "state": "((frozenset({'PB'}), frozenset({'PB'}), frozenset()), frozenset({'PB'}), (True, True, True), (True, True, True))",
+     "note": "box 1 holds ['PB']"
+    },
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, False, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    }
+   ]
+  }
+ },
+ {
+  "mode": "subs",
+  "mutate": "push_any+accept_any",
+  "states": 14720,
+  "transitions": 126288,
+  "truncated": false,
+  "violations": {
+   "S5": 16768
+  },
+  "examples": {
+   "S5": [
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, True, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    },
+    {
+     "state": "((frozenset({'PB'}), frozenset({'PB'}), frozenset()), frozenset({'PB'}), (True, True, True), (True, True, True))",
+     "note": "box 1 holds ['PB']"
+    },
+    {
+     "state": "((frozenset({'PA'}), frozenset(), frozenset({'PA'})), frozenset({'PA'}), (True, False, True), (True, True, True))",
+     "note": "box 2 holds ['PA']"
+    }
+   ]
+  }
+ },
+ {
+  "mode": "subs",
+  "mutate": "recon_all",
+  "states": 2304,
+  "transitions": 17280,
+  "truncated": false,
+  "violations": {},
+  "examples": {}
+ },
+ {
+  "mode": "subs",
+  "mutate": "push_any",
+  "states": 2304,
+  "transitions": 17280,
+  "truncated": false,
+  "violations": {},
+  "examples": {}
+ }
+]

@@ -78,7 +78,7 @@ When two boxes meet, they compare their sets instead of trusting each other's cl
 | 2 directed scenes (holes H1–H11 and the new rules) | all as predicted | estimate (model) |
 | 3 exhaustive small scope (3 boxes, adversary) | 2,496 states with 0 violations; clean-flag rule 17,408 states with 0 violations; 3 deliberate bugs caught | estimate (model) |
 | 4 real boxes (4 processes: link cuts, clock offsets, kills, forged copies, a held session) | 12 scripts pass; regressions L1–L7, P1–P4 pass | measured |
-| demo (CP32): five users on one screen, 15 steps | 14 pass; step 3 fails (H12) | measured |
+| demo (CP32, CP33): five users on one screen, 15 steps | 14 pass in CP32 (step 3: H12); 15 pass after CP33 | measured |
 
 Cost (model, CP26 scenes, n = 10–1000):
 
@@ -100,16 +100,23 @@ Re-run:
 .venv/Scripts/python.exe -W ignore tests/sync_check.py           # layer 4 (~12 min)                 -> results/tests/sync_check.json
 ```
 
-## Open hole H12 (found in CP32)
+## Sub-communities (H12 found in CP32, fixed in CP33)
 
-Set reconciliation compares every id a box holds, whatever its sub (topic), and a box accepts a message of a sub it never joined. So every box ends up receiving, verifying and storing every sub. Without the sub's key it cannot read the post, so nothing shows on its screen, but the cost is there. Since CP29 this has replaced the design's "replicate only the subs you joined" (P-sub, CP16) with "replicate everything" (P-all).
+A box receives only the sub-communities (subs) it joined.
+- A session reconciles only the subs both boxes hold. A fingerprint is a sum of ids, so the subs' fingerprints add, and one session with the same wire format covers them (`sim/recon.py` `TopicKeySet`).
+- A box refuses a message of a sub it does not hold before verifying it (`rej_sub`). The exhaustive check shows this receive check alone keeps S5 ("no box holds a sub it did not join"); filtering the session keeps the cost down.
+- Each box keeps at least 3 online neighbours in each of its subs, and explores among boxes that share a sub. Assumption: a sub's member boxes can be found (the config here; a rendezvous in a real deployment).
+- Before CP33 (CP29-CP32), every box received, verified and stored every sub (H12). The sync model had no subs, so layers 1-3 could not see it; the one-screen demo did.
 
-- Push (ids first) does respect subs. Only reconciliation leaks.
-- The sync model (`sim/sync.py`, `sim/recon.py`) has no subs, so layers 1–3 could not see it.
-- It was seen in the one-screen demo (`box/stage.py`, step 3): a sub-B post reached a box outside sub B within seconds, and every box held it at the end (`results/demo/`).
-- Cost (source CP16, behaviour model): P-all is 1/0.78 ≈ 1.28× the average box's load and 1/0.94 ≈ 1.06× the top 1 % box's.
+| CP33 (model, 20 subs, about 3 per box) | box as built (CP30) | per-sub (CP33) |
+|---|---|---|
+| sync overhead, max | 352 KB per box per day | 51.6 |
+| proof verifications per box | 1 | 0.25-0.51 |
+| live P99 | 392-1,181 s | <= 1.5 s in 13 of 15 cells; 60 and 188 s in two always-on cells (open) |
 
-The fix (CP33): reconcile per sub, over the subs both boxes hold, then re-run layers 1–4.
+Layers: random runs 0 violations so far (still running at commit), directed scenes as predicted, exhaustive 2,304 states 0 violations, real boxes (sub scripts, the 15-step story) pass. Labels: estimate (model) and measured (real boxes). Record: `journal/cp/CP33.md`.
+
+Open: a small sub loses the store-and-forward help that non-members gave (more messages wait for a member to come on in the laptop-heavy scene); the P99 tail above.
 
 ## Not covered
 

@@ -21,6 +21,7 @@ Each side ends with `need` (keys the peer has and it lacks). Fetching them is th
 from __future__ import annotations
 
 from bisect import bisect_left, insort
+from heapq import merge
 
 import numpy as np
 
@@ -86,6 +87,75 @@ class KeySet:
 
     def items(self, lo, hi) -> list:
         return self.keys[self.idx(lo):self.idx(hi)]
+
+
+class TopicKeySet:
+    """CP33: a box's reconciled set split by sub (topic). A session reconciles the union of the subs both boxes hold:
+    a range's fingerprint is the sum of the subs' fingerprints (the id sum mod 2^64 is additive) and its key list is
+    the merge, so one session and the same wire format cover any set of subs. With one sub it is a KeySet."""
+
+    def __init__(self):
+        self.by: dict[int, KeySet] = {}
+        self.topic: dict[int, int] = {}          # id -> sub
+
+    def add(self, k, topic: int) -> bool:
+        self.topic[k[1]] = topic
+        return self.by.setdefault(topic, KeySet()).add(k)
+
+    def discard(self, k) -> bool:
+        t = self.topic.get(k[1])
+        if t is None or t not in self.by:
+            return False
+        out = self.by[t].discard(k)
+        if out:                                  # an id has one key (a post and its forgotten id share it)
+            self.topic.pop(k[1], None)
+        return out
+
+    def __contains__(self, k):
+        t = self.topic.get(k[1])
+        return t is not None and t in self.by and k in self.by[t]
+
+    def __len__(self):
+        return sum(len(s) for s in self.by.values())
+
+    def drop_before(self, t: int) -> list:
+        out = []
+        for s in self.by.values():
+            out += s.drop_before(t)
+        for k in out:
+            self.topic.pop(k[1], None)
+        return sorted(out)
+
+    @property
+    def keys(self) -> list:
+        if len(self.by) == 1:
+            return next(iter(self.by.values())).keys
+        return list(merge(*(s.keys for s in self.by.values())))
+
+    def view(self, topics=None) -> "TopicView":
+        """The union of these subs (None: all) as one set for a Session."""
+        sets = [s for t, s in self.by.items() if topics is None or t in topics]
+        return TopicView(sets)
+
+
+class TopicView:
+    def __init__(self, sets: list):
+        self.sets = sets
+
+    def __len__(self):
+        return sum(len(s) for s in self.sets)
+
+    def fp(self, lo, hi) -> tuple[int, int]:
+        f = c = 0
+        for s in self.sets:
+            a, b = s.fp(lo, hi)
+            f, c = (f + a) & M64, c + b
+        return f, c
+
+    def items(self, lo, hi) -> list:
+        if len(self.sets) == 1:
+            return self.sets[0].items(lo, hi)
+        return list(merge(*(s.items(lo, hi) for s in self.sets)))
 
 
 class Session:

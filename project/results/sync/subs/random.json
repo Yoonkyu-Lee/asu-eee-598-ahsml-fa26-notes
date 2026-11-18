@@ -1,0 +1,3635 @@
+[
+ {
+  "n": 1000,
+  "violations": {
+   "S5": 579334
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 3095.162,
+     "box": 246,
+     "mid": 2144202629535757615,
+     "topic": 4
+    },
+    {
+     "t": 3095.385,
+     "box": 399,
+     "mid": 2144202629535757615,
+     "topic": 4
+    },
+    {
+     "t": 3095.385,
+     "box": 660,
+     "mid": 2144202629535757615,
+     "topic": 4
+    },
+    {
+     "t": 3095.385,
+     "box": 71,
+     "mid": 2144202629535757615,
+     "topic": 4
+    },
+    {
+     "t": 3095.385,
+     "box": 79,
+     "mid": 2144202629535757615,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 1265,
+  "l1_items": 72259,
+  "live_p99_s": 406.0951992920018,
+  "ev": {
+   "come_on": 2963,
+   "xfer_fail": 2253171,
+   "link_drop": 6176,
+   "pub_post": 1292,
+   "pub_comment": 451,
+   "pub_vote": 170,
+   "want_timeout": 532,
+   "pub_delete": 84,
+   "silent_loss": 20,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 4798,
+   "stranded": 6,
+   "stranded_pairs": 4892
+  },
+  "work": {
+   "verify": 859862,
+   "verify_invalid": 2294,
+   "encode": 160397,
+   "needed_env": 857568,
+   "dup_env": 4,
+   "rej_id": 1346,
+   "rej_sig": 2294,
+   "refuse_window": 0,
+   "recon_sessions": 156808,
+   "fetch_keys": 875431,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 580646
+  },
+  "verify_per_box_day": 318.4674074074074,
+  "encode_per_box_day": 59.4062962962963,
+  "subs_per_box": 2.996,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 173.9
+ },
+ {
+  "n": 1000,
+  "violations": {
+   "S5": 566413
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1322.502,
+     "box": 0,
+     "mid": 9165170984314525209,
+     "topic": 9
+    },
+    {
+     "t": 1322.502,
+     "box": 800,
+     "mid": 9165170984314525209,
+     "topic": 9
+    },
+    {
+     "t": 1322.502,
+     "box": 232,
+     "mid": 9165170984314525209,
+     "topic": 9
+    },
+    {
+     "t": 1322.502,
+     "box": 214,
+     "mid": 9165170984314525209,
+     "topic": 9
+    },
+    {
+     "t": 1347.198,
+     "box": 77,
+     "mid": 9165170984314525209,
+     "topic": 9
+    }
+   ]
+  },
+  "l1_checks": 1307,
+  "l1_items": 69151,
+  "live_p99_s": 428.91505902998324,
+  "ev": {
+   "come_on": 2925,
+   "xfer_fail": 2259078,
+   "link_drop": 5973,
+   "pub_post": 1249,
+   "want_timeout": 476,
+   "pub_comment": 490,
+   "pub_vote": 178,
+   "pub_delete": 66,
+   "silent_loss": 21,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 4779,
+   "stranded": 8,
+   "stranded_pairs": 4872
+  },
+  "work": {
+   "verify": 864211,
+   "verify_invalid": 1252,
+   "encode": 161686,
+   "needed_env": 862959,
+   "dup_env": 11,
+   "rej_id": 717,
+   "rej_sig": 1252,
+   "refuse_window": 0,
+   "recon_sessions": 157983,
+   "fetch_keys": 893100,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 567390
+  },
+  "verify_per_box_day": 320.07814814814816,
+  "encode_per_box_day": 59.8837037037037,
+  "subs_per_box": 3.091,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 176.0
+ },
+ {
+  "n": 1000,
+  "violations": {
+   "S5": 618952
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2724.033,
+     "box": 135,
+     "mid": 5267089699891425863,
+     "topic": 10
+    },
+    {
+     "t": 2776.854,
+     "box": 641,
+     "mid": 5267089699891425863,
+     "topic": 10
+    },
+    {
+     "t": 2778.804,
+     "box": 864,
+     "mid": 5267089699891425863,
+     "topic": 10
+    },
+    {
+     "t": 2778.904,
+     "box": 346,
+     "mid": 5267089699891425863,
+     "topic": 10
+    },
+    {
+     "t": 2778.904,
+     "box": 170,
+     "mid": 5267089699891425863,
+     "topic": 10
+    }
+   ]
+  },
+  "l1_checks": 1142,
+  "l1_items": 72012,
+  "live_p99_s": 375.9664315794944,
+  "ev": {
+   "come_on": 2850,
+   "xfer_fail": 2262834,
+   "link_drop": 6019,
+   "pub_post": 1354,
+   "partition": 2,
+   "pub_vote": 216,
+   "pub_comment": 526,
+   "want_timeout": 515,
+   "pub_delete": 84,
+   "silent_loss": 19,
+   "miss": 0,
+   "miss_pairs": 2491,
+   "stranded": 5,
+   "stranded_pairs": 2562
+  },
+  "work": {
+   "verify": 909555,
+   "verify_invalid": 1923,
+   "encode": 159238,
+   "needed_env": 907632,
+   "dup_env": 7,
+   "rej_id": 886,
+   "rej_sig": 1923,
+   "refuse_window": 0,
+   "recon_sessions": 156342,
+   "fetch_keys": 931634,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 620401
+  },
+  "verify_per_box_day": 336.8722222222222,
+  "encode_per_box_day": 58.977037037037036,
+  "subs_per_box": 3.091,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 180.9
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1052,
+  "l1_items": 17972,
+  "live_p99_s": 158.91368473743205,
+  "ev": {
+   "come_on": 2963,
+   "xfer_fail": 2855950,
+   "link_drop": 6176,
+   "pub_post": 1296,
+   "pub_comment": 449,
+   "pub_vote": 168,
+   "want_timeout": 534,
+   "pub_delete": 84,
+   "partition": 2,
+   "silent_loss": 13,
+   "miss": 0,
+   "miss_pairs": 4690,
+   "stranded": 111,
+   "stranded_pairs": 4872
+  },
+  "work": {
+   "verify": 270002,
+   "verify_invalid": 1176,
+   "encode": 152129,
+   "needed_env": 268826,
+   "dup_env": 5,
+   "rej_id": 3402,
+   "rej_sig": 1176,
+   "refuse_window": 0,
+   "recon_sessions": 132327,
+   "fetch_keys": 270330,
+   "floor_skip": 0,
+   "rej_sub": 321,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 100.00074074074074,
+  "encode_per_box_day": 56.34407407407408,
+  "subs_per_box": 2.996,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 210.6
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1132,
+  "l1_items": 21561,
+  "live_p99_s": 176.80812915350543,
+  "ev": {
+   "come_on": 2925,
+   "xfer_fail": 2956323,
+   "link_drop": 5973,
+   "pub_post": 1253,
+   "want_timeout": 458,
+   "pub_comment": 486,
+   "pub_vote": 178,
+   "pub_delete": 66,
+   "silent_loss": 17,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 4643,
+   "stranded": 136,
+   "stranded_pairs": 4859
+  },
+  "work": {
+   "verify": 287172,
+   "verify_invalid": 700,
+   "encode": 154156,
+   "needed_env": 286472,
+   "dup_env": 5,
+   "rej_id": 10833,
+   "rej_sig": 700,
+   "refuse_window": 0,
+   "recon_sessions": 132593,
+   "fetch_keys": 293960,
+   "floor_skip": 0,
+   "rej_sub": 302,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 106.36,
+  "encode_per_box_day": 57.09481481481481,
+  "subs_per_box": 3.091,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 223.7
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 951,
+  "l1_items": 17923,
+  "live_p99_s": 268.72917150886497,
+  "ev": {
+   "come_on": 2876,
+   "xfer_fail": 2974667,
+   "link_drop": 6118,
+   "pub_post": 1366,
+   "want_timeout": 524,
+   "partition": 3,
+   "pub_vote": 192,
+   "pub_comment": 453,
+   "pub_delete": 87,
+   "silent_loss": 23,
+   "miss": 0,
+   "miss_pairs": 3042,
+   "stranded": 157,
+   "stranded_pairs": 3248
+  },
+  "work": {
+   "verify": 277133,
+   "verify_invalid": 1424,
+   "encode": 160725,
+   "needed_env": 275709,
+   "dup_env": 11,
+   "rej_id": 22109,
+   "rej_sig": 1424,
+   "refuse_window": 0,
+   "recon_sessions": 126199,
+   "fetch_keys": 294447,
+   "floor_skip": 0,
+   "rej_sub": 376,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 102.64185185185185,
+  "encode_per_box_day": 59.52777777777778,
+  "subs_per_box": 3.091,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 242.0
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 237981,
+  "l1_items": 55587,
+  "live_p99_s": 196.66687167651253,
+  "ev": {
+   "come_on": 3429,
+   "xfer_fail": 1445368,
+   "link_drop": 6065,
+   "pub_post": 1583,
+   "want_timeout": 4420,
+   "pub_vote": 265,
+   "silent_loss": 418,
+   "pub_comment": 646,
+   "pub_delete": 80,
+   "miss": 5,
+   "miss_pairs": 365015,
+   "stranded": 5,
+   "stranded_pairs": 368526
+  },
+  "work": {
+   "verify": 565367,
+   "verify_invalid": 702,
+   "encode": 315011,
+   "needed_env": 564665,
+   "dup_env": 0,
+   "rej_id": 1275,
+   "rej_sig": 702,
+   "refuse_window": 0,
+   "recon_sessions": 1011559,
+   "fetch_keys": 183124,
+   "floor_skip": 0,
+   "rej_sub": 465,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 209.39518518518517,
+  "encode_per_box_day": 116.67074074074075,
+  "subs_per_box": 3.091,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 341.7
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 233705,
+  "l1_items": 54756,
+  "live_p99_s": 430.2268857128365,
+  "ev": {
+   "come_on": 3463,
+   "xfer_fail": 1645501,
+   "link_drop": 6123,
+   "pub_post": 1589,
+   "silent_loss": 369,
+   "want_timeout": 4155,
+   "pub_comment": 609,
+   "pub_vote": 224,
+   "pub_delete": 90,
+   "partition": 3,
+   "miss": 8,
+   "miss_pairs": 350507,
+   "stranded": 8,
+   "stranded_pairs": 354767
+  },
+  "work": {
+   "verify": 550881,
+   "verify_invalid": 910,
+   "encode": 312720,
+   "needed_env": 549971,
+   "dup_env": 0,
+   "rej_id": 1221,
+   "rej_sig": 910,
+   "refuse_window": 0,
+   "recon_sessions": 1030033,
+   "fetch_keys": 180964,
+   "floor_skip": 0,
+   "rej_sub": 526,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 204.03,
+  "encode_per_box_day": 115.82222222222221,
+  "subs_per_box": 2.996,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 342.1
+ },
+ {
+  "n": 1000,
+  "violations": {
+   "S5": 629953
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 588.577,
+     "box": 99,
+     "mid": 4870356201445221089,
+     "topic": 3
+    },
+    {
+     "t": 588.577,
+     "box": 115,
+     "mid": 4870356201445221089,
+     "topic": 3
+    },
+    {
+     "t": 588.577,
+     "box": 180,
+     "mid": 4870356201445221089,
+     "topic": 3
+    },
+    {
+     "t": 588.577,
+     "box": 89,
+     "mid": 4870356201445221089,
+     "topic": 3
+    },
+    {
+     "t": 588.727,
+     "box": 300,
+     "mid": 4870356201445221089,
+     "topic": 3
+    }
+   ]
+  },
+  "l1_checks": 983,
+  "l1_items": 67168,
+  "live_p99_s": 399.5582569319886,
+  "ev": {
+   "come_on": 2939,
+   "xfer_fail": 2367416,
+   "link_drop": 6111,
+   "pub_post": 1351,
+   "pub_comment": 501,
+   "partition": 3,
+   "pub_vote": 179,
+   "want_timeout": 453,
+   "pub_delete": 92,
+   "silent_loss": 25,
+   "miss": 0,
+   "miss_pairs": 2384,
+   "stranded": 1,
+   "stranded_pairs": 2437
+  },
+  "work": {
+   "verify": 929440,
+   "verify_invalid": 3281,
+   "encode": 169273,
+   "needed_env": 926159,
+   "dup_env": 18,
+   "rej_id": 5085,
+   "rej_sig": 3281,
+   "refuse_window": 0,
+   "recon_sessions": 154363,
+   "fetch_keys": 959236,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 632515
+  },
+  "verify_per_box_day": 344.23703703703706,
+  "encode_per_box_day": 62.693703703703704,
+  "subs_per_box": 2.996,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 210.0
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 118949,
+  "l1_items": 1562,
+  "live_p99_s": 499.34939245929127,
+  "ev": {
+   "come_on": 1219,
+   "xfer_fail": 46142,
+   "link_drop": 1799,
+   "pub_post": 531,
+   "want_timeout": 825,
+   "silent_loss": 80,
+   "pub_comment": 174,
+   "pub_vote": 85,
+   "pub_delete": 24,
+   "miss": 18,
+   "miss_pairs": 63546,
+   "stranded": 18,
+   "stranded_pairs": 63546
+  },
+  "work": {
+   "verify": 69988,
+   "verify_invalid": 1586,
+   "encode": 40904,
+   "needed_env": 68402,
+   "dup_env": 0,
+   "rej_id": 2202,
+   "rej_sig": 1586,
+   "refuse_window": 0,
+   "recon_sessions": 451138,
+   "fetch_keys": 4535,
+   "floor_skip": 0,
+   "rej_sub": 167,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 86.40493827160493,
+  "encode_per_box_day": 50.498765432098764,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 71.9
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 822,
+  "l1_items": 16684,
+  "live_p99_s": 212.49049521417874,
+  "ev": {
+   "come_on": 2939,
+   "xfer_fail": 2981559,
+   "link_drop": 6111,
+   "pub_post": 1354,
+   "pub_comment": 499,
+   "partition": 3,
+   "pub_vote": 179,
+   "want_timeout": 383,
+   "pub_delete": 91,
+   "silent_loss": 20,
+   "miss": 0,
+   "miss_pairs": 2396,
+   "stranded": 74,
+   "stranded_pairs": 2515
+  },
+  "work": {
+   "verify": 291859,
+   "verify_invalid": 1340,
+   "encode": 159566,
+   "needed_env": 290519,
+   "dup_env": 15,
+   "rej_id": 3963,
+   "rej_sig": 1340,
+   "refuse_window": 0,
+   "recon_sessions": 123741,
+   "fetch_keys": 290558,
+   "floor_skip": 0,
+   "rej_sub": 257,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 108.09592592592593,
+  "encode_per_box_day": 59.09851851851852,
+  "subs_per_box": 2.996,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 248.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 118213,
+  "l1_items": 1540,
+  "live_p99_s": 559.7759939429961,
+  "ev": {
+   "come_on": 1196,
+   "xfer_fail": 63221,
+   "link_drop": 1805,
+   "pub_post": 545,
+   "want_timeout": 924,
+   "pub_comment": 214,
+   "pub_vote": 76,
+   "silent_loss": 46,
+   "pub_delete": 31,
+   "partition": 2,
+   "miss": 2,
+   "miss_pairs": 62039,
+   "stranded": 2,
+   "stranded_pairs": 62039
+  },
+  "work": {
+   "verify": 69315,
+   "verify_invalid": 1398,
+   "encode": 38500,
+   "needed_env": 67917,
+   "dup_env": 0,
+   "rej_id": 4434,
+   "rej_sig": 1398,
+   "refuse_window": 0,
+   "recon_sessions": 455858,
+   "fetch_keys": 6098,
+   "floor_skip": 0,
+   "rej_sub": 147,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 85.57407407407408,
+  "encode_per_box_day": 47.53086419753086,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 67.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 116407,
+  "l1_items": 1614,
+  "live_p99_s": 541.2067353358307,
+  "ev": {
+   "come_on": 1195,
+   "xfer_fail": 60373,
+   "link_drop": 1848,
+   "pub_post": 582,
+   "pub_vote": 80,
+   "want_timeout": 981,
+   "silent_loss": 83,
+   "pub_comment": 189,
+   "pub_delete": 29,
+   "miss": 3,
+   "miss_pairs": 68535,
+   "stranded": 3,
+   "stranded_pairs": 68535,
+   "partition": 2
+  },
+  "work": {
+   "verify": 75632,
+   "verify_invalid": 787,
+   "encode": 43825,
+   "needed_env": 74845,
+   "dup_env": 0,
+   "rej_id": 4797,
+   "rej_sig": 787,
+   "refuse_window": 0,
+   "recon_sessions": 458201,
+   "fetch_keys": 6370,
+   "floor_skip": 0,
+   "rej_sub": 155,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 93.37283950617284,
+  "encode_per_box_day": 54.10493827160494,
+  "subs_per_box": 3.11,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 77.2
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 381823,
+  "l1_items": 17009,
+  "live_p99_s": 732.103581866395,
+  "ev": {
+   "come_on": 3946,
+   "xfer_fail": 357732,
+   "link_drop": 5990,
+   "pub_post": 1922,
+   "want_timeout": 8602,
+   "pub_comment": 688,
+   "silent_loss": 825,
+   "pub_vote": 262,
+   "pub_delete": 112,
+   "partition": 2,
+   "miss": 11,
+   "miss_pairs": 729960,
+   "stranded": 11,
+   "stranded_pairs": 729960
+  },
+  "work": {
+   "verify": 800966,
+   "verify_invalid": 9964,
+   "encode": 463548,
+   "needed_env": 790708,
+   "dup_env": 0,
+   "rej_id": 51570,
+   "rej_sig": 9964,
+   "refuse_window": 294,
+   "recon_sessions": 1790252,
+   "fetch_keys": 65521,
+   "floor_skip": 0,
+   "rej_sub": 559,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 296.65407407407406,
+  "encode_per_box_day": 171.68444444444444,
+  "subs_per_box": 2.996,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 644.9
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 382030,
+  "l1_items": 18013,
+  "live_p99_s": 861.56308526453,
+  "ev": {
+   "come_on": 3972,
+   "xfer_fail": 362817,
+   "pub_post": 1859,
+   "link_drop": 5912,
+   "want_timeout": 8664,
+   "silent_loss": 867,
+   "pub_comment": 644,
+   "pub_vote": 300,
+   "pub_delete": 95,
+   "partition": 2,
+   "miss": 26,
+   "miss_pairs": 749159,
+   "stranded": 26,
+   "stranded_pairs": 749159
+  },
+  "work": {
+   "verify": 812875,
+   "verify_invalid": 6172,
+   "encode": 466018,
+   "needed_env": 806703,
+   "dup_env": 0,
+   "rej_id": 62800,
+   "rej_sig": 6172,
+   "refuse_window": 0,
+   "recon_sessions": 1799468,
+   "fetch_keys": 77373,
+   "floor_skip": 0,
+   "rej_sub": 484,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 301.06481481481484,
+  "encode_per_box_day": 172.59925925925927,
+  "subs_per_box": 3.091,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 680.5
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 136676
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 396.214,
+     "box": 128,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 121,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 263,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 245,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 221,
+     "mid": 2634173484935892170,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 126765,
+  "l1_items": 41116,
+  "live_p99_s": 760.027229899104,
+  "ev": {
+   "come_on": 1184,
+   "xfer_fail": 52302,
+   "link_drop": 1782,
+   "pub_post": 527,
+   "want_timeout": 874,
+   "silent_loss": 71,
+   "pub_comment": 191,
+   "pub_vote": 81,
+   "pub_delete": 22,
+   "miss": 0,
+   "miss_pairs": 66011,
+   "stranded": 0,
+   "stranded_pairs": 66011
+  },
+  "work": {
+   "verify": 210459,
+   "verify_invalid": 3164,
+   "encode": 41406,
+   "needed_env": 207295,
+   "dup_env": 0,
+   "rej_id": 1614,
+   "rej_sig": 3164,
+   "refuse_window": 0,
+   "recon_sessions": 471699,
+   "fetch_keys": 144509,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 138733
+  },
+  "verify_per_box_day": 259.8259259259259,
+  "encode_per_box_day": 51.11851851851852,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 387.8
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 119832,
+  "l1_items": 1711,
+  "live_p99_s": 723.8543609436601,
+  "ev": {
+   "come_on": 1157,
+   "xfer_fail": 51364,
+   "link_drop": 1825,
+   "pub_post": 592,
+   "want_timeout": 918,
+   "silent_loss": 77,
+   "pub_comment": 176,
+   "pub_vote": 86,
+   "pub_delete": 29,
+   "miss": 5,
+   "miss_pairs": 68474,
+   "stranded": 5,
+   "stranded_pairs": 68474,
+   "partition": 1
+  },
+  "work": {
+   "verify": 74947,
+   "verify_invalid": 1873,
+   "encode": 44832,
+   "needed_env": 73074,
+   "dup_env": 0,
+   "rej_id": 2317,
+   "rej_sig": 1873,
+   "refuse_window": 0,
+   "recon_sessions": 454556,
+   "fetch_keys": 4818,
+   "floor_skip": 0,
+   "rej_sub": 137,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 92.52716049382717,
+  "encode_per_box_day": 55.34814814814815,
+  "subs_per_box": 3.07,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 87.5
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 61757
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1322.652,
+     "box": 258,
+     "mid": 518919269613440804,
+     "topic": 0
+    },
+    {
+     "t": 1322.652,
+     "box": 212,
+     "mid": 518919269613440804,
+     "topic": 0
+    },
+    {
+     "t": 1518.735,
+     "box": 258,
+     "mid": 3687740507896631158,
+     "topic": 0
+    },
+    {
+     "t": 1518.735,
+     "box": 212,
+     "mid": 3687740507896631158,
+     "topic": 0
+    },
+    {
+     "t": 3543.407,
+     "box": 228,
+     "mid": 518919269613440804,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 662,
+  "l1_items": 24119,
+  "live_p99_s": 596.8090843432874,
+  "ev": {
+   "come_on": 907,
+   "xfer_fail": 512842,
+   "link_drop": 1831,
+   "pub_post": 448,
+   "pub_comment": 149,
+   "want_timeout": 102,
+   "pub_vote": 56,
+   "pub_delete": 30,
+   "miss": 0,
+   "miss_pairs": 372,
+   "stranded": 3,
+   "stranded_pairs": 384,
+   "silent_loss": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 92223,
+   "verify_invalid": 422,
+   "encode": 17976,
+   "needed_env": 91801,
+   "dup_env": 2,
+   "rej_id": 177,
+   "rej_sig": 422,
+   "refuse_window": 0,
+   "recon_sessions": 34839,
+   "fetch_keys": 94038,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 61954
+  },
+  "verify_per_box_day": 113.85555555555555,
+  "encode_per_box_day": 22.192592592592593,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 32.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 504,
+  "l1_items": 6259,
+  "live_p99_s": 336.0767260535067,
+  "ev": {
+   "come_on": 907,
+   "xfer_fail": 665160,
+   "link_drop": 1831,
+   "pub_post": 455,
+   "pub_comment": 142,
+   "want_timeout": 89,
+   "pub_vote": 56,
+   "pub_delete": 30,
+   "miss": 0,
+   "miss_pairs": 370,
+   "stranded": 28,
+   "stranded_pairs": 404,
+   "partition": 1,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 27786,
+   "verify_invalid": 159,
+   "encode": 15167,
+   "needed_env": 27627,
+   "dup_env": 4,
+   "rej_id": 189,
+   "rej_sig": 159,
+   "refuse_window": 0,
+   "recon_sessions": 22036,
+   "fetch_keys": 26549,
+   "floor_skip": 0,
+   "rej_sub": 47,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 34.303703703703704,
+  "encode_per_box_day": 18.724691358024693,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 45.5
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 52882
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 7919.987,
+     "box": 208,
+     "mid": 741018829801922014,
+     "topic": 1
+    },
+    {
+     "t": 7922.037,
+     "box": 52,
+     "mid": 741018829801922014,
+     "topic": 1
+    },
+    {
+     "t": 7922.037,
+     "box": 79,
+     "mid": 741018829801922014,
+     "topic": 1
+    },
+    {
+     "t": 7922.037,
+     "box": 97,
+     "mid": 741018829801922014,
+     "topic": 1
+    },
+    {
+     "t": 10663.832,
+     "box": 68,
+     "mid": 741018829801922014,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 554,
+  "l1_items": 21043,
+  "live_p99_s": 593.3032638388395,
+  "ev": {
+   "come_on": 923,
+   "xfer_fail": 523279,
+   "link_drop": 1844,
+   "pub_post": 393,
+   "pub_vote": 54,
+   "pub_comment": 130,
+   "want_timeout": 64,
+   "pub_delete": 28,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 721,
+   "stranded": 6,
+   "stranded_pairs": 736,
+   "partition": 3
+  },
+  "work": {
+   "verify": 78517,
+   "verify_invalid": 361,
+   "encode": 14776,
+   "needed_env": 78156,
+   "dup_env": 1,
+   "rej_id": 105,
+   "rej_sig": 361,
+   "refuse_window": 0,
+   "recon_sessions": 30758,
+   "fetch_keys": 80158,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 53097
+  },
+  "verify_per_box_day": 96.93456790123457,
+  "encode_per_box_day": 18.241975308641976,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 34.8
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 152488
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 109.783,
+     "box": 135,
+     "mid": 7738737883279009713,
+     "topic": 0
+    },
+    {
+     "t": 109.783,
+     "box": 233,
+     "mid": 7738737883279009713,
+     "topic": 0
+    },
+    {
+     "t": 109.783,
+     "box": 27,
+     "mid": 7738737883279009713,
+     "topic": 0
+    },
+    {
+     "t": 109.783,
+     "box": 62,
+     "mid": 7738737883279009713,
+     "topic": 0
+    },
+    {
+     "t": 109.933,
+     "box": 171,
+     "mid": 7738737883279009713,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 122982,
+  "l1_items": 48322,
+  "live_p99_s": 923.9951388592599,
+  "ev": {
+   "come_on": 1221,
+   "xfer_fail": 103502,
+   "link_drop": 1802,
+   "pub_post": 569,
+   "want_timeout": 870,
+   "pub_comment": 194,
+   "silent_loss": 82,
+   "pub_vote": 81,
+   "pub_delete": 28,
+   "partition": 3,
+   "miss": 0,
+   "miss_pairs": 60501,
+   "stranded": 0,
+   "stranded_pairs": 60501
+  },
+  "work": {
+   "verify": 221690,
+   "verify_invalid": 1793,
+   "encode": 39843,
+   "needed_env": 219805,
+   "dup_env": 0,
+   "rej_id": 1937,
+   "rej_sig": 1793,
+   "refuse_window": 92,
+   "recon_sessions": 477488,
+   "fetch_keys": 159110,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 153777
+  },
+  "verify_per_box_day": 273.69135802469134,
+  "encode_per_box_day": 49.18888888888889,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 474.2
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 137410
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 619.878,
+     "box": 206,
+     "mid": 1631748797766852309,
+     "topic": 7
+    },
+    {
+     "t": 620.065,
+     "box": 155,
+     "mid": 8673784057153341315,
+     "topic": 14
+    },
+    {
+     "t": 650.775,
+     "box": 102,
+     "mid": 8673784057153341315,
+     "topic": 14
+    },
+    {
+     "t": 661.164,
+     "box": 176,
+     "mid": 1631748797766852309,
+     "topic": 7
+    },
+    {
+     "t": 661.754,
+     "box": 23,
+     "mid": 1631748797766852309,
+     "topic": 7
+    }
+   ]
+  },
+  "l1_checks": 125095,
+  "l1_items": 39933,
+  "live_p99_s": 981.6188617898442,
+  "ev": {
+   "come_on": 1225,
+   "xfer_fail": 82775,
+   "link_drop": 1875,
+   "pub_post": 551,
+   "pub_vote": 79,
+   "want_timeout": 1020,
+   "pub_comment": 179,
+   "silent_loss": 69,
+   "pub_delete": 26,
+   "miss": 0,
+   "miss_pairs": 64162,
+   "stranded": 0,
+   "stranded_pairs": 64162,
+   "partition": 1
+  },
+  "work": {
+   "verify": 211668,
+   "verify_invalid": 3990,
+   "encode": 41623,
+   "needed_env": 207678,
+   "dup_env": 0,
+   "rej_id": 2446,
+   "rej_sig": 3990,
+   "refuse_window": 0,
+   "recon_sessions": 476597,
+   "fetch_keys": 146802,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 140070
+  },
+  "verify_per_box_day": 261.3185185185185,
+  "encode_per_box_day": 51.38641975308642,
+  "subs_per_box": 3.11,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 446.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 442,
+  "l1_items": 3948,
+  "live_p99_s": 193.27818910652422,
+  "ev": {
+   "come_on": 923,
+   "xfer_fail": 618483,
+   "link_drop": 1844,
+   "pub_post": 398,
+   "pub_vote": 53,
+   "want_timeout": 41,
+   "pub_comment": 127,
+   "pub_delete": 27,
+   "miss": 0,
+   "miss_pairs": 675,
+   "stranded": 70,
+   "stranded_pairs": 754,
+   "partition": 3
+  },
+  "work": {
+   "verify": 22063,
+   "verify_invalid": 243,
+   "encode": 12270,
+   "needed_env": 21820,
+   "dup_env": 0,
+   "rej_id": 84,
+   "rej_sig": 243,
+   "refuse_window": 0,
+   "recon_sessions": 20067,
+   "fetch_keys": 20766,
+   "floor_skip": 0,
+   "rej_sub": 45,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 27.238271604938273,
+  "encode_per_box_day": 15.148148148148147,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 40.6
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 52698
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5941.463,
+     "box": 0,
+     "mid": 5179796434513723921,
+     "topic": 7
+    },
+    {
+     "t": 5943.513,
+     "box": 269,
+     "mid": 5179796434513723921,
+     "topic": 7
+    },
+    {
+     "t": 5943.513,
+     "box": 15,
+     "mid": 5179796434513723921,
+     "topic": 7
+    },
+    {
+     "t": 5943.513,
+     "box": 121,
+     "mid": 5179796434513723921,
+     "topic": 7
+    },
+    {
+     "t": 6304.421,
+     "box": 250,
+     "mid": 5179796434513723921,
+     "topic": 7
+    }
+   ]
+  },
+  "l1_checks": 584,
+  "l1_items": 18426,
+  "live_p99_s": 820.8834024083335,
+  "ev": {
+   "come_on": 852,
+   "xfer_fail": 500458,
+   "link_drop": 1811,
+   "pub_post": 399,
+   "pub_vote": 62,
+   "pub_comment": 141,
+   "want_timeout": 68,
+   "pub_delete": 28,
+   "partition": 4,
+   "silent_loss": 3,
+   "miss": 0,
+   "miss_pairs": 377,
+   "stranded": 2,
+   "stranded_pairs": 384
+  },
+  "work": {
+   "verify": 79020,
+   "verify_invalid": 475,
+   "encode": 15156,
+   "needed_env": 78545,
+   "dup_env": 2,
+   "rej_id": 379,
+   "rej_sig": 475,
+   "refuse_window": 0,
+   "recon_sessions": 29814,
+   "fetch_keys": 80084,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 53053
+  },
+  "verify_per_box_day": 97.55555555555556,
+  "encode_per_box_day": 18.711111111111112,
+  "subs_per_box": 3.11,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 30.2
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 116530,
+  "l1_items": 1771,
+  "live_p99_s": 2548.2401552156516,
+  "ev": {
+   "come_on": 1205,
+   "xfer_fail": 107154,
+   "link_drop": 1827,
+   "pub_post": 594,
+   "pub_vote": 106,
+   "silent_loss": 88,
+   "want_timeout": 1037,
+   "pub_comment": 182,
+   "partition": 2,
+   "pub_delete": 18,
+   "miss": 1,
+   "miss_pairs": 71153,
+   "stranded": 1,
+   "stranded_pairs": 71153
+  },
+  "work": {
+   "verify": 79038,
+   "verify_invalid": 1117,
+   "encode": 45608,
+   "needed_env": 77921,
+   "dup_env": 0,
+   "rej_id": 3376,
+   "rej_sig": 1117,
+   "refuse_window": 0,
+   "recon_sessions": 460764,
+   "fetch_keys": 5066,
+   "floor_skip": 0,
+   "rej_sub": 254,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 97.57777777777778,
+  "encode_per_box_day": 56.30617283950617,
+  "subs_per_box": 3.12,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 183.8
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 303,
+  "l1_items": 3765,
+  "live_p99_s": 97.36090697765758,
+  "ev": {
+   "come_on": 860,
+   "xfer_fail": 652835,
+   "link_drop": 1816,
+   "pub_post": 392,
+   "pub_vote": 57,
+   "pub_comment": 149,
+   "pub_delete": 19,
+   "partition": 1,
+   "want_timeout": 62,
+   "miss": 0,
+   "miss_pairs": 456,
+   "stranded": 51,
+   "stranded_pairs": 507,
+   "silent_loss": 2
+  },
+  "work": {
+   "verify": 21039,
+   "verify_invalid": 139,
+   "encode": 10872,
+   "needed_env": 20900,
+   "dup_env": 0,
+   "rej_id": 57,
+   "rej_sig": 139,
+   "refuse_window": 0,
+   "recon_sessions": 15984,
+   "fetch_keys": 19880,
+   "floor_skip": 0,
+   "rej_sub": 82,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 25.97407407407407,
+  "encode_per_box_day": 13.422222222222222,
+  "subs_per_box": 3.11,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 42.8
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 61725
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 10945.454,
+     "box": 189,
+     "mid": 5721869428673259660,
+     "topic": 3
+    },
+    {
+     "t": 10947.804,
+     "box": 0,
+     "mid": 5721869428673259660,
+     "topic": 3
+    },
+    {
+     "t": 10988.623,
+     "box": 168,
+     "mid": 5721869428673259660,
+     "topic": 3
+    },
+    {
+     "t": 11514.323,
+     "box": 190,
+     "mid": 5721869428673259660,
+     "topic": 3
+    },
+    {
+     "t": 11697.324,
+     "box": 268,
+     "mid": 5721869428673259660,
+     "topic": 3
+    }
+   ]
+  },
+  "l1_checks": 555,
+  "l1_items": 22547,
+  "live_p99_s": 603.2603832927052,
+  "ev": {
+   "come_on": 919,
+   "xfer_fail": 491932,
+   "link_drop": 1737,
+   "pub_post": 426,
+   "want_timeout": 107,
+   "pub_vote": 71,
+   "pub_delete": 33,
+   "pub_comment": 167,
+   "miss": 0,
+   "miss_pairs": 416,
+   "stranded": 8,
+   "stranded_pairs": 429,
+   "partition": 4,
+   "silent_loss": 3
+  },
+  "work": {
+   "verify": 91990,
+   "verify_invalid": 809,
+   "encode": 16399,
+   "needed_env": 91181,
+   "dup_env": 2,
+   "rej_id": 409,
+   "rej_sig": 809,
+   "refuse_window": 0,
+   "recon_sessions": 33444,
+   "fetch_keys": 92855,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 62237
+  },
+  "verify_per_box_day": 113.5679012345679,
+  "encode_per_box_day": 20.24567901234568,
+  "subs_per_box": 3.07,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 35.7
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 408,
+  "l1_items": 4382,
+  "live_p99_s": 293.5631252427411,
+  "ev": {
+   "come_on": 919,
+   "xfer_fail": 641628,
+   "link_drop": 1737,
+   "pub_post": 432,
+   "pub_vote": 67,
+   "pub_delete": 33,
+   "pub_comment": 165,
+   "want_timeout": 97,
+   "silent_loss": 2,
+   "miss": 0,
+   "miss_pairs": 390,
+   "stranded": 42,
+   "stranded_pairs": 435,
+   "partition": 4
+  },
+  "work": {
+   "verify": 26721,
+   "verify_invalid": 393,
+   "encode": 13392,
+   "needed_env": 26328,
+   "dup_env": 0,
+   "rej_id": 234,
+   "rej_sig": 393,
+   "refuse_window": 0,
+   "recon_sessions": 21515,
+   "fetch_keys": 25232,
+   "floor_skip": 0,
+   "rej_sub": 26,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 32.98888888888889,
+  "encode_per_box_day": 16.533333333333335,
+  "subs_per_box": 3.07,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 37.0
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 52529
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5434.64,
+     "box": 0,
+     "mid": 6139855269742564001,
+     "topic": 14
+    },
+    {
+     "t": 5434.64,
+     "box": 39,
+     "mid": 6139855269742564001,
+     "topic": 14
+    },
+    {
+     "t": 5434.64,
+     "box": 233,
+     "mid": 6139855269742564001,
+     "topic": 14
+    },
+    {
+     "t": 5434.64,
+     "box": 13,
+     "mid": 6139855269742564001,
+     "topic": 14
+    },
+    {
+     "t": 5434.64,
+     "box": 180,
+     "mid": 6139855269742564001,
+     "topic": 14
+    }
+   ]
+  },
+  "l1_checks": 633,
+  "l1_items": 17289,
+  "live_p99_s": 554.0014974563383,
+  "ev": {
+   "come_on": 888,
+   "xfer_fail": 507111,
+   "link_drop": 1801,
+   "pub_post": 376,
+   "pub_comment": 155,
+   "want_timeout": 138,
+   "pub_delete": 20,
+   "pub_vote": 71,
+   "miss": 0,
+   "miss_pairs": 100,
+   "stranded": 0,
+   "stranded_pairs": 102,
+   "silent_loss": 5,
+   "partition": 1
+  },
+  "work": {
+   "verify": 79696,
+   "verify_invalid": 234,
+   "encode": 14134,
+   "needed_env": 79462,
+   "dup_env": 0,
+   "rej_id": 99,
+   "rej_sig": 234,
+   "refuse_window": 0,
+   "recon_sessions": 31877,
+   "fetch_keys": 80977,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 52684
+  },
+  "verify_per_box_day": 98.39012345679014,
+  "encode_per_box_day": 17.44938271604938,
+  "subs_per_box": 3.12,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 46.3
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 290,
+  "l1_items": 3370,
+  "live_p99_s": 127.90819598932285,
+  "ev": {
+   "come_on": 888,
+   "xfer_fail": 662794,
+   "link_drop": 1801,
+   "pub_post": 380,
+   "pub_comment": 151,
+   "pub_delete": 20,
+   "pub_vote": 71,
+   "miss": 0,
+   "miss_pairs": 56,
+   "stranded": 37,
+   "stranded_pairs": 94,
+   "want_timeout": 98,
+   "partition": 1,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 21956,
+   "verify_invalid": 48,
+   "encode": 11183,
+   "needed_env": 21908,
+   "dup_env": 0,
+   "rej_id": 81,
+   "rej_sig": 48,
+   "refuse_window": 0,
+   "recon_sessions": 16864,
+   "fetch_keys": 20866,
+   "floor_skip": 0,
+   "rej_sub": 26,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 27.106172839506172,
+  "encode_per_box_day": 13.806172839506173,
+  "subs_per_box": 3.12,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 46.6
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 73256,
+  "l1_items": 5139,
+  "live_p99_s": 425.02280385422637,
+  "ev": {
+   "come_on": 1037,
+   "xfer_fail": 375734,
+   "link_drop": 1815,
+   "pub_post": 496,
+   "want_timeout": 600,
+   "pub_vote": 88,
+   "pub_comment": 158,
+   "silent_loss": 39,
+   "pub_delete": 35,
+   "miss": 3,
+   "miss_pairs": 32015,
+   "stranded": 26,
+   "stranded_pairs": 32501,
+   "partition": 1
+  },
+  "work": {
+   "verify": 50825,
+   "verify_invalid": 209,
+   "encode": 29465,
+   "needed_env": 50615,
+   "dup_env": 0,
+   "rej_id": 251,
+   "rej_sig": 209,
+   "refuse_window": 1,
+   "recon_sessions": 266448,
+   "fetch_keys": 16866,
+   "floor_skip": 0,
+   "rej_sub": 236,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 62.74691358024691,
+  "encode_per_box_day": 36.376543209876544,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 72.1
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 71848,
+  "l1_items": 5548,
+  "live_p99_s": 729.1205409663817,
+  "ev": {
+   "come_on": 1074,
+   "xfer_fail": 372491,
+   "link_drop": 1745,
+   "pub_post": 418,
+   "want_timeout": 393,
+   "pub_vote": 64,
+   "pub_comment": 168,
+   "silent_loss": 28,
+   "pub_delete": 21,
+   "miss": 0,
+   "miss_pairs": 25395,
+   "stranded": 0,
+   "stranded_pairs": 25866,
+   "partition": 1
+  },
+  "work": {
+   "verify": 39799,
+   "verify_invalid": 70,
+   "encode": 22029,
+   "needed_env": 39729,
+   "dup_env": 0,
+   "rej_id": 77,
+   "rej_sig": 70,
+   "refuse_window": 0,
+   "recon_sessions": 266289,
+   "fetch_keys": 12631,
+   "floor_skip": 0,
+   "rej_sub": 155,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 49.13456790123457,
+  "encode_per_box_day": 27.196296296296296,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 66.8
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 72283,
+  "l1_items": 7651,
+  "live_p99_s": 91.14756765795755,
+  "ev": {
+   "come_on": 1011,
+   "xfer_fail": 365499,
+   "link_drop": 1871,
+   "pub_post": 491,
+   "silent_loss": 37,
+   "want_timeout": 560,
+   "pub_comment": 213,
+   "pub_vote": 75,
+   "pub_delete": 33,
+   "miss": 0,
+   "miss_pairs": 35254,
+   "stranded": 0,
+   "stranded_pairs": 35541,
+   "partition": 2
+  },
+  "work": {
+   "verify": 55463,
+   "verify_invalid": 165,
+   "encode": 29396,
+   "needed_env": 55298,
+   "dup_env": 0,
+   "rej_id": 253,
+   "rej_sig": 165,
+   "refuse_window": 0,
+   "recon_sessions": 265802,
+   "fetch_keys": 18431,
+   "floor_skip": 0,
+   "rej_sub": 112,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 68.47283950617283,
+  "encode_per_box_day": 36.291358024691355,
+  "subs_per_box": 3.11,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 58.7
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 374440,
+  "l1_items": 20601,
+  "live_p99_s": 1826.9030630976486,
+  "ev": {
+   "come_on": 4431,
+   "xfer_fail": 484976,
+   "pub_post": 1834,
+   "link_drop": 5908,
+   "want_timeout": 8772,
+   "silent_loss": 900,
+   "pub_comment": 684,
+   "pub_vote": 288,
+   "pub_delete": 94,
+   "partition": 2,
+   "miss": 85,
+   "miss_pairs": 759874,
+   "stranded": 85,
+   "stranded_pairs": 759874,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 824877,
+   "verify_invalid": 5054,
+   "encode": 461951,
+   "needed_env": 819823,
+   "dup_env": 0,
+   "rej_id": 64563,
+   "rej_sig": 5054,
+   "refuse_window": 0,
+   "recon_sessions": 1788204,
+   "fetch_keys": 82959,
+   "floor_skip": 0,
+   "rej_sub": 499,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 305.51,
+  "encode_per_box_day": 171.09296296296296,
+  "subs_per_box": 3.091,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 933.1
+ },
+ {
+  "n": 1000,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 372500,
+  "l1_items": 22118,
+  "live_p99_s": 693.9053287411007,
+  "ev": {
+   "come_on": 4399,
+   "xfer_fail": 423634,
+   "link_drop": 6037,
+   "pub_post": 1877,
+   "want_timeout": 8648,
+   "pub_comment": 711,
+   "silent_loss": 802,
+   "pub_vote": 262,
+   "pub_delete": 112,
+   "partition": 2,
+   "miss": 18,
+   "miss_pairs": 725169,
+   "stranded": 18,
+   "stranded_pairs": 725169,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 801787,
+   "verify_invalid": 10310,
+   "encode": 453513,
+   "needed_env": 791477,
+   "dup_env": 0,
+   "rej_id": 51822,
+   "rej_sig": 10310,
+   "refuse_window": 0,
+   "recon_sessions": 1775070,
+   "fetch_keys": 73684,
+   "floor_skip": 0,
+   "rej_sub": 557,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 296.95814814814815,
+  "encode_per_box_day": 167.96777777777777,
+  "subs_per_box": 2.996,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 929.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 92872
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 900.716,
+     "box": 123,
+     "mid": 9166031142593695210,
+     "topic": 13
+    },
+    {
+     "t": 905.249,
+     "box": 16,
+     "mid": 9166031142593695210,
+     "topic": 13
+    },
+    {
+     "t": 948.039,
+     "box": 42,
+     "mid": 9166031142593695210,
+     "topic": 13
+    },
+    {
+     "t": 969.804,
+     "box": 102,
+     "mid": 9166031142593695210,
+     "topic": 13
+    },
+    {
+     "t": 1005.794,
+     "box": 103,
+     "mid": 9166031142593695210,
+     "topic": 13
+    }
+   ]
+  },
+  "l1_checks": 74142,
+  "l1_items": 42544,
+  "live_p99_s": 777.9648923672939,
+  "ev": {
+   "come_on": 1067,
+   "xfer_fail": 243763,
+   "link_drop": 1811,
+   "pub_post": 424,
+   "want_timeout": 421,
+   "pub_vote": 70,
+   "pub_comment": 158,
+   "silent_loss": 40,
+   "pub_delete": 20,
+   "miss": 0,
+   "miss_pairs": 27327,
+   "stranded": 46,
+   "stranded_pairs": 27743,
+   "partition": 2
+  },
+  "work": {
+   "verify": 136159,
+   "verify_invalid": 158,
+   "encode": 24583,
+   "needed_env": 136001,
+   "dup_env": 0,
+   "rej_id": 116,
+   "rej_sig": 158,
+   "refuse_window": 0,
+   "recon_sessions": 273112,
+   "fetch_keys": 109498,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 92989
+  },
+  "verify_per_box_day": 168.09753086419752,
+  "encode_per_box_day": 30.34938271604938,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 251.6
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 152854
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 653.444,
+     "box": 87,
+     "mid": 4223045892746549896,
+     "topic": 11
+    },
+    {
+     "t": 658.594,
+     "box": 228,
+     "mid": 4223045892746549896,
+     "topic": 11
+    },
+    {
+     "t": 679.683,
+     "box": 151,
+     "mid": 4223045892746549896,
+     "topic": 11
+    },
+    {
+     "t": 687.452,
+     "box": 118,
+     "mid": 4223045892746549896,
+     "topic": 11
+    },
+    {
+     "t": 687.637,
+     "box": 162,
+     "mid": 4223045892746549896,
+     "topic": 11
+    }
+   ]
+  },
+  "l1_checks": 127367,
+  "l1_items": 46567,
+  "live_p99_s": 775.5300149414106,
+  "ev": {
+   "come_on": 1147,
+   "xfer_fail": 57516,
+   "link_drop": 1808,
+   "pub_post": 569,
+   "want_timeout": 998,
+   "pub_comment": 208,
+   "silent_loss": 67,
+   "pub_vote": 77,
+   "pub_delete": 31,
+   "miss": 0,
+   "miss_pairs": 65762,
+   "stranded": 0,
+   "stranded_pairs": 65762,
+   "partition": 1
+  },
+  "work": {
+   "verify": 227183,
+   "verify_invalid": 2419,
+   "encode": 40585,
+   "needed_env": 224764,
+   "dup_env": 0,
+   "rej_id": 1879,
+   "rej_sig": 2419,
+   "refuse_window": 0,
+   "recon_sessions": 475384,
+   "fetch_keys": 160394,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 153944
+  },
+  "verify_per_box_day": 280.4728395061729,
+  "encode_per_box_day": 50.10493827160494,
+  "subs_per_box": 3.07,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 650.3
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 100408
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 325.346,
+     "box": 128,
+     "mid": 152807230719388386,
+     "topic": 0
+    },
+    {
+     "t": 325.496,
+     "box": 130,
+     "mid": 152807230719388386,
+     "topic": 0
+    },
+    {
+     "t": 325.496,
+     "box": 129,
+     "mid": 152807230719388386,
+     "topic": 0
+    },
+    {
+     "t": 325.496,
+     "box": 142,
+     "mid": 152807230719388386,
+     "topic": 0
+    },
+    {
+     "t": 325.496,
+     "box": 85,
+     "mid": 152807230719388386,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 74911,
+  "l1_items": 46036,
+  "live_p99_s": 813.7111604171077,
+  "ev": {
+   "come_on": 1032,
+   "xfer_fail": 227248,
+   "link_drop": 1779,
+   "pub_post": 478,
+   "pub_vote": 75,
+   "pub_comment": 147,
+   "want_timeout": 517,
+   "silent_loss": 32,
+   "pub_delete": 21,
+   "miss": 0,
+   "miss_pairs": 27577,
+   "stranded": 9,
+   "stranded_pairs": 27917,
+   "partition": 1
+  },
+  "work": {
+   "verify": 143319,
+   "verify_invalid": 110,
+   "encode": 25843,
+   "needed_env": 143209,
+   "dup_env": 0,
+   "rej_id": 161,
+   "rej_sig": 110,
+   "refuse_window": 0,
+   "recon_sessions": 270952,
+   "fetch_keys": 115872,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 100485
+  },
+  "verify_per_box_day": 176.93703703703704,
+  "encode_per_box_day": 31.904938271604937,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 276.3
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 73748,
+  "l1_items": 5018,
+  "live_p99_s": 158.16222670828574,
+  "ev": {
+   "come_on": 1012,
+   "xfer_fail": 369673,
+   "link_drop": 1839,
+   "pub_post": 451,
+   "want_timeout": 408,
+   "pub_comment": 192,
+   "silent_loss": 30,
+   "pub_vote": 69,
+   "pub_delete": 27,
+   "miss": 2,
+   "miss_pairs": 32814,
+   "stranded": 2,
+   "stranded_pairs": 33262,
+   "partition": 1
+  },
+  "work": {
+   "verify": 50831,
+   "verify_invalid": 193,
+   "encode": 28525,
+   "needed_env": 50638,
+   "dup_env": 0,
+   "rej_id": 298,
+   "rej_sig": 193,
+   "refuse_window": 0,
+   "recon_sessions": 267380,
+   "fetch_keys": 15509,
+   "floor_skip": 0,
+   "rej_sub": 123,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 62.754320987654324,
+  "encode_per_box_day": 35.21604938271605,
+  "subs_per_box": 3.07,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 97.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 92104
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 70.13,
+     "box": 73,
+     "mid": 446057150021649717,
+     "topic": 1
+    },
+    {
+     "t": 70.13,
+     "box": 17,
+     "mid": 446057150021649717,
+     "topic": 1
+    },
+    {
+     "t": 70.13,
+     "box": 51,
+     "mid": 446057150021649717,
+     "topic": 1
+    },
+    {
+     "t": 70.13,
+     "box": 122,
+     "mid": 446057150021649717,
+     "topic": 1
+    },
+    {
+     "t": 70.28,
+     "box": 42,
+     "mid": 446057150021649717,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 74310,
+  "l1_items": 39986,
+  "live_p99_s": 3479.9342703452567,
+  "ev": {
+   "come_on": 1033,
+   "xfer_fail": 262495,
+   "link_drop": 1843,
+   "pub_post": 439,
+   "pub_comment": 181,
+   "want_timeout": 445,
+   "pub_vote": 60,
+   "silent_loss": 20,
+   "pub_delete": 18,
+   "miss": 0,
+   "miss_pairs": 29550,
+   "stranded": 55,
+   "stranded_pairs": 30068,
+   "partition": 3
+  },
+  "work": {
+   "verify": 139774,
+   "verify_invalid": 137,
+   "encode": 27725,
+   "needed_env": 139637,
+   "dup_env": 0,
+   "rej_id": 140,
+   "rej_sig": 137,
+   "refuse_window": 0,
+   "recon_sessions": 275015,
+   "fetch_keys": 109421,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 92189
+  },
+  "verify_per_box_day": 172.56049382716049,
+  "encode_per_box_day": 34.2283950617284,
+  "subs_per_box": 3.11,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 245.5
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 69155,
+  "l1_items": 5787,
+  "live_p99_s": 742.5984497682512,
+  "ev": {
+   "come_on": 1050,
+   "xfer_fail": 434959,
+   "link_drop": 1882,
+   "pub_post": 465,
+   "want_timeout": 564,
+   "pub_comment": 170,
+   "silent_loss": 32,
+   "pub_vote": 68,
+   "partition": 4,
+   "pub_delete": 28,
+   "miss": 2,
+   "miss_pairs": 30828,
+   "stranded": 2,
+   "stranded_pairs": 30910
+  },
+  "work": {
+   "verify": 47927,
+   "verify_invalid": 121,
+   "encode": 27947,
+   "needed_env": 47806,
+   "dup_env": 0,
+   "rej_id": 206,
+   "rej_sig": 121,
+   "refuse_window": 0,
+   "recon_sessions": 268537,
+   "fetch_keys": 14695,
+   "floor_skip": 0,
+   "rej_sub": 161,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 59.169135802469135,
+  "encode_per_box_day": 34.50246913580247,
+  "subs_per_box": 3.12,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 69.8
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 52934
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 11525.473,
+     "box": 99,
+     "mid": 6165578933089569347,
+     "topic": 0
+    },
+    {
+     "t": 11525.473,
+     "box": 153,
+     "mid": 6165578933089569347,
+     "topic": 0
+    },
+    {
+     "t": 12241.885,
+     "box": 73,
+     "mid": 6165578933089569347,
+     "topic": 0
+    },
+    {
+     "t": 12829.585,
+     "box": 152,
+     "mid": 6165578933089569347,
+     "topic": 0
+    },
+    {
+     "t": 17695.516,
+     "box": 258,
+     "mid": 523712842590585254,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 327,
+  "l1_items": 16397,
+  "live_p99_s": 576.6006980164093,
+  "ev": {
+   "come_on": 888,
+   "xfer_fail": 516844,
+   "link_drop": 1798,
+   "pub_post": 428,
+   "pub_vote": 68,
+   "pub_delete": 27,
+   "pub_comment": 131,
+   "want_timeout": 129,
+   "miss": 0,
+   "miss_pairs": 587,
+   "stranded": 4,
+   "stranded_pairs": 607,
+   "partition": 1
+  },
+  "work": {
+   "verify": 81230,
+   "verify_invalid": 374,
+   "encode": 16233,
+   "needed_env": 80856,
+   "dup_env": 7,
+   "rej_id": 203,
+   "rej_sig": 374,
+   "refuse_window": 0,
+   "recon_sessions": 25772,
+   "fetch_keys": 83175,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 53228
+  },
+  "verify_per_box_day": 100.28395061728395,
+  "encode_per_box_day": 20.04074074074074,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 34.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 52257
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 10848.483,
+     "box": 134,
+     "mid": 7963411736050876548,
+     "topic": 10
+    },
+    {
+     "t": 11167.251,
+     "box": 218,
+     "mid": 7963411736050876548,
+     "topic": 10
+    },
+    {
+     "t": 11169.201,
+     "box": 119,
+     "mid": 7963411736050876548,
+     "topic": 10
+    },
+    {
+     "t": 11169.201,
+     "box": 72,
+     "mid": 7963411736050876548,
+     "topic": 10
+    },
+    {
+     "t": 11169.201,
+     "box": 146,
+     "mid": 7963411736050876548,
+     "topic": 10
+    }
+   ]
+  },
+  "l1_checks": 378,
+  "l1_items": 15512,
+  "live_p99_s": 560.208578517806,
+  "ev": {
+   "come_on": 876,
+   "xfer_fail": 515766,
+   "link_drop": 1760,
+   "partition": 4,
+   "pub_post": 409,
+   "pub_comment": 162,
+   "pub_vote": 63,
+   "want_timeout": 83,
+   "pub_delete": 19,
+   "miss": 0,
+   "miss_pairs": 226,
+   "stranded": 3,
+   "stranded_pairs": 232
+  },
+  "work": {
+   "verify": 81305,
+   "verify_invalid": 186,
+   "encode": 16183,
+   "needed_env": 81119,
+   "dup_env": 1,
+   "rej_id": 78,
+   "rej_sig": 186,
+   "refuse_window": 0,
+   "recon_sessions": 26281,
+   "fetch_keys": 83588,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 52387
+  },
+  "verify_per_box_day": 100.37654320987654,
+  "encode_per_box_day": 19.979012345679013,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 24.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 59313
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5964.719,
+     "box": 226,
+     "mid": 8262879379096819178,
+     "topic": 10
+    },
+    {
+     "t": 6100.833,
+     "box": 14,
+     "mid": 8262879379096819178,
+     "topic": 10
+    },
+    {
+     "t": 6343.301,
+     "box": 91,
+     "mid": 8262879379096819178,
+     "topic": 10
+    },
+    {
+     "t": 6345.251,
+     "box": 18,
+     "mid": 8262879379096819178,
+     "topic": 10
+    },
+    {
+     "t": 6385.942,
+     "box": 8,
+     "mid": 8262879379096819178,
+     "topic": 10
+    }
+   ]
+  },
+  "l1_checks": 385,
+  "l1_items": 13547,
+  "live_p99_s": 612.3559598108186,
+  "ev": {
+   "come_on": 943,
+   "xfer_fail": 533908,
+   "link_drop": 1843,
+   "pub_post": 420,
+   "pub_vote": 70,
+   "pub_delete": 25,
+   "pub_comment": 170,
+   "want_timeout": 97,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 125,
+   "stranded": 0,
+   "stranded_pairs": 130
+  },
+  "work": {
+   "verify": 89810,
+   "verify_invalid": 169,
+   "encode": 16172,
+   "needed_env": 89641,
+   "dup_env": 0,
+   "rej_id": 153,
+   "rej_sig": 169,
+   "refuse_window": 0,
+   "recon_sessions": 29663,
+   "fetch_keys": 92055,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 59445
+  },
+  "verify_per_box_day": 110.87654320987654,
+  "encode_per_box_day": 19.965432098765433,
+  "subs_per_box": 3.11,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 30.5
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 205,
+  "l1_items": 2501,
+  "live_p99_s": 182.5999999999185,
+  "ev": {
+   "come_on": 888,
+   "xfer_fail": 655549,
+   "link_drop": 1798,
+   "pub_post": 436,
+   "pub_vote": 64,
+   "pub_delete": 26,
+   "pub_comment": 128,
+   "want_timeout": 86,
+   "miss": 0,
+   "miss_pairs": 489,
+   "stranded": 136,
+   "stranded_pairs": 633,
+   "silent_loss": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 23771,
+   "verify_invalid": 54,
+   "encode": 12775,
+   "needed_env": 23717,
+   "dup_env": 5,
+   "rej_id": 133,
+   "rej_sig": 54,
+   "refuse_window": 0,
+   "recon_sessions": 15368,
+   "fetch_keys": 22912,
+   "floor_skip": 0,
+   "rej_sub": 56,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 29.346913580246916,
+  "encode_per_box_day": 15.771604938271606,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 43.1
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 214,
+  "l1_items": 3113,
+  "live_p99_s": 246.78618328273296,
+  "ev": {
+   "come_on": 876,
+   "xfer_fail": 599692,
+   "link_drop": 1760,
+   "partition": 4,
+   "pub_post": 417,
+   "pub_comment": 155,
+   "silent_loss": 2,
+   "pub_vote": 62,
+   "want_timeout": 74,
+   "pub_delete": 19,
+   "miss": 0,
+   "miss_pairs": 218,
+   "stranded": 18,
+   "stranded_pairs": 239
+  },
+  "work": {
+   "verify": 24748,
+   "verify_invalid": 79,
+   "encode": 13262,
+   "needed_env": 24669,
+   "dup_env": 1,
+   "rej_id": 62,
+   "rej_sig": 79,
+   "refuse_window": 0,
+   "recon_sessions": 14503,
+   "fetch_keys": 23565,
+   "floor_skip": 0,
+   "rej_sub": 46,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 30.553086419753086,
+  "encode_per_box_day": 16.37283950617284,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 36.7
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 39846
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 8498.156,
+     "box": 4,
+     "mid": 1576030292321981168,
+     "topic": 5
+    },
+    {
+     "t": 8498.156,
+     "box": 168,
+     "mid": 1576030292321981168,
+     "topic": 5
+    },
+    {
+     "t": 8498.156,
+     "box": 53,
+     "mid": 1576030292321981168,
+     "topic": 5
+    },
+    {
+     "t": 8498.156,
+     "box": 185,
+     "mid": 1576030292321981168,
+     "topic": 5
+    },
+    {
+     "t": 8498.156,
+     "box": 126,
+     "mid": 1576030292321981168,
+     "topic": 5
+    }
+   ]
+  },
+  "l1_checks": 266,
+  "l1_items": 10315,
+  "live_p99_s": 617.445495485088,
+  "ev": {
+   "come_on": 840,
+   "xfer_fail": 489919,
+   "link_drop": 1735,
+   "pub_post": 316,
+   "pub_vote": 53,
+   "pub_delete": 20,
+   "want_timeout": 120,
+   "pub_comment": 126,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 145,
+   "stranded": 2,
+   "stranded_pairs": 151,
+   "silent_loss": 3
+  },
+  "work": {
+   "verify": 61051,
+   "verify_invalid": 312,
+   "encode": 10310,
+   "needed_env": 60739,
+   "dup_env": 7,
+   "rej_id": 71,
+   "rej_sig": 312,
+   "refuse_window": 0,
+   "recon_sessions": 21068,
+   "fetch_keys": 62424,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 40049
+  },
+  "verify_per_box_day": 75.3716049382716,
+  "encode_per_box_day": 12.728395061728394,
+  "subs_per_box": 3.07,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 21.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 222,
+  "l1_items": 2594,
+  "live_p99_s": 189.35339407944412,
+  "ev": {
+   "come_on": 943,
+   "xfer_fail": 691973,
+   "link_drop": 1843,
+   "pub_post": 430,
+   "pub_delete": 25,
+   "pub_comment": 165,
+   "want_timeout": 86,
+   "pub_vote": 65,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 115,
+   "stranded": 14,
+   "stranded_pairs": 132,
+   "silent_loss": 2
+  },
+  "work": {
+   "verify": 24496,
+   "verify_invalid": 36,
+   "encode": 12489,
+   "needed_env": 24460,
+   "dup_env": 0,
+   "rej_id": 89,
+   "rej_sig": 36,
+   "refuse_window": 0,
+   "recon_sessions": 16546,
+   "fetch_keys": 23046,
+   "floor_skip": 0,
+   "rej_sub": 32,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 30.241975308641972,
+  "encode_per_box_day": 15.418518518518518,
+  "subs_per_box": 3.11,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 46.7
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 178,
+  "l1_items": 1370,
+  "live_p99_s": 129.4542926864815,
+  "ev": {
+   "come_on": 840,
+   "xfer_fail": 575609,
+   "link_drop": 1735,
+   "pub_post": 326,
+   "pub_vote": 52,
+   "pub_delete": 21,
+   "pub_comment": 116,
+   "want_timeout": 93,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 146,
+   "stranded": 20,
+   "stranded_pairs": 170,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 16109,
+   "verify_invalid": 159,
+   "encode": 6725,
+   "needed_env": 15950,
+   "dup_env": 2,
+   "rej_id": 45,
+   "rej_sig": 159,
+   "refuse_window": 0,
+   "recon_sessions": 11575,
+   "fetch_keys": 15058,
+   "floor_skip": 0,
+   "rej_sub": 41,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 19.887654320987654,
+  "encode_per_box_day": 8.30246913580247,
+  "subs_per_box": 3.07,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 33.6
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 57869
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5576.457,
+     "box": 27,
+     "mid": 1259658224956054078,
+     "topic": 14
+    },
+    {
+     "t": 5691.583,
+     "box": 257,
+     "mid": 1259658224956054078,
+     "topic": 14
+    },
+    {
+     "t": 5693.533,
+     "box": 14,
+     "mid": 1259658224956054078,
+     "topic": 14
+    },
+    {
+     "t": 5693.533,
+     "box": 266,
+     "mid": 1259658224956054078,
+     "topic": 14
+    },
+    {
+     "t": 5693.533,
+     "box": 124,
+     "mid": 1259658224956054078,
+     "topic": 14
+    }
+   ]
+  },
+  "l1_checks": 389,
+  "l1_items": 18478,
+  "live_p99_s": 535.180684828345,
+  "ev": {
+   "come_on": 923,
+   "xfer_fail": 515088,
+   "link_drop": 1739,
+   "pub_post": 402,
+   "partition": 2,
+   "want_timeout": 127,
+   "pub_comment": 174,
+   "pub_vote": 64,
+   "pub_delete": 32,
+   "silent_loss": 4,
+   "miss": 0,
+   "miss_pairs": 567,
+   "stranded": 5,
+   "stranded_pairs": 583
+  },
+  "work": {
+   "verify": 88738,
+   "verify_invalid": 646,
+   "encode": 15969,
+   "needed_env": 88092,
+   "dup_env": 2,
+   "rej_id": 226,
+   "rej_sig": 646,
+   "refuse_window": 0,
+   "recon_sessions": 29433,
+   "fetch_keys": 90633,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 58315
+  },
+  "verify_per_box_day": 109.55308641975309,
+  "encode_per_box_day": 19.714814814814815,
+  "subs_per_box": 3.12,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 34.9
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 285,
+  "l1_items": 3324,
+  "live_p99_s": 316.2992929809843,
+  "ev": {
+   "come_on": 923,
+   "xfer_fail": 652581,
+   "link_drop": 1739,
+   "pub_post": 406,
+   "partition": 2,
+   "want_timeout": 87,
+   "pub_comment": 172,
+   "pub_vote": 62,
+   "pub_delete": 32,
+   "miss": 0,
+   "miss_pairs": 518,
+   "stranded": 66,
+   "stranded_pairs": 593,
+   "silent_loss": 3
+  },
+  "work": {
+   "verify": 25927,
+   "verify_invalid": 146,
+   "encode": 13103,
+   "needed_env": 25781,
+   "dup_env": 0,
+   "rej_id": 179,
+   "rej_sig": 146,
+   "refuse_window": 0,
+   "recon_sessions": 18077,
+   "fetch_keys": 24808,
+   "floor_skip": 0,
+   "rej_sub": 73,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 32.00864197530864,
+  "encode_per_box_day": 16.176543209876545,
+  "subs_per_box": 3.12,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 42.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 103031
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 603.707,
+     "box": 91,
+     "mid": 650366022535382913,
+     "topic": 2
+    },
+    {
+     "t": 607.456,
+     "box": 49,
+     "mid": 650366022535382913,
+     "topic": 2
+    },
+    {
+     "t": 607.737,
+     "box": 143,
+     "mid": 650366022535382913,
+     "topic": 2
+    },
+    {
+     "t": 609.806,
+     "box": 16,
+     "mid": 650366022535382913,
+     "topic": 2
+    },
+    {
+     "t": 609.806,
+     "box": 17,
+     "mid": 650366022535382913,
+     "topic": 2
+    }
+   ]
+  },
+  "l1_checks": 75611,
+  "l1_items": 52131,
+  "live_p99_s": 720.8515426653903,
+  "ev": {
+   "come_on": 993,
+   "xfer_fail": 244297,
+   "link_drop": 1835,
+   "pub_post": 469,
+   "want_timeout": 449,
+   "pub_comment": 194,
+   "pub_vote": 73,
+   "silent_loss": 27,
+   "pub_delete": 15,
+   "miss": 0,
+   "miss_pairs": 34326,
+   "stranded": 7,
+   "stranded_pairs": 34747,
+   "partition": 2
+  },
+  "work": {
+   "verify": 153830,
+   "verify_invalid": 131,
+   "encode": 27637,
+   "needed_env": 153699,
+   "dup_env": 0,
+   "rej_id": 123,
+   "rej_sig": 131,
+   "refuse_window": 0,
+   "recon_sessions": 275517,
+   "fetch_keys": 120333,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 103100
+  },
+  "verify_per_box_day": 189.9135802469136,
+  "encode_per_box_day": 34.119753086419756,
+  "subs_per_box": 3.07,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 261.0
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 116376,
+  "l1_items": 2138,
+  "live_p99_s": 520.4178784849864,
+  "ev": {
+   "come_on": 1377,
+   "xfer_fail": 62811,
+   "link_drop": 1805,
+   "pub_post": 521,
+   "want_timeout": 841,
+   "silent_loss": 69,
+   "pub_comment": 187,
+   "pub_vote": 76,
+   "pub_delete": 23,
+   "miss": 17,
+   "miss_pairs": 62746,
+   "stranded": 17,
+   "stranded_pairs": 62746,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 69764,
+   "verify_invalid": 1722,
+   "encode": 39754,
+   "needed_env": 68042,
+   "dup_env": 0,
+   "rej_id": 3377,
+   "rej_sig": 1722,
+   "refuse_window": 0,
+   "recon_sessions": 446973,
+   "fetch_keys": 6389,
+   "floor_skip": 0,
+   "rej_sub": 223,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 86.1283950617284,
+  "encode_per_box_day": 49.07901234567901,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 111.9
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 151137
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1026.578,
+     "box": 6,
+     "mid": 6254074175388687208,
+     "topic": 0
+    },
+    {
+     "t": 1027.48,
+     "box": 144,
+     "mid": 6254074175388687208,
+     "topic": 0
+    },
+    {
+     "t": 1027.48,
+     "box": 82,
+     "mid": 6254074175388687208,
+     "topic": 0
+    },
+    {
+     "t": 1027.48,
+     "box": 118,
+     "mid": 6254074175388687208,
+     "topic": 0
+    },
+    {
+     "t": 1027.48,
+     "box": 183,
+     "mid": 6254074175388687208,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 124623,
+  "l1_items": 44832,
+  "live_p99_s": 2572.7465019800293,
+  "ev": {
+   "come_on": 1230,
+   "xfer_fail": 107641,
+   "link_drop": 1821,
+   "pub_post": 545,
+   "want_timeout": 1025,
+   "pub_vote": 111,
+   "silent_loss": 79,
+   "pub_comment": 222,
+   "partition": 2,
+   "pub_delete": 30,
+   "miss": 0,
+   "miss_pairs": 70871,
+   "stranded": 0,
+   "stranded_pairs": 70871
+  },
+  "work": {
+   "verify": 234118,
+   "verify_invalid": 5318,
+   "encode": 41518,
+   "needed_env": 228800,
+   "dup_env": 0,
+   "rej_id": 2200,
+   "rej_sig": 5318,
+   "refuse_window": 0,
+   "recon_sessions": 481747,
+   "fetch_keys": 161725,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 154544
+  },
+  "verify_per_box_day": 289.03456790123454,
+  "encode_per_box_day": 51.25679012345679,
+  "subs_per_box": 3.12,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 739.0
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 115194,
+  "l1_items": 2056,
+  "live_p99_s": 363.63491855034954,
+  "ev": {
+   "come_on": 1319,
+   "xfer_fail": 78312,
+   "link_drop": 1788,
+   "pub_post": 550,
+   "want_timeout": 946,
+   "pub_comment": 202,
+   "pub_vote": 77,
+   "silent_loss": 65,
+   "pub_delete": 19,
+   "partition": 2,
+   "miss": 1,
+   "miss_pairs": 63254,
+   "stranded": 1,
+   "stranded_pairs": 63254,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 70143,
+   "verify_invalid": 1837,
+   "encode": 39921,
+   "needed_env": 68306,
+   "dup_env": 0,
+   "rej_id": 7571,
+   "rej_sig": 1837,
+   "refuse_window": 0,
+   "recon_sessions": 448300,
+   "fetch_keys": 10273,
+   "floor_skip": 0,
+   "rej_sub": 141,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 86.5962962962963,
+  "encode_per_box_day": 49.285185185185185,
+  "subs_per_box": 2.9133333333333336,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 117.1
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 114475,
+  "l1_items": 1556,
+  "live_p99_s": 541.3567353358312,
+  "ev": {
+   "come_on": 1330,
+   "xfer_fail": 87144,
+   "link_drop": 1887,
+   "pub_post": 543,
+   "pub_vote": 78,
+   "want_timeout": 986,
+   "silent_loss": 69,
+   "pub_comment": 192,
+   "pub_delete": 29,
+   "miss": 1,
+   "miss_pairs": 66269,
+   "stranded": 1,
+   "stranded_pairs": 66269,
+   "corr_outage": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 72883,
+   "verify_invalid": 746,
+   "encode": 39455,
+   "needed_env": 72137,
+   "dup_env": 0,
+   "rej_id": 2075,
+   "rej_sig": 746,
+   "refuse_window": 0,
+   "recon_sessions": 452962,
+   "fetch_keys": 3523,
+   "floor_skip": 0,
+   "rej_sub": 145,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 89.97901234567901,
+  "encode_per_box_day": 48.70987654320987,
+  "subs_per_box": 3.11,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 93.8
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 99037
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1190.669,
+     "box": 128,
+     "mid": 4205655880444357111,
+     "topic": 1
+    },
+    {
+     "t": 1190.669,
+     "box": 84,
+     "mid": 4205655880444357111,
+     "topic": 1
+    },
+    {
+     "t": 1190.669,
+     "box": 111,
+     "mid": 4205655880444357111,
+     "topic": 1
+    },
+    {
+     "t": 1190.819,
+     "box": 10,
+     "mid": 4205655880444357111,
+     "topic": 1
+    },
+    {
+     "t": 1190.819,
+     "box": 129,
+     "mid": 4205655880444357111,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 72597,
+  "l1_items": 49217,
+  "live_p99_s": 811.4774152252212,
+  "ev": {
+   "come_on": 1061,
+   "xfer_fail": 286025,
+   "link_drop": 1876,
+   "pub_post": 477,
+   "pub_comment": 154,
+   "silent_loss": 23,
+   "want_timeout": 499,
+   "pub_vote": 81,
+   "partition": 4,
+   "pub_delete": 26,
+   "miss": 0,
+   "miss_pairs": 31454,
+   "stranded": 0,
+   "stranded_pairs": 31544
+  },
+  "work": {
+   "verify": 147104,
+   "verify_invalid": 139,
+   "encode": 27983,
+   "needed_env": 146965,
+   "dup_env": 0,
+   "rej_id": 174,
+   "rej_sig": 139,
+   "refuse_window": 0,
+   "recon_sessions": 278006,
+   "fetch_keys": 116415,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 99146
+  },
+  "verify_per_box_day": 181.60987654320988,
+  "encode_per_box_day": 34.546913580246915,
+  "subs_per_box": 3.12,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 280.0
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 17352
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1471.412,
+     "box": 60,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1489.567,
+     "box": 26,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1490.857,
+     "box": 33,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1491.444,
+     "box": 34,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1515.226,
+     "box": 71,
+     "mid": 5821444835348249559,
+     "topic": 8
+    }
+   ]
+  },
+  "l1_checks": 41886,
+  "l1_items": 5413,
+  "live_p99_s": 778.4976086694369,
+  "ev": {
+   "come_on": 388,
+   "xfer_fail": 13855,
+   "link_drop": 588,
+   "pub_post": 189,
+   "want_timeout": 153,
+   "pub_comment": 69,
+   "pub_vote": 31,
+   "silent_loss": 7,
+   "pub_delete": 11,
+   "miss": 0,
+   "miss_pairs": 7206,
+   "stranded": 0,
+   "stranded_pairs": 7206,
+   "partition": 1
+  },
+  "work": {
+   "verify": 26331,
+   "verify_invalid": 951,
+   "encode": 4701,
+   "needed_env": 25380,
+   "dup_env": 0,
+   "rej_id": 149,
+   "rej_sig": 951,
+   "refuse_window": 0,
+   "recon_sessions": 145566,
+   "fetch_keys": 18797,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 18104
+  },
+  "verify_per_box_day": 97.52222222222223,
+  "encode_per_box_day": 17.41111111111111,
+  "subs_per_box": 2.88,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 53.5
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40978,
+  "l1_items": 194,
+  "live_p99_s": 461.2340693926517,
+  "ev": {
+   "come_on": 404,
+   "xfer_fail": 16794,
+   "link_drop": 565,
+   "pub_post": 175,
+   "silent_loss": 16,
+   "want_timeout": 154,
+   "pub_comment": 72,
+   "pub_vote": 26,
+   "pub_delete": 7,
+   "miss": 0,
+   "miss_pairs": 6958,
+   "stranded": 0,
+   "stranded_pairs": 6958,
+   "partition": 1
+  },
+  "work": {
+   "verify": 7738,
+   "verify_invalid": 105,
+   "encode": 4115,
+   "needed_env": 7633,
+   "dup_env": 0,
+   "rej_id": 138,
+   "rej_sig": 105,
+   "refuse_window": 0,
+   "recon_sessions": 141272,
+   "fetch_keys": 360,
+   "floor_skip": 0,
+   "rej_sub": 66,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 28.659259259259258,
+  "encode_per_box_day": 15.24074074074074,
+  "subs_per_box": 2.88,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 19.5
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 116414,
+  "l1_items": 2258,
+  "live_p99_s": 1028.604808632197,
+  "ev": {
+   "come_on": 1338,
+   "xfer_fail": 70545,
+   "link_drop": 1820,
+   "pub_post": 579,
+   "want_timeout": 974,
+   "silent_loss": 73,
+   "pub_comment": 193,
+   "pub_vote": 83,
+   "pub_delete": 28,
+   "miss": 4,
+   "miss_pairs": 69303,
+   "stranded": 4,
+   "stranded_pairs": 69303,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 76151,
+   "verify_invalid": 1941,
+   "encode": 44513,
+   "needed_env": 74210,
+   "dup_env": 0,
+   "rej_id": 4712,
+   "rej_sig": 1941,
+   "refuse_window": 0,
+   "recon_sessions": 452549,
+   "fetch_keys": 8044,
+   "floor_skip": 0,
+   "rej_sub": 145,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 94.01358024691358,
+  "encode_per_box_day": 54.95432098765432,
+  "subs_per_box": 3.07,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 110.3
+ }
+]

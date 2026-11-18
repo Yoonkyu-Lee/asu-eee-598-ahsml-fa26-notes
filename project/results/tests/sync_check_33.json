@@ -1,0 +1,97 @@
+{
+ "scenes": [
+  {
+   "scene": "sub B post stays in sub B",
+   "model_scene": "D1 a foreign sub never arrives",
+   "pass": true,
+   "seconds": 1.1,
+   "held_outside": [],
+   "rej_sub_delta": {
+    "1": 0,
+    "3": 0
+   }
+  },
+  {
+   "scene": "sub B members cut apart, non-members between",
+   "model_scene": "D2/D5 (members only)",
+   "pass": true,
+   "reached_during_cut": false,
+   "after_link_back_s": 6.2,
+   "held_outside": []
+  }
+ ],
+ "final_sets_equal": true,
+ "per_box": {
+  "0": {
+   "verified": 2,
+   "verified_twice": 0,
+   "recon": {
+    "recon_sessions": 10,
+    "recon_b": 4,
+    "recon_bytes": 3110,
+    "recon_fetched": 0,
+    "recon_pushed": 1,
+    "recon_rx": 9,
+    "recon_f": 6
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "1": {
+   "verified": 0,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 9,
+    "recon_sessions": 8,
+    "recon_a": 1,
+    "recon_bytes": 960,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_b": 2,
+    "recon_f": 5
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "2": {
+   "verified": 2,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 10,
+    "recon_sessions": 10,
+    "recon_b": 2,
+    "recon_bytes": 1227,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_a": 2,
+    "recon_f": 6
+   },
+   "rejected": {},
+   "dup": 0
+  },
+  "3": {
+   "verified": 0,
+   "verified_twice": 0,
+   "recon": {
+    "recon_rx": 9,
+    "recon_sessions": 8,
+    "recon_a": 3,
+    "recon_bytes": 960,
+    "recon_fetched": 0,
+    "recon_pushed": 0,
+    "recon_f": 5
+   },
+   "rejected": {},
+   "dup": 0
+  }
+ },
+ "all_pass": true,
+ "settings": {
+  "boxes": 4,
+  "pae_s": [
+   20.0,
+   40.0
+  ],
+  "probe_max_s": 20.0
+ }
+}

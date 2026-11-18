@@ -35,6 +35,13 @@ fail observably (p_fail) and envelopes acked then lost (p_silent, the only loss 
 L2, F1 on every event; there is no final all-on phase.
 
 A script [(t, action, *args)] replaces random churn and writing (layer 2 directed scenes); see `run_script`.
+
+CP33 subs (journal/cp/CP33.md): topics > 0 gives every box a set of subs and every message a sub.
+  sub_mode "leak"  the CP29-CP32 box: push goes to the sub's holders, but reconciliation and accepting ignore subs (H12)
+           "sub"   reconcile only the subs both boxes hold (one session over their union), refuse a message of a sub
+                   I do not hold before verifying it, keep >= d_sub up mesh peers in each of my subs, explore and pick
+                   candidates among boxes that share a sub
+  topics = 0: one sub for everything, the CP29-CP30 model unchanged (same random draws, same results).
 """
 from __future__ import annotations
 
@@ -45,7 +52,7 @@ from dataclasses import dataclass, field, replace
 
 from .engine import Engine
 from .oracle import Oracle
-from .recon import KeySet, reconcile
+from .recon import KeySet, TopicKeySet, reconcile
 
 DAY = 86400.0
 ENV, HDR, IDB = 1000, 40, 12          # bytes: envelope, request/answer header, one key on the wire (추정, CP26/recon)
@@ -102,6 +109,11 @@ class SyncScene:
     explore: bool = False               # CP30 E: one random hello an hour (also on with px). Without it two sides of a
                                         # partition longer than the 1 h probe give-up never meet again (H11)
     miss_at: tuple = ()                 # CP30: delivery sweeps (s)
+    topics: int = 0                     # CP33: number of subs (0 = one set for everything, CP29-CP30)
+    sub_mode: str = "sub"               # CP33: "leak" (CP29-CP32 box) or "sub" (the fix)
+    d_sub: int = 3                      # CP33 sub: up mesh peers wanted in each of my subs
+    subs_mean: float = 3.0              # CP33: subs per box = 1 + Poisson(subs_mean - 1), Zipf(zipf) popularity (추정)
+    zipf: float = 1.0
 
     @property
     def t_bound(self) -> float:          # L1 deadline: floor period max + probe cap + slack (cp/CP29.md L1)
@@ -120,6 +132,7 @@ class Msg:
     valid: bool = True
     target_sig_ok: bool = True
     honest_stamp: bool = True
+    topic: int = 0                       # CP33: the sub (a comment, vote or delete has its target's)
 
     @property
     def tkey(self) -> int:
@@ -132,7 +145,11 @@ class Box:
         self.on = False
         self.sid = 0
         self.held: dict[int, Msg] = {}          # claimed id -> message (S0 also stores invalid ones here)
-        self.keys = KeySet()
+        self.keys = TopicKeySet()               # CP33: by sub (one sub when topics = 0)
+        self.subs: frozenset = frozenset({0})   # CP33
+        self.sub_cand: dict[int, list] = {}     # CP33 sub: candidates per sub (refilled at most every 600 s)
+        self.sub_refill: dict[int, float] = {}
+        self.floor_n: Counter = Counter()       # CP33: live floor timers per peer (this lifetime)
         self.forgotten: dict[int, int] = {}     # target id -> tkey
         self.applied_del: set[int] = set()
         self.pending: dict[int, tuple] = {}     # comment/vote waiting for its target: claimed -> (msg, frm)
@@ -197,6 +214,29 @@ class Sync:
                 B.off = 0.0
         if sc.skew_violation and n > 1:
             self.boxes[1].off = sc.skew_violation
+        self.subbed = sc.topics > 0 and sc.sub_mode == "sub"
+        self.topic_of: dict[int, int] = {}            # CP33: ground truth, message id -> sub
+        self.holders: dict[int, list] = {0: list(range(n))}
+        if sc.topics > 0:                             # own stream: churn, writing and protocol draws are unchanged
+            srng = random.Random(sc.seed * 31 + 7)
+            w = [1.0 / (j + 1) ** sc.zipf for j in range(sc.topics)]
+            self.holders = {j: [] for j in range(sc.topics)}
+            for B in self.boxes:
+                k, lam, u = 0, max(sc.subs_mean - 1.0, 0.0), srng.random()
+                cdf, pk = 0.0, 2.718281828459045 ** (-lam)
+                while True:                              # Poisson(lam) by inversion
+                    cdf += pk
+                    if u <= cdf or k > 50:
+                        break
+                    k += 1
+                    pk *= lam / k
+                k = min(1 + k, sc.topics)
+                pick: set = set()
+                while len(pick) < k:
+                    pick.add(srng.choices(range(sc.topics), weights=w)[0])
+                B.subs = frozenset(pick)
+                for j in pick:
+                    self.holders[j].append(B.i)
         self.link_down: set[tuple] = set()
         self.group: dict[int, int] = {}                # partition: box -> side
         self.kind_of: dict[int, str] = {}
@@ -211,6 +251,15 @@ class Sync:
                                                         # held becomes a post: that depends on the protocol)
 
     # ------------------------------------------------------------------ helpers
+    def common(self, a: int, b: int):
+        """CP33: the subs a session between a and b reconciles (None: everything)."""
+        if not self.subbed:
+            return None
+        return self.boxes[a].subs & self.boxes[b].subs
+
+    def shares(self, a: int, b: int) -> bool:
+        return not self.subbed or bool(self.boxes[a].subs & self.boxes[b].subs)
+
     def pair(self, a, b):
         return (a, b) if a < b else (b, a)
 
@@ -279,13 +328,19 @@ class Sync:
         A.backoff.pop(b, None)
         A.down_since.pop(b, None)
         A.cand_down.discard(b)
+        remesh = False
         if b not in A.mesh:
             A.mesh.add(b)
+            remesh = was is True                        # CP33: back in the mesh after a prune, still marked up
             self._contact(a, b)
             ups = [p for p in A.mesh if A.up.get(p) and p != b]
             if len(ups) + 1 > self.sc.D_HI:                # prune back to D, both sides drop the link
                 self.rng.shuffle(ups)
-                for p in ups[: len(ups) + 1 - self.sc.D]:
+                drop_n = len(ups) + 1 - self.sc.D
+                if self.subbed:                            # CP33: never the last d_sub covers of one of my subs
+                    cov = Counter(t for p in ups + [b] for t in self.boxes[p].subs & A.subs)
+                    ups = [p for p in ups if all(cov[t] > self.sc.d_sub for t in self.boxes[p].subs & A.subs)]
+                for p in ups[: max(drop_n, 0)]:
                     A.mesh.discard(p)
                     self.boxes[p].mesh.discard(a)
                     self._contact(a, p)
@@ -293,6 +348,8 @@ class Sync:
             if was is False or b in A.dirty:
                 self.recon(a, b, "b")                          # (b) peer became up after down
             self._floor_start(a, b)
+        elif remesh and self.sc.variant != "S0" and A.honest and not A.floor_n[b]:
+            self._floor_start(a, b)                            # CP33 fix: its floor timer had ended (not in the mesh)
 
     def mark_down(self, a: int, b: int):
         A = self.boxes[a]
@@ -396,23 +453,52 @@ class Sync:
             return
         if need > 0 and not A.cand and self.eng.t - A.refill_t > 600.0:
             A.refill_t = self.eng.t
-            A.cand = [c for c in range(self.sc.n) if c != a and c not in A.mesh]
+            A.cand = [c for c in range(self.sc.n) if c != a and c not in A.mesh and self.shares(a, c)]
             self.rng.shuffle(A.cand)
         while need > 0 and A.cand:
             c = A.cand.pop()
             if c in A.mesh or c in A.hello_out:
                 continue
             need -= 1
-            if self.sc.px:
+            if self.sc.px or self.subbed:
                 A.hello_out.add(c)
             self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
+        if self.subbed and A.honest:
+            self._graft_subs(a)
+
+    def _graft_subs(self, a: int):
+        """CP33 sub: each of my subs gets d_sub up mesh peers that hold it (hellos still out count)."""
+        A = self.boxes[a]
+        for t in sorted(A.subs):
+            have = sum(1 for p in A.mesh if A.up.get(p) and t in self.boxes[p].subs)
+            have += sum(1 for p in A.hello_out if t in self.boxes[p].subs)
+            need = min(self.sc.d_sub, len(self.holders[t]) - 1) - have
+            if need <= 0:
+                continue
+            cand = A.sub_cand.get(t)
+            if not cand and self.eng.t - A.sub_refill.get(t, -1e18) > 600.0:
+                A.sub_refill[t] = self.eng.t
+                cand = [c for c in self.holders[t] if c != a and c not in A.mesh]
+                self.rng.shuffle(cand)
+                A.sub_cand[t] = cand
+            while need > 0 and cand:
+                c = cand.pop()
+                if c in A.mesh or c in A.hello_out or A.up.get(c):
+                    continue
+                need -= 1
+                A.hello_out.add(c)
+                self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
 
     def _explore(self, a, sid):
         """P: one random box an hour, so that two components meet again after a long partition (Codex 2nd review)."""
         A = self.boxes[a]
         if not A.on or A.sid != sid:
             return
-        c = self.rng.randrange(self.sc.n)
+        if self.subbed:                                  # CP33: a random holder of a random one of my subs
+            hs = self.holders[self.rng.choice(sorted(A.subs))]
+            c = hs[self.rng.randrange(len(hs))]
+        else:
+            c = self.rng.randrange(self.sc.n)
         if c != a and c not in A.mesh and c not in A.hello_out:
             A.hello_out.add(c)
             self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda: self._explore_failed(a, c))
@@ -454,6 +540,7 @@ class Sync:
         B.cand_down = set()
         B.requested, B.inflight, B.taken, B.cov, B.stalled = {}, set(), [], None, False
         B.fetching, B.skipped, B.again, B.clean, B.heard = {}, {}, set(), set(), {}
+        B.floor_n = Counter()
         self.ev["come_on"] += 1
         if self.sc.variant != "S0":
             self._expire(b)
@@ -462,6 +549,9 @@ class Sync:
             self.eng.after(self.sc.timeout_s * 3, self._s0_stall_check, b, B.sid)
         others = [c for c in range(self.sc.n) if c != b]
         self.rng.shuffle(others)
+        if self.subbed:
+            others = [c for c in others if self.shares(b, c)]
+            B.sub_cand, B.sub_refill = {}, {}
         B.hints, B.hello_out = [], set()
         if self.sc.px and B.prev_mesh:                   # P: last mesh and random, interleaved (popped from the end)
             prev = [c for c in B.prev_mesh if c != b]
@@ -522,7 +612,7 @@ class Sync:
         if not B.honest:                                  # liars keep what they get (they may serve it or not)
             if claimed not in B.held:
                 B.held[claimed] = m
-                B.keys.add((m.tkey, claimed))
+                B.keys.add((m.tkey, claimed), m.topic)
                 if B.liar_mode == "squat":
                     self._announce(b, claimed, frm)
             return True
@@ -535,7 +625,12 @@ class Sync:
         if claimed != m.mid:                              # content id check (cheap hash), before any verification
             B.c["rej_id"] += 1
             return False
+        if self.subbed and m.topic not in B.subs:        # CP33: not my sub (header), refused before verifying
+            B.c["rej_sub"] += 1
+            return False
         B.c["verify"] += 1
+        if m.topic not in B.subs:
+            B.c["verify_foreign"] += 1                    # leak: verified for a sub this box cannot read
         if not m.valid or (m.kind == "delete" and not m.target_sig_ok):
             B.c["rej_sig"] += 1
             B.c["verify_invalid"] += 1
@@ -555,14 +650,14 @@ class Sync:
     def _hold(self, b, claimed, m, frm, how):
         B = self.boxes[b]
         B.held[claimed] = m
-        B.keys.add((m.tkey, claimed))
+        B.keys.add((m.tkey, claimed), m.topic)
         B.ver += 1
         if self.sc.floor_change:                          # F: my set changed; only the sender still matches me
             B.clean = (B.clean & {frm}) if frm is not None else set()
         B.fetching.pop(claimed, None)
         B.skipped.pop(claimed, None)
         B.c["needed_env"] += 1
-        if m.kind == "post":
+        if m.kind == "post" and m.topic in B.subs:       # no key for a foreign sub: nothing to encode
             B.c["encode"] += 1
         if m.author != b and m.true_t <= self.eng.t and B.on:
             if B.session <= m.true_t:
@@ -583,7 +678,7 @@ class Sync:
             B.forgotten[d.target] = d.target_t0
             return
         B.forgotten[d.target] = d.target_t0
-        B.keys.add((d.target_t0, d.target))               # the target's key stays (or appears) as a forgotten id
+        B.keys.add((d.target_t0, d.target), d.topic)      # the target's key stays (or appears) as a forgotten id
         if tgt is not None and tgt.kind != "post":
             pass
 
@@ -595,7 +690,7 @@ class Sync:
             self.oracle.on_refuse(B, m, claimed, "dup")
             return False
         B.held[claimed] = m
-        B.keys.add((m.tkey, claimed))
+        B.keys.add((m.tkey, claimed), m.topic)
         B.taken.append(claimed)
         B.c["needed_env"] += 1
         self.oracle.on_hold(B, m, claimed)
@@ -619,8 +714,9 @@ class Sync:
         B = self.boxes[b]
         if B.liar_mode in ("echo", "withhold"):
             return
+        t = self.topic_of.get(mid, 0)
         for p in list(B.mesh):
-            if p != frm and B.up.get(p):
+            if p != frm and B.up.get(p) and t in self.boxes[p].subs:   # the sub's holders (as the box's targets())
                 self.xfer(b, p, HDR + IDB, "ihave", self._ihave_at, p, b, mid,
                           fail=lambda p=p: self.mark_down(b, p))
 
@@ -702,6 +798,8 @@ class Sync:
         A, sc = self.boxes[a], self.sc
         if sc.variant == "S0" or not A.on or not A.honest or b in A.inflight:
             return
+        if self.subbed and not self.common(a, b):           # CP33: no sub in common, nothing to reconcile
+            return
         A.inflight.add(b)
         A.c["recon_" + why] += 1
         now = A.now()
@@ -719,7 +817,8 @@ class Sync:
     def _recon_at(self, b, a, lo, hi, ver0, silent=False):
         A, B, sc = self.boxes[a], self.boxes[b], self.sc
         liar = B.liar_mode if B.liar_mode in ("echo", "withhold") else None
-        r = reconcile(A.keys, B.keys, lo, hi, sc.variant, liar_b=liar)
+        cm = self.common(a, b)
+        r = reconcile(A.keys.view(cm), B.keys.view(cm), lo, hi, sc.variant, liar_b=liar)
         if (sc.floor_change and r.get("done", True) and not r["need_a"] and not r["need_b"]
                 and A.ver == ver0):                        # F: no difference over my band, and no change since I began
             A.clean.add(b)
@@ -838,11 +937,15 @@ class Sync:
         if not self.sc.floor or self.sc.variant == "S0":
             return
         A = self.boxes[a]
+        A.floor_n[b] += 1
         self.eng.after(self.rng.uniform(*self.sc.pae), self._floor_tick, a, A.sid, b)
 
     def _floor_tick(self, a, sid, b):
         A = self.boxes[a]
-        if not A.on or A.sid != sid or not A.up.get(b) or b not in A.mesh:
+        if A.sid != sid:
+            return
+        if not A.on or not A.up.get(b) or b not in A.mesh:
+            A.floor_n[b] -= 1
             return
         last = A.last_recon.get(b, -1e18)
         quiet = (self.sc.floor_change == "heard"
@@ -923,8 +1026,13 @@ class Sync:
             self.accept(b, mid, m, a, "offer")
 
     # ------------------------------------------------------------------ writing
+    def set_subs(self, b: int, subs) -> None:
+        """CP33 script: box b's subs (the holders table follows)."""
+        self.boxes[b].subs = frozenset(subs)
+        self.holders = {j: [B.i for B in self.boxes if j in B.subs] for j in range(max(self.sc.topics, 1))}
+
     def publish(self, b: int, kind: str = None, tag: str = None, stamp_dt: float = 0.0, target: str | int = None,
-                valid: bool = True, foreign: bool = False):
+                valid: bool = True, foreign: bool = False, topic_set: int | None = None):
         B, sc = self.boxes[b], self.sc
         if not B.on:
             return None
@@ -948,7 +1056,7 @@ class Sync:
             elif target is not None:
                 tgt = B.held.get(target)
             else:
-                pool = [m for m in B.held.values() if m.kind == "post" and m.valid
+                pool = [m for m in B.held.values() if m.kind == "post" and m.valid and m.topic in B.subs
                         and (kind != "delete" or m.author == b or foreign)]
                 u = self.wrng.random()                     # always one draw (the pool depends on the protocol)
                 tgt = pool[int(u * len(pool))] if pool else None
@@ -956,12 +1064,21 @@ class Sync:
                 kind = "post"
         if valid and sc.invalid_frac and self.wrng.random() < sc.invalid_frac and self.script is None:
             valid = False
+        topic = 0
+        if topic_set is not None:                          # CP33 script: this sub
+            topic = topic_set
+        elif sc.topics > 0:                                # CP33: one of my subs (one draw, always)
+            own = sorted(B.subs)
+            topic = own[int(self.wrng.random() * len(own))]
         m = Msg(self.new_id(world=True), kind, t0, self.eng.t, b, valid=valid, honest_stamp=honest_stamp)
         if kind != "post":
+            topic = tgt.topic
             m.target = tgt.mid
             if kind == "delete":
                 m.target_t0 = tgt.t0
                 m.target_sig_ok = (tgt.author == b) and not foreign
+        m.topic = topic
+        self.topic_of[m.mid] = topic
         self.msgs.append(m)
         self._tr("pub", b, round(self.eng.t, 3), kind == "post")
         self.kind_of[m.mid] = kind
@@ -980,7 +1097,7 @@ class Sync:
     def _hold_liar(self, b, m):
         B = self.boxes[b]
         B.held[m.mid] = m
-        B.keys.add((m.tkey, m.mid))
+        B.keys.add((m.tkey, m.mid), m.topic)
         for p in list(B.mesh):
             if B.up.get(p):
                 self.xfer(b, p, HDR + IDB, "ihave", self._ihave_at, p, b, m.mid)
@@ -1112,20 +1229,32 @@ class Sync:
         have: set[int] = set()
         for B in on:
             have.update(B.held)
-        ok = {m.mid: m for m in self.msgs if m.mid in have and m.valid and m.target_sig_ok
-              and t - m.true_t >= sc.t_bound}
-        miss = pairs = 0
+        anywhere: set[int] = set()                         # CP33: held by an honest box, on or off
+        for B in self.boxes:
+            if B.honest:
+                anywhere.update(B.held)
+        good = [m for m in self.msgs if m.valid and m.target_sig_ok and t - m.true_t >= sc.t_bound]
+        ok = {m.mid: m for m in good if m.mid in have}
+        any_ok = {m.mid: m for m in good if m.mid in anywhere}
+        miss = pairs = stranded = spairs = 0
         for B in on:
             if t - B.session < sc.t_bound:
                 continue
             lo, hi = B.now() - sc.R + 2 * sc.sigma, B.now() + 2 * sc.sigma
             for mid, m in ok.items():
-                if lo <= m.tkey <= hi:
+                if lo <= m.tkey <= hi and m.topic in B.subs:     # CP33: only my subs are mine to miss
                     pairs += 1
                     if not B.has(mid):
                         miss += 1
+            for mid, m in any_ok.items():
+                if lo <= m.tkey <= hi and m.topic in B.subs:
+                    spairs += 1
+                    if not B.has(mid):
+                        stranded += 1
         self.ev["miss"] += miss
         self.ev["miss_pairs"] += pairs
+        self.ev["stranded"] += stranded
+        self.ev["stranded_pairs"] += spairs
 
     def _f1_tick(self):
         self.oracle.f1_sweep()
@@ -1176,7 +1305,10 @@ class Sync:
             tgt = args[4] if len(args) > 4 else None
             valid = args[5] if len(args) > 5 else True
             foreign = args[6] if len(args) > 6 else False
-            self.publish(b, kind, tag, stamp, tgt, valid, foreign)
+            topic = args[7] if len(args) > 7 else None
+            self.publish(b, kind, tag, stamp, tgt, valid, foreign, topic)
+        elif act == "subs":
+            self.set_subs(args[0], args[1])
         elif act == "link":
             a, b, state = args
             pr = self.pair(a, b)
@@ -1233,7 +1365,12 @@ class Sync:
             "recon_tx_per_box_day": idle,
             "tx": {k[3:]: v for k, v in tot.items() if k.startswith("tx_")},
             "work": {k: tot[k] for k in ("verify", "verify_invalid", "encode", "needed_env", "dup_env", "rej_id",
-                                         "rej_sig", "refuse_window", "recon_sessions", "fetch_keys", "floor_skip")},
+                                         "rej_sig", "refuse_window", "recon_sessions", "fetch_keys", "floor_skip",
+                                         "rej_sub", "verify_foreign")},
+            "verify_per_box_day": tot["verify"] / max(len(honest), 1) / n_days,
+            "encode_per_box_day": tot["encode"] / max(len(honest), 1) / n_days,
+            "topics": sc.topics, "sub_mode": sc.sub_mode if sc.topics else None,
+            "subs_per_box": (sum(len(B.subs) for B in self.boxes) / len(self.boxes)) if sc.topics else None,
             "triggers": {k: tot[k] for k in tot if k.startswith("recon_") and k != "recon_sessions"},
             "ev": dict(self.ev),
             "world_trace": self.trace,

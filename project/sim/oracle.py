@@ -8,6 +8,8 @@ Properties (cp/CP29.md, written before results):
   L1/L2 two honest boxes in contact for T_bound end up with every item that one of them held at the start and that
         stays inside both boxes' reconciliation band (L2 = the same for deletes)
   F1 storage: no held message older than now - R, no tombstone / forgotten id older than now - R - 2 sigma
+  S5 (CP33, with subs) no honest box holds a message of a sub it does not hold. With sub_mode "sub", L1/L2 are about
+        the subs both boxes hold.
 Physical limit: boxes that never meet a holder are not counted (L1 is about pairs in contact).
 Also recorded, separately: dishonest stamps (not a violation), injected clock-bound violations.
 """
@@ -41,6 +43,8 @@ class Oracle:
             self.bad("S1", box=box.i, mid=claimed, kind=msg.kind)
         if msg.kind != "delete" and msg.mid in box.applied_del and box.now() - self.sim.sc.R <= msg.t0:
             self.bad("S2", box=box.i, mid=msg.mid)
+        if self.sim.sc.topics and msg.topic not in box.subs:
+            self.bad("S5", box=box.i, mid=claimed, topic=msg.topic)
 
     def on_apply_delete(self, box, d):
         if box.honest and not d.target_sig_ok:
@@ -85,7 +89,9 @@ class Oracle:
         T = sc.t_bound
         lo = max(a.now(), b.now()) + T - sc.R + 2 * sc.sigma          # stays inside both B for the whole check
         hi = min(a.now(), b.now()) + 2 * sc.sigma
-        diff = [k for k in set(a.keys.keys) ^ set(b.keys.keys) if lo <= k[0] <= hi]
+        cm = sim.common(p[0], p[1])                                  # CP33: the subs this pair reconciles
+        diff = [k for k in set(a.keys.keys) ^ set(b.keys.keys) if lo <= k[0] <= hi
+                and (cm is None or sim.topic_of.get(k[1], 0) in cm)]
         ep = self.epoch[p]
         sim.eng.after(T, self._check, p, ep, diff, sim.eng.t)
         if sim.in_contact(*p):

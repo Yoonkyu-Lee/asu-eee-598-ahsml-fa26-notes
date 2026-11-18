@@ -272,3 +272,142 @@ def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
                             "violations": dict(count), "examples": viol}
     return {"mode": "S12c", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": False,
             "violations": dict(count), "examples": viol}
+
+
+# ---------------------------------------------------------------------------------------------- CP33: subs
+SUBS = ({"A", "B"}, {"A"}, {"B"})                      # box 0 in both subs, box 1 only A, box 2 only B
+TOPIC = {"PA": "A", "PB": "B", "DB": "B", "CB": "B", "XB": "B"}
+S_VALID = ("PA", "PB", "DB", "CB")
+S_AUTHOR = {"PA": 0, "PB": 0, "DB": 0, "CB": 2}
+S_PAIRS = ((0, 1), (0, 2), (1, 2))
+
+
+def s_accept(held: frozenset, item: str, box: int, mutate: set) -> frozenset:
+    """CP33 accept rules: refuse a sub the box does not hold (before anything else), then the CP29 rules."""
+    if TOPIC[item] not in SUBS[box] and "accept_any" not in mutate:
+        return held
+    if item in held or item == "XB":                   # XB: claims PB's id, other content -> rejected
+        return held
+    if item == "PB" and "DB" in held:
+        return held
+    new = set(held) | {item}
+    if item == "DB":
+        new.discard("PB")
+    return frozenset(new)
+
+
+def s_keys(held: frozenset) -> frozenset:
+    ks = set(held)
+    if "DB" in ks:
+        ks.add("PB")                                   # the forgotten target's key
+    return frozenset(ks)
+
+
+def check_subs(max_states: int = 3_000_000, mutate: str | None = None) -> dict:
+    """CP33 layer 3a: three honest boxes with subs {A,B}, {A}, {B}; an adversary on every box's link that can deliver
+    any published message (any sub) and a forged copy XB of PB at any time. Events: on/off, link up/down, publishing,
+    a push of one held item to a connected box that holds its sub, and an atomic session between two connected boxes
+    over the subs both hold. Properties: S5 no box holds a message of a sub it does not hold, S1 no forgery held,
+    S2 no post held with its delete, L1/L2 after a session the two boxes' keys in their common subs are equal.
+    mutate: "recon_all" (a session ignores subs: the CP29-CP32 box), "accept_any" (a box accepts any sub),
+    "push_any" (a push goes to any connected box); several joined by "+". "recon_all+accept_any" is the CP29-CP32
+    box (H12)."""
+    mset = set((mutate or "").split("+")) - {""}
+    start = ((frozenset(),) * 3, frozenset(), (True, True, True), (True, True, True))
+    seen = {start}
+    q = deque([start])
+    viol: dict[str, list] = {}
+    count: dict[str, int] = {}
+    n_trans = 0
+
+    def bad(p, s, note=""):
+        viol.setdefault(p, [])
+        count[p] = count.get(p, 0) + 1
+        if len(viol[p]) < 3:
+            viol[p].append({"state": str(s), "note": note})
+
+    def common(i, j):
+        return {"A", "B"} if "recon_all" in mset else SUBS[i] & SUBS[j]
+
+    def session(H, i, j):
+        cm = common(i, j)
+        hi, hj = H[i], H[j]
+        for src, dst in ((j, i), (i, j)):
+            have = hi if dst == i else hj
+            give = hj if dst == i else hi
+            for it in sorted((give - have), key=lambda x: x != "DB"):
+                if TOPIC[it] in cm:
+                    have = s_accept(have, it, dst, mset)
+            if dst == i:
+                hi = have
+            else:
+                hj = have
+        out = list(H)
+        out[i], out[j] = hi, hj
+        return tuple(out)
+
+    while q:
+        s = q.popleft()
+        H, pub, on, link = s
+        for i, h in enumerate(H):
+            if any(TOPIC[x] not in SUBS[i] for x in h):
+                bad("S5", s, f"box {i} holds {sorted(x for x in h if TOPIC[x] not in SUBS[i])}")
+            if "XB" in h:
+                bad("S1", s, f"box {i}")
+            if "PB" in h and "DB" in h:
+                bad("S2", s, f"box {i}")
+        nxt = []
+        for k, (i, j) in enumerate(S_PAIRS):
+            if on[i] and on[j] and link[k]:
+                after = session(H, i, j)
+                cm = SUBS[i] & SUBS[j]
+                ki = {x for x in s_keys(after[i]) if TOPIC[x] in cm}
+                kj = {x for x in s_keys(after[j]) if TOPIC[x] in cm}
+                if ki != kj:
+                    bad("L1", s, f"pair {i},{j}: {sorted(ki)} vs {sorted(kj)}")
+                if ("DB" in after[i] or "DB" in after[j]) and "B" in cm and not ("DB" in after[i] and "DB" in after[j]):
+                    bad("L2", s, f"pair {i},{j}")
+                nxt.append((after, pub, on, link))
+                for src, dst in ((i, j), (j, i)):         # push one item
+                    for it in H[src]:
+                        if TOPIC[it] not in SUBS[dst] and "push_any" not in mset:
+                            continue
+                        hh = list(H)
+                        hh[dst] = s_accept(H[dst], it, dst, mset)
+                        if hh[dst] != H[dst]:
+                            nxt.append((tuple(hh), pub, on, link))
+        for i in range(3):
+            o = list(on)
+            o[i] = not o[i]
+            nxt.append((H, pub, tuple(o), link))
+        for k in range(3):
+            lk = list(link)
+            lk[k] = not lk[k]
+            nxt.append((H, pub, on, tuple(lk)))
+        for it in S_VALID:
+            au = S_AUTHOR[it]
+            if it in pub or not on[au]:
+                continue
+            if it in ("DB", "CB") and "PB" not in H[au]:
+                continue
+            hh = list(H)
+            hh[au] = s_accept(H[au], it, au, mset)
+            nxt.append((tuple(hh), pub | {it}, on, link))
+        for i in range(3):                                 # the adversary delivers anything published, or XB
+            if not on[i]:
+                continue
+            for it in ("XB",) + tuple(sorted(pub)):
+                hh = list(H)
+                hh[i] = s_accept(H[i], it, i, mset)
+                if hh[i] != H[i]:
+                    nxt.append((tuple(hh), pub, on, link))
+        for t in nxt:
+            n_trans += 1
+            if t not in seen:
+                seen.add(t)
+                q.append(t)
+                if len(seen) > max_states:
+                    return {"mode": "subs", "mutate": mutate, "states": len(seen), "transitions": n_trans,
+                            "truncated": True, "violations": dict(count), "examples": viol}
+    return {"mode": "subs", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": False,
+            "violations": dict(count), "examples": viol}

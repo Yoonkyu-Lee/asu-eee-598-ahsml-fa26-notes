@@ -32,6 +32,7 @@ ARRAYS = (8, 16, 32)
 GHZ = 0.5
 DRAM_GBS = 8.5  # as in CP4 (assumed LPDDR4 share)
 GLB_KB = 2048   # CP4 sram_needed(B=1, streaming) = 1.97 MB
+WB = 8          # CP34: word width in bits (16: FP16 text, with a 16-bit integer MAC as a proxy for the FP16 MAC)
 
 
 def problem_yaml(K: int, N: int, P: int) -> dict:
@@ -109,7 +110,8 @@ def run(R: int, gemm: str, P: int, work: Path) -> dict:
     spec = tl.Specification.from_yaml_files(
         str(SPEC / "top.yaml.jinja2"),
         jinja_parse_data={"problem": str(prob), "R": R, "GLB_KB": GLB_KB, "CYCLE_S": cycle_s,
-                          "DRAM_WPC": 4096, "COMPONENTS": COMPONENTS, "VICTORY": victory, "TIMEOUT": timeout})
+                          "DRAM_WPC": 4096, "COMPONENTS": COMPONENTS, "VICTORY": victory, "TIMEOUT": timeout,
+                          "WB": WB})
     tl.call_mapper(spec, output_dir=str(run_dir), log_to=str(run_dir / "mapper.log"))
     stats = parse_stats((run_dir / "timeloop-mapper.stats.txt").read_text())
     stats["mapping"] = (run_dir / "timeloop-mapper.map.txt").read_text()

@@ -1,0 +1,1724 @@
+[
+ {
+  "scene": "CP29: H1 failed push, nobody comes on",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H1 failed push, nobody comes on",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H2 gap never retried",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H2 gap never retried",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true,
+   "box2 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H3 skew beyond the catch-up margin",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H3 skew beyond the catch-up margin",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H4 liar claims coverage",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H4 liar claims coverage",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H5 offer to one box that leaves",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H5 offer to one box that leaves",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H6 tombstone expiry, no resurrection",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H6 tombstone expiry, no resurrection",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 never holds X again": true,
+   "box1 dropped X (expired)": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H8 squatting liar, invalid first",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: H8 squatting liar, invalid first",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds the valid X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: silent loss, then idle",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: silent loss, then idle",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: silent link return",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: silent link return",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: partition heals",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: partition heals",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box2 holds X": true,
+   "box3 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: delete arrives before its post",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: delete arrives before its post",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 never holds X": true,
+   "box1 forgot X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: comment before its post",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: comment before its post",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X and C": true,
+   "C not orphan at box1": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: future edge: +2 sigma received by a box sigma behind",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: future edge: +2 sigma received by a box sigma behind",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds X": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: lower edge: item leaves the band",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: lower edge: item leaves the band",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "no claim on X (left B), no violation": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: dishonest stamps: -6 h and +3 sigma",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  }
+ },
+ {
+  "scene": "CP29: dishonest stamps: -6 h and +3 sigma",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "backdated held": true
+  },
+  "violations": {},
+  "report": {
+   "backdated: held by box1": true,
+   "far future: held by its own box": false,
+   "far future: held by box1": false
+  }
+ },
+ {
+  "scene": "CP29: foreign delete",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: foreign delete",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "X still held by 0 and 1": true
+  },
+  "violations": {},
+  "report": null
+ },
+ {
+  "scene": "CP29: tombstone invariant (+-sigma)",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": 0,
+  "violations": {}
+ },
+ {
+  "scene": "CP29: tombstone invariant (+-sigma)",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "breaks": 0,
+  "violations": {}
+ },
+ {
+  "scene": "CP29: tombstone invariant (injected 3 sigma)",
+  "variant": "S2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": 240,
+  "violations": {}
+ },
+ {
+  "scene": "CP29: tombstone invariant (injected 3 sigma)",
+  "variant": "S2c",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "breaks": 240,
+  "violations": {}
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": false,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_f": 6,
+   "recon_b": 3,
+   "recon_e": 1
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+K",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 6,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+F",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": false,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_f": 4,
+   "recon_b": 3,
+   "recon_e": 1
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+P",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": false,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_f": 6,
+   "recon_b": 2,
+   "recon_e": 1
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 3,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+P2",
+  "pass": false,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box0 holds X within 30 s": false,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_f": 6,
+   "recon_b": 3,
+   "recon_e": 1
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 5,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 5,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KF'",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 5,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KF'+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 5,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KE",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 5,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "K owner leg fails, skipped session still running",
+  "variant": "S2+KF'E",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box0 holds X within 30 s": true,
+   "box0 holds X within t_bound": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 3,
+   "recon_c": 4,
+   "recon_f": 3,
+   "recon_b": 2
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 15,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+K",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 15,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+F",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+P",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 13,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 15,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KF'",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KF'+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KE",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 13,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F third-party change, push to Y silently lost",
+  "variant": "S2+KF'E",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 18,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+K",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 18,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+F",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+P",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 17,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 18,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 8,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KF'",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 9,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KF'+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 9,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KE",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 17,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F peer restarts unnoticed, then a silent loss",
+  "variant": "S2+KF'E",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box1 holds W": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_f": 11,
+   "recon_a": 5
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 275,
+   "floor_skips": 0
+  },
+  "triggers": {
+   "recon_f": 553,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+K",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 275,
+   "floor_skips": 0
+  },
+  "triggers": {
+   "recon_f": 553,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+F",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": true
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 0,
+   "floor_skips": 861
+  },
+  "triggers": {
+   "recon_f": 4,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+P",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 273,
+   "floor_skips": 0
+  },
+  "triggers": {
+   "recon_f": 551,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": true
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 0,
+   "floor_skips": 861
+  },
+  "triggers": {
+   "recon_f": 4,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+P2",
+  "pass": false,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 275,
+   "floor_skips": 0
+  },
+  "triggers": {
+   "recon_f": 553,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "floor sessions on day 2 <= 3": true
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 0,
+   "floor_skips": 861
+  },
+  "triggers": {
+   "recon_f": 4,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "floor sessions on day 2 <= 3": true
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 0,
+   "floor_skips": 861
+  },
+  "triggers": {
+   "recon_f": 4,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KF'",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 113,
+   "floor_skips": 619
+  },
+  "triggers": {
+   "recon_f": 231,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KF'+P2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 113,
+   "floor_skips": 619
+  },
+  "triggers": {
+   "recon_f": 231,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KE",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 273,
+   "floor_skips": 0
+  },
+  "triggers": {
+   "recon_f": 551,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "F clean, then a quiet day (floor sessions day 2 <= 3)",
+  "variant": "S2+KF'E",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "floor sessions on day 2 <= 3": false
+  },
+  "violations": {},
+  "report": {
+   "floor_sessions_day2": 114,
+   "floor_skips": 638
+  },
+  "triggers": {
+   "recon_f": 231,
+   "recon_a": 3
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+K",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+F",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+P",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 240
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 240
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 360
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 360
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KF'",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KF'+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 360
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KE",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P laptop comes on, only the always-on box is on",
+  "variant": "S2+KF'E",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "box5 holds X within 60 s": true,
+   "box5 holds Z within 60 s of coming on again": true
+  },
+  "violations": {},
+  "report": {
+   "probe_bytes_second_come_on": 1320
+  },
+  "triggers": {
+   "recon_b": 2,
+   "recon_a": 2
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": false
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 168,
+   "recon_e": 27
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+K",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": false
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 168,
+   "recon_e": 27
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+F",
+  "pass": true,
+  "predicted_fail": true,
+  "as_predicted": false,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 27,
+   "recon_e": 13
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+P",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 16,
+   "recon_f": 202,
+   "recon_e": 31,
+   "recon_b": 16
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2c",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_a": 20,
+   "recon_b": 11,
+   "recon_f": 29,
+   "recon_e": 19
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+P2",
+  "pass": false,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "boxes 4-7 hold X": false
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 157,
+   "recon_e": 27
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KF",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 27,
+   "recon_e": 13
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KF+P2",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": null,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 27,
+   "recon_e": 13
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KF'",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": false
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 73,
+   "recon_e": 27
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KF'+P2",
+  "pass": false,
+  "predicted_fail": true,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": false
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 8,
+   "recon_a": 20,
+   "recon_f": 70,
+   "recon_e": 27
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KE",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 22,
+   "recon_a": 22,
+   "recon_f": 189,
+   "recon_e": 47
+  }
+ },
+ {
+  "scene": "P 2 h partition (D=3), heal, post crosses within 2 h",
+  "variant": "S2+KF'E",
+  "pass": true,
+  "predicted_fail": false,
+  "as_predicted": true,
+  "checks": {
+   "boxes 4-7 hold X": true
+  },
+  "violations": {},
+  "report": null,
+  "triggers": {
+   "recon_b": 15,
+   "recon_a": 21,
+   "recon_f": 85,
+   "recon_e": 50
+  }
+ }
+]

@@ -1,4 +1,4 @@
-# CP12 encoder: INT8 weight-stationary array for MiniLM-L6 GEMMs (CP3 contract), 45 nm.
+# CP12 encoder: INT8 weight-stationary array (CP34: word width WB, default 8; 16 = the FP16 text width) for MiniLM-L6 GEMMs (CP3 contract), 45 nm.
 # Structure follows the CP4 design point (chip/model/encoder_analytic.py) and the simple_weight_stationary
 # example of timeloop-accelergy-exercises. Jinja variables: R (array side), GLB_KB, DRAM_WPC, CYCLE_S.
 architecture:
@@ -16,7 +16,7 @@ architecture:
     attributes:
       type: "LPDDR4"
       width: 64
-      datawidth: 8
+      datawidth: {{WB|default(8)}}
       read_bandwidth: {{DRAM_WPC}}
       write_bandwidth: {{DRAM_WPC}}
 
@@ -32,9 +32,9 @@ architecture:
       depth: {{GLB_KB * 64}}
       width: 128
       n_banks: 16
-      datawidth: 8
-      read_bandwidth: 16
-      write_bandwidth: 16
+      datawidth: {{WB|default(8)}}
+      read_bandwidth: {{128 // (WB|default(8))}}    # a 128-bit port (16 INT8 words; 8 FP16 words)
+      write_bandwidth: {{128 // (WB|default(8))}}
     constraints:
       dataspace: {keep: [Weights, Inputs, Outputs]}
 
@@ -45,7 +45,7 @@ architecture:
     attributes:
       depth: 1024
       width: 128
-      datawidth: 8
+      datawidth: {{WB|default(8)}}
       read_bandwidth: {{R}}
       write_bandwidth: {{R}}
     constraints:
@@ -77,7 +77,7 @@ architecture:
       name: weight_reg
       class: storage
       subclass: aladdin_register
-      attributes: {depth: 1, width: 8, datawidth: 8}
+      attributes: {depth: 1, width: {{WB|default(8)}}, datawidth: {{WB|default(8)}}}
       constraints:
         dataspace: {keep: [Weights]}
         temporal: {factors: [R=1, S=1, M=1, C=1]}
@@ -85,7 +85,7 @@ architecture:
       name: input_reg
       class: storage
       subclass: aladdin_register
-      attributes: {depth: 1, width: 8, datawidth: 8}
+      attributes: {depth: 1, width: {{WB|default(8)}}, datawidth: {{WB|default(8)}}}
       constraints:
         dataspace: {keep: [Inputs]}
         temporal: {factors: [P=1, Q=1, C=1, N=1]}
@@ -102,5 +102,5 @@ architecture:
     name: mac
     class: intmac
     attributes:
-      multiplier_width: 8
+      multiplier_width: {{WB|default(8)}}
       adder_width: 32
