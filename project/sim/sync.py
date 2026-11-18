@@ -253,7 +253,9 @@ class Sync:
         self.live: list[float] = []
         self.pend: dict[int, dict] = {}                 # CP38 diag: mid -> {box on at creation: [samples, member path]}
         self.msg_by: dict[int, Msg] = {}
-        self.tail: list[tuple] = []                     # CP38 diag: (latency s, samples, samples with a member path, sub)
+        self.live_path: list[float] = []                # CP38 diag: live latency counted from a member path
+        self.tail: list[tuple] = []                     # CP38 diag: (latency s, samples, samples with a member path, sub,
+                                                        # s from the first sample with a path to delivery, or None)
         self.ev = Counter()
         self.end = sc.days * DAY
         self.trace = 0                                  # CP30: hash of world events (equal workloads across variants)
@@ -695,8 +697,13 @@ class Sync:
                 d = self.pend.get(claimed)
                 if d is not None and b in d:
                     s = d.pop(b)
-                    if self.eng.t - m.true_t > 30.0:
-                        self.tail.append((round(self.eng.t - m.true_t, 1), s[0], s[1], m.topic))
+                    lat = self.eng.t - m.true_t
+                    first = None if s[2] is None else round(self.eng.t - s[2], 1)
+                    # CP38 re-registered rule: the wait counted from the first sample with a member path (a pair
+                    # with no sample that saw a path had one for at most DIAG_S; an upper bound either way)
+                    self.live_path.append(min(lat, DIAG_S if first is None else first + DIAG_S))
+                    if lat > 30.0:
+                        self.tail.append((round(lat, 1), s[0], s[1], m.topic, first))
                     if not d:
                         del self.pend[claimed]
         self.oracle.on_hold(B, m, claimed)
@@ -1125,7 +1132,7 @@ class Sync:
         self._cover(b, m)
         if sc.tail_diag and B.honest and m.valid and m.target_sig_ok:
             self.msg_by[m.mid] = m
-            self.pend[m.mid] = {h: [0, 0] for h in self.holders[topic] if h != b and self.boxes[h].on
+            self.pend[m.mid] = {h: [0, 0, None] for h in self.holders[topic] if h != b and self.boxes[h].on
                                 and self.boxes[h].honest}
         if not B.honest:                                  # liars' own messages go out as they are
             self._hold_liar(b, m)
@@ -1340,6 +1347,8 @@ class Sync:
                 s[0] += 1
                 if any(h != b and self.link_ok(h, b) for h in on):
                     s[1] += 1
+                    if s[2] is None:
+                        s[2] = now                       # first sample that saw a member path
         self.eng.after(DIAG_S, self._diag_tick)
 
     def run_script(self) -> dict:
@@ -1438,5 +1447,6 @@ class Sync:
             "world_trace": self.trace,
             "world_trace_times": self.trace_nokind,
             "cells": {"|".join(k): v for k, v in self.oracle.cells.items()},
-            **({"tail_diag": self.tail} if sc.tail_diag else {}),
+            **({"tail_diag": self.tail, "live_path_p99_s": sorted(self.live_path)[int(0.99 * (len(self.live_path) - 1))]
+                if self.live_path else None} if sc.tail_diag else {}),
         }

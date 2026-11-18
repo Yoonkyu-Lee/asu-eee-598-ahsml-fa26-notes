@@ -54,7 +54,8 @@ def _one(job):
     sc = c33.scene(n, "sub", seed=seed, days=3.0, miss_at=(DAY, 2 * DAY, 3 * DAY - 400.0), topics=c33.TOPICS,
                    tail_diag=diag, **VARIANTS[var], **c29.SCENES[s], **c29.FAULTS)
     r = Sync(sc).run()
-    keep = {**c30.metrics(r, n, 3.0), "ev": r["ev"], "verify_per_box_day": r["verify_per_box_day"]}
+    keep = {**c30.metrics(r, n, 3.0), "ev": r["ev"], "verify_per_box_day": r["verify_per_box_day"],
+            "live_path_p99_s": r.get("live_path_p99_s")}
     keep.update(scene=s, n=n, seed=seed, variant=var, secs=round(time.time() - t, 1))
     if diag:
         keep["tail_diag"] = r["tail_diag"]
