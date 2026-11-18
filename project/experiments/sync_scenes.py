@@ -1,10 +1,14 @@
 """CP29: sync by set reconciliation, verified in layers (cp/CP29.md has the rules, written before results).
+The scene data here (scene_list, QUIET, SCENES, NS, SEEDS, FAULTS, CP26_FAULTS, tomb_scene) is shared by the CP30,
+CP33 and CP38 runners.
 
-  .venv/Scripts/python.exe experiments/sync_scenes.py holes     # layer 2, directed scenes      -> results/sync/holes.json
+  .venv/Scripts/python.exe experiments/sync_scenes.py holes     # layer 2, S2 and S2e (no floor)  -> results/sync/holes.json
   .venv/Scripts/python.exe experiments/sync_scenes.py random    # layer 1, random + coverage    -> results/sync/random.json
   .venv/Scripts/python.exe experiments/sync_scenes.py props     # layer 3b, reconciler tests    -> results/sync/props.json
-  .venv/Scripts/python.exe experiments/sync_scenes.py mc        # layer 3a, model checking      -> results/sync/mc.json
-  .venv/Scripts/python.exe experiments/sync_scenes.py cost      # idle cost, CPU, index         -> results/sync/cost.json
+
+Retired in recast R1b: the variants S0 (the CP26 X2 box), S1 and S1e (fixed 1 h buckets), the X2-vs-S2 cost grid
+(cost) and this runner's layer 3a (mc: its S2 search runs in experiments/sync.py mc, the S0 contrast search is gone).
+Their results stay in results/sync/; the commands run at tag pre-r1, the CP29 originals at tag cp30.
 """
 from __future__ import annotations
 
@@ -20,11 +24,11 @@ from sim.sync import DAY, Sync, SyncScene  # noqa: E402
 
 OUT = ROOT / "results" / "sync"
 T0 = time.time()
-VARIANTS = (("S0", False), ("S1", True), ("S1", False), ("S2", True), ("S2", False))
+VARIANTS = (("S2", True), ("S2", False))
 
 
 def vname(v, fl):
-    return v if v == "S0" else v + ("" if fl else "e")
+    return v + ("" if fl else "e")
 
 
 def log(*a):
@@ -50,30 +54,30 @@ def scene_list():
     S.append(dict(name="H1 failed push, nobody comes on", n=2,
                   rows=[(0, "on", 0), (0, "on", 1), (99, "force", 0, 1, "fail"), (100, "pub", 0, "post", "X"),
                         (100 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail=set()))
     # H2: an unfilled gap is never retried
     S.append(dict(name="H2 gap never retried", n=3,
                   rows=[(0, "on", 0), (100, "pub", 0, "post", "X"), (200, "off", 0), (300, "on", 0), (400, "off", 0),
                         (500, "on", 2), (600, "on", 1), (700, "on", 0), (700 + T + 60, "until")],
                   checks=[("box1 holds X", lambda s: s.holds(1, "X")), ("box2 holds X", lambda s: s.holds(2, "X"))],
-                  fail={"S0"}))
+                  fail=set()))
     # H3: author clock skew beyond the 60 s margin (both within sigma)
     S.append(dict(name="H3 skew beyond the catch-up margin", n=2,
                   rows=[(0, "offset", 0, -110.0), (0, "offset", 1, 110.0), (0, "on", 0), (0, "on", 1),
                         (200, "off", 1), (210, "pub", 0, "post", "X"), (300, "on", 1), (300 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail=set()))
     # H4: a liar claims coverage
     S.append(dict(name="H4 liar claims coverage", n=3,
                   rows=[(0, "liar", 2, "withhold"), (0, "on", 2), (50, "on", 0), (60, "pub", 0, "post", "X"),
                         (100, "off", 0), (110, "on", 0), (120, "off", 0), (200, "on", 1), (300, "on", 0),
                         (300 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail=set()))
     # H5: the offer goes to one box, which leaves
     S.append(dict(name="H5 offer to one box that leaves", n=3,
                   rows=[(0, "on", 0), (10, "pub", 0, "post", "X"), (20, "off", 0), (100, "on", 2), (110, "on", 1),
                         (190, "link", 0, 1, "down"), (200, "on", 0), (200.27, "off", 2), (205, "link", 0, 1, "up"),
                         (205 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail=set()))
     # H6: deletes - tombstones forever (F1) vs resurrection after expiry
     S.append(dict(name="H6 tombstone expiry, no resurrection", n=2,
                   rows=[(0, "on", 0), (0, "on", 1), (100, "pub", 0, "post", "X"), (150, "off", 1),
@@ -81,30 +85,30 @@ def scene_list():
                         (DAY + 4 * SIG + 1200, "on", 1), (DAY + 4 * SIG + 1200 + T + 60, "until")],
                   checks=[("box0 never holds X again", lambda s: not s.holds(0, "X")),
                           ("box1 dropped X (expired)", lambda s: not s.holds(1, "X"))],
-                  fail={"S0:F1"}))
+                  fail=set()))
     # H8: store before validate / squatting by a liar
     S.append(dict(name="H8 squatting liar, invalid first", n=3,
                   rows=[(0, "liar", 2, "squat"), (0, "on", 0), (0, "on", 1), (0, "on", 2), (99, "force", 0, 1, "fail"),
                         (100, "pub", 0, "post", "X"), (100 + T + 60, "until")],
                   checks=[("box1 holds the valid X", lambda s: s.holds(1, "X") and
-                           s.boxes[1].held[s.tag["X"].mid] is s.tag["X"])], fail={"S0"}))
+                           s.boxes[1].held[s.tag["X"].mid] is s.tag["X"])], fail=set()))
     # idle silent loss: an envelope is acked and lost, then nothing happens
     S.append(dict(name="silent loss, then idle", n=2,
                   rows=[(0, "on", 0), (0, "on", 1), (99, "force", 0, 1, "pass"), (99, "force", 0, 1, "silent"),
                         (100, "pub", 0, "post", "X"),
                         (100 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0", "S1e", "S2e"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S2e"}))
     # a link comes back without any traffic
     S.append(dict(name="silent link return", n=2,
                   rows=[(0, "on", 0), (0, "on", 1), (50, "link", 0, 1, "down"), (100, "pub", 0, "post", "X"),
                         (400, "link", 0, 1, "up"), (400 + T + 60, "until")],
-                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail={"S0"}))
+                  checks=[("box1 holds X", lambda s: s.holds(1, "X"))], fail=set()))
     # partition, then heal
     S.append(dict(name="partition heals", n=4,
                   rows=[(0, "on", 0), (0, "on", 1), (0, "on", 2), (0, "on", 3), (100, "part", [0, 1]),
                         (200, "pub", 0, "post", "X"), (1000, "heal"), (1000 + T + 60, "until")],
                   checks=[("box2 holds X", lambda s: s.holds(2, "X")), ("box3 holds X", lambda s: s.holds(3, "X"))],
-                  fail={"S0"}))
+                  fail=set()))
     # delete before post
     S.append(dict(name="delete arrives before its post", n=2,
                   rows=[(0, "on", 0), (0, "on", 1), (99, "force", 0, 1, "fail"), (100, "pub", 0, "post", "X"),
@@ -117,7 +121,7 @@ def scene_list():
                         (101, "pub", 0, "comment", "C", 0.0, "X"), (101 + T + 60, "until")],
                   checks=[("box1 holds X and C", lambda s: s.holds(1, "X") and s.holds(1, "C")),
                           ("C not orphan at box1", lambda s: s.tag["C"].mid not in s.boxes[1].orphan)],
-                  fail={"S0"}))
+                  fail=set()))
     # window edge: stamped near now + 2 sigma, receiver sigma behind
     S.append(dict(name="future edge: +2 sigma received by a box sigma behind", n=2,
                   rows=[(0, "offset", 0, SIG), (0, "offset", 1, -SIG), (0, "on", 0), (0, "on", 1),
@@ -144,7 +148,7 @@ def scene_list():
                         (100, "pub", 0, "post", "X"), (200, "pub", 2, "delete", "FD", 0.0, "X", True, True),
                         (200 + T + 60, "until")],
                   checks=[("X still held by 0 and 1", lambda s: s.holds(0, "X") and s.holds(1, "X"))],
-                  fail={"S0:S1"}))
+                  fail=set()))
     return S
 
 
@@ -190,7 +194,7 @@ def run_holes():
     for sc_def in scene_list():
         for v, fl in VARIANTS:
             name = vname(v, fl)
-            sc = SyncScene(n=sc_def["n"], variant=v, floor=fl, days=10.0, **QUIET)
+            sc = SyncScene(n=sc_def["n"], floor=fl, days=10.0, **QUIET)
             sim = Sync(sc, script=list(sc_def["rows"]))
             r = sim.run()
             checks = {lab: bool(fn(sim)) for lab, fn in sc_def["checks"]}
@@ -208,10 +212,8 @@ def run_holes():
     # tombstone invariant: within the clock bound, and with an injected violation
     for inject in (None, 3 * SIG):
         for v, fl in VARIANTS:
-            if v == "S0":
-                continue
             rows, lo, hi = tomb_scene(inject)
-            sc = SyncScene(n=2, variant=v, floor=fl, days=10.0, **QUIET)
+            sc = SyncScene(n=2, floor=fl, days=10.0, **QUIET)
             sim = Sync(sc, script=rows)
             found: list = []
             sim.eng.at(lo, tomb_monitor(sim, 1.0, lo, hi, found), sim)
@@ -240,7 +242,7 @@ FAULTS = dict(liars=0.1, invalid_frac=0.02, foreign_del_frac=0.2, backdate_frac=
 def _one(job):
     scene, n, seed, v, fl = job
     t = time.time()
-    sc = SyncScene(n=n, variant=v, floor=fl, seed=seed, days=3.0, **SCENES[scene], **FAULTS)
+    sc = SyncScene(n=n, floor=fl, seed=seed, days=3.0, **SCENES[scene], **FAULTS)
     r = Sync(sc).run()
     r.update(scene=scene, name=vname(v, fl), secs=round(time.time() - t, 1))
     return r
@@ -248,10 +250,10 @@ def _one(job):
 
 def run_random(ns=NS, seeds=SEEDS, workers=14):
     from concurrent.futures import ProcessPoolExecutor, as_completed
-    # n = 1000 (20-40 min a run): only S0 and S2, seeds 1-2 (time; S1 is out by C1, the floor rule uses n <= 300)
+    # n = 1000 (20-40 min a run): only S2, seeds 1-2 (time; the floor rule uses n <= 300)
     jobs = [(s, n, seed, v, fl) for n in sorted(ns, reverse=True) for s in SCENES for seed in seeds
             for v, fl in VARIANTS
-            if n < 1000 or ((v, fl) in (("S0", False), ("S2", True)) and seed <= 2)]
+            if n < 1000 or ((v, fl) == ("S2", True) and seed <= 2)]
     OUT.mkdir(parents=True, exist_ok=True)
     out = []
     with ProcessPoolExecutor(workers) as ex:
@@ -268,38 +270,6 @@ def run_random(ns=NS, seeds=SEEDS, workers=14):
 
 # ---------------------------------------------------------------------------------------------- cost (pick rule, C1)
 CP26_FAULTS = dict(p_fail=0.0, p_silent=1e-3, link_drops_per_day=0.0, partitions_per_day=0.0, invalid_frac=0.0)
-EXCHANGE = {"S0": ("since", "since_env", "offer", "want"), "S2": ("recon", "fetch", "fetched", "probe"),
-            "S1": ("recon", "fetch", "fetched", "probe")}
-
-
-def _cost_one(job):
-    scene, n, v = job
-    t = time.time()
-    sc = SyncScene(n=n, variant=v, floor=True, seed=1, days=2.0, **SCENES[scene], **CP26_FAULTS)
-    r = Sync(sc).run()
-    tx = r["tx"]
-    exch = sum(tx.get(k, 0) for k in EXCHANGE[v])
-    push = sum(tx.get(k, 0) for k in ("ihave", "iwant", "env"))
-    return {"scene": scene, "n": n, "variant": v, "needed_bytes": r["needed_bytes"], "exchange_bytes": exch,
-            "exchange_over_needed": exch / r["needed_bytes"] if r["needed_bytes"] else None,
-            "push_over_needed": push / r["needed_bytes"] if r["needed_bytes"] else None, "tx": tx,
-            "violations": r["violations"], "secs": round(time.time() - t, 1)}
-
-
-def run_cost(workers=14):
-    """CP26 scenes (C-a, C-b, C-c), CP26's loss model (silent loss 1e-3, nothing else), S0 = X2 vs S2:
-    exchange bytes (catch-up / offer for S0; reconciliation, fetches, probes for S2) over the needed bytes."""
-    from concurrent.futures import ProcessPoolExecutor, as_completed
-    jobs = [(s, n, v) for n in (1000, 300, 100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in ("S0", "S2")]
-    out = []
-    with ProcessPoolExecutor(workers) as ex:
-        for f in as_completed([ex.submit(_cost_one, j) for j in jobs]):
-            r = f.result()
-            out.append(r)
-            log(f"cost {r['scene']} n={r['n']:4d} {r['variant']} exchange/needed={r['exchange_over_needed']:.4f} "
-                f"push/needed={r['push_over_needed']:.3f} viol={r['violations']} {r['secs']}s")
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "cost.json").write_text(json.dumps(out, indent=1, default=str))
 
 
 # ---------------------------------------------------------------------------------------------- layer 3b: reconciler
@@ -337,9 +307,9 @@ def run_props(branches=(16, 8)):
             a, b = KeySet(A), KeySet(B)
             ta, tb = set(a.keys), set(b.keys)
             ka, kb = list(a.keys), list(b.keys)
-            for v in ("S1", "S2"):
-                for br in (branches if v == "S2" else (16,)):
-                    r = reconcile(a, b, *band, v, branch=br, leaf=16)
+            for v in ("S2",):
+                for br in branches:
+                    r = reconcile(a, b, *band, branch=br, leaf=16)
                     d = len(tb - ta) + len(ta - tb)
                     exact = r["need_a"] == tb - ta and r["need_b"] == ta - tb and r["done"]
                     nn = max(len(ta), len(tb), 2)
@@ -350,7 +320,7 @@ def run_props(branches=(16, 8)):
                            "c1": total <= gate, "rounds": r["rounds"]}
                     # interrupted at every round: partial results are true differences, sets untouched
                     for k in range(1, r["rounds"] + 1):
-                        p = reconcile(a, b, *band, v, branch=br, leaf=16, abort_after=k)
+                        p = reconcile(a, b, *band, branch=br, leaf=16, abort_after=k)
                         if not (p["need_a"] <= tb - ta and p["need_b"] <= ta - tb):
                             bad.append(("abort wrong", N, label, v, br, k))
                     if a.keys != ka or b.keys != kb:
@@ -365,7 +335,7 @@ def run_props(branches=(16, 8)):
         base = mk(N)
         a, b = KeySet(base + mk(rng.randrange(0, 20))), KeySet(base + mk(rng.randrange(0, 20)))
         seen_a, seen_b = set(a.keys), set(b.keys)
-        sa, sb = Session(a, "S2"), Session(b, "S2")
+        sa, sb = Session(a), Session(b)
         msg, side = sa.initiate(*band), sb
         while msg:
             for _ in range(rng.randrange(0, 4)):                     # someone writes, something expires
@@ -383,34 +353,19 @@ def run_props(branches=(16, 8)):
             bad.append(("concurrent: need not held by peer", trial))
         a.keys = sorted(set(a.keys) | sa.need & seen_b)
         a._pre = None
-        r2 = reconcile(a, b, *band, "S2")                            # a second, quiet session closes the rest
+        r2 = reconcile(a, b, *band)                                  # a second, quiet session closes the rest
         if r2["need_a"] != set(b.keys) - set(a.keys) or r2["need_b"] != set(a.keys) - set(b.keys):
             bad.append(("concurrent: second session not exact", trial))
         conc += 1
     res = {"rows": rows, "concurrent_trials": conc, "failures": bad[:50], "n_failures": len(bad)}
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "props.json").write_text(json.dumps(res, indent=1, default=str))
-    for v, br in (("S1", 16),) + tuple(("S2", b) for b in branches):
+    for v, br in tuple(("S2", b) for b in branches):
         rs = [x for x in rows if x["variant"] == v and x["branch"] == br]
         fails = [x for x in rs if not x["c1"]]
         log(f"{v} branch {br}: {len(rs)} cases, exact {sum(x['exact'] for x in rs)}, C1 pass {len(rs) - len(fails)};"
             f" C1 fails: {[(x['N'], x['case'], x['total_bytes'], x['gate']) for x in fails][:8]}")
     log(f"props: {len(bad)} failures (abort / unchanged / exact / concurrent), {conc} concurrent trials")
-
-
-# ---------------------------------------------------------------------------------------------- layer 3a: BFS
-def run_mc():
-    from sim.sync_mc import check
-    out = []
-    for mode in ("S12", "S0"):
-        r = check(mode)
-        out.append(r)
-        log(f"mc {mode}: {r['states']} states, {r['transitions']} transitions, truncated={r['truncated']}, "
-            f"violations={r['violations']}")
-        for k, ex in r["examples"].items():
-            log("   ", k, ex[0]["note"], ex[0]["state"][:160])
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "mc.json").write_text(json.dumps(out, indent=1, default=str))
 
 
 if __name__ == "__main__":
@@ -419,4 +374,4 @@ if __name__ == "__main__":
         ns = tuple(int(x) for x in sys.argv[2].split(",")) if len(sys.argv) > 2 else NS
         run_random(ns)
     else:
-        {"holes": run_holes, "props": run_props, "mc": run_mc, "cost": run_cost}[cmd]()
+        {"holes": run_holes, "props": run_props}[cmd]()

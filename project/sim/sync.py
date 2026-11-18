@@ -1,33 +1,30 @@
 """Box-to-box sync with boxes that come and go, links that drop, clocks that differ and boxes that lie (CP29).
 
-Message-level model. Each box holds signed immutable messages (post / comment / vote / delete). Variants:
+Message-level model. Each box holds signed immutable messages (post / comment / vote / delete) and syncs by S2: push
+ids first + range-based set reconciliation (RBSR, sim/recon.py), content ids, validate first, windows A/B and
+tombstone expiry, triggers (a)-(e); with the slow anti-entropy floor (f) unless floor=False.
 
-  S0   the CP26-CP28 demo box (X2): push ids first (no retries, only to peers known up); when a box comes on it asks ONE
-       peer for "everything since I went off minus 60 s" by author stamp, trusts the peer's coverage claim, asks a gap
-       of one more peer, and offers its last session's ids to one peer. Stores an envelope before validating it (H8),
-       ids are not content-checked, tombstones are kept forever, nothing expires.
-  S1   push ids first + set reconciliation with fixed 1 h buckets (sim/recon.py), content ids, validate first,
-       windows A/B and tombstone expiry, triggers (a)-(e); with the slow anti-entropy floor (f) unless floor=False.
-  S2   the same with range-based reconciliation (RBSR).
-
-CP30 cost fixes (flags, off by default so CP29 runs are unchanged; all three on = "S2c", cp/CP30.md):
+CP30 flags (cp/CP30.md; the CP30 default is S2+KE, the box adds F'):
   dedupe        K: one fetch per id at a time across sessions and IWANTs; an observed failure re-triggers the
                 sessions that skipped the id; a session that failed with a peer that is still up is retried with
                 backoff (CP29's design rule (c); the CP29 model only probed peers that were down, so a failed
                 fetch from an up peer waited for the floor)
-  floor_change  F: box X skips its floor check of Y while clean_X(Y): X's last session with Y found no difference
-                over X's band and X's set has changed since only by items that came from Y
-                "heard" (F', after the cost grid): ... and X heard from Y within the last P_AE max. Anything Y
-                sends to X (IHAVE, a session, a hello) shows Y is up and still counts X as its peer. Without it a box
-                whose peers restarted and forgot it kept "clean" ghosts and was cut off for hours (miss sweep, C-a)
-  px            P: random candidates (and probes of failed ones) only while the box has no up peer; once it has
-                one, new candidates come from peer exchange (hello answers carry the answerer's up mesh peers);
-                warm start mixes last session's mesh with random candidates (so the overlay does not freeze)
+  floor_change  F' ("heard"): box X skips its floor check of Y while clean_X(Y) and X heard from Y within the last
+                P_AE max. clean_X(Y): X's last session with Y found no difference over X's band and X's set has changed
+                since only by items that came from Y. Anything Y sends to X (IHAVE, a session, a hello) shows Y is up
+                and still counts X as its peer; without that a box whose peers restarted and forgot it kept "clean"
+                ghosts and was cut off for hours (CP30, the plain F)
+  explore       E: one random hello every explore_s. Without it two sides of a partition longer than the 1 h probe
+                give-up never meet again (H11)
   split_rng     world events (churn, writing, link drops, partitions) draw from their own stream, so variants
                 see the same workload (Codex review of the CP30 plan)
   miss_at       delivery sweeps: at these times, count (box, message) pairs where an honest box on for at least
                 t_bound lacks an in-band valid message older than t_bound that another on honest box holds
-                (P could split the overlay, which L1 does not see: it only judges pairs in contact)
+                (an overlay split is not seen by L1: it only judges pairs in contact)
+
+Retired in recast R1b (results stay in results/sync/, commands and code at tags pre-r1 and cp30): S0 (the CP26 X2
+demo box), S1 (fixed 1 h buckets), P (peer exchange) and P2 (candidate probe backoff), F (the plain changed-pair floor)
+and the variants made with them (S2c, S2+F, S2+P, S2+P2, S2+KF, S2+KF+P2, S2+KF'+P2).
 
 Faults: boxes on/off (always-on with outages, laptops, a correlated outage), link drops, partitions, transfers that
 fail observably (p_fail) and envelopes acked then lost (p_silent, the only loss nobody sees), per-box clock offsets
@@ -48,7 +45,7 @@ from __future__ import annotations
 import random
 import zlib
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass
 
 from .engine import Engine
 from .oracle import Oracle
@@ -57,14 +54,12 @@ from .recon import KeySet, TopicKeySet, reconcile
 DAY = 86400.0
 DIAG_S = 30.0                           # CP38 tail diagnosis: sampling period of the member-path check
 ENV, HDR, IDB = 1000, 40, 12          # bytes: envelope, request/answer header, one key on the wire (추정, CP26/recon)
-PXB = 8                               # one peer id in a peer-exchange hint (추정, CP30)
 
 
 @dataclass
 class SyncScene:
     n: int = 10
-    variant: str = "S2"                 # S0 / S1 / S2
-    floor: bool = True                  # anti-entropy floor (S1/S2)
+    floor: bool = True                  # anti-entropy floor (f)
     always: float = 1.0
     always_n: int | None = None
     msgs_per_day: float = 1.0           # per box (추정, CP16)
@@ -99,16 +94,13 @@ class SyncScene:
     pae: tuple = (600.0, 1800.0)        # floor period, uniform
     probe0: float = 5.0
     p_max: float = 300.0
-    w_s: float = 60.0                   # S0 catch-up margin
     l1_every_s: float = 1800.0
     seed: int = 29
     dedupe: bool = False                # CP30 K
-    floor_change: bool = False          # CP30 F
-    px: bool = False                    # CP30 P
+    floor_change: bool | str = False    # CP30 F': "heard"
     split_rng: bool = False             # CP30: separate world stream
-    cand_probe: tuple | None = None     # CP30 P2: (first, cap) backoff for failed candidates (never in the mesh)
-    explore: bool = False               # CP30 E: one random hello an hour (also on with px). Without it two sides of a
-                                        # partition longer than the 1 h probe give-up never meet again (H11)
+    explore: bool = False               # CP30 E: one random hello an hour. Without it two sides of a partition longer
+                                        # than the 1 h probe give-up never meet again (H11)
     miss_at: tuple = ()                 # CP30: delivery sweeps (s)
     topics: int = 0                     # CP33: number of subs (0 = one set for everything, CP29-CP30)
     sub_mode: str = "sub"               # CP33: "leak" (CP29-CP32 box) or "sub" (the fix)
@@ -149,7 +141,7 @@ class Box:
         self.sim, self.i, self.honest, self.liar_mode, self.off, self.always = sim, i, honest, liar_mode, offset, always
         self.on = False
         self.sid = 0
-        self.held: dict[int, Msg] = {}          # claimed id -> message (S0 also stores invalid ones here)
+        self.held: dict[int, Msg] = {}          # claimed id -> message
         self.keys = TopicKeySet()               # CP33: by sub (one sub when topics = 0)
         self.subs: frozenset = frozenset({0})   # CP33
         self.sub_cand: dict[int, list] = {}     # CP33 sub: candidates per sub (refilled at most every 600 s)
@@ -158,7 +150,6 @@ class Box:
         self.forgotten: dict[int, int] = {}     # target id -> tkey
         self.applied_del: set[int] = set()
         self.pending: dict[int, tuple] = {}     # comment/vote waiting for its target: claimed -> (msg, frm)
-        self.invalid_held: set[int] = set()
         self.mesh: set[int] = set()
         self.up: dict[int, bool] = {}
         self.dirty: set[int] = set()
@@ -169,27 +160,19 @@ class Box:
         self.cand: list[int] = []
         self.refill_t = -1e18
         self.down_since: dict[int, float] = {}
-        self.prev_taken: list[int] = []
-        self.asked: set[int] = set()
         self.last_recon: dict[int, float] = {}
         self.orphan: set[int] = set()
         self.cand_down: set[int] = set()
         self.fetching: dict[int, int] = {}      # CP30 K: id -> the peer it is being fetched from
         self.skipped: dict[int, set] = {}       # CP30 K: id -> peers whose session skipped it (in flight elsewhere)
         self.again: set[int] = set()            # CP30 K: reconcile again with these when the running session ends
-        self.clean: set[int] = set()            # CP30 F: peers p with clean_X(p)
+        self.clean: set[int] = set()            # CP30 F': peers p with clean_X(p)
         self.heard: dict[int, float] = {}       # CP30 F': last time anything came from p
-        self.prev_mesh: list[int] = []          # CP30 P: last session's mesh
-        self.hints: list[int] = []              # CP30 P: peers heard of in hello answers
-        self.hello_out: set[int] = set()        # CP30 P: candidates asked and not answered yet
+        self.hello_out: set[int] = set()        # candidates asked and not answered yet (CP33 sub, E)
         self.known: dict[int, list] = {}        # CP38 K: sub -> members I was up with, most recent first (kept)
         self.known_tried: set[int] = set()      # CP38 K: known members already asked this session
-        self.ver = 0                            # CP30 F: mutation generation of my set (the fence)
+        self.ver = 0                            # CP30 F': mutation generation of my set (the fence)
         self.session = 0.0
-        self.last_off = None
-        self.taken: list[int] = []              # S0: ids taken this session (offer)
-        self.cov = None
-        self.stalled = False
         self.c = Counter()                      # bytes and work counters
 
     def now(self) -> float:
@@ -364,11 +347,11 @@ class Sync:
                     A.mesh.discard(p)
                     self.boxes[p].mesh.discard(a)
                     self._contact(a, p)
-        if self.sc.variant != "S0" and A.honest and was is not True:
+        if A.honest and was is not True:
             if was is False or b in A.dirty:
                 self.recon(a, b, "b")                          # (b) peer became up after down
             self._floor_start(a, b)
-        elif remesh and self.sc.variant != "S0" and A.honest and not A.floor_n[b]:
+        elif remesh and A.honest and not A.floor_n[b]:
             self._floor_start(a, b)                            # CP33 fix: its floor timer had ended (not in the mesh)
 
     def mark_down(self, a: int, b: int):
@@ -377,7 +360,7 @@ class Sync:
         A.up[b] = False
         A.clean.discard(b)
         A.down_since.setdefault(b, self.eng.t)
-        if self.sc.variant == "S0" or not A.honest:
+        if not A.honest:
             self._graft(a)
             return
         A.dirty.add(b)
@@ -392,11 +375,8 @@ class Sync:
         A = self.boxes[a]
         if b in A.probing:
             return
-        p0, pm = self.sc.probe0, self.sc.p_max
-        if self.sc.cand_probe and b in A.cand_down and b not in A.mesh and b not in A.dirty:
-            p0, pm = self.sc.cand_probe                     # P2: a failed candidate is not a lost peer
-        d = A.backoff.get(b, p0 / 2) * 2
-        d = min(d, pm)
+        d = A.backoff.get(b, self.sc.probe0 / 2) * 2
+        d = min(d, self.sc.p_max)
         A.backoff[b] = d
         A.probing.add(b)
         self.eng.after(d, self._probe, a, A.sid, b)
@@ -408,10 +388,6 @@ class Sync:
             return
         if b not in A.mesh and b not in A.dirty and b not in A.cand_down:
             return
-        if (self.sc.px and b not in A.mesh and b not in A.dirty
-                and any(A.up.get(p) for p in A.mesh)):    # P: not alone any more, stop probing failed candidates
-            A.cand_down.discard(b)
-            return
         if self.eng.t - A.down_since.get(b, self.eng.t) > 3600.0:      # down for an hour: stop probing, drop it
             A.mesh.discard(b)
             A.dirty.discard(b)
@@ -422,55 +398,21 @@ class Sync:
 
     def _hello_at(self, b, a, silent=False):
         """b got a hello / probe from a: both now know each other is up (mutual graft)."""
-        B = self.boxes[b]
         self.mark_up(b, a)
-        if self.sc.variant == "S0" and B.stalled and B.honest:
-            B.stalled = False
-            self._s0_catch_up(b, a)
-        hints = []
-        if self.sc.px and B.honest:                      # P: peer exchange, my up mesh peers
-            hints = [p for p in B.mesh if p != a and B.up.get(p)][: self.sc.D_HI]
-        self.xfer(b, a, HDR + PXB * len(hints), "probe", self._hello_back, a, b, hints)
+        self.xfer(b, a, HDR, "probe", self._hello_back, a, b)
 
-    def _hello_back(self, a, b, hints=(), silent=False):
+    def _hello_back(self, a, b, silent=False):
         A = self.boxes[a]
         first = A.up.get(b) is not True
         A.hello_out.discard(b)
-        for h in hints:                                  # P: peer exchange
-            if h != a and h not in A.mesh and h not in A.hints:
-                A.hints.append(h)
         self.mark_up(a, b)
-        if self.sc.variant == "S0":
-            if first and A.cov is None and not A.stalled and A.inflight == set():
-                self._s0_catch_up(a, b)
-            elif A.stalled:
-                A.stalled = False
-                self._s0_catch_up(a, b)
-        elif first and A.honest:
+        if first and A.honest:
             self.recon(a, b, "a")                              # (a) I came on: reconcile with each up peer
-        if self.sc.px and hints and A.honest:
-            self._graft(a)
 
     def _graft(self, a: int):
         A = self.boxes[a]
         upn = sum(1 for p in A.mesh if A.up.get(p))
         need = self.sc.D - upn
-        if self.sc.px and A.honest:
-            need -= len(A.hello_out)                     # P: count the hellos still out
-        if self.sc.px and A.honest and upn > 0:        # P: not alone: candidates only from peer exchange
-            while need > 0 and A.hints:
-                c = A.hints.pop()
-                if c in A.mesh or A.up.get(c) or c in A.hello_out:
-                    continue
-                need -= 1
-                A.hello_out.add(c)
-                self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
-            if need > 0 and self.eng.t - A.refill_t > 600.0:     # ask one peer for fresh hints
-                A.refill_t = self.eng.t
-                ups = sorted(p for p in A.mesh if A.up.get(p))
-                q = self.rng.choice(ups)
-                self.xfer(a, q, HDR, "probe", self._hello_at, q, a, fail=lambda: self.mark_down(a, q))
-            return
         if need > 0 and not A.cand and self.eng.t - A.refill_t > 600.0:
             A.refill_t = self.eng.t
             A.cand = [c for c in range(self.sc.n) if c != a and c not in A.mesh and self.shares(a, c)]
@@ -480,7 +422,7 @@ class Sync:
             if c in A.mesh or c in A.hello_out:
                 continue
             need -= 1
-            if self.sc.px or self.subbed:
+            if self.subbed:
                 A.hello_out.add(c)
             self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
         if self.subbed and A.honest:
@@ -520,7 +462,7 @@ class Sync:
                 self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
 
     def _explore(self, a, sid):
-        """P: one random box an hour, so that two components meet again after a long partition (Codex 2nd review)."""
+        """E: one random box an hour, so that two components meet again after a long partition (Codex 2nd review)."""
         A = self.boxes[a]
         if not A.on or A.sid != sid:
             return
@@ -544,7 +486,7 @@ class Sync:
             return
         A.up[c] = False
         A.down_since.setdefault(c, self.eng.t)
-        if self.sc.variant != "S0" and A.honest and len(A.cand_down) < self.sc.D_HI:
+        if A.honest and len(A.cand_down) < self.sc.D_HI:
             A.cand_down.add(c)
             self._probe_later(a, c)
         self._graft(a)
@@ -568,34 +510,20 @@ class Sync:
         B.up, B.mesh, B.dirty, B.backoff, B.probing, B.down_since = {}, set(), set(), {}, set(), {}
         B.refill_t = self.eng.t
         B.cand_down = set()
-        B.requested, B.inflight, B.taken, B.cov, B.stalled = {}, set(), [], None, False
+        B.requested, B.inflight = {}, set()
         B.fetching, B.skipped, B.again, B.clean, B.heard = {}, {}, set(), set(), {}
         B.floor_n = Counter()
         self.ev["come_on"] += 1
-        if self.sc.variant != "S0":
-            self._expire(b)
-            self.eng.after(600.0, self._expiry_tick, b, B.sid)
-        else:
-            self.eng.after(self.sc.timeout_s * 3, self._s0_stall_check, b, B.sid)
+        self._expire(b)
+        self.eng.after(600.0, self._expiry_tick, b, B.sid)
         others = [c for c in range(self.sc.n) if c != b]
         self.rng.shuffle(others)
         if self.subbed:
             others = [c for c in others if self.shares(b, c)]
             B.sub_cand, B.sub_refill = {}, {}
-        B.hints, B.hello_out, B.known_tried = [], set(), set()
-        if self.sc.px and B.prev_mesh:                   # P: last mesh and random, interleaved (popped from the end)
-            prev = [c for c in B.prev_mesh if c != b]
-            ps = set(prev)
-            rest = [c for c in others if c not in ps]
-            mix = []
-            while prev or rest:
-                if rest:
-                    mix.append(rest.pop())
-                if prev:
-                    mix.append(prev.pop(0))
-            others = mix[::-1]
+        B.hello_out, B.known_tried = set(), set()
         B.cand = others
-        if (self.sc.px or self.sc.explore) and B.honest:
+        if self.sc.explore and B.honest:
             self.eng.after(self.rng.uniform(self.sc.explore_s / 2, self.sc.explore_s), self._explore, b, B.sid)
         self._graft(b)
 
@@ -606,16 +534,13 @@ class Sync:
         self._tr("off", b, round(self.eng.t, 3))
         B.on = False
         B.sid += 1
-        B.last_off = self.eng.t
         for d in self.pend.values():                     # CP38 diag: its live clock restarts at the next session
             d.pop(b, None)
-        B.prev_mesh = list(B.mesh)
         for p in list(B.mesh):
             self._contact(b, p)
         B.mesh = set()                                  # peers' meshes keep b until they notice
-        B.prev_taken = B.taken
 
-    # ------------------------------------------------------------------ expiry (S1/S2)
+    # ------------------------------------------------------------------ expiry
     def _expiry_tick(self, b, sid):
         B = self.boxes[b]
         if B.on and B.sid == sid:
@@ -648,11 +573,8 @@ class Sync:
                 if B.liar_mode == "squat":
                     self._announce(b, claimed, frm)
             return True
-        if sc.variant == "S0":
-            return self._accept_s0(b, claimed, m, frm, how)
         if B.has(claimed):
             B.c["dup_env"] += 1
-            self.oracle.on_refuse(B, m, claimed, "dup")
             return False
         if claimed != m.mid:                              # content id check (cheap hash), before any verification
             B.c["rej_id"] += 1
@@ -684,7 +606,7 @@ class Sync:
         B.held[claimed] = m
         B.keys.add((m.tkey, claimed), m.topic)
         B.ver += 1
-        if self.sc.floor_change:                          # F: my set changed; only the sender still matches me
+        if self.sc.floor_change:                          # F': my set changed; only the sender still matches me
             B.clean = (B.clean & {frm}) if frm is not None else set()
         B.fetching.pop(claimed, None)
         B.skipped.pop(claimed, None)
@@ -718,40 +640,10 @@ class Sync:
         self.oracle.on_apply_delete(B, d)
         B.applied_del.add(d.target)
         tgt = B.held.pop(d.target, None)
-        if self.sc.variant == "S0":
-            B.forgotten[d.target] = d.target_t0
-            return
         B.forgotten[d.target] = d.target_t0
         B.keys.add((d.target_t0, d.target), d.topic)      # the target's key stays (or appears) as a forgotten id
         if tgt is not None and tgt.kind != "post":
             pass
-
-    def _accept_s0(self, b, claimed, m, frm, how):
-        """The demo box before CP29: store, then validate (H8); ids not content-checked; no windows."""
-        B = self.boxes[b]
-        if claimed in B.held or claimed in B.forgotten:
-            B.c["dup_env"] += 1
-            self.oracle.on_refuse(B, m, claimed, "dup")
-            return False
-        B.held[claimed] = m
-        B.keys.add((m.tkey, claimed), m.topic)
-        B.taken.append(claimed)
-        B.c["needed_env"] += 1
-        self.oracle.on_hold(B, m, claimed)
-        B.c["verify"] += 1
-        ok = claimed == m.mid and m.valid and (m.kind != "delete" or m.target_sig_ok)
-        if not ok:
-            B.invalid_held.add(claimed)                   # stays stored and served (H8)
-            B.c["rej_sig"] += 1
-            return False
-        if m.kind == "post":
-            B.c["encode"] += 1
-        if m.author != b and B.on and B.session <= m.true_t:
-            self.live.append(self.eng.t - m.true_t)
-        if m.kind == "delete":
-            self._apply_delete(b, m)
-        self._announce(b, claimed, frm)
-        return True
 
     # ------------------------------------------------------------------ push: ids first (P2)
     def _announce(self, b, mid, frm):
@@ -776,7 +668,7 @@ class Sync:
         P.requested[mid] = frm
         self.xfer(p, frm, HDR + IDB, "iwant", self._iwant_at, frm, p, mid,
                   fail=lambda: self._want_failed(p, frm, mid))
-        if self.sc.variant != "S0" and P.honest:
+        if P.honest:
             self.eng.after(4 * self.sc.timeout_s, self._want_check, p, P.sid, frm, mid)
 
     def _iwant_at(self, frm, p, mid, silent=False):
@@ -817,7 +709,7 @@ class Sync:
             self._release(p, mid, False)
             return
         ok = self.accept(p, mid, m, frm, "push")
-        if not ok and P.honest and self.sc.variant != "S0" and mid != m.mid:
+        if not ok and P.honest and mid != m.mid:
             P.dirty.add(frm)                              # (c) a forged envelope is an observable failure
         if not P.has(mid):
             self._release(p, mid, True)
@@ -837,10 +729,10 @@ class Sync:
                 else:
                     self.recon(x, q, "c")
 
-    # ------------------------------------------------------------------ reconciliation (S1/S2)
+    # ------------------------------------------------------------------ reconciliation
     def recon(self, a: int, b: int, why: str):
         A, sc = self.boxes[a], self.sc
-        if sc.variant == "S0" or not A.on or not A.honest or b in A.inflight:
+        if not A.on or not A.honest or b in A.inflight:
             return
         if self.subbed and not self.common(a, b):           # CP33: no sub in common, nothing to reconcile
             return
@@ -862,9 +754,9 @@ class Sync:
         A, B, sc = self.boxes[a], self.boxes[b], self.sc
         liar = B.liar_mode if B.liar_mode in ("echo", "withhold") else None
         cm = self.common(a, b)
-        r = reconcile(A.keys.view(cm), B.keys.view(cm), lo, hi, sc.variant, liar_b=liar)
+        r = reconcile(A.keys.view(cm), B.keys.view(cm), lo, hi, liar_b=liar)
         if (sc.floor_change and r.get("done", True) and not r["need_a"] and not r["need_b"]
-                and A.ver == ver0):                        # F: no difference over my band, and no change since I began
+                and A.ver == ver0):                        # F': no difference over my band, and no change since I began
             A.clean.add(b)
         A.c["tx_recon"] += r["bytes"] // 2
         B.c["tx_recon"] += r["bytes"] - r["bytes"] // 2
@@ -978,7 +870,7 @@ class Sync:
             self.recon(a, b, "c")
 
     def _floor_start(self, a, b):
-        if not self.sc.floor or self.sc.variant == "S0":
+        if not self.sc.floor:
             return
         A = self.boxes[a]
         A.floor_n[b] += 1
@@ -992,9 +884,8 @@ class Sync:
             A.floor_n[b] -= 1
             return
         last = A.last_recon.get(b, -1e18)
-        quiet = (self.sc.floor_change == "heard"
-                 and self.eng.t - A.heard.get(b, -1e18) > self.sc.pae[1])   # F': no sign of life from b
-        if self.sc.floor_change and b in A.clean and not quiet:   # F: nothing changed here since a clean session
+        quiet = self.eng.t - A.heard.get(b, -1e18) > self.sc.pae[1]      # F': no sign of life from b
+        if self.sc.floor_change and b in A.clean and not quiet:   # F': nothing changed here since a clean session
             A.c["floor_skip"] += 1
             self.eng.after(self.rng.uniform(*self.sc.pae), self._floor_tick, a, sid, b)
             return
@@ -1004,70 +895,6 @@ class Sync:
         else:                                               # a session just ran: next check P_AE after it
             nxt = max(last + self.rng.uniform(*self.sc.pae) - self.eng.t, 1.0)
         self.eng.after(nxt, self._floor_tick, a, sid, b)
-
-    # ------------------------------------------------------------------ S0 catch-up and offer
-    def _s0_stall_check(self, b, sid):
-        B = self.boxes[b]
-        if B.on and B.sid == sid and B.cov is None and not B.inflight and not any(B.up.values()):
-            B.stalled = True
-
-    def _s0_catch_up(self, a, b, lo=None):
-        A = self.boxes[a]
-        if lo is None:
-            lo = (A.last_off - self.sc.w_s + A.off) if A.last_off is not None else -1e18
-        A.inflight.add(b)
-        self.xfer(a, b, HDR, "since", self._s0_since_at, b, a, lo, fail=lambda: self._s0_ask_next(a, b, lo))
-
-    def _s0_since_at(self, b, a, lo, silent=False):
-        B = self.boxes[b]
-        if B.honest:
-            out = [(mid, m) for mid, m in B.held.items() if m.t0 >= lo]
-            cov = B.cov if B.cov is not None else B.session + B.off
-        else:
-            out, cov = [], lo                             # a liar claims it covers everything and sends nothing
-        self.xfer(b, a, HDR + ENV * len(out), "since_env", self._s0_since_back, a, b, lo, out, cov)
-
-    def _s0_since_back(self, a, b, lo, out, cov, silent=False):
-        A = self.boxes[a]
-        A.inflight.discard(b)
-        for mid, m in out:
-            self.accept(a, mid, m, b, "since")
-        if cov > lo and not A.inflight:
-            asked = getattr(A, "asked", set()) | {b}
-            A.asked = asked
-            nxt = [p for p in A.mesh if A.up.get(p) and p not in asked]
-            if nxt:
-                self._s0_catch_up(a, nxt[0], lo)
-                return
-        A.cov = lo if cov <= lo else cov                  # unfilled gap is kept, never retried (H2)
-        A.asked = set()
-        offer = list(A.prev_taken)
-        if offer:
-            self.xfer(a, b, HDR + IDB * len(offer), "offer", self._s0_offer_at, b, a, offer)
-
-    def _s0_ask_next(self, a, b, lo):
-        A = self.boxes[a]
-        A.inflight.discard(b)
-        nxt = [p for p in A.mesh if A.up.get(p) and p != b]
-        if nxt:
-            self._s0_catch_up(a, nxt[0], lo)
-        else:
-            A.stalled = True
-
-    def _s0_offer_at(self, b, a, offer, silent=False):
-        B = self.boxes[b]
-        want = [mid for mid in offer if not B.has(mid)]
-        if want and B.honest:
-            self.xfer(b, a, HDR + IDB * len(want), "want", self._s0_want_at, a, b, want)
-
-    def _s0_want_at(self, a, b, want, silent=False):
-        A = self.boxes[a]
-        out = [(mid, A.held[mid]) for mid in want if mid in A.held]
-        self.xfer(a, b, HDR + ENV * len(out), "since_env", self._s0_offer_back, b, a, out)
-
-    def _s0_offer_back(self, b, a, out, silent=False):
-        for mid, m in out:
-            self.accept(b, mid, m, a, "offer")
 
     # ------------------------------------------------------------------ writing
     def set_subs(self, b: int, subs) -> None:
@@ -1427,7 +1254,7 @@ class Sync:
         n_days = sc.days
         idle = sum(v for k, v in tot.items() if k in ("tx_recon", "tx_probe")) / max(len(honest), 1) / n_days
         return {
-            "n": sc.n, "variant": sc.variant, "floor": sc.floor, "seed": sc.seed,
+            "n": sc.n, "floor": sc.floor, "seed": sc.seed,
             "messages": len(self.msgs), "events": self.eng.events,
             "violations": dict(self.oracle.viol), "examples": self.oracle.examples,
             "l1_checks": self.oracle.l1_checks, "l1_items": self.oracle.l1_items,

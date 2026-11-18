@@ -1,12 +1,15 @@
-"""CP30: squeeze the sync cost (K fetch dedupe + retry, F floor only for changed pairs, P peer discovery) and verify
+"""CP30: squeeze the sync cost (K fetch dedupe + retry, F' floor only for changed pairs, E exploration) and verify
 again in layers (cp/CP30.md has the rules, written before results).
 
   .venv/Scripts/python.exe -W ignore experiments/sync.py holes    # layer 2: CP29 scenes + new ones -> results/sync/holes.json
   .venv/Scripts/python.exe -W ignore experiments/sync.py mc       # layer 3a: clean flags + mutants  -> results/sync/mc.json
-  .venv/Scripts/python.exe -W ignore experiments/sync.py cost     # CP26 scenes, gate (i)-(iii)       -> results/sync/cost.json
+  .venv/Scripts/python.exe -W ignore experiments/sync.py cost4    # CP26 scenes, S2+KE and S2+KF'E   -> results/sync/cost4.json
   .venv/Scripts/python.exe -W ignore experiments/sync.py idle     # gate 2: no posts, no faults       -> results/sync/idle.json
-  .venv/Scripts/python.exe -W ignore experiments/sync.py traffic  # info: 10 posts a box a day        -> results/sync/traffic.json
   .venv/Scripts/python.exe -W ignore experiments/sync.py random   # layer 1: S2+KE and S2+KF'E         -> results/sync/random.json
+
+Retired in recast R1b: the variants S0 (X2), F, P, P2 and their mixes (S2c, S2+F, S2+P, S2+P2, S2+KF, S2+KF+P2,
+S2+KF'+P2), the grids that compared them (cost, cost2, cost3, traffic) and the gate (experiments/sync_gate.py). Their
+results stay in results/sync/ (cost*.json, traffic.json, gate.json); the commands run at tag pre-r1.
 """
 from __future__ import annotations
 
@@ -24,15 +27,9 @@ import sync_scenes as c29  # noqa: E402
 OUT = ROOT / "results" / "sync"
 T0 = time.time()
 WORLD = {"split_rng": True}                       # every CP30 run, the S2 baseline too (Codex 1st review)
-VAR = {"S2": {}, "S2+K": {"dedupe": True}, "S2+F": {"floor_change": True}, "S2+P": {"px": True},
-       "S2c": {"dedupe": True, "floor_change": True, "px": True},
-       # after the cost grid: P1 made live delivery worse in C-b n = 1000, so by the rule (cp/CP30.md) P1 -> P2
-       "S2+P2": {"cand_probe": (60.0, 3600.0)},
-       "S2+KF": {"dedupe": True, "floor_change": True},
-       "S2+KF+P2": {"dedupe": True, "floor_change": True, "cand_probe": (60.0, 3600.0)},
+VAR = {"S2": {}, "S2+K": {"dedupe": True},
        # after cost2 (labelled): F left boxes with forgotten one-sided peers cut off -> F' ("heard")
        "S2+KF'": {"dedupe": True, "floor_change": "heard"},
-       "S2+KF'+P2": {"dedupe": True, "floor_change": "heard", "cand_probe": (60.0, 3600.0)},
        # after layer 2 (labelled): S2+K kept H11 (a long partition never heals) -> E, exploration on its own
        "S2+KE": {"dedupe": True, "explore": True},
        "S2+KF'E": {"dedupe": True, "floor_change": "heard", "explore": True}}
@@ -44,9 +41,7 @@ def log(*a):
 
 
 def scene(n, v, **kw):
-    if v == "S0":
-        return SyncScene(n=n, variant="S0", floor=False, **WORLD, **kw)
-    return SyncScene(n=n, variant="S2", floor=True, **WORLD, **VAR[v], **kw)
+    return SyncScene(n=n, floor=True, **WORLD, **VAR[v], **kw)
 
 
 # ---------------------------------------------------------------------------------------------- layer 2: directed
@@ -83,7 +78,7 @@ def new_scenes():
                         at(130, "X", 0, "x30"), (100 + T + 60, "until")],
                   checks=[("box0 holds X within 30 s", lambda s: s.seen.get("x30", False)),
                           ("box0 holds X within t_bound", lambda s: s.holds(0, "X"))],
-                  fail={"S2", "S2+F", "S2+P"}, fail_check={"box0 holds X within 30 s"}))
+                  fail={"S2"}, fail_check={"box0 holds X within 30 s"}))
 
     # F: box 0 takes W from box 2 while it is clean towards box 1; the push 0->1 (and 2->1) is lost silently
     S.append(dict(name="F third-party change, push to Y silently lost", n=3,
@@ -110,7 +105,7 @@ def new_scenes():
                            lambda s: sum(B.c["recon_f"] for B in s.boxes) - s.day1 <= 3)],
                   report=lambda s: {"floor_sessions_day2": sum(B.c["recon_f"] for B in s.boxes) - s.day1,
                                     "floor_skips": sum(B.c["floor_skip"] for B in s.boxes)},
-                  fail={"S2", "S2+K", "S2+P", "S2+KF'", "S2+KF'+P2", "S2+KE", "S2+KF'E"}))
+                  fail={"S2", "S2+K", "S2+KF'", "S2+KE", "S2+KF'E"}))
 
     # P: only the always-on box is on when a laptop comes on (twice)
     def hellos(s):
@@ -129,15 +124,15 @@ def new_scenes():
                   rows=[(0, "on", b) for b in range(8)] + [(100, "part", [0, 1, 2, 3]), (7300, "heal"),
                                                             (7400, "pub", 0, "post", "X"), (7400 + 7200, "until")],
                   checks=[("boxes 4-7 hold X", lambda s: all(s.holds(b, "X") for b in (4, 5, 6, 7)))],
-                  fail={"S2", "S2+K", "S2+F", "S2+KF'", "S2+KF'+P2"}))
+                  fail={"S2", "S2+K", "S2+KF'"}))
     return S
 
 
 def run_holes():
     out = []
     names = list(VAR)
-    for sc_def in c29.scene_list():                    # CP29 scenes: S2 and S2c must pass as predicted there
-        for v in ("S2", "S2c"):
+    for sc_def in c29.scene_list():                    # CP29 scenes: S2 must pass as predicted there
+        for v in ("S2",):
             sc = scene(sc_def["n"], v, days=10.0, **c29.QUIET)
             sim = Sync(sc, script=list(sc_def["rows"]))
             r = sim.run()
@@ -152,7 +147,7 @@ def run_holes():
             log(f"{sc_def['name'][:50]:50s} {v:5s} {'PASS' if passed else 'FAIL'}"
                 f"{'' if passed != pred_fail else '  <-- NOT AS PREDICTED'} {checks}")
     for inject in (None, 3 * c29.SIG):                 # tombstone invariant
-        for v in ("S2", "S2c"):
+        for v in ("S2",):
             rows, lo, hi = c29.tomb_scene(inject)
             sim = Sync(scene(2, v, days=10.0, **c29.QUIET), script=rows)
             found: list = []
@@ -174,18 +169,12 @@ def run_holes():
             fc = sc_def.get("fail_check")
             passed = all(checks.values()) and not r["violations"]
             pred_fail = v in sc_def["fail"]
-            if v in ("S2+P2", "S2+KF", "S2+KF+P2"):         # added after the cost grid; no prediction written
-                as_pred_note = "no prediction"
-            else:
-                as_pred_note = ""
             if fc:                                     # the predicted failure is on these checks only
                 ok_other = all(val for lab, val in checks.items() if lab not in fc) and not r["violations"]
                 as_pred = ok_other and (all(checks[l] for l in fc) != pred_fail)
             else:
                 as_pred = passed != pred_fail
             rep = sc_def["report"](sim) if "report" in sc_def else None
-            if as_pred_note:
-                as_pred = None
             out.append({"scene": sc_def["name"], "variant": v, "pass": passed, "predicted_fail": pred_fail,
                         "as_predicted": as_pred, "checks": checks, "violations": r["violations"], "report": rep,
                         "triggers": r["triggers"]})
@@ -206,10 +195,10 @@ def run_mc():
         out.append(r)
         log(f"mc clean flags mutate={m}: {r['states']} states, {r['transitions']} transitions, "
             f"truncated={r['truncated']}, violations={r['violations']}")
-    for mode in ("S12", "S0"):                         # CP29 regression (keyset knows P3 now)
-        r = check(mode)
+    for m in (None, "accept_forged", "resurrect"):     # CP29 regression; the mutants show the search can fail
+        r = check(mutate=m)
         out.append(r)
-        log(f"mc {mode}: {r['states']} states, violations={r['violations']}")
+        log(f"mc {r['mode']} mutate={m}: {r['states']} states, violations={r['violations']}")
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "mc.json").write_text(json.dumps(out, indent=1, default=str))
 
@@ -259,38 +248,6 @@ def _pool(jobs, fn, name, workers=14):
     return out
 
 
-def run_cost():
-    jobs = [(s, n, v, 1, {}) for n in (1000, 300, 100, 30, 10) for s in ("C-a", "C-b", "C-c")
-            for v in ("S0",) + tuple(VAR)]
-    jobs += [(s, n, v, seed, {}) for n in (100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in ("S2", "S2c")
-             for seed in (2, 3)]
-    out = _pool(jobs, _cost_one, "cost")
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "cost.json").write_text(json.dumps(out, indent=1, default=str))
-
-
-def run_cost2():
-    """After the cost grid (labelled in cp/CP30.md): S2+P2, S2+KF, S2+KF+P2 and S2 again (for the trace check)."""
-    vs = ("S2", "S2+P2", "S2+KF", "S2+KF+P2")
-    jobs = [(s, n, v, 1, {}) for n in (1000, 300, 100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in vs]
-    jobs += [(s, n, v, seed, {}) for n in (100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in ("S2", "S2+KF+P2")
-             for seed in (2, 3)]
-    out = _pool(jobs, _cost_one, "cost2")
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "cost2.json").write_text(json.dumps(out, indent=1, default=str))
-
-
-def run_cost3():
-    """After cost2 (labelled in cp/CP30.md): F' variants; S2 again for the trace and miss baseline."""
-    vs = ("S2", "S2+KF'", "S2+KF'+P2")
-    jobs = [(s, n, v, 1, {}) for n in (1000, 300, 100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in vs]
-    jobs += [(s, n, v, seed, {}) for n in (100, 30, 10) for s in ("C-a", "C-b", "C-c") for v in vs
-             for seed in (2, 3, 4, 5)]
-    out = _pool(jobs, _cost_one, "cost3")
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "cost3.json").write_text(json.dumps(out, indent=1, default=str))
-
-
 def run_cost4():
     """After layer 2 (labelled): E (exploration on its own)."""
     vs = ("S2+KE", "S2+KF'E")
@@ -300,14 +257,6 @@ def run_cost4():
     out = _pool(jobs, _cost_one, "cost4")
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "cost4.json").write_text(json.dumps(out, indent=1, default=str))
-
-
-def run_traffic():
-    jobs = [(s, 100, v, 1, {"msgs_per_day": mpd}) for s in ("C-a", "C-b") for v in ("S0", "S2", "S2c")
-            for mpd in (1.0, 10.0)]
-    out = _pool(jobs, _cost_one, "traffic")
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "traffic.json").write_text(json.dumps(out, indent=1, default=str))
 
 
 def _idle_one(job):
@@ -324,7 +273,7 @@ def _idle_one(job):
 
 def run_idle():
     from concurrent.futures import ProcessPoolExecutor
-    jobs = [(n, v) for n in (10, 30, 100, 300) for v in ("S2", "S2c", "S2+KF", "S2+KF+P2", "S2+K", "S2+KF'", "S2+KF'+P2", "S2+KE", "S2+KF'E")]
+    jobs = [(n, v) for n in (10, 30, 100, 300) for v in VAR]
     with ProcessPoolExecutor(8) as ex:
         out = list(ex.map(_idle_one, jobs))
     for r in out:
@@ -370,4 +319,4 @@ if __name__ == "__main__":
         ns = tuple(int(x) for x in sys.argv[2].split(",")) if len(sys.argv) > 2 else c29.NS
         run_random(ns)
     else:
-        {"holes": run_holes, "mc": run_mc, "cost": run_cost, "cost2": run_cost2, "cost3": run_cost3, "cost4": run_cost4, "idle": run_idle, "traffic": run_traffic}[cmd]()
+        {"holes": run_holes, "mc": run_mc, "cost4": run_cost4, "idle": run_idle}[cmd]()

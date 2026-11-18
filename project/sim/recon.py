@@ -1,13 +1,12 @@
 """Set reconciliation between two boxes (CP29). Shared by the model (sim/sync.py) and the demo box.
 
 A box's reconciled set is a sorted set of keys (t_key, id): t_key is an int second (a message's own author stamp, or
-for a delete the target's stamp), id a 64-bit int (content hash). Two variants run on one engine:
+for a delete the target's stamp), id a 64-bit int (content hash).
 
-  S2  range-based set reconciliation (RBSR, the idea of Negentropy): one fingerprint over the band; a range whose
-      fingerprints differ is split into BRANCH (8, picked by the C1 gate in layer 3b) sub-ranges by the responder's own items, until a side holds at most LEAF
-      items in it, which it then sends as a list of ids.
-  S1  fixed time buckets: the band is cut into buckets of BUCKET_S seconds, one fingerprint each; a differing bucket
-      is answered with its whole id list (LEAF = infinity, no recursion).
+S2, range-based set reconciliation (RBSR, the idea of Negentropy): one fingerprint over the band; a range whose
+fingerprints differ is split into BRANCH (8, picked by the C1 gate in layer 3b) sub-ranges by the responder's own
+items, until a side holds at most LEAF items in it, which it then sends as a list of ids. S1 (fixed 1 h buckets, one
+fingerprint each) failed CP29's C1 gate (23/46 cases, idle 345 KB/box-day) and was retired in recast R1b (tag pre-r1).
 
 Fingerprint of a range = (sum of ids mod 2^64, count). A real box would hash ids to 128 bits first; the byte model
 charges 16 B for it.
@@ -159,12 +158,10 @@ class TopicView:
 
 
 class Session:
-    """One side of a reconciliation. `variant` 'S1' or 'S2'. The band [lo, hi) is set by the initiator."""
+    """One side of a reconciliation. The band [lo, hi) is set by the initiator."""
 
-    def __init__(self, ks: KeySet, variant: str = "S2", branch: int = 8, leaf: int = 16, bucket_s: int = 3600,
-                 liar: str | None = None):
-        self.ks, self.variant, self.branch, self.bucket_s = ks, variant, branch, bucket_s
-        self.leaf = leaf if variant == "S2" else 10 ** 12
+    def __init__(self, ks: KeySet, branch: int = 8, leaf: int = 16, liar: str | None = None):
+        self.ks, self.branch, self.leaf = ks, branch, leaf
         self.liar = liar                      # None / 'echo' (claims every fingerprint matches) / 'withhold' (hides)
         self.need: set = set()
         self.have: set = set()
@@ -195,18 +192,6 @@ class Session:
         return self.ks.fp(lo, hi)
 
     def initiate(self, lo, hi):
-        if self.variant == "S1":
-            assert hi[0] - lo[0] < 10 ** 8, "S1 needs a finite band"
-            msg, t = [], lo[0] - lo[0] % self.bucket_s
-            edges = [lo]
-            while t + self.bucket_s < hi[0]:
-                t += self.bucket_s
-                edges.append((t, -1))
-            edges.append(hi)
-            for a, b in zip(edges[:-1], edges[1:]):
-                if a < b:
-                    msg.append((a, b, FP, self._fp(a, b)))
-            return self._send(msg)
         return self._send([(lo, hi, FP, self._fp(lo, hi))])
 
     def _split(self, lo, hi):
@@ -250,12 +235,12 @@ class Session:
         return self._send(out) if out else out
 
 
-def reconcile(a: KeySet, b: KeySet, lo, hi, variant="S2", liar_b: str | None = None, max_rounds: int = 64,
+def reconcile(a: KeySet, b: KeySet, lo, hi, liar_b: str | None = None, max_rounds: int = 64,
               abort_after: int | None = None, **kw):
     """Run a whole session in memory (initiator a, responder b). Returns dict with need_a, need_b, bytes, rounds.
     abort_after: stop after that many messages (interrupted session)."""
-    sa = Session(a, variant, **kw)
-    sb = Session(b, variant, liar=liar_b, **kw)
+    sa = Session(a, **kw)
+    sb = Session(b, liar=liar_b, **kw)
     msg = sa.initiate(lo, hi)
     side, n = sb, 1
     while msg and n < max_rounds and (abort_after is None or n < abort_after):
