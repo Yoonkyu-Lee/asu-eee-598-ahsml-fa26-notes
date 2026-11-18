@@ -11,22 +11,22 @@ DAY = 86400.0
 @dataclass(frozen=True)
 class Params:
     users: int = 1000
-    # activity, per daily active user per day (filled from cp/CP16.md sources)
-    dau_frac: float = 0.25
-    posts_per_dau: float = 0.05
-    comments_per_dau: float = 0.5
-    votes_per_dau: float = 5.0
-    lurker_frac: float = 0.9          # users who never write (they may still vote)
-    tail_sigma: float = 1.5           # lognormal spread of per-user rates (heavy tail)
+    # activity, per daily active user per day: the CP16 BASE (legacy/src/sim_cp16.py, journal/cp/CP16.md "매개변수")
+    dau_frac: float = 0.26            # Reddit DAUq 121.4M / WAUq 471.6M (Q4'25 shareholder letter)
+    posts_per_dau: float = 0.0147     # 0.10 posts+comments per DAUq-day (2.2B in H2'25) x posts share 1/(1+5.8) (2022)
+    comments_per_dau: float = 0.0853
+    votes_per_dau: float = 0.82       # upvotes 24B vs posts+comments 2.93B (2022) = 8.2 per item, x 0.10
+    lurker_frac: float = 0.90         # 90-9-1 (Nielsen Norman Group); lurkers never write, they may still vote
+    tail_sigma: float = 1.85          # lognormal: "20% of users contribute 84% of the comments" (arXiv 2503.02661)
     # topics
-    users_per_topic: float = 100.0
-    zipf_s: float = 1.0
-    subs_per_user: float = 10.0
+    users_per_topic: float = 4700.0   # 121.4M DAUq / >100k active subreddits / 0.26 (S-1, Q4'25 letter)
+    zipf_s: float = 1.3               # 85% of comments in the top 500 of 100k subreddits (Pew 2016)
+    subs_per_user: float = 10.0       # (추정)
     # content
-    image_frac: float = 0.3
-    image_bytes: float = 300e3
-    post_bytes: float = 600.0
-    comment_bytes: float = 200.0
+    image_frac: float = 0.30          # ~30% of submissions are images, gifs, videos (arXiv 1703.01725)
+    image_bytes: float = 177e3        # web image p90 (HTTP Archive Web Almanac 2024) as a photo proxy (추정 choice)
+    post_bytes: float = 650.0         # (추정) CP4 sample: mean 164 tokens x ~4 bytes per token
+    comment_bytes: float = 180.0      # 30.15 words mean (arXiv 2105.12006) x ~6 bytes per word
     vote_bytes: float = 40.0          # one vote inside a message (post id + direction)
     overhead_bytes: float = 400.0     # header + signature 64 + RLN proof 128 (compressed) + nullifier, share
     # time of day: activity per hour relative to the daily mean (mean of the 24 values = 1)
@@ -40,6 +40,10 @@ class Params:
 
     def with_(self, **kw) -> "Params":
         return replace(self, **kw)
+
+
+# CP16 high band for writing and voting (x5: DAUq counts logged-out readers, engaged users write more)
+HIGH_ACTIVITY = {"posts_per_dau": 0.0735, "comments_per_dau": 0.4265, "votes_per_dau": 4.1}
 
 
 @dataclass

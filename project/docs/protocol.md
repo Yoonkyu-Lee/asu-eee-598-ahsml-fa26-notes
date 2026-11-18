@@ -104,6 +104,8 @@ the gate table `results/sync/gate.json`) runs at tag `pre-r1` (recast R1b).
 
 ## Sub-communities (H12 found in CP32, fixed in CP33)
 
+> **Direction change (CP39, owner decision 2026-11-18; model and calculation, the box code is unchanged until the 2026-12-06 freeze):** public posts go to every box, and each box filters locally what its owner reads and follows. Box load = all public posts + the private groups the box joined. Under this design H12 is the intended behaviour for public posts; the per-sub reconciliation below stays for private groups (invite rooms, tag stores) until LEDGER D11 is decided. Design point 10^6 members fits the assumed budgets (busy hour 4.4 messages/s per box, 1.06-1.22x a sub-only box, estimate, CP16 sourced activity); 10^7 fits the sourced budgets at CP16 activity and exceeds upload, monthly volume and storage at the x5 high band (estimate); the owner listed 10^7 as a new requirement, to be revisited after a correction. Semantic-neighbourhood routing failed its pre-registered rules on real posts (model). Numbers: `journal/cp/CP39.md`.
+
 A box receives only the sub-communities (subs) it joined.
 - A session reconciles only the subs both boxes hold. A fingerprint is a sum of ids, so the subs' fingerprints add, and one session with the same wire format covers them (`sim/recon.py` `TopicKeySet`).
 - A box refuses a message of a sub it does not hold before verifying it (`rej_sub`). The exhaustive check shows this receive check alone keeps S5 ("no box holds a sub it did not join"); filtering the session keeps the cost down.

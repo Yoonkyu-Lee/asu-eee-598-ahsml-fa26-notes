@@ -4,8 +4,10 @@ cost one box at 10^6 and 10^7 members?
   .venv/Scripts/python.exe -W ignore experiments/hood_scale.py         -> results/neighborhoods/b_scale.json
   .venv/Scripts/python.exe -W ignore experiments/hood_scale.py 10m     -> results/neighborhoods/b_scale_10m.json (re-judged)
   .venv/Scripts/python.exe -W ignore experiments/hood_scale.py spam    -> results/neighborhoods/spam_all.json
+  add "high" to any of the three for the CP16 high activity band (x5 writing and voting) -> *_high.json
 
-Rates: the CP16 behaviour model (sim/community.py, sourced parameters) at 10^6 members; 10^7 = 10x (estimate: linear).
+Rates: the CP16 behaviour model (sim/community.py, the sourced CP16 BASE) at 10^6 members; 10^7 = 10x (estimate:
+linear). The first CP39 run used unsourced defaults (0.05 / 0.5 / 5.0 per DAU), corrected in CP39.md.
 Times: chip/model/chip.py (chip), results/chip/cp6_crypto.json (measured CPU proof verification). Every number is an
 estimate (model) unless marked.
 """
@@ -20,7 +22,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from chip.model.chip import IMAGE_S, PROOF_S, SPEC, text_table  # noqa: E402
-from sim.community import Params, build, topic_rates  # noqa: E402
+from sim.community import HIGH_ACTIVITY, Params, build, topic_rates  # noqa: E402
 
 OUT = ROOT / "results" / "neighborhoods" / "b_scale.json"
 CP6_POSTS_PER_S = 1_000_000 / 86_400        # CP6 ordinary day: the chip's ordinary-day load
@@ -43,10 +45,12 @@ JOIN_PER_DAY = (0.001, 0.01)                # (assumption) members joining or re
 LINE_BPS = 100e6                            # the FCC benchmark download, for the bootstrap time
 UNIT_BYTES = 400 + 256 * 4                  # spam unit: overhead + a 256-token text at ~4 bytes per token (assumption)
 LIMITS_PER_DAY = {"old": 6 * 144, "new": 5 * 24}   # CP22: 6 units / 10 min, new groups 5 units / h
+BAND = HIGH_ACTIVITY if "high" in sys.argv[1:] else {}
+SUFFIX = "_high" if BAND else ""
 
 
 def main():
-    p = Params(users=1_000_000)
+    p = Params(users=1_000_000, **BAND)
     c = build(p)
     peak = float(max(p.diurnal))
     tr = topic_rates(c)                      # per topic, per second, daily mean
@@ -62,6 +66,7 @@ def main():
     box_sub = np.bincount(c.su, weights=per_topic_msgs[c.st], minlength=p.users)
 
     res = {"what": "CP39 B1 (journal/cp/CP39.md)", "label": "estimate (CP16 behaviour model x chip model)",
+           "band": "high" if BAND else "base",
            "params": {"dau_frac": p.dau_frac, "posts_per_dau": p.posts_per_dau, "comments_per_dau": p.comments_per_dau,
                       "votes_per_dau": p.votes_per_dau, "peak_factor": peak, "keep_days": KEEP_DAYS,
                       "post_tokens": POST_TOKENS, "comment_tokens": COMMENT_TOKENS, "budget": BUDGET},
@@ -99,11 +104,11 @@ def main():
         res["scales"][str(users)] = r
         print(users, {a: (round(b, 4) if isinstance(b, float) else b) for a, b in r.items()}, flush=True)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(res, indent=1), encoding="utf-8")
+    OUT.with_name(OUT.stem + SUFFIX + ".json").write_text(json.dumps(res, indent=1), encoding="utf-8")
 
 
 def _rates(k):
-    p = Params(users=1_000_000)
+    p = Params(users=1_000_000, **BAND)
     c = build(p)
     tr = topic_rates(c)
     r = {x: float(tr[x].sum()) * k for x in ("post", "comment", "vote", "votes_inside")}
@@ -148,6 +153,7 @@ def rejudge_10m():
                                        "mean_Mbps": (down_Bps + serve_Bps) / phi * 8 / 1e6}
     month_GB = {k: (down_Bps * 8 / 1e6 + v["mean_Mbps"]) * 1e6 / 8 * 86400 * 30 / 1e9 for k, v in up.items()}
     res = {"what": "CP39 B1 10^7 re-judgement (journal/cp/CP39.md)", "label": "estimate (CP16 model x10, chip model)",
+           "band": "high" if BAND else "base",
            "sources": SOURCES, "budget": BUDGET_10M,
            "assumptions": {"id_first_bytes": ID_FIRST, "online": ONLINE, "join_per_day": JOIN_PER_DAY,
                            "keep_days": KEEP_DAYS, "pi5_slowdown": PI5_SLOW},
@@ -169,12 +175,13 @@ def rejudge_10m():
                    "chip_f1": res["chip_busy_peak_f1"] <= BUDGET_10M["chip_busy"],
                    "bootstrap_chip": boot["ready_h_chip"] <= BUDGET_10M["bootstrap_h"]}
     res["pass"]["all_with_chip"] = all(v for k, v in res["pass"].items() if k != "cpu_no_chip")
-    (OUT.parent / "b_scale_10m.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+    (OUT.parent / f"b_scale_10m{SUFFIX}.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     print(json.dumps(res, indent=1))
 
 
 def spam():
     out = {"what": "CP39 spam to every box (journal/cp/CP39.md)", "label": "estimate (CP22 limits x CP16 model)",
+           "band": "high" if BAND else "base",
            "assumptions": {"unit_bytes": UNIT_BYTES, "limits_per_day": LIMITS_PER_DAY, "flat_rate": True}, "rows": []}
     pi5_proof_s = _pi5_proof_s()
     t256 = text_table().text1(256)[0]
@@ -192,10 +199,11 @@ def spam():
                                     "chip_encode_busy_f1": ps * t256, "chip_encode_busy_f001": ps * t256 * 0.01,
                                     "feed_share_all": n / (n + honest_texts),
                                     "feed_share_top_tag": n / (n + honest_texts * r["top_topic_share"])})
-    (OUT.parent / "spam_all.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    (OUT.parent / f"spam_all{SUFFIX}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     for x in out["rows"]:
         print({a: (round(b, 4) if isinstance(b, float) else b) for a, b in x.items()})
 
 
 if __name__ == "__main__":
-    {"10m": rejudge_10m, "spam": spam}.get(sys.argv[1] if sys.argv[1:] else "", main)()
+    mode = next((a for a in sys.argv[1:] if a != "high"), "")
+    {"10m": rejudge_10m, "spam": spam}.get(mode, main)()

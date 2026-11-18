@@ -1,6 +1,7 @@
 {
  "what": "CP39 spam to every box (journal/cp/CP39.md)",
  "label": "estimate (CP22 limits x CP16 model)",
+ "band": "base",
  "assumptions": {
   "unit_bytes": 1424,
   "limits_per_day": {
@@ -21,8 +22,8 @@
    "cpu_cores_pi5": 0.00103728409375,
    "chip_encode_busy_f1": 0.03929692430020283,
    "chip_encode_busy_f001": 0.00039296924300202834,
-   "feed_share_all": 0.38647281521642973,
-   "feed_share_top_tag": 0.8604405500632425
+   "feed_share_all": 0.7694425439263901,
+   "feed_share_top_tag": 0.9159416700389331
   },
   {
    "users": 1000000,
@@ -35,8 +36,8 @@
    "cpu_cores_pi5": 0.00014406723524305556,
    "chip_encode_busy_f1": 0.0054579061528059495,
    "chip_encode_busy_f001": 5.4579061528059496e-05,
-   "feed_share_all": 0.08045033113275638,
-   "feed_share_top_tag": 0.4612957913177095
+   "feed_share_all": 0.3167138947255892,
+   "feed_share_top_tag": 0.6021330294468121
   },
   {
    "users": 1000000,
@@ -49,8 +50,8 @@
    "cpu_cores_pi5": 0.0103728409375,
    "chip_encode_busy_f1": 0.3929692430020283,
    "chip_encode_busy_f001": 0.003929692430020283,
-   "feed_share_all": 0.8629986147235373,
-   "feed_share_top_tag": 0.9840393401934128
+   "feed_share_all": 0.9709075137298715,
+   "feed_share_top_tag": 0.9909061981900674
   },
   {
    "users": 1000000,
@@ -63,8 +64,8 @@
    "cpu_cores_pi5": 0.0014406723524305555,
    "chip_encode_busy_f1": 0.05457906152805948,
    "chip_encode_busy_f001": 0.0005457906152805948,
-   "feed_share_all": 0.4666349123660108,
-   "feed_share_top_tag": 0.8954309898553953
+   "feed_share_all": 0.8225426814046439,
+   "feed_share_top_tag": 0.9380192017588873
   },
   {
    "users": 1000000,
@@ -77,8 +78,8 @@
    "cpu_cores_pi5": 0.103728409375,
    "chip_encode_busy_f1": 3.929692430020283,
    "chip_encode_busy_f001": 0.03929692430020283,
-   "feed_share_all": 0.9843730375150641,
-   "feed_share_top_tag": 0.9983806730453665
+   "feed_share_all": 0.9970125297289278,
+   "feed_share_top_tag": 0.9990831156509088
   },
   {
    "users": 1000000,
@@ -91,8 +92,8 @@
    "cpu_cores_pi5": 0.014406723524305557,
    "chip_encode_busy_f1": 0.5457906152805949,
    "chip_encode_busy_f001": 0.0054579061528059495,
-   "feed_share_all": 0.8974241533360645,
-   "feed_share_top_tag": 0.9884567382787073
+   "feed_share_all": 0.9788813797983948,
+   "feed_share_top_tag": 0.9934357483759246
   },
   {
    "users": 10000000,
@@ -105,8 +106,8 @@
    "cpu_cores_pi5": 0.00103728409375,
    "chip_encode_busy_f1": 0.03929692430020283,
    "chip_encode_busy_f001": 0.00039296924300202834,
-   "feed_share_all": 0.059259114728291595,
-   "feed_share_top_tag": 0.38139502765275113
+   "feed_share_all": 0.25022382566904244,
+   "feed_share_top_tag": 0.5214509818335509
   },
   {
    "users": 10000000,
@@ -119,8 +120,8 @@
    "cpu_cores_pi5": 0.00014406723524305556,
    "chip_encode_busy_f1": 0.0054579061528059495,
    "chip_encode_busy_f001": 5.4579061528059496e-05,
-   "feed_share_all": 0.00867300459575565,
-   "feed_share_top_tag": 0.0788763920501069
+   "feed_share_all": 0.044298283052152256,
+   "feed_share_top_tag": 0.13144705508686635
   },
   {
    "users": 10000000,
@@ -133,8 +134,8 @@
    "cpu_cores_pi5": 0.0103728409375,
    "chip_encode_busy_f1": 0.3929692430020283,
    "chip_encode_busy_f001": 0.003929692430020283,
-   "feed_share_all": 0.3864728152164298,
-   "feed_share_top_tag": 0.8604405500632425
+   "feed_share_all": 0.7694425439263901,
+   "feed_share_top_tag": 0.915941670038933
   },
   {
    "users": 10000000,
@@ -147,8 +148,8 @@
    "cpu_cores_pi5": 0.0014406723524305555,
    "chip_encode_busy_f1": 0.05457906152805948,
    "chip_encode_busy_f001": 0.0005457906152805948,
-   "feed_share_all": 0.08045033113275636,
-   "feed_share_top_tag": 0.4612957913177095
+   "feed_share_all": 0.31671389472558925,
+   "feed_share_top_tag": 0.602133029446812
   },
   {
    "users": 10000000,
@@ -161,8 +162,8 @@
    "cpu_cores_pi5": 0.103728409375,
    "chip_encode_busy_f1": 3.929692430020283,
    "chip_encode_busy_f001": 0.03929692430020283,
-   "feed_share_all": 0.8629986147235372,
-   "feed_share_top_tag": 0.9840393401934127
+   "feed_share_all": 0.9709075137298716,
+   "feed_share_top_tag": 0.9909061981900674
   },
   {
    "users": 10000000,
@@ -175,8 +176,8 @@
    "cpu_cores_pi5": 0.014406723524305557,
    "chip_encode_busy_f1": 0.5457906152805949,
    "chip_encode_busy_f001": 0.0054579061528059495,
-   "feed_share_all": 0.46663491236601085,
-   "feed_share_top_tag": 0.895430989855395
+   "feed_share_all": 0.8225426814046438,
+   "feed_share_top_tag": 0.9380192017588873
   }
  ]
 }

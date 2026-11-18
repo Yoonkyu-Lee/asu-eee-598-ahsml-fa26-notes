@@ -1,6 +1,7 @@
 {
  "what": "CP39 B1 10^7 re-judgement (journal/cp/CP39.md)",
  "label": "estimate (CP16 model x10, chip model)",
+ "band": "base",
  "sources": {
   "line": "FCC 24-27 (2024 Section 706 report): fixed broadband benchmark 100/20 Mbps, https://docs.fcc.gov/public/attachments/FCC-24-27A1.pdf",
   "cap": "Xfinity legacy plans: 1.2 TB per month, https://www.xfinity.com/support/articles/data-usage-plan",
@@ -26,83 +27,83 @@
   "keep_days": 30,
   "pi5_slowdown": 2.93
  },
- "msgs_per_s_peak": 256.55297255104875,
- "down_Mbps_peak": 3.1337885315422107,
- "down_Mbps_peak_text_votes": 1.131744457585115,
- "images_Mbps_peak": 2.0020440739570957,
+ "msgs_per_s_peak": 44.315540427573055,
+ "down_Mbps_peak": 0.5564915590377528,
+ "down_Mbps_peak_text_votes": 0.19682859551882903,
+ "images_Mbps_peak": 0.35966296351892385,
  "upload": {
   "phi0.95_join0.0": {
-   "peak_Mbps": 3.2987247700444327,
-   "mean_Mbps": 2.0617029812777705
+   "peak_Mbps": 0.5857805884607924,
+   "mean_Mbps": 0.36611286778799534
   },
   "phi0.95_join0.001": {
-   "peak_Mbps": 3.360575859482766,
-   "mean_Mbps": 2.1235540707161036
+   "peak_Mbps": 0.5967639744944323,
+   "mean_Mbps": 0.37709625382163514
   },
   "phi0.95_join0.01": {
-   "peak_Mbps": 3.9172356644277637,
-   "mean_Mbps": 2.680213875661101
+   "peak_Mbps": 0.695614448797191,
+   "mean_Mbps": 0.47594672812439387
   },
   "phi0.5_join0.0": {
-   "peak_Mbps": 6.267577063084421,
-   "mean_Mbps": 3.9172356644277633
+   "peak_Mbps": 1.1129831180755057,
+   "mean_Mbps": 0.695614448797191
   },
   "phi0.5_join0.001": {
-   "peak_Mbps": 6.385094133017255,
-   "mean_Mbps": 4.0347527343605964
+   "peak_Mbps": 1.1338515515394214,
+   "mean_Mbps": 0.7164828822611068
   },
   "phi0.5_join0.01": {
-   "peak_Mbps": 7.442747762412751,
-   "mean_Mbps": 5.092406363756092
+   "peak_Mbps": 1.321667452714663,
+   "mean_Mbps": 0.9042987834363483
   },
   "phi0.3_join0.0": {
-   "peak_Mbps": 10.44596177180737,
-   "mean_Mbps": 6.528726107379606
+   "peak_Mbps": 1.854971863459176,
+   "mean_Mbps": 1.1593574146619852
   },
   "phi0.3_join0.001": {
-   "peak_Mbps": 10.64182355502876,
-   "mean_Mbps": 6.724587890600994
+   "peak_Mbps": 1.8897525858990356,
+   "mean_Mbps": 1.1941381371018447
   },
   "phi0.3_join0.01": {
-   "peak_Mbps": 12.404579604021253,
-   "mean_Mbps": 8.487343939593488
+   "peak_Mbps": 2.2027790878577718,
+   "mean_Mbps": 1.5071646390605806
   }
  },
  "month_GB": {
-  "phi0.95_join0.0": 1302.5839435712953,
-  "phi0.95_join0.001": 1322.6236965493154,
-  "phi0.95_join0.01": 1502.9814733514947,
-  "phi0.5_join0.0": 1903.776532911893,
-  "phi0.5_join0.001": 1941.8520635701311,
-  "phi0.5_join0.01": 2284.5318394942715,
-  "phi0.3_join0.0": 2749.8994364282903,
-  "phi0.3_join0.001": 2813.3586541920195,
-  "phi0.3_join0.01": 3384.4916140655882
+  "phi0.95_join0.0": 231.31010986845544,
+  "phi0.95_join0.001": 234.86872694335472,
+  "phi0.95_join0.01": 266.89628061744855,
+  "phi0.5_join0.0": 338.0686221154349,
+  "phi0.5_join0.001": 344.82999455774353,
+  "phi0.5_join0.01": 405.68234653852176,
+  "phi0.3_join0.0": 488.3213430556281,
+  "phi0.3_join0.001": 499.5902971261426,
+  "phi0.3_join0.01": 601.010883760773
  },
- "store_GB_30d": 528.8268146977481,
- "store_GB_30d_no_images": 190.98187721748815,
- "cpu_cores_verify_peak": 0.26611831763148325,
- "chip_busy_peak_f1": 0.5863769434678396,
- "chip_busy_peak_f001": 0.02477712432525389,
+ "store_GB_30d": 93.9079505876208,
+ "store_GB_30d_no_images": 33.2148254938024,
+ "cpu_cores_verify_peak": 0.04596780519145661,
+ "chip_busy_peak_f1": 0.1579218452681893,
+ "chip_busy_peak_f001": 0.004846206688834795,
  "bootstrap": {
-  "fetch_h": 14.102048391939945,
-  "verify_h_cpu_4cores": 29.938310733541858,
-  "verify_h_chip": 8.59697949571613,
-  "encode_h_chip_f1": 82.59634368601218,
-  "encode_h_chip_f001": 0.8259634368601219,
-  "images_h_chip_f1": 172.6763013787995,
-  "ready_h_chip": 14.102048391939945,
-  "ready_h_cpu": 29.938310733541858
+  "fetch_h": 2.504212015669888,
+  "verify_h_cpu_4cores": 5.171378084038868,
+  "verify_h_chip": 1.4849946527967737,
+  "encode_h_chip_f1": 17.001987237367775,
+  "encode_h_chip_f001": 0.17001987237367777,
+  "images_h_chip_f1": 52.57784848052064,
+  "ready_h_chip": 2.504212015669888,
+  "ready_h_cpu": 5.171378084038868
  },
  "judged_at": "phi0.95_join0.01",
  "pass": {
   "down": true,
-  "up": false,
-  "month": false,
-  "store": false,
+  "up": true,
+  "month": true,
+  "store": true,
   "cpu_no_chip": true,
   "chip_f1": true,
   "bootstrap_chip": true,
-  "all_with_chip": false
+  "all_with_chip": true
  }
 }

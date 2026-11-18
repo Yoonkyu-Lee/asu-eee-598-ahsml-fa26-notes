@@ -1,11 +1,12 @@
 {
  "what": "CP39 B1 (journal/cp/CP39.md)",
  "label": "estimate (CP16 behaviour model x chip model)",
+ "band": "base",
  "params": {
-  "dau_frac": 0.25,
-  "posts_per_dau": 0.05,
-  "comments_per_dau": 0.5,
-  "votes_per_dau": 5.0,
+  "dau_frac": 0.26,
+  "posts_per_dau": 0.0147,
+  "comments_per_dau": 0.0853,
+  "votes_per_dau": 0.82,
   "peak_factor": 1.6,
   "keep_days": 30,
   "post_tokens": 128,
@@ -18,35 +19,35 @@
  },
  "scales": {
   "1000000": {
-   "msgs_per_s_mean": 16.034560784440547,
-   "msgs_per_s_peak": 25.655297255104877,
-   "posts_per_s_mean": 0.14482379007212787,
-   "comments_per_s_mean": 1.442680325683044,
-   "vote_msgs_per_s_mean": 14.447056668685374,
-   "x_cp6_peak": 2.2166176828410613,
-   "text_votes_Mbps_peak": 0.09431203813209289,
-   "images_Mbps_peak_if_all": 0.1668370061630913,
-   "text_votes_GB_day": 0.6366062573916269,
-   "images_GB_day_if_all": 1.1261497916008663,
-   "store_TB_text_votes": 0.01909818772174881,
-   "store_TB_with_images": 0.052882681469774796,
-   "proofs_per_s_peak": 25.655297255104877,
-   "cpu_p_core_share_verify_peak": 0.009082536437934583,
-   "cpu_lpe_core_share_verify_peak": 0.023127729352251554,
-   "chip_verify_busy_peak": 0.0022987146340573967,
+   "msgs_per_s_mean": 2.7697212767233155,
+   "msgs_per_s_peak": 4.431554042757305,
+   "posts_per_s_mean": 0.044097095142680356,
+   "comments_per_s_mean": 0.2555451041268033,
+   "vote_msgs_per_s_mean": 2.470079077453832,
+   "x_cp6_peak": 0.3828862692942311,
+   "text_votes_Mbps_peak": 0.01640238295990242,
+   "images_Mbps_peak_if_all": 0.029971913626576984,
+   "text_votes_GB_day": 0.11071608497934134,
+   "images_GB_day_if_all": 0.20231041697939464,
+   "store_TB_text_votes": 0.0033214825493802403,
+   "store_TB_with_images": 0.009390795058762079,
+   "proofs_per_s_peak": 4.431554042757305,
+   "cpu_p_core_share_verify_peak": 0.0015688670713807711,
+   "cpu_lpe_core_share_verify_peak": 0.003994955953604217,
+   "chip_verify_busy_peak": 0.00039706724223105447,
    "chip_text_busy_peak_by_audit_f": {
-    "1.0": 0.01835474304133604,
-    "0.1": 0.0018354743041336039,
-    "0.01": 0.00018354743041336039
+    "1.0": 0.0037782193860817284,
+    "0.1": 0.0003778219386081729,
+    "0.01": 3.778219386081728e-05
    },
    "chip_image_busy_peak_by_audit_f": {
-    "1.0": 0.038372511417511,
-    "0.1": 0.0038372511417511003,
-    "0.01": 0.00038372511417511003
+    "1.0": 0.01168396632900459,
+    "0.1": 0.001168396632900459,
+    "0.01": 0.0001168396632900459
    },
    "sub_only_box_msgs_per_s_peak": {
-    "median": 11.741510288344447,
-    "top1pct": 19.1028422901859
+    "median": 3.630969674140939,
+    "top1pct": 4.175920272556609
    },
    "lie_unseen_by_audit_f_over_boxes": {
     "1.0": {
@@ -73,35 +74,35 @@
    }
   },
   "10000000": {
-   "msgs_per_s_mean": 160.34560784440546,
-   "msgs_per_s_peak": 256.55297255104875,
-   "posts_per_s_mean": 1.4482379007212787,
-   "comments_per_s_mean": 14.426803256830441,
-   "vote_msgs_per_s_mean": 144.47056668685374,
-   "x_cp6_peak": 22.166176828410613,
-   "text_votes_Mbps_peak": 0.943120381320929,
-   "images_Mbps_peak_if_all": 1.668370061630913,
-   "text_votes_GB_day": 6.36606257391627,
-   "images_GB_day_if_all": 11.261497916008663,
-   "store_TB_text_votes": 0.1909818772174881,
-   "store_TB_with_images": 0.5288268146977481,
-   "proofs_per_s_peak": 256.55297255104875,
-   "cpu_p_core_share_verify_peak": 0.09082536437934582,
-   "cpu_lpe_core_share_verify_peak": 0.23127729352251553,
-   "chip_verify_busy_peak": 0.02298714634057397,
+   "msgs_per_s_mean": 27.697212767233157,
+   "msgs_per_s_peak": 44.315540427573055,
+   "posts_per_s_mean": 0.44097095142680354,
+   "comments_per_s_mean": 2.555451041268033,
+   "vote_msgs_per_s_mean": 24.70079077453832,
+   "x_cp6_peak": 3.828862692942312,
+   "text_votes_Mbps_peak": 0.1640238295990242,
+   "images_Mbps_peak_if_all": 0.29971913626576985,
+   "text_votes_GB_day": 1.1071608497934133,
+   "images_GB_day_if_all": 2.0231041697939465,
+   "store_TB_text_votes": 0.033214825493802405,
+   "store_TB_with_images": 0.0939079505876208,
+   "proofs_per_s_peak": 44.315540427573055,
+   "cpu_p_core_share_verify_peak": 0.015688670713807716,
+   "cpu_lpe_core_share_verify_peak": 0.03994955953604217,
+   "chip_verify_busy_peak": 0.003970672422310546,
    "chip_text_busy_peak_by_audit_f": {
-    "1.0": 0.1835474304133604,
-    "0.1": 0.018354743041336042,
-    "0.01": 0.001835474304133604
+    "1.0": 0.037782193860817284,
+    "0.1": 0.0037782193860817284,
+    "0.01": 0.0003778219386081729
    },
    "chip_image_busy_peak_by_audit_f": {
-    "1.0": 0.38372511417511007,
-    "0.1": 0.03837251141751101,
-    "0.01": 0.0038372511417511007
+    "1.0": 0.11683966329004587,
+    "0.1": 0.011683966329004588,
+    "0.01": 0.0011683966329004588
    },
    "sub_only_box_msgs_per_s_peak": {
-    "median": 117.41510288344446,
-    "top1pct": 191.02842290185902
+    "median": 36.30969674140939,
+    "top1pct": 41.759202725566084
    },
    "lie_unseen_by_audit_f_over_boxes": {
     "1.0": {
@@ -123,8 +124,8 @@
    "affordable": {
     "bytes": true,
     "store": true,
-    "msgs": false,
-    "all": false
+    "msgs": true,
+    "all": true
    }
   }
  }
