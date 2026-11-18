@@ -1,0 +1,140 @@
+{
+ "what": "CP34 partial: 16 x 16 array, 2 MB, 16-bit words, 16-bit integer MAC as FP16 proxy; sweep cut at 40 min",
+ "label": "estimate (Timeloop/Accelergy, 45 nm)",
+ "finished": 12,
+ "of": 16,
+ "runs": [
+  {
+   "gemm": "attn_out",
+   "P": 128,
+   "cycles": 79872,
+   "utilization": 0.9231,
+   "energy_uJ": 178.61,
+   "int8_cycles": 73728,
+   "int8_energy_uJ": 77.69,
+   "cycles_ratio": 1.083,
+   "energy_ratio": 2.299
+  },
+  {
+   "gemm": "attn_out",
+   "P": 2048,
+   "cycles": 1671169,
+   "utilization": 0.7059000000000001,
+   "energy_uJ": 2543.14,
+   "int8_cycles": 1277952,
+   "int8_energy_uJ": 1009.62,
+   "cycles_ratio": 1.308,
+   "energy_ratio": 2.519
+  },
+  {
+   "gemm": "attn_out",
+   "P": 32,
+   "cycles": 27648,
+   "utilization": 0.6667000000000001,
+   "energy_uJ": 64.02,
+   "int8_cycles": 18432,
+   "int8_energy_uJ": 27.68,
+   "cycles_ratio": 1.5,
+   "energy_ratio": 2.313
+  },
+  {
+   "gemm": "attn_out",
+   "P": 512,
+   "cycles": 393216,
+   "utilization": 0.75,
+   "energy_uJ": 662.42,
+   "int8_cycles": 307200,
+   "int8_energy_uJ": 270.07,
+   "cycles_ratio": 1.28,
+   "energy_ratio": 2.453
+  },
+  {
+   "gemm": "ffn_in",
+   "P": 128,
+   "cycles": 473088,
+   "utilization": 0.6234000000000001,
+   "energy_uJ": 1058.06,
+   "int8_cycles": 294912,
+   "int8_energy_uJ": 268.19,
+   "cycles_ratio": 1.604,
+   "energy_ratio": 3.945
+  },
+  {
+   "gemm": "ffn_in",
+   "P": 32,
+   "cycles": 93696,
+   "utilization": 0.7868999999999999,
+   "energy_uJ": 222.25,
+   "int8_cycles": 74496,
+   "int8_energy_uJ": 107.28,
+   "cycles_ratio": 1.258,
+   "energy_ratio": 2.072
+  },
+  {
+   "gemm": "ffn_out",
+   "P": 128,
+   "cycles": 350208,
+   "utilization": 0.8421,
+   "energy_uJ": 622.39,
+   "int8_cycles": 294912,
+   "int8_energy_uJ": 300.88,
+   "cycles_ratio": 1.188,
+   "energy_ratio": 2.069
+  },
+  {
+   "gemm": "ffn_out",
+   "P": 32,
+   "cycles": 96768,
+   "utilization": 0.7619,
+   "energy_uJ": 238.68,
+   "int8_cycles": 73728,
+   "int8_energy_uJ": 108.24,
+   "cycles_ratio": 1.312,
+   "energy_ratio": 2.205
+  },
+  {
+   "gemm": "qkv",
+   "P": 128,
+   "cycles": 248832,
+   "utilization": 0.8889,
+   "energy_uJ": 473.33,
+   "int8_cycles": 227328,
+   "int8_energy_uJ": 224.57,
+   "cycles_ratio": 1.095,
+   "energy_ratio": 2.108
+  },
+  {
+   "gemm": "qkv",
+   "P": 2048,
+   "cycles": 4276224,
+   "utilization": 0.8276,
+   "energy_uJ": 7779.42,
+   "int8_cycles": 3538944,
+   "int8_energy_uJ": 2793.52,
+   "cycles_ratio": 1.208,
+   "energy_ratio": 2.785
+  },
+  {
+   "gemm": "qkv",
+   "P": 32,
+   "cycles": 84480,
+   "utilization": 0.6545000000000001,
+   "energy_uJ": 173.04,
+   "int8_cycles": 55296,
+   "int8_energy_uJ": 75.06,
+   "cycles_ratio": 1.528,
+   "energy_ratio": 2.305
+  },
+  {
+   "gemm": "qkv",
+   "P": 512,
+   "cycles": 958464,
+   "utilization": 0.9231,
+   "energy_uJ": 1991.31,
+   "int8_cycles": 884736,
+   "int8_energy_uJ": 769.55,
+   "cycles_ratio": 1.083,
+   "energy_ratio": 2.588
+  }
+ ]
+}
