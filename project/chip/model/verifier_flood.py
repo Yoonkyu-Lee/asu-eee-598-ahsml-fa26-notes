@@ -3,17 +3,17 @@
 Run from project/:  .venv/Scripts/python.exe chip/model/verifier_flood.py   (CP13: was src/sim_cp13.py)
 Writes results/chip/cp13_flood.json.
 
-1. Trace (bn254_trace.py, same formulas as CP11) the cost of each kind of test, on proofs already decoded:
+1. Trace (verifier_cycles.py, same tests as CP11) the cost of each kind of test, on proofs already decoded:
    batch test of k proofs, single test, building a cached Miller value per proof, a test from cached values.
 2. Turn base-field operation counts into cycles on the verification unit (M multipliers, A adders):
    lock-step microcode over independent tests reaches the marginal utilization of a CP11 batch (measured here
    by scheduling CP11 batches); sensitivity: one test at a time (each test scheduled alone).
-3. Monte Carlo over proof streams with a fraction f invalid, for strategies A-D and batch sizes n.
+3. Monte Carlo over proof streams with a fraction f invalid, for strategies A-D (`STRATEGIES`) and batch sizes n.
+   CP14 reuses steps 2-3 (`flood`, `cycles`, `unit_size`, `flood_chip_W`).
 """
 from __future__ import annotations
 
 import json
-import random
 import sys
 from pathlib import Path
 
@@ -22,17 +22,27 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bn254_trace as bn  # noqa: E402
 import verifier_cycles as s11  # noqa: E402
-from bn254_trace import C, Fp, Fp2, Fp6, Fp12, P, R  # noqa: E402
+from bn254_trace import Fp, Fp2, Fp6, Fp12  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "results" / "chip"
-MHZ = s11.MHZ
-FLOOD = 12_207
+OUT = s11.OUT
+MHZ, FLOOD = s11.MHZ, s11.FLOOD
 MUL_MM2 = 0.283293       # CP10 S=1 multiplier, synthesized
 ADD_MM2 = 0.011456 / 4   # CP12: 2 x 256-bit Aladdin adders per modular adder
 MUL_LEAK_MW, ADD_LEAK_MW = 1.4514, 0.0384
+CP12_CHIP_ORDINARY_W = 0.0918   # results/chip/cp12_chip.json chip_A.ordinary_W (encoder at its ordinary rate)
+CP12_VERIFY_MM2, CP12_VERIFY_LEAK_MW = 1.8283, 10.888
 NS = (8, 16, 32, 64, 128)
 FS = (0.0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 1.0)
+MACHINES = [(5, 4), (5, 6), (5, 8), (5, 10), (6, 6), (6, 8), (7, 7), (7, 10), (8, 8), (8, 10), (10, 10)]
+
+# How a failed batch is resolved (cp/CP13.md alternatives; D = the best n per f, in `summarize`).
+#   split: halve and re-test (False: every proof alone); prep: per-proof work done once after the failure;
+#   test1 / test: op-count keys of a test of one proof / of k proofs.
+STRATEGIES = {
+    "A": {"split": False, "test1": "single"},                                                # one by one
+    "B": {"split": True, "test1": "single", "test": "batch"},                                # halves, recomputed
+    "C": {"split": True, "prep": "cache_build", "test1": "single_cached", "test": "cached"},  # halves, cached Miller
+}
 
 
 def fresh12(f):
@@ -47,76 +57,21 @@ def counts(trace) -> dict:
     return {"mul": m, "add": len(trace) - m}
 
 
-class Setup:
-    """Decoded proofs, verifying key and prepared lines, made without tracing (decoding is costed separately)."""
-
-    def __init__(self, n: int = 16, seed: int = 598):
-        rng = random.Random(seed)
-        self.rng = rng
-        bn.tracing(False)
-        self.proofs = [(s11.rand_g1(rng), s11.rand_g2(rng), s11.rand_g1(rng)) for _ in range(n)]
-        self.alpha = s11.rand_g1(rng)
-        beta, gamma, delta = (s11.rand_g2(rng) for _ in range(3))
-        self.ic = [s11.rand_g1(rng) for _ in range(6)]
-        self.publics = [[rng.randrange(R) for _ in range(5)] for _ in range(n)]
-        self.lines = {k: bn.prepare(q) for k, q in (("beta", beta), ("gamma", gamma), ("delta", delta))}
-        self.r = [rng.getrandbits(128) | 1 for _ in range(n)]
-
-    def pts(self, k):
-        """Decoded points of the first k proofs as fresh inputs (read from the 256 B per-proof store)."""
-        g1 = lambda p: (s11.fresh(p[0]), s11.fresh(p[1]))
-        g2 = lambda q: (s11.fresh(q[0]), s11.fresh(q[1]))
-        return [(g1(a), g2(b), g1(c)) for a, b, c in self.proofs[:k]]
-
-    def weights_tail(self, k, cs):
-        """sum r_i C_i, public-input weighting, sum r L, (sum r) alpha; returns the three affine G1 points."""
-        r = self.r[:k]
-        sC = s11.straus(cs, r)
-        coeff = [sum(ri * x[j] for ri, x in zip(r, self.publics)) % R for j in range(5)]
-        for _ in range(k):  # scalar-field weighting of public inputs, counted as base-field work (as CP11)
-            for _ in range(5):
-                C(self.rng.randrange(P)) * C(self.rng.randrange(P))
-        sL = s11.straus(self.ic, [sum(r) % R] + coeff)
-        sA = bn.scalar_mul(self.alpha, sum(r) % R)
-        return sC, sL, sA
+def t_decode(su: s11.Setup, k: int):
+    return s11.trace_of(lambda: s11.ls_decode(su.proofs[:k]))
 
 
-def trace_of(fn) -> list:
-    bn.TRACE.clear()
-    bn.tracing(True)
-    fn()
-    bn.tracing(False)
-    return list(bn.TRACE)
-
-
-def t_decode(su: Setup, k: int):
-    return trace_of(lambda: s11.ls_decode(su.proofs[:k]))
-
-
-def t_batch(su: Setup, k: int):
+def t_batch(su: s11.Setup, k: int):
     """Batch test of k decoded proofs (CP11's batch without decoding)."""
-    def run():
-        d = su.pts(k)
-        rA = s11.ls_scalar_mul([a for a, _, _ in d], su.r[:k])
-        sC, sL, sA = su.weights_tail(k, [c for _, _, c in d])
-        aff = s11.batch_affine(rA + [sC, sL, sA])
-        pre = [((aff[k][0], -aff[k][1]), su.lines["delta"]), ((aff[k + 1][0], -aff[k + 1][1]), su.lines["gamma"]),
-               ((aff[k + 2][0], -aff[k + 2][1]), su.lines["beta"])]
-        bn.final_exp(bn.miller_loop_otf([(p, b) for p, (_, b, _) in zip(aff[:k], d)], pre))
-    return trace_of(run)
+    return s11.trace_of(lambda: su.batch_test(su.pts(k)))
 
 
-def t_single(su: Setup):
+def t_single(su: s11.Setup):
     """Single verification of a decoded proof (CP11's single without decoding)."""
-    def run():
-        (A, B, Cp), x = su.pts(1)[0], su.publics[0]
-        L = s11.batch_affine([s11.straus(su.ic, [1] + x)])[0]
-        pre = [((L[0], -L[1]), su.lines["gamma"]), ((Cp[0], -Cp[1]), su.lines["delta"])]
-        bn.final_exp(bn.miller_loop_otf([(A, B)], pre))
-    return trace_of(run)
+    return s11.trace_of(lambda: su.single_test(su.pts(1)[0], su.publics[0]))
 
 
-def t_cache_build(su: Setup, k: int):
+def t_cache_build(su: s11.Setup, k: int):
     """After a failed batch: one Miller value per proof, g_i = ML(r_i A_i, B_i), from the affine r_i A_i the batch
     test already made (kept, 64 B each). Each value gets its own squarings (no sharing)."""
     def run():
@@ -126,26 +81,24 @@ def t_cache_build(su: Setup, k: int):
         bn.tracing(True)
         for (x, y), (_, b, _) in zip(rA, d):
             bn.miller_loop_otf([((s11.fresh(x), s11.fresh(y)), b)], [])
-    return trace_of(run)
+    return s11.trace_of(run)
 
 
-def t_cached_test(su: Setup, j: int):
+def t_cached_test(su: s11.Setup, j: int):
     """Test of a subset of j proofs from cached Miller values: product of the g_i, the three vk pairs for this
     subset (MSMs redone over the subset), one final exponentiation."""
     bn.tracing(False)
     d0 = su.proofs[0]
     g = bn.miller_loop_otf([(d0[0], d0[1])], [])
+
     def run():
         d = su.pts(j)
         prod = fresh12(g)
         for _ in range(j - 1):
             prod = prod * fresh12(g)
-        sC, sL, sA = su.weights_tail(j, [c for _, _, c in d])
-        aff = s11.batch_affine([sC, sL, sA])
-        pre = [((aff[0][0], -aff[0][1]), su.lines["delta"]), ((aff[1][0], -aff[1][1]), su.lines["gamma"]),
-               ((aff[2][0], -aff[2][1]), su.lines["beta"])]
-        bn.final_exp(prod * bn.miller_loop_otf([], pre))
-    return trace_of(run)
+        aff = s11.batch_affine(su.weights_tail(j, [c for _, _, c in d]))
+        bn.final_exp(prod * bn.miller_loop_otf([], su.vk_pairs(aff)))
+    return s11.trace_of(run)
 
 
 def linear(f, ks=(4, 8)):
@@ -158,20 +111,15 @@ def linear(f, ks=(4, 8)):
 
 def lockstep_util(mults: int, adders: int, built) -> float:
     """Marginal utilization of a CP11 batch (decode included) on this machine, relative to the op-count bound."""
-    r8 = s11.schedule(built[8]["trace"], mults, adders, 256)
-    r4 = s11.schedule(built[4]["trace"], mults, adders, 256)
-    cyc = (r8["cycles"] - r4["cycles"]) / 4
+    r8, r4, cyc = s11.per_proof({n: built[n]["trace"] for n in (4, 8)}, mults, adders, 256)
     mm = (r8["mul_ops"] - r4["mul_ops"]) / 4
     aa = (r8["add_ops"] - r4["add_ops"]) / 4
     return max(mm * s11.MUL_OCC / mults, aa / adders) / cyc
 
 
-class Machine:
-    def __init__(self, mults, adders, util, costs):
-        self.M, self.A, self.u, self.c = mults, adders, util, costs
-
-    def cyc(self, ops: dict) -> float:
-        return max(ops["mul"] * s11.MUL_OCC / self.M, ops["add"] / self.A) / self.u
+def cycles(mul, add, m: int, a: int, util: float):
+    """Unit cycles for op counts (numbers or arrays): the busier unit kind, at lock-step utilization."""
+    return np.maximum(mul * s11.MUL_OCC / m, add / a) / util
 
 
 def lin(c, k):
@@ -196,41 +144,42 @@ def resolve(bad: np.ndarray, strat: str, co: dict, tests: list) -> dict:
     tests.append(n)
     if not bad.any():
         return ops
-    if strat == "A":
-        add(ops, co["single"], n)
+    s = STRATEGIES[strat]
+    if not s["split"]:
+        add(ops, co[s["test1"]], n)
         tests.extend([1] * n)
         return ops
-    if strat == "C":
-        add(ops, co["cache_build"][1], n)  # per-proof Miller values, made once
-        test = lambda k: co["single_cached"] if k == 1 else lin(co["cached"], k)
-    else:
-        test = lambda k: co["single"] if k == 1 else lin(co["batch"], k)
+    if "prep" in s:
+        add(ops, co[s["prep"]][1], n)
+
+    def test(k):
+        add(ops, co[s["test1"]] if k == 1 else lin(co[s["test"]], k))
+        tests.append(k)
 
     def split(lo, hi):  # bad[lo:hi] holds at least one invalid proof and has already been tested
         if hi - lo == 1:
             return
         mid = (lo + hi) // 2
-        add(ops, test(mid - lo))
-        tests.append(mid - lo)
+        test(mid - lo)
         if bad[lo:mid].any():
             split(lo, mid)
             if bad[mid:hi].any():
-                add(ops, test(hi - mid))
-                tests.append(hi - mid)
-                if hi - mid > 1:
-                    split(mid, hi)
+                test(hi - mid)
+                split(mid, hi)
         else:  # left passed, so the right half is known to fail: split it without testing it whole
             split(mid, hi)
     split(0, n)
     return ops
 
 
-def run_strategy(strat, n, f, co, mach, rng, batches=400, spread=False):
+def flood(strat: str, n: int, f: float, co: dict, rng, batches: int, spread=False, defer=False):
+    """Classify `batches` batches of n with a share f invalid: (op totals, per-batch ops [(mul, add)], table reads).
+    spread: the adversary spreads invalid proofs evenly (no shuffling at the unit). defer (CP14 O4): the G2 subgroup
+    check runs after the test, on the accepted proofs only. Reads count fixed-base table entries (CP14 O3)."""
     tot = {"mul": 0.0, "add": 0.0}
-    lat = []
-    proofs = 0
+    per, reads = [], 0
     for _ in range(batches):
-        if spread:  # adversary spreads invalid proofs evenly (no shuffling at the unit)
+        if spread:
             k = int(round(f * n))
             bad = np.zeros(n, bool)
             bad[:k] = True
@@ -240,19 +189,34 @@ def run_strategy(strat, n, f, co, mach, rng, batches=400, spread=False):
         tests = []
         ops = resolve(bad, strat, co, tests)
         add(ops, co["decode"][1], n)
+        if defer:
+            add(ops, co["subgroup"][1], int(n - bad.sum()))
+            add(ops, co["subgroup"][0], 1.0 if (n - bad.sum()) else 0.0)
+        reads += sum(co.get("reads_single", 0) if t == 1 else co.get("reads_batch", 0) for t in tests)
         add(tot, ops)
-        proofs += n
-        lat.append(mach.cyc(ops))
-    cyc_pp = mach.cyc(tot) / proofs
-    return cyc_pp, tot, proofs, lat
+        per.append((ops["mul"], ops["add"]))
+    return tot, np.array(per), reads
 
 
-def energy_mJ(ops: dict) -> float:
-    return (ops["mul"] * s11.NJ_MUL * 1e3 + ops["add"] * s11.PJ_ADD + (ops["mul"] + ops["add"]) * s11.PJ_TRAFFIC) * 1e-9
+def unit_size(m: int, a: int):
+    """Verification unit area (mm2) and leakage (mW) with m multipliers and a adders, from CP12's 5 + 4."""
+    return (CP12_VERIFY_MM2 + (m - 5) * MUL_MM2 + (a - 4) * ADD_MM2,
+            CP12_VERIFY_LEAK_MW + (m - 5) * MUL_LEAK_MW + (a - 4) * ADD_LEAK_MW)
 
 
-CP12_CHIP_ORDINARY_W = 0.0918   # results/chip/cp12_chip.json chip_A.ordinary_W (encoder at its ordinary rate)
-CP12_VERIFY_MM2, CP12_VERIFY_LEAK_MW = 1.8283, 10.888
+def flood_chip_W(env: list, leak_mW: float) -> float:
+    """Chip power in the worst flood of an envelope: ordinary encoder + verification at min(capacity, flood) + leak."""
+    return CP12_CHIP_ORDINARY_W + max(min(e["proofs_per_s"], FLOOD) * e["mJ_per_proof"] * 1e-3 for e in env) \
+        + leak_mW * 1e-3
+
+
+def measure(strat, n, f, co, m, a, u, rng, batches=400, spread=False) -> dict:
+    """One Monte Carlo point on one machine: capacity, energy per proof, P99 work per batch."""
+    tot, per, _ = flood(strat, n, f, co, rng, batches, spread)
+    proofs = batches * n
+    return {"proofs_per_s": MHZ * 1e6 / (float(cycles(tot["mul"], tot["add"], m, a, u)) / proofs),
+            "mJ_per_proof": s11.energy_mJ({k: v / proofs for k, v in tot.items()}),
+            "batch_work_ms_p99": float(np.percentile(cycles(per[:, 0], per[:, 1], m, a, u), 99)) / (MHZ * 1e3)}
 
 
 def summarize(rows, fine) -> dict:
@@ -276,9 +240,8 @@ def summarize(rows, fine) -> dict:
         worst = min(e["proofs_per_s"] for e in env["B"])
         ok_f = [e["f"] for e in env["B"] if e["proofs_per_s"] >= FLOOD]
         f_max = max(f for f in ok_f if all(e["proofs_per_s"] >= FLOOD for e in env["B"] if e["f"] <= f)) if ok_f else 0.0
-        area = CP12_VERIFY_MM2 + (m - 5) * MUL_MM2 + (a - 4) * ADD_MM2
-        leak = CP12_VERIFY_LEAK_MW + (m - 5) * MUL_LEAK_MW + (a - 4) * ADD_LEAK_MW
-        chip_W = CP12_CHIP_ORDINARY_W + max(e["verify_W"] for e in env["B"]) + leak * 1e-3
+        area, leak = unit_size(m, a)
+        chip_W = flood_chip_W(env["B"], leak)
         out[f"{m}x{a}"] = {"envelope_B": env["B"], "envelope_C_worst": min(e["proofs_per_s"] for e in env["C"]),
                            "worst_proofs_per_s": worst, "f_max": f_max, "verify_mm2": area, "verify_leak_mW": leak,
                            "chip_flood_W_worst_f": chip_W,
@@ -288,7 +251,7 @@ def summarize(rows, fine) -> dict:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    su = Setup()
+    su = s11.Setup(16)
     co = {"decode": linear(lambda k: t_decode(su, k)),
           "batch": linear(lambda k: t_batch(su, k)),
           "single": counts(t_single(su)),
@@ -296,14 +259,12 @@ def main() -> None:
           "cached": linear(lambda k: t_cached_test(su, k)),
           "single_cached": counts(t_cached_test(su, 1))}
     # check linearity of the batch test at a third size
-    b16 = counts(t_batch(su, 16))
-    co["batch_linearity_16"] = {"traced": b16, "fit": lin(co["batch"], 16)}
+    co["batch_linearity_16"] = {"traced": counts(t_batch(su, 16)), "fit": lin(co["batch"], 16)}
     print(json.dumps(co, indent=1), flush=True)
 
     built = {n: s11.build(n) for n in (4, 8)}
-    machines = [(5, 4), (5, 6), (5, 8), (5, 10), (6, 6), (6, 8), (7, 7), (7, 10), (8, 8), (8, 10), (10, 10)]
     utils = {}
-    for m, a in machines:
+    for m, a in MACHINES:
         utils[f"{m}x{a}"] = lockstep_util(m, a, built)
         print("lock-step util", m, a, round(utils[f"{m}x{a}"], 3), flush=True)
     # one test at a time: each kind of test scheduled alone on M=5, A=4
@@ -320,43 +281,31 @@ def main() -> None:
 
     rng = np.random.default_rng(13)
     rows = []
-    for m, a in machines:
-        mach = Machine(m, a, utils[f"{m}x{a}"], co)
+    for m, a in MACHINES:
+        u = utils[f"{m}x{a}"]
         for strat in ("A", "B", "C"):
             for n in NS:
                 for f in FS:
-                    cpp, tot, np_, lat = run_strategy(strat, n, f, co, mach, rng)
-                    row = {"M": m, "A": a, "strategy": strat, "n": n, "f": f, "proofs_per_s": MHZ * 1e6 / cpp,
-                           "mJ_per_proof": energy_mJ({k: v / np_ for k, v in tot.items()}),
-                           "batch_work_ms_p99": float(np.percentile(lat, 99)) / (MHZ * 1e3),
-                           "fill_ms": n / FLOOD * 1e3}
-                    rows.append(row)
+                    rows.append({"M": m, "A": a, "strategy": strat, "n": n, "f": f,
+                                 **measure(strat, n, f, co, m, a, u, rng), "fill_ms": n / FLOOD * 1e3})
         # n = 1: singles only (also strategy D's choice when f is large)
         for f in FS:
-            cpp, tot, np_, lat = run_strategy("A", 1, f, co, mach, rng, batches=50)
-            rows.append({"M": m, "A": a, "strategy": "single", "n": 1, "f": f, "proofs_per_s": MHZ * 1e6 / cpp,
-                         "mJ_per_proof": energy_mJ({k: v / np_ for k, v in tot.items()}),
-                         "batch_work_ms_p99": float(np.percentile(lat, 99)) / (MHZ * 1e3), "fill_ms": 0.0})
+            rows.append({"M": m, "A": a, "strategy": "single", "n": 1, "f": f,
+                         **measure("A", 1, f, co, m, a, u, rng, batches=50), "fill_ms": 0.0})
         print("machine", m, a, "done", flush=True)
     res["rows"] = rows
     # adversary spreading invalid proofs evenly, M=5 (sensitivity for unshuffled batches)
-    mach = Machine(5, 4, utils["5x4"], co)
-    spread = []
-    for strat in ("B", "C"):
-        for n in NS:
-            for f in (1 / 128, 1 / 64, 1 / 32, 1 / 16, 1 / 8):
-                cpp, tot, np_, _ = run_strategy(strat, n, f, co, mach, rng, spread=True)
-                spread.append({"strategy": strat, "n": n, "f": f, "proofs_per_s": MHZ * 1e6 / cpp})
-    res["spread_M5"] = spread
+    res["spread_M5"] = [{"strategy": strat, "n": n, "f": f,
+                         "proofs_per_s": measure(strat, n, f, co, 5, 4, utils["5x4"], rng, spread=True)["proofs_per_s"]}
+                        for strat in ("B", "C") for n in NS for f in (1 / 128, 1 / 64, 1 / 32, 1 / 16, 1 / 8)]
     # finer f around the crossing, for f_max
     fine = []
     for m, a in ((5, 4), (8, 8)):
-        mach = Machine(m, a, utils[f"{m}x{a}"], co)
         for f in np.round(np.arange(0.02, 0.21, 0.01), 2):
             for n in (8, 16, 32):
-                cpp, tot, np_, _ = run_strategy("B", n, float(f), co, mach, rng, batches=1000)
-                fine.append({"M": m, "A": a, "strategy": "B", "n": n, "f": float(f), "proofs_per_s": MHZ * 1e6 / cpp,
-                             "mJ_per_proof": energy_mJ({k: v / np_ for k, v in tot.items()})})
+                r = measure("B", n, float(f), co, m, a, utils[f"{m}x{a}"], rng, batches=1000)
+                fine.append({"M": m, "A": a, "strategy": "B", "n": n, "f": float(f),
+                             "proofs_per_s": r["proofs_per_s"], "mJ_per_proof": r["mJ_per_proof"]})
     res["fine"] = fine
     res["summary"] = summarize(rows, fine)
     print(json.dumps(res["summary"], indent=1))
