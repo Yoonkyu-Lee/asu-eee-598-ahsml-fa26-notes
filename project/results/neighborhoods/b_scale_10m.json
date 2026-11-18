@@ -1,0 +1,108 @@
+{
+ "what": "CP39 B1 10^7 re-judgement (journal/cp/CP39.md)",
+ "label": "estimate (CP16 model x10, chip model)",
+ "sources": {
+  "line": "FCC 24-27 (2024 Section 706 report): fixed broadband benchmark 100/20 Mbps, https://docs.fcc.gov/public/attachments/FCC-24-27A1.pdf",
+  "cap": "Xfinity legacy plans: 1.2 TB per month, https://www.xfinity.com/support/articles/data-usage-plan",
+  "disk": "Raspberry Pi SSD kit 512 GB, https://www.raspberrypi.com/news/raspberry-pi-ssds-and-ssd-kits/",
+  "pi5": "CP34 necessity: Pi 5 = laptop P-core x 2.93 (Geekbench 6), 4 cores"
+ },
+ "budget": {
+  "down_Mbps": 10.0,
+  "up_Mbps": 2.0,
+  "month_GB": 300.0,
+  "store_GB": 256.0,
+  "cpu_cores": 1.0,
+  "chip_busy": 1.0,
+  "bootstrap_h": 24.0
+ },
+ "assumptions": {
+  "id_first_bytes": 1.2,
+  "online": 0.95,
+  "join_per_day": [
+   0.001,
+   0.01
+  ],
+  "keep_days": 30,
+  "pi5_slowdown": 2.93
+ },
+ "msgs_per_s_peak": 256.55297255104875,
+ "down_Mbps_peak": 3.1337885315422107,
+ "down_Mbps_peak_text_votes": 1.131744457585115,
+ "images_Mbps_peak": 2.0020440739570957,
+ "upload": {
+  "phi0.95_join0.0": {
+   "peak_Mbps": 3.2987247700444327,
+   "mean_Mbps": 2.0617029812777705
+  },
+  "phi0.95_join0.001": {
+   "peak_Mbps": 3.360575859482766,
+   "mean_Mbps": 2.1235540707161036
+  },
+  "phi0.95_join0.01": {
+   "peak_Mbps": 3.9172356644277637,
+   "mean_Mbps": 2.680213875661101
+  },
+  "phi0.5_join0.0": {
+   "peak_Mbps": 6.267577063084421,
+   "mean_Mbps": 3.9172356644277633
+  },
+  "phi0.5_join0.001": {
+   "peak_Mbps": 6.385094133017255,
+   "mean_Mbps": 4.0347527343605964
+  },
+  "phi0.5_join0.01": {
+   "peak_Mbps": 7.442747762412751,
+   "mean_Mbps": 5.092406363756092
+  },
+  "phi0.3_join0.0": {
+   "peak_Mbps": 10.44596177180737,
+   "mean_Mbps": 6.528726107379606
+  },
+  "phi0.3_join0.001": {
+   "peak_Mbps": 10.64182355502876,
+   "mean_Mbps": 6.724587890600994
+  },
+  "phi0.3_join0.01": {
+   "peak_Mbps": 12.404579604021253,
+   "mean_Mbps": 8.487343939593488
+  }
+ },
+ "month_GB": {
+  "phi0.95_join0.0": 1302.5839435712953,
+  "phi0.95_join0.001": 1322.6236965493154,
+  "phi0.95_join0.01": 1502.9814733514947,
+  "phi0.5_join0.0": 1903.776532911893,
+  "phi0.5_join0.001": 1941.8520635701311,
+  "phi0.5_join0.01": 2284.5318394942715,
+  "phi0.3_join0.0": 2749.8994364282903,
+  "phi0.3_join0.001": 2813.3586541920195,
+  "phi0.3_join0.01": 3384.4916140655882
+ },
+ "store_GB_30d": 528.8268146977481,
+ "store_GB_30d_no_images": 190.98187721748815,
+ "cpu_cores_verify_peak": 0.26611831763148325,
+ "chip_busy_peak_f1": 0.5863769434678396,
+ "chip_busy_peak_f001": 0.02477712432525389,
+ "bootstrap": {
+  "fetch_h": 14.102048391939945,
+  "verify_h_cpu_4cores": 29.938310733541858,
+  "verify_h_chip": 8.59697949571613,
+  "encode_h_chip_f1": 82.59634368601218,
+  "encode_h_chip_f001": 0.8259634368601219,
+  "images_h_chip_f1": 172.6763013787995,
+  "ready_h_chip": 14.102048391939945,
+  "ready_h_cpu": 29.938310733541858
+ },
+ "judged_at": "phi0.95_join0.01",
+ "pass": {
+  "down": true,
+  "up": false,
+  "month": false,
+  "store": false,
+  "cpu_no_chip": true,
+  "chip_f1": true,
+  "bootstrap_chip": true,
+  "all_with_chip": false
+ }
+}

@@ -44,8 +44,8 @@
 
 ## 4a. 규모 가정
 
-- **설계점: 회원 10⁶명** (CP16 출처 기반 행동 모델). **스트레스점: 10⁷명** (2026-11-18 결정).
-- 박스 부하는 공동체 전체가 아니라 **가입 서브의 합**으로 잰다 (CP33). 10⁷에서 묶이는 것은 가장 큰 서브 하나의 속도다.
+- **설계점: 회원 10⁶명** (CP16 출처 기반 행동 모델). **10⁷명은 새 요구다** (2026-11-18 결정, CP39: 공개 글을 다 받으면 10⁷에서 업로드·한 달 양·보관이 출처 예산을 넘는다).
+- **박스 부하 = 공개 글 전부 + 가입한 비공개 그룹** (CP39 ②, 2026-11-18 소유자). 공개 글은 모든 박스가 받고, 무엇을 읽고 따르는지는 박스 안에서 거른다. 이전: 가입 서브의 합 (CP33).
 - 가정을 넘는 규모는 버그가 아니라 새 요구다.
 
 ## 5. 아직 열린 문제 (구현 범위 안. 하드웨어 이야기와 이어지는 것부터 푼다)
@@ -85,4 +85,4 @@
 - 범용 "엣지 벡터 검색 가속기"도 아니다. 그건 이미 있다 (CP0: RoCR, IKS 등). 우리 차별점은 server-blind가 만드는 조건(수집 마감, 검색 중 삽입, 암호와 ML의 공존, 오프라인 후 밀린 수집)이다.
 
 ---
-English, for teammates and reviewers: *Use hardware compute to build a community that is operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. An operator's power and a community's usability come from metadata (who talks to whom, who reads what, whom to trust), not only from content, so the compute goes into producing that usability without seeing it. Our course contribution is hardware for the part of that work that existing hardware is measured to handle poorly, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest; search queries and reading history never leave the user's own box. Goal: reveal less about joined sub-communities and contacts. Scale: designed for 10⁶ members, stressed at 10⁷. The main workload is chosen by measurement; every design is compared at equal quality and equal resources, and user-facing thresholds are kept apart from comparison rules. A hardware claim counts only after the algorithm and protocol have been squeezed, and only after a measured duel against the protocol alternative.*
+English, for teammates and reviewers: *Use hardware compute to build a community that is operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. An operator's power and a community's usability come from metadata (who talks to whom, who reads what, whom to trust), not only from content, so the compute goes into producing that usability without seeing it. Our course contribution is hardware for the part of that work that existing hardware is measured to handle poorly, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest; search queries and reading history never leave the user's own box. Goal: reveal less about joined sub-communities and contacts. Scale: designed for 10⁶ members; every box receives every public post plus its private groups, and filters locally; 10⁷ is a new requirement. The main workload is chosen by measurement; every design is compared at equal quality and equal resources, and user-facing thresholds are kept apart from comparison rules. A hardware claim counts only after the algorithm and protocol have been squeezed, and only after a measured duel against the protocol alternative.*
