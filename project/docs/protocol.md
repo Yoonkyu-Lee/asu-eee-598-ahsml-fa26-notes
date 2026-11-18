@@ -114,7 +114,7 @@ A box receives only the sub-communities (subs) it joined.
 | proof verifications per box | 1 | 0.25-0.51 |
 | live P99 | 392-1,181 s | <= 1.5 s in 13 of 15 cells; 60 and 188 s in two always-on cells (open) |
 
-Layers: random runs 0 violations in 110, directed scenes as predicted, exhaustive 2,304 states 0 violations, real boxes (14 scripts, regressions, the 15-step story) pass. **But the pre-registered delivery rule fails** (P99 no worse than the box as built + 1 s): in 12 of 100 fault-injected runs the per-sub box delivers its slowest posts later, up to 8,994 s vs 795 s. Status: provisional. Labels: estimate (model) and measured (real boxes). Record: `journal/cp/CP33.md`.
+Layers: random runs 0 violations in 110, directed scenes as predicted, exhaustive 2,304 states 0 violations, real boxes (14 scripts, regressions, the 15-step story) pass. **But the pre-registered delivery rule fails** (P99 no worse than the box as built + 1 s): in 16 of 110 fault-injected runs the per-sub box delivers its slowest posts later, up to 8,994 s vs 795 s. Status: provisional. Labels: estimate (model) and measured (real boxes). Record: `journal/cp/CP33.md`.
 
 Open: a small sub loses the store-and-forward help that non-members gave (more messages wait for a member to come on in the laptop-heavy scene); the P99 tail above.
 

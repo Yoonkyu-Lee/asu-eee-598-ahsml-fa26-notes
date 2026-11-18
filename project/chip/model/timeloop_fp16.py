@@ -24,9 +24,12 @@ ROWS = (32, 128, 512, 2048)
 
 def main() -> None:
     base.WB = int(sys.argv[sys.argv.index("--bits") + 1]) if "--bits" in sys.argv else 16
-    runs = os.path.expanduser("~/tl_runs")            # /opt/tl/runs may belong to root
+    runs = os.path.expanduser("~/tl_runs")            # run as root (Accelergy's config is root's), like CP12
     os.makedirs(runs, exist_ok=True)
-    work = Path(tempfile.mkdtemp(prefix=f"cp34_w{base.WB}_", dir=runs))
+    if "--work" in sys.argv:                          # resume: finished shapes are kept (base.run skips them)
+        work = Path(sys.argv[sys.argv.index("--work") + 1])
+    else:
+        work = Path(tempfile.mkdtemp(prefix=f"cp34_w{base.WB}_", dir=runs))
     print("work", work, flush=True)
     jobs = [(16, g, P, work) for g in base.GEMMS for P in ROWS]
     out, comps = [], None
