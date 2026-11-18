@@ -1,0 +1,213 @@
+{
+ "what": "CP39 B2 (journal/cp/CP39.md)",
+ "label": "estimate (model) on measured embeddings",
+ "calibration": {
+  "fp32": {
+   "fwd_cos": 0.21981931081547854,
+   "in_median": 0.2912815210263486,
+   "out_median": 0.09803059446719509,
+   "out_q95": 0.2875858746876373,
+   "out_pass": 0.12926738622920614
+  },
+  "mpnet": {
+   "fwd_cos": 0.20309582877293642,
+   "in_median": 0.269207125408895,
+   "out_median": 0.09108282891983473,
+   "out_q95": 0.26056686028623205,
+   "out_pass": 0.12200720260466284
+  }
+ },
+ "A0": {
+  "recall_60s": 0.6859011495397286,
+  "recall_1h": 0.6859011495397286,
+  "recall_small_60s": 0.4704176077532853,
+  "recall_small_1h": 0.4704176077532853,
+  "waste_share": 0.9135337757582843,
+  "receipts_per_box_day": 377.70944444444444,
+  "members_receipts_per_box_day": 47.59166666666666,
+  "flood_receipts_per_box_day": 901.9833333333335,
+  "exposure_top1": 0.9788888888888888,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   20.2,
+   20.4,
+   20.8
+  ],
+  "r3_travel": {
+   "boxes": 60,
+   "never": 9,
+   "median_hours": 5.0
+  },
+  "verdict": {
+   "r2": false,
+   "r3": false,
+   "r4": false
+  }
+ },
+ "A0/laptops": {
+  "recall_60s": 0.4582034111260425,
+  "recall_1h": 0.4582034111260425,
+  "recall_small_60s": 0.49021604273688313,
+  "recall_small_1h": 0.49021604273688313,
+  "waste_share": 0.8385997603285009,
+  "receipts_per_box_day": 39.67666666666667,
+  "members_receipts_per_box_day": 13.739444444444445,
+  "flood_receipts_per_box_day": 487.5361111111111,
+  "exposure_top1": 0.9544444444444444,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   5.1,
+   4.5,
+   5.5
+  ]
+ },
+ "B2": {
+  "recall_60s": 0.3070852303111684,
+  "recall_1h": 0.3070852303111684,
+  "recall_small_60s": 0.11568491857225201,
+  "recall_small_1h": 0.11568491857225201,
+  "waste_share": 0.7930725399061199,
+  "receipts_per_box_day": 70.62833333333333,
+  "members_receipts_per_box_day": 47.522777777777776,
+  "flood_receipts_per_box_day": 900.6544444444444,
+  "exposure_top1": 1.0,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   103.9,
+   110.1,
+   107.3
+  ],
+  "r3_travel": {
+   "boxes": 60,
+   "never": 13,
+   "median_hours": 9.0
+  },
+  "verdict": {
+   "r2": false,
+   "r3": false,
+   "r4": false
+  }
+ },
+ "B2/laptops": {
+  "recall_60s": 0.12160517020847976,
+  "recall_1h": 0.12160517020847976,
+  "recall_small_60s": 0.030790326601844924,
+  "recall_small_1h": 0.030790326601844924,
+  "waste_share": 0.8504953665049695,
+  "receipts_per_box_day": 11.316666666666665,
+  "members_receipts_per_box_day": 13.893333333333333,
+  "flood_receipts_per_box_day": 489.5294444444444,
+  "exposure_top1": 0.9344444444444444,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   15.6,
+   13.5,
+   17.3
+  ]
+ },
+ "B2_ttl1": {
+  "recall_60s": 0.23415104550741342,
+  "recall_1h": 0.23415104550741342,
+  "recall_small_60s": 0.07629508861393364,
+  "recall_small_1h": 0.07629508861393364,
+  "waste_share": 0.771502459962647,
+  "receipts_per_box_day": 48.71611111111111,
+  "members_receipts_per_box_day": 47.55666666666667,
+  "flood_receipts_per_box_day": 897.4983333333333,
+  "exposure_top1": 1.0,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   107.7,
+   107.8,
+   111.6
+  ],
+  "r3_travel": {
+   "boxes": 60,
+   "never": 21,
+   "median_hours": 8.0
+  },
+  "verdict": {
+   "r2": false,
+   "r3": false,
+   "r4": false
+  }
+ },
+ "B2_ttl1/laptops": {
+  "recall_60s": 0.1128621351820878,
+  "recall_1h": 0.1128621351820878,
+  "recall_small_60s": 0.022522522522522525,
+  "recall_small_1h": 0.022522522522522525,
+  "waste_share": 0.8367614116179575,
+  "receipts_per_box_day": 9.482222222222223,
+  "members_receipts_per_box_day": 13.826666666666668,
+  "flood_receipts_per_box_day": 486.20722222222224,
+  "exposure_top1": 0.9244444444444445,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   15.6,
+   16.4,
+   18.7
+  ]
+ },
+ "B2_ttl6": {
+  "recall_60s": 0.3276983698861222,
+  "recall_1h": 0.3276983698861222,
+  "recall_small_60s": 0.21537619689655998,
+  "recall_small_1h": 0.21537619689655998,
+  "waste_share": 0.8160038439570662,
+  "receipts_per_box_day": 83.10277777777777,
+  "members_receipts_per_box_day": 46.67611111111111,
+  "flood_receipts_per_box_day": 887.5316666666666,
+  "exposure_top1": 1.0,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   104.4,
+   103.2,
+   72.7
+  ],
+  "r3_travel": {
+   "boxes": 60,
+   "never": 22,
+   "median_hours": 7.0
+  },
+  "verdict": {
+   "r2": false,
+   "r3": false,
+   "r4": false
+  }
+ },
+ "B2_ttl6/laptops": {
+  "recall_60s": 0.13034619970760786,
+  "recall_1h": 0.13034619970760786,
+  "recall_small_60s": 0.022853998532648568,
+  "recall_small_1h": 0.022853998532648568,
+  "waste_share": 0.857787018560877,
+  "receipts_per_box_day": 12.318888888888887,
+  "members_receipts_per_box_day": 13.399444444444446,
+  "flood_receipts_per_box_day": 468.26722222222224,
+  "exposure_top1": 0.9322222222222223,
+  "exposure_prior": 0.0911111111111111,
+  "pulls_per_box_day": 0.0,
+  "pulled_per_box_day": 0.0,
+  "secs": [
+   19.0,
+   16.3,
+   20.8
+  ]
+ },
+ "rescued_by": []
+}

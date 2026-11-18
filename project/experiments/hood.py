@@ -2,6 +2,7 @@
 
   .venv/Scripts/python.exe -W ignore experiments/hood.py all     -> results/neighborhoods/r2_r5.json
   .venv/Scripts/python.exe -W ignore experiments/hood.py a       -> results/neighborhoods/a_rescue.json (CP39 A)
+  .venv/Scripts/python.exe -W ignore experiments/hood.py b       -> results/neighborhoods/b_opinion.json (CP39 B2)
 Needs data/neighborhoods/posts.npz (experiments/hood_data.py). Every number is an estimate (model).
 """
 from __future__ import annotations
@@ -23,6 +24,7 @@ from sim.hood import DAY, Hood, HoodScene, unit  # noqa: E402
 DATA = ROOT / "data" / "neighborhoods" / "posts.npz"
 OUT = ROOT / "results" / "neighborhoods" / "r2_r5.json"
 OUT_A = ROOT / "results" / "neighborhoods" / "a_rescue.json"
+OUT_B = ROOT / "results" / "neighborhoods" / "b_opinion.json"
 CALIB_Q = 0.30                   # forward threshold = this quantile of cos(post, first u) over in-interest pairs (CP39)
 SEEDS = (1, 2, 3)
 T0 = time.time()
@@ -170,24 +172,25 @@ METRICS = ("recall_60s", "recall_1h", "recall_small_60s", "recall_small_1h", "wa
            "members_receipts_per_box_day", "flood_receipts_per_box_day", "exposure_top1", "exposure_prior", "cell_sets")
 
 
-def run_a():
-    """CP39 A (journal/cp/CP39.md, rules written before the run): pull, coarse cells, the larger encoder, all of them."""
+def run_a(variants=None, aux=None, out=OUT_A, what="CP39 A (journal/cp/CP39.md)"):
+    """CP39 A (journal/cp/CP39.md, rules written before the run): pull, coarse cells, the larger encoder, all of them.
+    With variants given (CP39 B2), the same scenes, travel and rules for those variants only."""
     cal = {v: calib(v) for v in ("fp32", "mpnet")}
     print("calibration", cal, flush=True)
     base = HoodScene()
     mp = replace(base, fwd_cos=cal["mpnet"]["fwd_cos"])
     K = 16
-    variants = {"A0": (base, "fp32", 0), "Aa": (replace(base, pull=True), "fp32", 0),
+    variants = variants or {"A0": (base, "fp32", 0), "Aa": (replace(base, pull=True), "fp32", 0),
                 "Aa+": (replace(base, pull=True, pull_votes=True), "fp32", 0),
                 "Ab": (replace(base, buckets=True), "fp32", K), "Ac": (mp, "mpnet", 0),
                 "A-all": (replace(mp, pull=True, pull_votes=True, buckets=True), "mpnet", K)}
-    aux = {"Ab_k8": (replace(base, buckets=True), "fp32", 8), "Ab_k32": (replace(base, buckets=True), "fp32", 32),
+    aux = {} if aux is not None else {"Ab_k8": (replace(base, buckets=True), "fp32", 8), "Ab_k32": (replace(base, buckets=True), "fp32", 32),
            "Ab_n1": (replace(base, buckets=True, bucket_n=1), "fp32", K),
            "Ab_n3": (replace(base, buckets=True, bucket_n=3), "fp32", K),
            "Ac+pull": (replace(mp, pull=True, pull_votes=True), "mpnet", 0)}
     for v, k in {(v, k) for _, v, k in list(variants.values()) + list(aux.values())}:
         _w(v, k)                                         # codebooks once, before forking
-    res = {"what": "CP39 A (journal/cp/CP39.md)", "label": "estimate (model) on measured embeddings", "calibration": cal}
+    res = {"what": what, "label": "estimate (model) on measured embeddings", "calibration": cal}
     with ProcessPoolExecutor(14) as ex:
         futs, trav = {}, {}
         for name, (sc, v, k) in {**variants, **aux}.items():
@@ -217,9 +220,18 @@ def run_a():
                         "r4": r["exposure_top1"] <= 0.5}
     res["rescued_by"] = [n for n in variants if all(res[n]["verdict"].values())]
     print("verdicts", {n: res[n]["verdict"] for n in variants}, "rescued_by", res["rescued_by"])
-    OUT_A.parent.mkdir(parents=True, exist_ok=True)
-    OUT_A.write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
+
+
+def run_b():
+    """CP39 B2: opinion neighbours (simplified WhatsUp) on the A scenes; A0 again as the reference."""
+    base = HoodScene()
+    run_a({"A0": (base, "fp32", 0), "B2": (replace(base, opinion=True), "fp32", 0),
+           "B2_ttl1": (replace(base, opinion=True, opinion_ttl=1), "fp32", 0),
+           "B2_ttl6": (replace(base, opinion=True, opinion_ttl=6), "fp32", 0)}, aux={}, out=OUT_B,
+          what="CP39 B2 (journal/cp/CP39.md)")
 
 
 if __name__ == "__main__":
-    run_a() if sys.argv[1:] == ["a"] else run_all()
+    {"a": run_a, "b": run_b}.get(sys.argv[1] if sys.argv[1:] else "", run_all)()

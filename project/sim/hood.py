@@ -11,6 +11,9 @@ is of one of the owner's interests (a person's judgement, so the label) and may 
 CP39 A variants: pull (every refresh_s a box asks one on semantic neighbour for the last day's posts that match what the
 box advertises, optionally plus the posts that neighbour's owner voted for) and buckets (a box advertises only the ids of
 its bucket_n nearest cells of a public codebook, world["codebook"]; a post routes by its nearest cell).
+CP39 B2 opinion mode (a simplified WhatsUp, Boutet et al. IPDPS 2013): no embeddings; neighbours are the boxes whose
+liked-post sets overlap most (cosine), a liked post goes to every such neighbour, any other post to one random neighbour
+while its hops last (opinion_ttl). A post is liked when its owner reads it (one of the owner's true interests).
 Baselines on the same posts: "members" (CP33: exactly the boxes whose owner holds the label) and "flood" (everyone).
 
 Attack hooks (R5): spam posts whose claimed embedding is rotated toward a target subreddit by tol_deg (the honest
@@ -58,6 +61,8 @@ class HoodScene:
     pull_votes: bool = False             # A (a+): the fill also takes the posts that neighbour's owner voted for
     buckets: bool = False                # A (b): advertise codebook cell ids instead of u (world["codebook"])
     bucket_n: int = 2                    # A (b): cells a box advertises
+    opinion: bool = False                # B2: route by liked-post overlap instead of embeddings
+    opinion_ttl: int = 3                 # B2: hops a post nobody on the path liked may still take
     seed: int = 39
 
 
@@ -99,17 +104,18 @@ class Hood:
         self.on_off = self.rng.uniform(0, DAY, n)                        # laptops: on from this time of day for 8 h
         self.spam = set(range(n - sc.spam_boxes, n)) if sc.spam_boxes else set()
         self.cb = world.get("codebook") if sc.buckets else None
-        self.nb = [self._fresh(b) for b in range(n)]
         self.has: list[dict] = [dict() for _ in range(n)]             # post -> arrival time
         cap = int(n * sc.posts_per_box_day * sc.days * 3 + sc.spam_boxes * sc.spam_per_day * sc.days * 3 + 200)
         self.HAS = np.zeros((n, cap), bool)                               # pull: who has what, as a matrix
         self.VOTED = np.zeros((n, cap), bool)
+        self.LIKED = np.zeros((n, cap), bool)
         self.PE = np.zeros((cap, E.shape[1]))
         self.PT = np.zeros(cap)
         self.PK = np.zeros(cap, int)
         self.posts: list[dict] = []
         self.votes: list[int] = []
         self.c = {"receipts": 0, "encodes": 0, "forwards": 0, "reads": 0, "votes": 0, "pulls": 0, "pulled": 0}
+        self.nb = [self._fresh(b) for b in range(n)]
 
     # ---- helpers
     def on(self, b, t):
@@ -138,7 +144,11 @@ class Hood:
         pool = np.array(sorted(set(range(n)) - {b} if cands is None else set(cands) - {b}))
         if cands is None:
             pool = self.rng.choice(pool, min(60, len(pool)), replace=False)
-        if self.cb is not None:
+        if self.sc.opinion:
+            L = self.LIKED[:, :len(self.posts)].astype(float)
+            ov = L[pool] @ L[b]
+            score = ov / np.sqrt(np.maximum(L[pool].sum(1) * L[b].sum(), 1)) + 1e-3 * self.rng.random(len(pool))
+        elif self.cb is not None:
             mine = self.cells(b)
             score = np.array([len(mine & self.cells(x)) for x in pool]) + 0.1 * self.rng.random(len(pool))
         else:
@@ -201,12 +211,14 @@ class Hood:
         self.votes.append(votes)
         self.has[b][pid] = self.eng.t
         self.HAS[b, pid] = True
+        self.LIKED[b, pid] = label >= 0
         self._forward(b, pid, 0)
 
     def _grow(self):
         k = len(self.PT)
         self.HAS = np.pad(self.HAS, ((0, 0), (0, k)))
         self.VOTED = np.pad(self.VOTED, ((0, 0), (0, k)))
+        self.LIKED = np.pad(self.LIKED, ((0, 0), (0, k)))
         self.PE = np.pad(self.PE, ((0, k), (0, 0)))
         self.PT = np.pad(self.PT, (0, k))
         self.PK = np.pad(self.PK, (0, k))
@@ -222,6 +234,7 @@ class Hood:
         p = self.posts[pid]
         if p["label"] in self.true[b] and b not in self.spam:
             self.c["reads"] += 1
+            self.LIKED[b, pid] = True
             self.u[b] = unit(self.u[b] + self.sc.alpha * self.w["emb"][p["ix"]])
             if self.rng.random() < self.sc.vote_p:
                 self.votes[pid] += 1
@@ -230,6 +243,16 @@ class Hood:
         self._forward(b, pid, off_hops)
 
     def _forward(self, b, pid, off_hops):
+        if self.sc.opinion:
+            if self.LIKED[b, pid]:
+                for q in self.nb[b][:D_SEM]:
+                    self.c["forwards"] += 1
+                    self.eng.after(HOP_S, self._receive, q, pid, b, 0)
+            elif off_hops < self.sc.opinion_ttl:
+                self.c["forwards"] += 1
+                q = self.nb[b][int(self.rng.integers(len(self.nb[b])))]
+                self.eng.after(HOP_S, self._receive, q, pid, b, off_hops + 1)
+            return
         reach = int(math.log2(1 + self.votes[pid])) if self.sc.rumour else 0
         for q in self.nb[b]:
             match = self.match(pid, q)
@@ -293,7 +316,15 @@ class Hood:
         # R4: a neighbour guesses the owner's main interest from what the box advertises. Vector: the nearest subreddit
         # centre. Cells: the most common true interest among boxes advertising the same cells (an attacker who knows
         # the population). Prior: the most common interest for everyone (the floor).
-        if self.cb is not None:
+        if self.sc.opinion:
+            lab = np.array([p["label"] for p in self.posts])
+            pop0 = np.bincount([x for b in honest for x in self.true[b]], minlength=self.n_sub).argmax()
+            guess = []
+            for b in honest:
+                ls = lab[np.flatnonzero(self.LIKED[b, :len(self.posts)])]
+                ls = ls[ls >= 0]
+                guess.append(int(np.bincount(ls, minlength=self.n_sub).argmax()) if len(ls) else int(pop0))
+        elif self.cb is not None:
             sig = {b: tuple(sorted(self.cells(b))) for b in honest}
             cnt: dict = {}
             for b in honest:
