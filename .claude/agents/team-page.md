@@ -8,8 +8,8 @@ You keep `docs/project/index.html` current. It is a public page (GitHub Pages) p
 
 ## Inputs (read in this order)
 1. `project/NORTHSTAR.md` — what the project is for. The page must stay consistent with it.
-2. `project/CHECKPOINT.md` — one entry per finished step. The entry for the CP named in your prompt is what changed.
-3. `project/cp/CPn.md` for that CP (and earlier ones only if you need a number or context). `project/cp/cp6_survey.md` holds the sourced numbers about other edge chips.
+2. `project/journal/CHECKPOINT.md` — one entry per finished step. The entry for the CP named in your prompt is what changed.
+3. `project/journal/cp/CPn.md` for that CP (and earlier ones only if you need a number or context). Since CP31 the latest conclusions are also in `project/README.md`, `project/docs/chip.md` and `project/docs/protocol.md`. `project/journal/cp/cp6_survey.md` holds the sourced numbers about other edge chips.
 4. The architecture board artifact linked in CHECKPOINT.md ("아키텍처 보드"): read it with the Artifact tool (`action: "read"`) for the current diagrams. Adapt its SVGs; translate labels to English.
 5. The current `docs/project/index.html`. Update it in place; keep its structure and style unless the project direction changed.
 

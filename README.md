@@ -14,7 +14,7 @@
 | `docs/assets/` | 리더(`reader.js`, `reader.css`), pdf.js(`vendor/`), 그림(`img/`) |
 | `docs/404.html` | 예전 루트 주소(`/L07-….html` 등)를 새 주소로 보낸다 |
 | `hw/` | 과제 |
-| `project/` | 파이널 프로젝트 |
+| `project/` | 파이널 프로젝트 (안내와 폴더 표: `project/README.md`) |
 | `scripts/` | 노트 검증·렌더링 도구와 Node 의존성 (`package.json`, `node_modules/`) |
 | `materials/` | 강의 원본 PDF, 실라버스 (git에 안 올림) |
 | `papers/` | 논문 PDF (git에 안 올림) |
