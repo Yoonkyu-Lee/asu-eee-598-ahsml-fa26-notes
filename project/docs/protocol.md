@@ -93,12 +93,14 @@ Re-run:
 ```
 .venv/Scripts/python.exe -W ignore experiments/sync.py holes     # layer 2           -> results/sync/holes.json
 .venv/Scripts/python.exe -W ignore experiments/sync.py mc        # layer 3a          -> results/sync/mc.json
-.venv/Scripts/python.exe -W ignore experiments/sync.py cost      # cost grid (~15 min, 14 processes) -> results/sync/cost.json
-.venv/Scripts/python.exe experiments/sync_gate.py                # the cost gate table              -> results/sync/gate.json
+.venv/Scripts/python.exe -W ignore experiments/sync.py cost4     # cost grid, S2+KE and S2+KF'E      -> results/sync/cost4.json
 .venv/Scripts/python.exe -W ignore experiments/sync.py random    # layer 1 (~25 min, 14 processes)   -> results/sync/random.json
 .venv/Scripts/python.exe -W ignore experiments/sync_scenes.py props   # layer 3b: the reconciler alone -> results/sync/props.json
 .venv/Scripts/python.exe -W ignore tests/sync_check.py           # layer 4 (~12 min)                 -> results/tests/sync_check.json
 ```
+
+The CP30 comparison against the retired variants (S0 = X2, F, P, P2; the `cost`, `cost2`, `cost3`, `traffic` grids and
+the gate table `results/sync/gate.json`) runs at tag `pre-r1` (recast R1b).
 
 ## Sub-communities (H12 found in CP32, fixed in CP33)
 

@@ -725,7 +725,7 @@ class BoxNode:
             self.up.add(frm)
             self.peer_seen[frm] = time.time()
             cm = self.common(frm) if topics is None else {int(x) for x in topics} & set(self.box.topics)
-            s = Session(self.keys.view(cm), "S2")
+            s = Session(self.keys.view(cm))
             out = s.process(self._dec(rows))
             need = sorted(s.need)
         return {"reply": self._enc(out), "need": [[t, str(i)] for t, i in need]}
@@ -765,7 +765,7 @@ class BoxNode:
             now = self.now()
             lo, hi = (int(now - self.R + 2 * self.sigma), -1), (int(now + 2 * self.sigma) + 1, -1)
             with self.lock:
-                s = Session(self.keys.view(cm), "S2")
+                s = Session(self.keys.view(cm))
                 msg = s.initiate(lo, hi)
                 ver0 = self.ver                                    # CP30 F: the fence
             theirs, rounds = set(), 0

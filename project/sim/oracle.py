@@ -4,7 +4,10 @@ Properties (cp/CP29.md, written before results):
   S1 no honest box holds / serves / applies an invalid message (receiver-verifiable validity)
   S2 no resurrection: a box that applied a delete never again holds the target while the target is inside its window
   S3 no foreign delete applied
-  S4 no squatting: a valid message is never refused because an invalid envelope took its id
+  S4 no squatting: a valid message is never refused because an invalid envelope took its id. Boxes validate before
+        storing, so an invalid envelope never holds an id; S4 is judged by the H8 directed scene (layer 2) and the
+        layer-3a search. The per-event check here flagged only the store-first S0 box (retired in recast R1b, tag
+        pre-r1).
   L1/L2 two honest boxes in contact for T_bound end up with every item that one of them held at the start and that
         stays inside both boxes' reconciliation band (L2 = the same for deletes)
   F1 storage: no held message older than now - R, no tombstone / forgotten id older than now - R - 2 sigma
@@ -49,12 +52,6 @@ class Oracle:
     def on_apply_delete(self, box, d):
         if box.honest and not d.target_sig_ok:
             self.bad("S3", box=box.i, mid=d.mid)
-
-    def on_refuse(self, box, msg, claimed: int, reason: str):
-        if not box.honest:
-            return
-        if reason == "dup" and claimed == msg.mid and msg.valid and claimed in box.invalid_held:
-            self.bad("S4", box=box.i, mid=claimed)
 
     def f1_sweep(self):
         R, s2 = self.sim.sc.R, 2 * self.sim.sc.sigma

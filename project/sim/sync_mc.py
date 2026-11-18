@@ -8,10 +8,10 @@ a push of one held item between two connected honest boxes, an adversary deliver
 between two connected honest boxes. Failed transfers and silent losses leave the state unchanged, so they are
 covered by "that push did not happen". Windows and expiry are not modelled here (layer 2 covers them).
 
-Claim (limited): with the accept rules of S1/S2 (content ids, validate first, tombstones in the set, comments kept
+Claim (limited): with the accept rules of S2 (content ids, validate first, tombstones in the set, comments kept
 without their target), every reachable state satisfies S1-S4, and one reconciliation between two connected honest
-boxes makes their sets equal (L1) and carries every delete (L2). The same search with the S0 accept rules
-(store then validate, ids not content-checked) is run for contrast.
+boxes makes their sets equal (L1) and carries every delete (L2). The S0 contrast search was retired with S0 in recast R1b (tag pre-r1);
+check(mutate=...) now shows the search can fail.
 """
 from __future__ import annotations
 
@@ -23,25 +23,16 @@ AUTHOR = {"P1": 0, "P2": 1, "D1": 0, "C1": 1}
 PAIRS = ((0, 1), (0, 2), (1, 2))
 
 
-def accept(held: frozenset, item: str, mode: str) -> frozenset:
-    """One honest box receives one envelope. Returns its new held set."""
-    if mode == "S0":                                   # store first, validate after (H8); id = claimed id
-        ident = "P1" if item == "XS" else item
-        if any(("P1" if h == "XS" else h) == ident for h in held):
-            return held                                # duplicate id: dropped
-        if ident == "P1" and "D1" in held:             # since CP28 a forgotten post is refused
-            return held
-        new = held | {item}
-        if item == "D1" and "P1" in new:               # valid delete applies
-            new = new - {"P1"}
-        return frozenset(new)
+def accept(held: frozenset, item: str, mutate: str | None = None) -> frozenset:
+    """One honest box receives one envelope. Returns its new held set. mutate (to show check() can fail):
+    "accept_forged" (no content-id check: XS is stored), "resurrect" (a deleted post is taken again)."""
     if item in held:
         return held
-    if item == "XS":                                   # hash(header) != claimed id: rejected, nothing stored
+    if item == "XS" and mutate != "accept_forged":     # hash(header) != claimed id: rejected, nothing stored
         return held
     if item == "FD":                                   # signature does not match the target's key
         return held
-    if item == "P1" and "D1" in held:                  # forgotten (its key stays as a tombstone)
+    if item == "P1" and "D1" in held and mutate != "resurrect":   # forgotten (its key stays as a tombstone)
         return held
     new = set(held) | {item}
     if item == "D1":
@@ -57,16 +48,16 @@ def keyset(held: frozenset) -> frozenset:
     return frozenset(ks)
 
 
-def reconcile(ha: frozenset, hb: frozenset, mode: str):
+def reconcile(ha: frozenset, hb: frozenset, mutate: str | None = None):
     """Atomic session: each side fetches what the other holds and it lacks (deletes first)."""
     def pull(dst, src):
         for it in sorted(src - dst, key=lambda x: x != "D1"):
-            dst = accept(dst, it, mode)
+            dst = accept(dst, it, mutate)
         return dst
     return pull(ha, hb), pull(hb, ha)
 
 
-def check(mode: str, max_states: int = 2_000_000) -> dict:
+def check(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
     start = (frozenset(), frozenset(), False, False, frozenset(), (False, False, False), (True, True, True))
     seen = {start}
     q = deque([start])
@@ -91,16 +82,16 @@ def check(mode: str, max_states: int = 2_000_000) -> dict:
             if "P1" in h and "D1" in h:
                 bad("S2", s, f"box {i}")
             had = (had0, had1)[i]
-            if had and "P1" not in h and "D1" not in h and not (mode == "S0" and "XS" in h):
+            if had and "P1" not in h and "D1" not in h:
                 bad("S3", s, f"box {i} lost P1 without D1")
         # S4: a box that lacks P1 and has no D1 must be able to take the valid P1
         if "P1" in pub:
             for i, h in enumerate(H):
-                if "P1" not in h and "D1" not in h and "P1" not in accept(h, "P1", mode):
+                if "P1" not in h and "D1" not in h and "P1" not in accept(h, "P1", mutate):
                     bad("S4", s, f"box {i} cannot accept P1")
         # ---- L1/L2: one session between connected honest boxes closes the difference
         if on[0] and on[1] and link[0]:
-            a, b = reconcile(h0, h1, mode)
+            a, b = reconcile(h0, h1, mutate)
             if keyset(a) != keyset(b):
                 bad("L1", s, f"after session {sorted(keyset(a))} vs {sorted(keyset(b))}")
             if ("D1" in a or "D1" in b) and not ("D1" in a and "D1" in b and "P1" not in a and "P1" not in b):
@@ -125,17 +116,17 @@ def check(mode: str, max_states: int = 2_000_000) -> dict:
             if it == "C1" and "P1" not in ha:
                 continue
             hh = list(H)
-            hh[au] = accept(ha, it, mode)
+            hh[au] = accept(ha, it, mutate)
             had = [had0 or "P1" in hh[0], had1 or "P1" in hh[1]]
             nxt.append((hh[0], hh[1], had[0], had[1], pub | {it}, on, link))
         if on[0] and on[1] and link[0]:                   # push one item, and a whole session
             for src, dst in ((0, 1), (1, 0)):
                 for it in H[src]:
                     hh = list(H)
-                    hh[dst] = accept(H[dst], it, mode)
+                    hh[dst] = accept(H[dst], it, mutate)
                     if hh[dst] != H[dst]:
                         nxt.append((hh[0], hh[1], had0 or "P1" in hh[0], had1 or "P1" in hh[1], pub, on, link))
-            a, b = reconcile(h0, h1, mode)
+            a, b = reconcile(h0, h1, mutate)
             nxt.append((a, b, had0 or "P1" in a, had1 or "P1" in b, pub, on, link))
         if on[2]:                                          # the adversary: forgeries and replays
             for i, j in ((0, 1), (1, 2)):
@@ -143,7 +134,7 @@ def check(mode: str, max_states: int = 2_000_000) -> dict:
                     continue
                 for it in ("XS", "FD") + tuple(sorted(pub)):
                     hh = list(H)
-                    hh[i] = accept(H[i], it, mode)
+                    hh[i] = accept(H[i], it, mutate)
                     if hh[i] != H[i]:
                         nxt.append((hh[0], hh[1], had0 or "P1" in hh[0], had1 or "P1" in hh[1], pub, on, link))
         for t in nxt:
@@ -152,14 +143,14 @@ def check(mode: str, max_states: int = 2_000_000) -> dict:
                 seen.add(t)
                 q.append(t)
                 if len(seen) > max_states:
-                    return {"mode": mode, "states": len(seen), "transitions": n_trans, "truncated": True,
+                    return {"mode": "S12", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": True,
                             "violations": dict(count), "examples": viol}
-    return {"mode": mode, "states": len(seen), "transitions": n_trans, "truncated": False,
+    return {"mode": "S12", "mutate": mutate, "states": len(seen), "transitions": n_trans, "truncated": False,
             "violations": dict(count), "examples": viol}
 
 
 def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
-    """CP30 F: the same search (S1/S2 accept rules) with the one-sided clean flags c01 (box 0 about box 1) and c10.
+    """CP30 F/F': the same search (S2 accept rules) with the one-sided clean flags c01 (box 0 about box 1) and c10.
 
     A session started by box i sets c_ij when it finds no difference; any change to box i's set that did not come
     from box j clears c_ij (publishing, an adversary delivery, incl. P3: a valid post by the adversary, so that a
@@ -170,7 +161,6 @@ def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
     changes is covered by the generation fence (layer 2 and 4 scenes).
     mutate (to show the check can fail): "keep_on_publish" (publishing does not clear the flag), "keep_on_adversary"
     (a third-party delivery does not clear it), "set_on_difference" (a session sets the flag even after fetching)."""
-    mode = "S12"
     start = (frozenset(), frozenset(), frozenset(), (False, False, False), (True, True, True), (False, False))
     seen = {start}
     q = deque([start])
@@ -226,7 +216,7 @@ def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
             if it in ("D1", "C1") and "P1" not in H[au]:
                 continue
             hh = list(H)
-            hh[au] = accept(H[au], it, mode)
+            hh[au] = accept(H[au], it)
             c = list(cl)
             if hh[au] != H[au] and mutate != "keep_on_publish":
                 c[au] = False
@@ -235,11 +225,11 @@ def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
             for src, dst in ((0, 1), (1, 0)):              # a push: dst's change came from src, its flag stays
                 for it in H[src]:
                     hh = list(H)
-                    hh[dst] = accept(H[dst], it, mode)
+                    hh[dst] = accept(H[dst], it)
                     if hh[dst] != H[dst]:
                         nxt.append(st(hh[0], hh[1], cl))
             same = k0 == k1
-            a, b = reconcile(h0, h1, mode)
+            a, b = reconcile(h0, h1)
             for ini in (0, 1):                              # a session started by either box
                 c = list(cl)
                 if same:
@@ -256,7 +246,7 @@ def check_clean(max_states: int = 2_000_000, mutate: str | None = None) -> dict:
                     continue
                 for it in ("XS", "FD", "P3") + tuple(sorted(pub)):
                     hh = list(H)
-                    hh[i] = accept(H[i], it, mode)
+                    hh[i] = accept(H[i], it)
                     if hh[i] != H[i]:
                         c = list(cl)
                         if mutate != "keep_on_adversary":
