@@ -19,6 +19,7 @@
 | 2026-11-18 | 리메이크 대 리캐스트 | 리캐스트, 브랜치에서 R2 → R3 → R1 → R4 | 결과 JSON·재현 명령·데모가 지금 계약에 기댐 (journal/recast/REVIEW.md 6i) | 소유자 |
 | 2026-11-18 | `--exchange` CLI 계약 | R1에서 바꿔도 됨. 옛 재현 명령은 태그로 | | 소유자 |
 | 2026-11-18 | gate.py | G-a 지금 (`tests/fast/`), G-c 학기 뒤 | journal/recast/DRAFT_CLAUDE.md | 소유자 |
+| 2026-11-18 | 대상보다 먼저 온 투표 | 버리지 않고 대상 글이 올 때 점수에 더함 (`sim/box.py` `early`) | 무대 8단계 간헐 실패(7번 중 2번)의 원인. 집합 맞추기·offer는 순서를 보장하지 않음. 고친 뒤 6/6 통과, `tests/fast/vote_order.py`는 고치기 전 실패·되돌리면 실패 | 측정 |
 
 ## Doubts
 

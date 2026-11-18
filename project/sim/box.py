@@ -233,6 +233,7 @@ class Box:
         self.vnul: set[int] = set()
         self.banned: set[int] = set()
         self.items: dict[int, dict] = {}          # mid -> {kind, topic, t, epub, title, score, parent}
+        self.early: dict[int, int] = {}           # target mid -> score from votes that came before the target
         self.deleted: set[int] = set()
         self.idx_ids = {k: [] for k in emb_dim}   # "text" / "image" -> list of mids (deleted ones skipped)
         self.idx_vec = {k: [] for k in emb_dim}
@@ -282,13 +283,16 @@ class Box:
             return "no_key"
         if m.kind in ("post", "comment", "room"):
             self.items[m.mid] = {"kind": m.kind, "topic": m.topic, "t": m.t0, "epub": m.epub,
-                                 "title": body.get("title"), "score": 0, "parent": body.get("parent")}
+                                 "title": body.get("title"), "score": self.early.pop(m.mid, 0),
+                                 "parent": body.get("parent")}
             if m.mid in self.S.emb:          # image posts: the caption here, the picture once it is pulled
                 self.index("text", m.mid)
         elif m.kind == "vote":
             tgt = body["target"]
             if tgt in self.items:
                 self.items[tgt]["score"] += body["dir"]
+            else:                            # reconciliation delivers in any order: count it when the post comes
+                self.early[tgt] = self.early.get(tgt, 0) + body["dir"]
         elif m.kind == "delete":
             tgt = body["target"]
             if tgt in self.items and self.items[tgt]["epub"] == m.epub:   # only the author's one-time key
