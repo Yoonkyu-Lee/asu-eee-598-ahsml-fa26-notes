@@ -1,5 +1,6 @@
 """CP11: replay a Groth16 batch verification, base-field operation by operation, on a cycle model of the
-verification unit. Rules are pre-registered in cp/CP11.md.
+verification unit. Rules are pre-registered in cp/CP11.md. Also the core CP13 and CP14 build on: the proofs and key
+(`Setup`), the traced tests (decode, batch test, single test), the list scheduler (`schedule`, `per_proof`).
 
 Run from project/:  .venv/Scripts/python.exe chip/model/verifier_cycles.py   (CP11: was src/sim_cp11.py)
 Writes results/chip/cp11_sim.json.
@@ -33,7 +34,8 @@ MUL_OCC, MUL_LAT = 4, 4  # CP10 S=1: a product every 4 cycles per unit, result 4
 NJ_MUL = 1.758           # CP10 S=1, synthesized (results/cp10)
 PJ_ADD = 1.6             # CP7: 254-bit add + conditional subtract, L7 45 nm
 PJ_TRAFFIC = 24 * 5.0    # CP7: two operands in, one out, 8 words each, 8 KB SRAM 5 pJ per 32-bit word
-FLOOD, R2 = 12_207, 2 * 12_207
+FLOOD = 12_207           # proofs/s that fill 100 Mbps
+R2 = 2 * FLOOD           # CP11 rule R2
 
 
 def straus(points, scalars):
@@ -120,20 +122,28 @@ def ls_fp2_sqrt(vals):
     return [Fp2(x, v.c1 * t) for x, v, t in zip(x0, vals, inv2x0)]
 
 
-def ls_decode(proofs):
-    """Decompress A, C (G1) and B (G2) of every proof and check B is in G2, all in lock-step."""
-    ax = [fresh(a[0]) for a, _, _ in proofs]
-    cx = [fresh(c[0]) for _, _, c in proofs]
+def ls_recover(proofs):
+    """Decompress A, C (G1) and B (G2) of every proof: G1 x's (all A, then all C), their y's, the G2 points."""
+    g1x = [fresh(a[0]) for a, _, _ in proofs] + [fresh(c[0]) for _, _, c in proofs]
     bx = [fresh(b[0]) for _, b, _ in proofs]
-    g1x = ax + cx
     g1y = ls_pow([x.sq() * x + bn.B1 for x in g1x], (P + 1) // 4)
     by = ls_fp2_sqrt([x.sq() * x + bn.B2 for x in bx])
-    bs = list(zip(bx, by))
-    m = ls_scalar_mul(bs, [6 * bn.X * bn.X] * len(bs))  # psi(B) == [6x^2] B
+    return g1x, g1y, list(zip(bx, by))
+
+
+def ls_subgroup(bs):
+    """G2 subgroup check psi(B) == [6x^2] B for every point."""
+    m = ls_scalar_mul(bs, [6 * bn.X * bn.X] * len(bs))
     zi = ls_inv([j.z for j in m])
     for j, z, b in zip(m, zi, bs):
         z2 = z.sq()
         (j.x * z2, j.y * z2 * z), bn._frob_point(b)  # affine [6x^2]B and psi(B), then compared
+
+
+def ls_decode(proofs):
+    """Decompress every proof and check B is in G2: [(A, B, C)] as traced values."""
+    g1x, g1y, bs = ls_recover(proofs)
+    ls_subgroup(bs)
     n = len(proofs)
     return [((g1x[i], g1y[i]), bs[i], (g1x[n + i], g1y[n + i])) for i in range(n)]
 
@@ -151,43 +161,85 @@ def fresh(v):
     return Fp(v.v) if isinstance(v, Fp) else Fp2(Fp(v.c0.v), Fp(v.c1.v))
 
 
-def build(n: int, single: bool = False, seed: int = 598) -> dict:
-    rng = random.Random(seed)
-    bn.tracing(False)
-    proofs = [(rand_g1(rng), rand_g2(rng), rand_g1(rng)) for _ in range(n)]
-    alpha, beta, gamma, delta = rand_g1(rng), rand_g2(rng), rand_g2(rng), rand_g2(rng)
-    ic = [rand_g1(rng) for _ in range(6)]
-    publics = [[rng.randrange(R) for _ in range(5)] for _ in range(n)]
-    lines = {k: bn.prepare(q) for k, q in (("beta", beta), ("gamma", gamma), ("delta", delta))}
+def trace_of(fn) -> list:
     bn.TRACE.clear()
     bn.tracing(True)
-
-    dec = ls_decode(proofs)
-    n_decode = len(bn.TRACE)
-
-    if single:
-        (A, B, Cp), x = dec[0], publics[0]
-        L = batch_affine([straus(ic, [1] + x)])[0]
-        pre = [((L[0], -L[1]), lines["gamma"]), ((Cp[0], -Cp[1]), lines["delta"])]
-        bn.final_exp(bn.miller_loop_otf([(A, B)], pre))  # compared with the precomputed e(alpha, beta)
-    else:
-        r = [rng.getrandbits(128) | 1 for _ in range(n)]
-        rA = ls_scalar_mul([A for A, _, _ in dec], r)
-        sC = straus([Cp for _, _, Cp in dec], r)
-        coeff = [sum(ri * x[j] for ri, x in zip(r, publics)) % R for j in range(5)]
-        for x in publics:  # the scalar-field weighting of public inputs, counted as base-field work
-            for _ in range(5):
-                C(rng.randrange(P)) * C(rng.randrange(P))
-        sL = straus(ic, [sum(r) % R] + coeff)
-        sA = bn.scalar_mul(alpha, sum(r) % R)
-        aff = batch_affine(rA + [sC, sL, sA])
-        fresh_pairs = [(p, B) for p, (_, B, _) in zip(aff[:n], dec)]
-        pre = [((aff[n][0], -aff[n][1]), lines["delta"]), ((aff[n + 1][0], -aff[n + 1][1]), lines["gamma"]),
-               ((aff[n + 2][0], -aff[n + 2][1]), lines["beta"])]
-        bn.final_exp(bn.miller_loop_otf(fresh_pairs, pre))  # == 1 for a valid batch
+    fn()
     bn.tracing(False)
-    trace = list(bn.TRACE)
-    return {"trace": trace, "n": n, "decode_ops": n_decode}
+    return list(bn.TRACE)
+
+
+class Setup:
+    """n synthetic proofs, verifying key, prepared vk lines and batch weights r_i, made without tracing.
+    The tests take the vk multi-scalar products and the final exponentiation as arguments (CP14's variants)."""
+
+    def __init__(self, n: int, seed: int = 598):
+        rng = random.Random(seed)
+        self.rng = rng
+        bn.tracing(False)
+        self.proofs = [(rand_g1(rng), rand_g2(rng), rand_g1(rng)) for _ in range(n)]
+        self.alpha = rand_g1(rng)
+        beta, gamma, delta = (rand_g2(rng) for _ in range(3))
+        self.ic = [rand_g1(rng) for _ in range(6)]
+        self.publics = [[rng.randrange(R) for _ in range(5)] for _ in range(n)]
+        self.lines = {k: bn.prepare(q) for k, q in (("beta", beta), ("gamma", gamma), ("delta", delta))}
+        self.r = [rng.getrandbits(128) | 1 for _ in range(n)]
+
+    def pts(self, k):
+        """Decoded points of the first k proofs as fresh inputs (read from the 256 B per-proof store)."""
+        pt = lambda p: (fresh(p[0]), fresh(p[1]))
+        return [(pt(a), pt(b), pt(c)) for a, b, c in self.proofs[:k]]
+
+    def vk_msm(self, scalars):
+        """sum_j s_j IC_j (Straus) and s_0 alpha."""
+        return straus(self.ic, scalars), bn.scalar_mul(self.alpha, scalars[0])
+
+    def ic_msm(self, x):
+        """IC_0 + sum_j x_j IC_(j+1) for one proof's public inputs."""
+        return straus(self.ic, [1] + x)
+
+    def weights_tail(self, k, cs, vk_msm=None):
+        """sum r_i C_i, public-input weighting, sum r L, (sum r) alpha: three G1 points (Jacobian)."""
+        r = self.r[:k]
+        sC = straus(cs, r)
+        coeff = [sum(ri * x[j] for ri, x in zip(r, self.publics)) % R for j in range(5)]
+        for _ in range(k):  # scalar-field weighting of public inputs, counted as base-field work
+            for _ in range(5):
+                C(self.rng.randrange(P)) * C(self.rng.randrange(P))
+        return [sC, *(vk_msm or self.vk_msm)([sum(r) % R] + coeff)]
+
+    def vk_pairs(self, aff):
+        """(-sum r C, delta), (-sum r L, gamma), (-(sum r) alpha, beta) from the three affine points."""
+        return [((p[0], -p[1]), self.lines[k]) for p, k in zip(aff, ("delta", "gamma", "beta"))]
+
+    def batch_test(self, d, final=bn.final_exp, vk_msm=None):
+        """Batch test of the decoded proofs d (== 1 for a valid batch)."""
+        k = len(d)
+        rA = ls_scalar_mul([a for a, _, _ in d], self.r[:k])
+        aff = batch_affine(rA + self.weights_tail(k, [c for _, _, c in d], vk_msm))
+        final(bn.miller_loop_otf([(p, b) for p, (_, b, _) in zip(aff[:k], d)], self.vk_pairs(aff[k:])))
+
+    def single_test(self, proof, x, final=bn.final_exp, ic_msm=None):
+        """Single verification of a decoded proof (compared with the precomputed e(alpha, beta))."""
+        A, B, Cp = proof
+        L = batch_affine([(ic_msm or self.ic_msm)(x)])[0]
+        pre = [((L[0], -L[1]), self.lines["gamma"]), ((Cp[0], -Cp[1]), self.lines["delta"])]
+        final(bn.miller_loop_otf([(A, B)], pre))
+
+
+def build(n: int, single: bool = False, seed: int = 598) -> dict:
+    """The traced batch of n proofs (or one proof verified alone), decoding included."""
+    su = Setup(n, seed)
+    bn.TRACE.clear()
+    bn.tracing(True)
+    dec = ls_decode(su.proofs)
+    n_decode = len(bn.TRACE)
+    if single:
+        su.single_test(dec[0], su.publics[0])
+    else:
+        su.batch_test(dec)
+    bn.tracing(False)
+    return {"trace": list(bn.TRACE), "n": n, "decode_ops": n_decode}
 
 
 def level_order(trace):
@@ -283,6 +335,17 @@ def schedule(trace, mults: int, adders: int, window: int = 1 << 30) -> dict:
             "mul_util": busy_mul_cycles / (mults * total) if total else 0, "peak_live_values": peak}
 
 
+def per_proof(traces: dict, mults: int, adders: int, window: int = 1 << 30):
+    """Batches of 8 and 4 on one machine: (r8, r4, marginal cycles of one more proof in the batch)."""
+    r8 = schedule(traces[8], mults, adders, window)
+    r4 = schedule(traces[4], mults, adders, window)
+    return r8, r4, (r8["cycles"] - r4["cycles"]) / 4
+
+
+def energy_mJ(ops: dict) -> float:
+    return (ops["mul"] * NJ_MUL * 1e3 + ops["add"] * PJ_ADD + (ops["mul"] + ops["add"]) * PJ_TRAFFIC) * 1e-9
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     res = {"machine": {"MHz": MHZ, "mul_occupancy": MUL_OCC, "mul_latency": MUL_LAT, "nJ_mul": NJ_MUL,
@@ -300,34 +363,28 @@ def main() -> None:
     res["per_proof_marginal"] = marg
     print("counts", counts, "per proof", marg, flush=True)
 
+    program = {n: built[n]["trace"] for n in (4, 8)}
+    mj = energy_mJ(marg)
     sweep = []
     for mults in (1, 2, 4, 5, 6, 8):
         for adders in (1, 2, 3, 4, 6):
-            r8 = schedule(built[8]["trace"], mults, adders)
-            r4 = schedule(built[4]["trace"], mults, adders)
-            cyc_per_proof = (r8["cycles"] - r4["cycles"]) / 4  # marginal cost of one more proof in the batch
-            proofs_s = MHZ * 1e6 / cyc_per_proof
-            mj = (marg["mul"] * NJ_MUL * 1e3 + marg["add"] * PJ_ADD + (marg["mul"] + marg["add"]) * PJ_TRAFFIC) * 1e-9
-            row = {"mults": mults, "adders": adders, "batch8": r8, "cycles_per_proof": cyc_per_proof,
-                   "proofs_per_s": proofs_s, "mJ_per_proof": mj, "R1": mj <= 0.08, "R2": proofs_s >= R2,
-                   "buffer_KB": r8["peak_live_values"] * 32 / 1024}
-            sweep.append(row)
-            print(mults, adders, round(cyc_per_proof), round(proofs_s), f"util {r8['mul_util']:.2f}",
+            r8, _, cpp = per_proof(program, mults, adders)
+            sweep.append({"mults": mults, "adders": adders, "batch8": r8, "cycles_per_proof": cpp,
+                          "proofs_per_s": MHZ * 1e6 / cpp, "mJ_per_proof": mj, "R1": mj <= 0.08,
+                          "R2": MHZ * 1e6 / cpp >= R2, "buffer_KB": r8["peak_live_values"] * 32 / 1024})
+            print(mults, adders, round(cpp), round(MHZ * 1e6 / cpp), f"util {r8['mul_util']:.2f}",
                   f"live {r8['peak_live_values']}", flush=True)
     res["sweep"] = sweep
     win = []
-    lv = {n: level_order(built[n]["trace"]) for n in (4, 8)}
-    for order, tr in (("program", {n: built[n]["trace"] for n in (4, 8)}), ("level", lv)):
-      for mults, adders in ((4, 4), (5, 4), (6, 4), (6, 6)):
-        for w in (32, 64, 128, 256, 1024, 4096):
-            r8 = schedule(tr[8], mults, adders, w)
-            r4 = schedule(tr[4], mults, adders, w)
-            cpp = (r8["cycles"] - r4["cycles"]) / 4
-            win.append({"order": order, "mults": mults, "adders": adders, "window": w, "cycles_per_proof": cpp,
-                        "proofs_per_s": MHZ * 1e6 / cpp, "mul_util": r8["mul_util"],
-                        "peak_live_values": r8["peak_live_values"], "buffer_KB": r8["peak_live_values"] * 32 / 1024})
-            print("window", order, mults, adders, w, round(MHZ * 1e6 / cpp), f"util {r8['mul_util']:.2f}",
-                  f"live {r8['peak_live_values']}", flush=True)
+    for order, tr in (("program", program), ("level", {n: level_order(program[n]) for n in (4, 8)})):
+        for mults, adders in ((4, 4), (5, 4), (6, 4), (6, 6)):
+            for w in (32, 64, 128, 256, 1024, 4096):
+                r8, _, cpp = per_proof(tr, mults, adders, w)
+                win.append({"order": order, "mults": mults, "adders": adders, "window": w, "cycles_per_proof": cpp,
+                            "proofs_per_s": MHZ * 1e6 / cpp, "mul_util": r8["mul_util"],
+                            "peak_live_values": r8["peak_live_values"], "buffer_KB": r8["peak_live_values"] * 32 / 1024})
+                print("window", order, mults, adders, w, round(MHZ * 1e6 / cpp), f"util {r8['mul_util']:.2f}",
+                      f"live {r8['peak_live_values']}", flush=True)
     res["window_sweep"] = win
     s1 = schedule(single["trace"], 4, 2)
     res["single_proof_M4_A2"] = {**s1, "us": s1["cycles"] / MHZ}
