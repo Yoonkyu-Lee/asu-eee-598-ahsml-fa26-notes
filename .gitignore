@@ -55,3 +55,6 @@ project/bench/crypto_bench/target-fast/
 # CP9 Apporto 실행 산출물 (시뮬레이션·합성 작업 폴더)
 project/chip/rtl/run_*/
 project/legacy/rtl/run_*/
+
+# Checkouts of old tags made by chip/model/at_tag.py (CP31 tag cp30 reproduces old CP commands)
+.worktrees/
