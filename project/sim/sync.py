@@ -55,6 +55,7 @@ from .oracle import Oracle
 from .recon import KeySet, TopicKeySet, reconcile
 
 DAY = 86400.0
+DIAG_S = 30.0                           # CP38 tail diagnosis: sampling period of the member-path check
 ENV, HDR, IDB = 1000, 40, 12          # bytes: envelope, request/answer header, one key on the wire (추정, CP26/recon)
 PXB = 8                               # one peer id in a peer-exchange hint (추정, CP30)
 
@@ -114,6 +115,10 @@ class SyncScene:
     d_sub: int = 3                      # CP33 sub: up mesh peers wanted in each of my subs
     subs_mean: float = 3.0              # CP33: subs per box = 1 + Poisson(subs_mean - 1), Zipf(zipf) popularity (추정)
     zipf: float = 1.0
+    sub_refill_s: float = 600.0         # CP38: at most one fresh candidate list per sub this often
+    explore_s: float = 3600.0           # CP38: one random hello this often (CP30 E)
+    known_first: bool = False           # CP38 K: hello members of the sub I met before (most recent first), no timer
+    tail_diag: bool = False             # CP38: for late live deliveries, the share of the wait a member path existed
 
     @property
     def t_bound(self) -> float:          # L1 deadline: floor period max + probe cap + slack (cp/CP29.md L1)
@@ -177,6 +182,8 @@ class Box:
         self.prev_mesh: list[int] = []          # CP30 P: last session's mesh
         self.hints: list[int] = []              # CP30 P: peers heard of in hello answers
         self.hello_out: set[int] = set()        # CP30 P: candidates asked and not answered yet
+        self.known: dict[int, list] = {}        # CP38 K: sub -> members I was up with, most recent first (kept)
+        self.known_tried: set[int] = set()      # CP38 K: known members already asked this session
         self.ver = 0                            # CP30 F: mutation generation of my set (the fence)
         self.session = 0.0
         self.last_off = None
@@ -244,6 +251,9 @@ class Sync:
         self.forced: dict[tuple, list] = defaultdict(list)   # script: (a, b) -> ["fail"/"silent"] for next transfers
         self.tag: dict[str, Msg] = {}
         self.live: list[float] = []
+        self.pend: dict[int, dict] = {}                 # CP38 diag: mid -> {box on at creation: [samples, member path]}
+        self.msg_by: dict[int, Msg] = {}
+        self.tail: list[tuple] = []                     # CP38 diag: (latency s, samples, samples with a member path, sub)
         self.ev = Counter()
         self.end = sc.days * DAY
         self.trace = 0                                  # CP30: hash of world events (equal workloads across variants)
@@ -328,6 +338,14 @@ class Sync:
         A.backoff.pop(b, None)
         A.down_since.pop(b, None)
         A.cand_down.discard(b)
+        if self.sc.known_first and self.subbed:
+            A.known_tried.discard(b)
+            for t in A.subs & self.boxes[b].subs:
+                k = A.known.setdefault(t, [])
+                if b in k:
+                    k.remove(b)
+                k.insert(0, b)
+                del k[2 * self.sc.D_HI:]
         remesh = False
         if b not in A.mesh:
             A.mesh.add(b)
@@ -475,8 +493,18 @@ class Sync:
             need = min(self.sc.d_sub, len(self.holders[t]) - 1) - have
             if need <= 0:
                 continue
+            if self.sc.known_first:
+                for c in A.known.get(t, ()):
+                    if need <= 0:
+                        break
+                    if c in A.mesh or c in A.hello_out or A.up.get(c) or c in A.known_tried:
+                        continue
+                    A.known_tried.add(c)
+                    need -= 1
+                    A.hello_out.add(c)
+                    self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda c=c: self._cand_failed(a, c))
             cand = A.sub_cand.get(t)
-            if not cand and self.eng.t - A.sub_refill.get(t, -1e18) > 600.0:
+            if not cand and self.eng.t - A.sub_refill.get(t, -1e18) > self.sc.sub_refill_s:
                 A.sub_refill[t] = self.eng.t
                 cand = [c for c in self.holders[t] if c != a and c not in A.mesh]
                 self.rng.shuffle(cand)
@@ -502,7 +530,7 @@ class Sync:
         if c != a and c not in A.mesh and c not in A.hello_out:
             A.hello_out.add(c)
             self.xfer(a, c, HDR, "probe", self._hello_at, c, a, fail=lambda: self._explore_failed(a, c))
-        self.eng.after(3600.0, self._explore, a, sid)
+        self.eng.after(self.sc.explore_s, self._explore, a, sid)
 
     def _explore_failed(self, a, c):
         self.boxes[a].hello_out.discard(c)
@@ -552,7 +580,7 @@ class Sync:
         if self.subbed:
             others = [c for c in others if self.shares(b, c)]
             B.sub_cand, B.sub_refill = {}, {}
-        B.hints, B.hello_out = [], set()
+        B.hints, B.hello_out, B.known_tried = [], set(), set()
         if self.sc.px and B.prev_mesh:                   # P: last mesh and random, interleaved (popped from the end)
             prev = [c for c in B.prev_mesh if c != b]
             ps = set(prev)
@@ -566,7 +594,7 @@ class Sync:
             others = mix[::-1]
         B.cand = others
         if (self.sc.px or self.sc.explore) and B.honest:
-            self.eng.after(self.rng.uniform(1800.0, 3600.0), self._explore, b, B.sid)
+            self.eng.after(self.rng.uniform(self.sc.explore_s / 2, self.sc.explore_s), self._explore, b, B.sid)
         self._graft(b)
 
     def go_off(self, b: int):
@@ -577,6 +605,8 @@ class Sync:
         B.on = False
         B.sid += 1
         B.last_off = self.eng.t
+        for d in self.pend.values():                     # CP38 diag: its live clock restarts at the next session
+            d.pop(b, None)
         B.prev_mesh = list(B.mesh)
         for p in list(B.mesh):
             self._contact(b, p)
@@ -662,6 +692,13 @@ class Sync:
         if m.author != b and m.true_t <= self.eng.t and B.on:
             if B.session <= m.true_t:
                 self.live.append(self.eng.t - m.true_t)
+                d = self.pend.get(claimed)
+                if d is not None and b in d:
+                    s = d.pop(b)
+                    if self.eng.t - m.true_t > 30.0:
+                        self.tail.append((round(self.eng.t - m.true_t, 1), s[0], s[1], m.topic))
+                    if not d:
+                        del self.pend[claimed]
         self.oracle.on_hold(B, m, claimed)
         if m.kind == "delete":
             self._apply_delete(b, m)
@@ -1086,6 +1123,10 @@ class Sync:
             self.tag[tag] = m
         self.ev["pub_" + kind] += 1
         self._cover(b, m)
+        if sc.tail_diag and B.honest and m.valid and m.target_sig_ok:
+            self.msg_by[m.mid] = m
+            self.pend[m.mid] = {h: [0, 0] for h in self.holders[topic] if h != b and self.boxes[h].on
+                                and self.boxes[h].honest}
         if not B.honest:                                  # liars' own messages go out as they are
             self._hold_liar(b, m)
         elif m.valid and m.target_sig_ok:
@@ -1277,8 +1318,29 @@ class Sync:
         for t in sc.miss_at:
             self.eng.at(t, self._miss_sweep)
         self.eng.after(3600.0, self._f1_tick)
+        if sc.tail_diag:
+            self.eng.after(DIAG_S, self._diag_tick)
         self.eng.run(self.end)
         return self.result()
+
+    def _diag_tick(self):
+        """CP38: every DIAG_S, for each live (message, box) pair still waiting, does a member path exist now? An honest
+        box that is on, holds the sub and the message, and can reach the waiting box (no partition, no dropped link)."""
+        now = self.eng.t
+        for mid in list(self.pend):
+            d, m = self.pend[mid], self.msg_by[mid]
+            if now - m.true_t > 2 * DAY:                 # never came (deletes, misses): stop sampling
+                del self.pend[mid]
+                continue
+            if now - m.true_t < DIAG_S:
+                continue
+            on = [h for h in self.holders[m.topic] if self.boxes[h].on and self.boxes[h].honest
+                  and mid in self.boxes[h].held]
+            for b, s in d.items():
+                s[0] += 1
+                if any(h != b and self.link_ok(h, b) for h in on):
+                    s[1] += 1
+        self.eng.after(DIAG_S, self._diag_tick)
 
     def run_script(self) -> dict:
         """Script actions: on b | off b | pub b kind tag [stamp_dt] [target] [valid] | link a b up/down |
@@ -1376,4 +1438,5 @@ class Sync:
             "world_trace": self.trace,
             "world_trace_times": self.trace_nokind,
             "cells": {"|".join(k): v for k, v in self.oracle.cells.items()},
+            **({"tail_diag": self.tail} if sc.tail_diag else {}),
         }
