@@ -35,15 +35,31 @@ td { padding:2px 10px 2px 0; }
 .banner { margin:10px 16px 0; padding:8px 12px; border-radius:6px; border:1px solid var(--warn); color:var(--warn); }
 .budget span { display:inline-block; margin-right:12px; font-size:13px; }
 .wide { grid-column:1 / -1; }
-/* CP32 stage mode (?stage=<port>&name=<user>): one narrow column inside the one-screen demo */
-body.stage { font-size:13px; }
-body.stage header { padding:8px 10px; }
-body.stage header h1 { font-size:15px; }
-body.stage header span { font-size:11px; }
-body.stage main { grid-template-columns:1fr; gap:8px; padding:8px; }
-body.stage section { padding:8px 10px; }
-body.stage #worksec table { font-size:11px; }
-body.stage .item canvas { max-width:120px; }
+/* CP32 stage mode (?stage=<port>&name=<user>): one user's client, as a clean narrow app inside the one-screen demo.
+   Light theme always; the feed first; debug panels hidden. The ids and handlers the stage's puppet uses are unchanged. */
+body.stage { --bg:#f2f3f5; --card:#fff; --ink:#1c1e21; --mute:#65676b; --line:#e4e6eb; --acc:#2f6f5e; --warn:#b3261e;
+  color-scheme:light; background:var(--bg); color:var(--ink); font-size:11.5px; line-height:1.35; scrollbar-width:none; }
+body.stage::-webkit-scrollbar { display:none; }
+html:has(body.stage) { scrollbar-width:none; }
+body.stage header { display:none; }
+body.stage main { display:flex; flex-direction:column; gap:5px; padding:5px; max-width:none; }
+body.stage section { padding:6px 8px; border-radius:7px; }
+body.stage h2 { font-size:9.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--mute); margin:0 0 3px; }
+body.stage h2 .ghost, body.stage #worksec, body.stage #limits, body.stage #filelabel, body.stage #budget,
+body.stage #imgbtn, body.stage #postmsg { display:none !important; }
+body.stage #feedsec { order:1; } body.stage #writesec { order:2; } body.stage #roomsec { order:3; } body.stage #searchsec { order:4; }
+body.stage input, body.stage textarea, body.stage select { font-size:11.5px; padding:3px 6px; background:#f0f2f5;
+  border-color:transparent; border-radius:6px; }
+body.stage textarea { min-height:26px; height:26px; }
+body.stage .row { gap:5px; margin:3px 0; }
+body.stage button { font-size:11px; border-radius:6px; padding:3px 9px; font-weight:600; }
+body.stage .item { border-top:none; background:var(--bg); border-radius:6px; padding:4px 7px; margin-top:4px; }
+body.stage .item .t { font-size:11.5px; }
+body.stage .item .m { font-size:10px; }
+body.stage .item .row { margin:2px 0 0; }
+body.stage .item button.ghost { padding:0 6px; font-size:10px; }
+body.stage .item canvas { max-width:100%; border-radius:5px; }
+body.stage .banner { margin:5px 5px 0; padding:5px 8px; border-radius:6px; background:#fdecea; font-size:11px; }
 .puppet { outline:3px solid var(--acc); outline-offset:2px; transition:outline-color .3s; }
 #toast { position:fixed; left:8px; right:8px; bottom:8px; padding:8px 10px; border-radius:6px; background:var(--ink); color:var(--card); font-size:12px; display:none; z-index:9; }
 </style>
@@ -52,28 +68,28 @@ body.stage .item canvas { max-width:120px; }
 <header><h1 id="who">Home node box</h1><span id="sub"></span></header>
 <div id="banner"></div>
 <main>
-  <section>
+  <section id="writesec">
     <h2>Write</h2>
     <div class="row"><select id="topic"><option value="0">sub A</option><option value="1">sub B</option></select>
       <label id="cocolabel"><input type="checkbox" id="photo"> any photo (COCO)</label>
-      <label>my photo <input type="file" id="file" accept="image/*"></label></div>
+      <label id="filelabel">my photo <input type="file" id="file" accept="image/*"></label></div>
     <input type="text" id="title" placeholder="Title (empty + COCO photo = the photo's caption)">
     <textarea id="body" placeholder="Body"></textarea>
     <div class="row"><button onclick="post()">Post</button><span id="postmsg" class="m"></span></div>
     <div class="budget m" id="budget"></div>
   </section>
-  <section>
+  <section id="searchsec">
     <h2>Search</h2>
     <div class="row"><input type="text" id="q" placeholder="Search posts (MiniLM)" style="flex:1"><button onclick="search()">Text</button>
-      <button onclick="searchImg()">Photos by words</button></div>
+      <button id="imgbtn" onclick="searchImg()">Photos by words</button></div>
     <div id="results"></div>
   </section>
-  <section>
+  <section id="feedsec">
     <h2>Feed <button class="ghost" onclick="feed()">refresh</button></h2>
     <div id="feed"></div>
   </section>
-  <section>
-    <h2>Room R</h2>
+  <section id="roomsec">
+    <h2 id="roomh">Room R</h2>
     <div id="room"></div>
     <div class="row"><input type="text" id="roomtext" placeholder="Message to the room" style="flex:1"><button onclick="roomSend()">Send</button></div>
   </section>
@@ -94,7 +110,14 @@ body.stage .item canvas { max-width:120px; }
 <script>
 const $ = id => document.getElementById(id);
 const PARAMS = new URLSearchParams(location.search), STAGE = PARAMS.get("stage"), NAME = PARAMS.get("name");
-if (STAGE) document.body.classList.add("stage");
+if (STAGE) {
+  document.body.classList.add("stage");
+  document.title = (NAME || "Client") + " · node box";
+  $("title").placeholder = "Title"; $("body").placeholder = "Write something"; $("q").placeholder = "Search posts";
+  $("roomtext").placeholder = "Message the private room"; $("roomh").textContent = "Private room";
+  $("cocolabel").lastChild.textContent = " attach a photo";
+  document.querySelector("button[onclick='search()']").textContent = "Search";
+}
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function note(msg) {           // an alert would block the stage's clients: show a toast there instead
   if (!STAGE) { alert(msg); return; }

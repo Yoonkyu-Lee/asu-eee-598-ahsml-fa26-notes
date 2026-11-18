@@ -21,7 +21,7 @@
   ],
   "probe_max_s": 20.0
  },
- "pass": false,
+ "pass": true,
  "steps": [
   {
    "n": 1,
@@ -29,11 +29,11 @@
    "pass": true,
    "check": "held",
    "arrival_s": {
-    "0": 0.02,
-    "1": 0.02,
-    "2": 0.03,
-    "3": 0.05,
-    "4": 0.05
+    "0": 0.03,
+    "1": 0.04,
+    "2": 0.06,
+    "3": 0.06,
+    "4": 0.07
    }
   },
   {
@@ -48,24 +48,21 @@
   {
    "n": 3,
    "say_en": "Ana posts in sub B. Only the boxes holding sub B (Ana, Cho, Eve) get it; Ben's and Dev's never do.",
-   "pass": false,
+   "pass": true,
    "check": "held",
    "arrival_s": {
-    "0": 0.01,
-    "2": 0.02,
-    "4": 0.03
+    "0": 0.0,
+    "2": 0.01,
+    "4": 0.01
    },
-   "held_where_it_should_not": [
-    1,
-    3
-   ]
+   "held_where_it_should_not": []
   },
   {
    "n": 4,
    "say_en": "Ben writes in room R. Only Ana, Ben and Dev (told the password) can read it. Cho's and Eve's boxes carry the encrypted envelope and cannot open it.",
    "pass": true,
    "check": "room",
-   "readers_s": 0.01,
+   "readers_s": 0.04,
    "relays": {
     "2": {
      "holds_envelope": true,
@@ -89,10 +86,10 @@
    "pass": true,
    "check": "held",
    "arrival_s": {
-    "0": 0.01,
-    "1": 0.03,
-    "2": 0.04,
-    "4": 0.06
+    "0": 0.0,
+    "1": 0.02,
+    "2": 0.03,
+    "4": 0.03
    }
   },
   {
@@ -107,12 +104,12 @@
    "say_en": "Dev opens the laptop. As soon as box 3 is on it reconciles with its neighbours and gets the missed photo post and vote.",
    "pass": true,
    "check": "caught",
-   "seconds_after_box_answered": 0.01,
+   "seconds_after_box_answered": 0.0,
    "box_start_s": 2.1,
    "recon": {
     "recon_sessions": 4,
     "recon_fetched": 0,
-    "recon_bytes": 1384,
+    "recon_bytes": 1320,
     "offer_want": 2
    }
   },
@@ -121,7 +118,7 @@
    "say_en": "Ana deletes the first post. All five boxes drop the original and remember its id so it never comes back (forgetting).",
    "pass": true,
    "check": "gone",
-   "seconds": 0.05
+   "seconds": 0.01
   },
   {
    "n": 10,
@@ -153,7 +150,7 @@
    "p11b": {
     "arrival_s": {
      "2": 0.0,
-     "3": 0.0,
+     "3": 0.01,
      "4": 0.01
     },
     "crossed_to": []
@@ -164,7 +161,7 @@
    "say_en": "The network heals. Nobody announces it; the boxes meet again and exchange only what the other lacks.",
    "pass": true,
    "check": "held_all",
-   "seconds": 6.37
+   "seconds": 7.5
   },
   {
    "n": 13,
@@ -173,7 +170,7 @@
    "check": "forged",
    "held_forged": false,
    "rej_id_delta": 1,
-   "real_after_heal_s": 5.1
+   "real_after_heal_s": 5.09
   },
   {
    "n": 14,
@@ -192,12 +189,12 @@
    "author_holds": false,
    "rejected": {
     "0": {
-     "rej_slash": 3,
+     "rej_slash": 2,
      "rej_bad_proof": 1
     },
     "1": {
      "rej_id": 1,
-     "rej_slash": 2,
+     "rej_slash": 3,
      "rej_bad_proof": 1
     },
     "2": {
@@ -205,25 +202,26 @@
      "rej_bad_proof": 1
     },
     "3": {
-     "rej_slash": 2,
+     "rej_slash": 3,
      "rej_bad_proof": 1
     }
    }
   }
  ],
- "total_s": 88.9,
+ "total_s": 89.4,
  "boxes_at_end": {
   "0": {
    "count": {
-    "hello": 24,
-    "fence_held": 19,
-    "recon_sessions": 21,
-    "recon_b": 8,
-    "recon_bytes": 3268,
-    "recon_fetched": 0,
-    "recon_pushed": 0,
-    "recon_rx": 21,
+    "hello": 25,
+    "fence_held": 38,
+    "recon_sessions": 42,
+    "recon_b": 9,
+    "recon_bytes": 11380,
+    "recon_fetched": 1,
+    "recon_pushed": 2,
+    "recon_rx": 39,
     "recon_a": 4,
+    "recon_f": 26,
     "lookup": 10,
     "proof": 10,
     "ed25519": 11,
@@ -233,33 +231,70 @@
     "decrypt": 10,
     "text": 8,
     "insert": 9,
-    "ihave_rx": 31,
-    "recon_f": 9,
-    "env_rx": 10,
+    "ihave_rx": 23,
+    "env_rx": 9,
     "image": 1,
+    "recon_e": 3,
     "tally": 1,
+    "pull": 1,
     "delete": 1,
-    "offer_want": 1,
-    "rej_slash": 3,
-    "slash_published": 1,
+    "offer_want": 0,
+    "rej_slash": 2,
     "rej_bad_proof": 1
    },
-   "chip_virtual_ms": 641.0,
+   "chip_virtual_ms": 582.8,
    "items": 8,
    "slashed": false
   },
   "1": {
    "count": {
-    "hello": 23,
-    "recon_rx": 26,
-    "fence_held": 17,
-    "recon_sessions": 20,
-    "recon_b": 8,
-    "recon_bytes": 9368,
+    "hello": 25,
+    "recon_rx": 47,
+    "fence_held": 39,
+    "recon_sessions": 43,
+    "recon_b": 11,
+    "recon_bytes": 8535,
     "recon_fetched": 1,
-    "recon_pushed": 3,
+    "recon_pushed": 0,
     "recon_a": 4,
-    "ihave_rx": 18,
+    "recon_f": 28,
+    "ihave_rx": 20,
+    "env_rx": 11,
+    "lookup": 9,
+    "proof": 9,
+    "ed25519": 10,
+    "rln": 9,
+    "send": 29,
+    "ihave_sent": 26,
+    "decrypt": 9,
+    "text": 7,
+    "insert": 8,
+    "image": 1,
+    "tally": 1,
+    "delete": 1,
+    "offer_want": 0,
+    "rej_id": 1,
+    "rej_slash": 3,
+    "slash_published": 1,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 579.0,
+   "items": 7,
+   "slashed": false
+  },
+  "2": {
+   "count": {
+    "hello": 22,
+    "recon_rx": 44,
+    "fence_held": 38,
+    "recon_sessions": 41,
+    "recon_b": 8,
+    "recon_bytes": 8035,
+    "recon_fetched": 1,
+    "recon_pushed": 0,
+    "recon_a": 4,
+    "recon_f": 29,
+    "ihave_rx": 36,
     "env_rx": 12,
     "lookup": 10,
     "proof": 10,
@@ -270,124 +305,86 @@
     "decrypt": 10,
     "text": 7,
     "insert": 8,
-    "recon_f": 8,
-    "offer_want": 2,
-    "image": 1,
-    "tally": 1,
-    "pull": 1,
-    "delete": 1,
-    "rej_id": 1,
-    "rej_slash": 2,
-    "rej_bad_proof": 1
-   },
-   "chip_virtual_ms": 629.8,
-   "items": 7,
-   "slashed": false
-  },
-  "2": {
-   "count": {
-    "hello": 22,
-    "recon_rx": 23,
-    "fence_held": 17,
-    "recon_sessions": 20,
-    "recon_b": 7,
-    "recon_bytes": 5063,
-    "recon_fetched": 0,
-    "recon_pushed": 1,
-    "recon_a": 4,
-    "ihave_rx": 35,
-    "env_rx": 13,
-    "lookup": 10,
-    "proof": 10,
-    "ed25519": 11,
-    "rln": 10,
-    "send": 30,
-    "ihave_sent": 27,
-    "decrypt": 10,
-    "text": 7,
-    "insert": 8,
-    "recon_f": 9,
     "query": 1,
     "pull": 3,
     "image": 1,
     "tally": 1,
     "delete": 1,
-    "rej_slash": 3,
-    "slash_published": 1,
-    "rej_bad_proof": 1,
-    "offer_want": 1
+    "offer_want": 0,
+    "rej_slash": 2,
+    "rej_bad_proof": 1
    },
-   "chip_virtual_ms": 641.1,
+   "chip_virtual_ms": 582.9,
    "items": 7,
    "slashed": false
   },
   "3": {
    "count": {
-    "lookup": 10,
-    "proof": 10,
-    "ed25519": 11,
-    "rln": 10,
-    "decrypt": 10,
+    "lookup": 9,
+    "proof": 9,
+    "ed25519": 10,
+    "rln": 9,
+    "decrypt": 9,
     "text": 7,
     "insert": 8,
-    "hello": 21,
+    "hello": 20,
     "recon_rx": 14,
     "offer_want": 2,
-    "recon_sessions": 9,
+    "recon_sessions": 10,
     "recon_a": 4,
-    "recon_bytes": 1974,
-    "recon_fetched": 0,
+    "recon_bytes": 3435,
+    "recon_fetched": 1,
     "recon_pushed": 0,
-    "env_rx": 8,
-    "send": 25,
-    "ihave_sent": 22,
+    "env_rx": 9,
+    "send": 26,
+    "ihave_sent": 23,
     "tally": 1,
     "image": 1,
     "ihave_rx": 15,
     "delete": 1,
     "fence_held": 5,
-    "recon_f": 2,
+    "recon_f": 3,
     "recon_b": 3,
-    "rej_slash": 2,
+    "rej_slash": 3,
     "slash_published": 1,
+    "dup": 1,
     "rej_bad_proof": 1
    },
-   "chip_virtual_ms": 629.9,
+   "chip_virtual_ms": 579.0,
    "items": 7,
    "slashed": false
   },
   "4": {
    "count": {
-    "hello": 24,
-    "recon_rx": 21,
-    "fence_held": 17,
-    "recon_sessions": 22,
-    "recon_b": 8,
-    "recon_bytes": 9090,
-    "recon_fetched": 1,
-    "recon_pushed": 2,
+    "hello": 22,
+    "fence_held": 34,
+    "recon_sessions": 39,
+    "recon_b": 6,
+    "recon_bytes": 9482,
+    "recon_fetched": 2,
+    "recon_pushed": 0,
+    "recon_rx": 44,
     "recon_a": 4,
-    "ihave_rx": 31,
+    "recon_f": 29,
+    "ihave_rx": 34,
     "env_rx": 9,
     "lookup": 10,
     "proof": 10,
     "ed25519": 11,
     "rln": 10,
-    "send": 37,
+    "send": 39,
     "ihave_sent": 28,
     "decrypt": 10,
     "text": 7,
     "insert": 8,
-    "recon_f": 8,
     "image": 1,
     "tally": 1,
     "delete": 1,
-    "recon_e": 2,
     "offer_want": 0,
-    "rej_slash": 1,
+    "rej_slash": 2,
     "rej_bad_proof": 1
    },
-   "chip_virtual_ms": 630.1,
+   "chip_virtual_ms": 579.2,
    "items": 7,
    "slashed": true
   }
@@ -396,9 +393,7 @@
   "p1": [],
   "p3": [
    0,
-   1,
    2,
-   3,
    4
   ],
   "r4": [

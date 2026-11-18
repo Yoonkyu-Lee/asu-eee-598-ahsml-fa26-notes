@@ -5,45 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Five users, one screen</title>
 <style>
-:root { --bg:#f7f7f5; --card:#fff; --ink:#1d1d1b; --mute:#6b6b66; --line:#e2e1dc; --acc:#2f6f5e; --warn:#a1452b; --ok:#2f6f5e; --hl:#fff4d6; }
-@media (prefers-color-scheme: dark) { :root { --bg:#161615; --card:#1f1f1d; --ink:#ecebe6; --mute:#a3a29b; --line:#33332f; --acc:#7cc4ad; --warn:#e58d6f; --ok:#7cc4ad; --hl:#3a3420; } }
+:root { --bg:#f2f3f5; --card:#fff; --ink:#1c1e21; --mute:#65676b; --line:#dfe1e5; --acc:#2f6f5e; --warn:#b3261e; --ok:#2f6f5e;
+  color-scheme:light; }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; }
-header { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); }
-header h1 { font-size:17px; margin:0; }
-.m { color:var(--mute); font-size:12px; }
-button { font:inherit; border:none; border-radius:6px; padding:6px 10px; background:var(--acc); color:var(--card); cursor:pointer; }
-button.ghost { background:transparent; color:var(--acc); border:1px solid var(--line); }
+html, body { height:100%; }
+body { margin:0; background:var(--bg); color:var(--ink); font:12.5px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  display:flex; flex-direction:column; }
+header { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:6px 12px; background:var(--card);
+  border-bottom:1px solid var(--line); }
+header h1 { font-size:14px; margin:0 6px 0 0; }
+.m { color:var(--mute); font-size:11px; }
+button { font:inherit; font-size:11.5px; border:none; border-radius:6px; padding:4px 9px; background:var(--acc); color:#fff;
+  cursor:pointer; font-weight:600; }
+button.ghost { background:transparent; color:var(--acc); border:1px solid var(--line); font-weight:500; }
 button:disabled { opacity:.45; cursor:default; }
 .spacer { flex:1; }
-#story { margin:10px 16px 0; padding:10px 14px; background:var(--card); border:1px solid var(--line); border-radius:8px; }
-#say { font-size:16px; min-height:2.9em; }
-#steps { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
-#steps span { min-width:26px; text-align:center; padding:1px 6px; border-radius:10px; border:1px solid var(--line); font-size:12px; cursor:default; }
-#steps span.cur { border-color:var(--acc); font-weight:600; }
-#steps span.pass { background:var(--ok); color:var(--card); border-color:var(--ok); }
-#steps span.fail { background:var(--warn); color:var(--card); border-color:var(--warn); }
-#verdict { margin-top:6px; font-size:12px; font-family:ui-monospace, monospace; white-space:pre-wrap; word-break:break-word; color:var(--mute); }
+#story { margin:6px 12px 0; padding:6px 10px; background:var(--card); border:1px solid var(--line); border-radius:8px;
+  display:grid; grid-template-columns:1fr auto; gap:3px 12px; align-items:center; }
+#say { font-size:13px; grid-column:1 / span 2; }
+#steps { display:flex; flex-wrap:wrap; gap:3px; }
+#steps span { min-width:22px; text-align:center; padding:0 5px; border-radius:9px; border:1px solid var(--line); font-size:10.5px;
+  background:var(--card); }
+#steps span.cur { border-color:var(--acc); font-weight:700; }
+#steps span.pass { background:var(--ok); color:#fff; border-color:var(--ok); }
+#steps span.fail { background:var(--warn); color:#fff; border-color:var(--warn); }
+#verdict { font-size:11.5px; color:var(--mute); text-align:right; }
 #verdict b.pass { color:var(--ok); } #verdict b.fail { color:var(--warn); }
-#grid { display:grid; grid-template-columns:repeat(5, minmax(250px, 1fr)); gap:10px; padding:10px 16px 16px; overflow-x:auto; }
-@media (max-width:1300px) { #grid { grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); } }
-.pane { background:var(--card); border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; min-width:0; transition:box-shadow .3s, border-color .3s; }
-.pane.acting { border-color:var(--acc); box-shadow:0 0 0 3px var(--acc); }
-.pane .top { padding:8px 10px; border-bottom:1px solid var(--line); }
-.pane .name { font-weight:700; font-size:15px; }
-.badge { display:inline-block; font-size:11px; padding:0 6px; border-radius:8px; border:1px solid var(--line); margin-right:4px; color:var(--mute); }
-.badge.key { border-color:var(--acc); color:var(--acc); }
-.pane .st { font-size:11px; color:var(--mute); margin-top:3px; min-height:2.6em; }
-.pane .ctl { display:flex; gap:6px; margin-top:4px; }
-.pane .ctl button { padding:2px 8px; font-size:12px; }
-.frame { position:relative; flex:1; min-height:560px; }
-.frame iframe { position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:0 0 8px 8px; background:var(--bg); }
-.frame .off { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:20px;
-  background:var(--bg); color:var(--mute); border-radius:0 0 8px 8px; font-size:13px; }
+#grid { flex:1; min-height:0; display:flex; gap:8px; padding:6px 12px 8px; }
+.pane { flex:1 1 0; min-width:0; background:var(--card); border:1px solid var(--line); border-radius:8px; display:flex;
+  flex-direction:column; overflow:hidden; transition:box-shadow .3s, border-color .3s; }
+.pane.acting { border-color:var(--acc); box-shadow:0 0 0 2px var(--acc); }
+.screen { flex:1; display:flex; flex-direction:column; min-height:0; }
+.top { padding:6px 8px; border-bottom:1px solid var(--line); display:grid; grid-template-columns:22px 1fr auto; gap:0 6px;
+  align-items:center; }
+.av { grid-row:1 / span 2; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:700; font-size:11px; }
+.name { font-weight:700; font-size:12.5px; line-height:1.2; }
+.name .box { color:var(--mute); font-weight:400; font-size:10.5px; }
+.role { font-size:10.5px; color:var(--mute); line-height:1.2; grid-column:2 / span 2; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; }
+.ctl button { padding:1px 6px; font-size:10px; border-radius:8px; }
+.meta { grid-column:1 / span 3; display:flex; flex-wrap:wrap; gap:3px; margin-top:3px; align-items:center; }
+.badge { display:inline-block; font-size:9.5px; padding:0 5px; border-radius:7px; background:#f0f2f5; color:var(--mute); }
+.badge.key { background:#e3f1ec; color:var(--acc); }
+.st { font-size:9.5px; color:var(--mute); margin-left:auto; }
+.frame { position:relative; flex:1; min-height:0; }
+.frame iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:var(--bg); }
+.frame .off { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:16px;
+  background:#e9ebee; color:var(--mute); font-size:11.5px; }
 .pane.down .frame .off { display:flex; }
-.pane.down .name::after { content:" · off"; color:var(--warn); font-weight:400; font-size:12px; }
-.pane.cut { border-style:dashed; }
-footer { padding:0 16px 16px; }
+.pane.down .st::before { content:"off · "; color:var(--warn); font-weight:600; }
+.pane.cut { border-style:dashed; border-color:var(--warn); }
+footer { padding:0 12px 6px; font-size:10.5px; }
 </style>
 </head>
 <body>
@@ -71,7 +84,7 @@ const get = p => fetch(p).then(r => r.json());
 const send = (p, b) => fetch(p, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b || {})}).then(r => r.json());
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
-let lang = "ko", S = null, cur = 0, playing = false, stepMode = false, waitNext = null;
+let lang = "en", S = null, cur = 0, playing = false, stepMode = false, waitNext = null;
 const T = {
   ko: {h1: "다섯 사용자, 한 화면", play: "▶ 이야기 재생", next: "다음 단계", split: "망 쪼개기", heal: "다시 붙이기", reset: "처음부터",
        intro: "각 칸은 한 사용자의 클라 (그 사람 박스의 진짜 화면)임. ▶를 누르면 사용자들이 각자 자기 클라에 직접 입력하고 누름. 단계마다 무대가 모든 박스를 읽어 약속대로인지 판정함. 아무 칸에서나 직접 써 봐도 됨.",
@@ -82,7 +95,7 @@ const T = {
        foot: "모두 127.0.0.1에서만 열림. 박스끼리는 CP30 기본 프로토콜 (집합 맞추기 + ID 먼저 push). 무대는 각 박스의 주인 API를 읽기만 함 (관찰자). 망 쪼개기와 위조본은 시험 훅. 시간은 이 PC 한 대 안의 시간이라 망 지연이 아님."},
   en: {h1: "Five users, one screen", play: "▶ Play the story", next: "Next step", split: "Split the network", heal: "Heal", reset: "Start over",
        intro: "Each pane is one user's client (the real UI of that person's box). Press ▶ and the users type and click in their own clients. After each step the stage reads every box and checks the protocol's promise. You can also use any pane by hand.",
-       on: "on", off: "off", boxoff: "The box is off (laptop closed). When it comes on it reconciles with its neighbours and gets what it missed.",
+       on: "Turn on", off: "Turn off", boxoff: "The box is off (laptop closed). When it comes on it reconciles with its neighbours and gets what it missed.",
        subs: "subs", key: "room R key", relay: "relays room R", items: "items", heard: "heard", rej: "rejected", chip: "chip (model)",
        starting: "starting five boxes …", ready: "ready", done: "Done. Saved:", cutnote: "links cut:",
        timers: t => t.real ? "timers: box defaults (floor 10–30 min)" : `timers: test values (floor ${t.pae_s[0]}–${t.pae_s[1]} s, probe cap ${t.probe_max_s} s; defaults 10–30 min / 5 min)`,
@@ -105,17 +118,18 @@ const titleOf = {};
 async function init() {
   S = await get("/api/story");
   for (const s of S.steps) for (const a of s.acts) if (a.label && a.title) titleOf[a.label] = a.title;
+  const COL = ["#3b6fd6", "#d9822b", "#2f8f6f", "#8e44ad", "#c0392b"];
   $("grid").innerHTML = S.personas.map((p, i) => `
-    <div class="pane" id="pane${i}">
+    <div class="pane" id="pane${i}"><div class="screen">
       <div class="top">
-        <div class="name">${esc(p.name)} <span class="m">· box ${i}</span></div>
-        <div class="m" id="role${i}"></div>
-        <div id="badges${i}"></div>
-        <div class="st" id="st${i}"></div>
+        <div class="av" style="background:${COL[i % COL.length]}">${esc(p.name[0])}</div>
+        <div class="name">${esc(p.name)} <span class="box">· box ${i}</span></div>
         <div class="ctl"><button class="ghost" id="pbtn${i}" onclick="power(${i})"></button></div>
+        <div class="role" id="role${i}"></div>
+        <div class="meta"><span id="badges${i}"></span><span class="st" id="st${i}"></span></div>
       </div>
       <div class="frame"><iframe id="f${i}" title="${esc(p.name)}'s client"></iframe><div class="off" id="offtxt${i}"></div></div>
-    </div>`).join("");
+    </div></div>`).join("");
   $("steps").innerHTML = S.steps.map(s => `<span id="sn${s.n}">${s.n}</span>`).join("");
   chrome(); showStep(0); poll();
 }
@@ -136,8 +150,7 @@ async function poll() {
       if (!b.on) loaded[b.i] = false;
       const heard = b.heard ? Object.keys(b.heard).map(Number).sort().map(j => S.personas[j].name).join(", ") : "";
       $("st" + b.i).innerHTML = b.on && b.items !== undefined
-        ? `${L().items} ${b.items} · ${L().rej} ${b.rejected} · ${L().chip} ${b.chip_ms} ms<br>${L().heard}: ${esc(heard) || "—"}` +
-          (b.drop.length ? `<br>${L().cutnote} ${b.drop.map(j => S.personas[j].name).join(", ")}` : "")
+        ? `${b.items} posts · ${b.heard ? Object.keys(b.heard).length : 0} peers` + (b.drop.length ? " · link cut" : "")
         : (b.on ? "…" : "");
     }
   } catch (e) { $("status").textContent = "stage not answering"; }
@@ -161,7 +174,14 @@ function puppet(i, act) {        // tell user i's client what its user does; it 
 }
 function verdict(r) {
   const rest = Object.fromEntries(Object.entries(r).filter(([k]) => !["n", "pass", "check"].includes(k)));
-  $("verdict").innerHTML = `<b class="${r.pass ? "pass" : "fail"}">${r.pass ? "✓ PASS" : "✗ FAIL"}</b> ${esc(r.check)} ${esc(JSON.stringify(rest))}`;
+  const WHAT = {held: "the post reached exactly the boxes that should have it", search: "the user's own box found it by search",
+    room: "only room members can read it; the others only relay it", down: "the box is off", score: "every box counts the vote",
+    caught: "the box caught up as soon as it came back", gone: "every box forgot the deleted post",
+    refused: "the box refused to delete someone else's post", split: "nothing crossed the split",
+    held_all: "after healing, every box has both posts", forged: "the forged copy was refused and the real one arrived",
+    slashed: "every box revealed and removed the rate-limit breaker", dropped: "the other boxes dropped the breaker's new post"};
+  $("verdict").innerHTML = `<b class="${r.pass ? "pass" : "fail"}">${r.pass ? "✓ Pass" : "✗ Fail"}</b> · ${esc(WHAT[r.check] || r.check)}`;
+  $("verdict").title = JSON.stringify(rest);
   $("sn" + r.n).classList.add(r.pass ? "pass" : "fail");
   const known = S.steps[r.n - 1].known;
   if (!r.pass && known) $("verdict").innerHTML += `<br><b class="fail">${esc(known[lang])}</b>`;
