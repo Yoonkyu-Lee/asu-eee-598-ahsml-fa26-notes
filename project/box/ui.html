@@ -35,6 +35,17 @@ td { padding:2px 10px 2px 0; }
 .banner { margin:10px 16px 0; padding:8px 12px; border-radius:6px; border:1px solid var(--warn); color:var(--warn); }
 .budget span { display:inline-block; margin-right:12px; font-size:13px; }
 .wide { grid-column:1 / -1; }
+/* CP32 stage mode (?stage=<port>&name=<user>): one narrow column inside the one-screen demo */
+body.stage { font-size:13px; }
+body.stage header { padding:8px 10px; }
+body.stage header h1 { font-size:15px; }
+body.stage header span { font-size:11px; }
+body.stage main { grid-template-columns:1fr; gap:8px; padding:8px; }
+body.stage section { padding:8px 10px; }
+body.stage #worksec table { font-size:11px; }
+body.stage .item canvas { max-width:120px; }
+.puppet { outline:3px solid var(--acc); outline-offset:2px; transition:outline-color .3s; }
+#toast { position:fixed; left:8px; right:8px; bottom:8px; padding:8px 10px; border-radius:6px; background:var(--ink); color:var(--card); font-size:12px; display:none; z-index:9; }
 </style>
 </head>
 <body>
@@ -66,7 +77,7 @@ td { padding:2px 10px 2px 0; }
     <div id="room"></div>
     <div class="row"><input type="text" id="roomtext" placeholder="Message to the room" style="flex:1"><button onclick="roomSend()">Send</button></div>
   </section>
-  <section>
+  <section id="worksec">
     <h2>This box's work <button class="ghost" onclick="stats()">refresh</button></h2>
     <div id="stats"></div>
   </section>
@@ -79,8 +90,17 @@ td { padding:2px 10px 2px 0; }
     <div id="notices"></div>
   </section>
 </main>
+<div id="toast"></div>
 <script>
 const $ = id => document.getElementById(id);
+const PARAMS = new URLSearchParams(location.search), STAGE = PARAMS.get("stage"), NAME = PARAMS.get("name");
+if (STAGE) document.body.classList.add("stage");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function note(msg) {           // an alert would block the stage's clients: show a toast there instead
+  if (!STAGE) { alert(msg); return; }
+  const t = $("toast"); t.textContent = msg; t.style.display = "block";
+  clearTimeout(note.h); note.h = setTimeout(() => t.style.display = "none", 4000);
+}
 const get = p => fetch(p).then(r => r.json());
 const send = (p, b) => fetch(p, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b)}).then(r => r.json());
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
@@ -101,13 +121,17 @@ function itemHtml(it, actions) {
     `<div class="m">${esc(it.topic)} · score ${it.score}${it.own ? " · yours" : ""}${it.photo ? " · photo" : ""}</div><div class="row">${a}</div></div>`;
 }
 async function feed() {
-  const rows = await get("/api/feed");
+  const rows = await get("/api/feed"), key = JSON.stringify(rows);
+  if (key === feed.last) return rows;          // unchanged: keep the drawn photos (no re-fetch every refresh)
+  feed.last = key;
   $("feed").innerHTML = rows.map(it => itemHtml(it, true)).join("") || "<p class='m'>Nothing yet.</p>";
   rows.filter(it => it.photo).forEach(it => draw(it.mid, $("i" + it.mid)));
+  return rows;
 }
 async function search() {
   const rows = await get("/api/search?q=" + encodeURIComponent($("q").value));
   $("results").innerHTML = rows.map(it => itemHtml(it, false)).join("") || "<p class='m'>No match.</p>";
+  return rows;
 }
 async function searchImg() {
   const rows = await get("/api/search_image?q=" + encodeURIComponent($("q").value));
@@ -136,25 +160,27 @@ async function post() {
   if (f) b.rgb = await rgbOf(f);
   const r = await send("/api/post", b);
   $("postmsg").textContent = r.mid ? "posted" : (r.error || "error");
-  if (r.mid) { $("title").value = $("body").value = ""; $("file").value = ""; }
+  if (r.mid) { $("title").value = $("body").value = ""; $("file").value = ""; $("photo").checked = false; }
   setTimeout(feed, 800); setTimeout(stats, 800);
+  return r;
 }
 async function misbehave() {
   const r = await send("/api/misbehave", {});
   $("mismsg").textContent = r.mids ? "sent; watch the notices on every box" : (r.error || "error");
   setTimeout(stats, 1500);
+  return r;
 }
-async function vote(mid, d) { const r = await send("/api/vote", {mid, dir:d}); if (r.error) alert(r.error); setTimeout(feed, 500); }
-async function del(mid) { const r = await send("/api/delete", {mid}); if (r.error) alert(r.error); setTimeout(feed, 500); }
+async function vote(mid, d) { const r = await send("/api/vote", {mid, dir:d}); if (r.error) note(r.error); setTimeout(feed, 500); return r; }
+async function del(mid) { const r = await send("/api/delete", {mid}); if (r.error) note(r.error); setTimeout(feed, 500); return r; }
 async function room() {
   const r = await get("/api/room");
   $("room").innerHTML = r.member ? (r.items.map(it => `<div class="item">${esc(it.body)}</div>`).join("") || "<p class='m'>No messages.</p>")
     : "<p class='m'>This box is not in room R: it never gets the room key and cannot read the room.</p>";
 }
-async function roomSend() { const r = await send("/api/room", {body: $("roomtext").value}); if (r.error) alert(r.error); $("roomtext").value = ""; setTimeout(room, 500); }
+async function roomSend() { const r = await send("/api/room", {body: $("roomtext").value}); if (r.error) note(r.error); $("roomtext").value = ""; setTimeout(room, 500); return r; }
 async function stats() {
   const s = await get("/api/stats");
-  $("who").textContent = "Home node box " + s.box;
+  $("who").textContent = (NAME ? NAME + "'s client · " : "") + "Home node box " + s.box;
   $("sub").textContent = `identity ${s.identity}… · ${s.tier} group · holds ${s.topics.length} topics · ${s.items} items · ${s.index.text} text / ${s.index.image} photo vectors · ${s.banned} banned identities`;
   $("cocolabel").hidden = !s.coco;
   $("banner").innerHTML = s.slashed ? `<div class="banner">Your identity was revealed for breaking the limit and removed from the group: other boxes now drop your messages (their proof no longer verifies). ${s.kept_on_disk ? "Start the box again with --new-identity for a new one (your posts stay)." : "Restart the box for a new identity."}</div>` : "";
@@ -171,8 +197,81 @@ async function stats() {
   $("stats").innerHTML = `<table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join("")}` +
     `<tr><td>chip time (model)</td><td>${s.chip_virtual_ms.toFixed(1)} ms</td></tr></table>`;
 }
+// CP32 puppet: the stage tells this client what its user does; the client types and clicks in its own page and calls
+// only its own box (the same calls as a person using it). Messages are accepted only from the stage on this computer.
+function seeEl(el, center) {   // scroll this client's own page only (the stage page must not move)
+  const r = el.getBoundingClientRect();
+  if (!center && r.top >= 0 && r.bottom <= innerHeight) return;
+  scrollTo({top: Math.max(0, scrollY + r.top - (center ? innerHeight / 2 - r.height / 2 : 60))});
+}
+async function typeInto(el, text) {
+  el.classList.add("puppet"); seeEl(el); el.focus({preventScroll: true}); el.value = "";
+  for (const ch of text) { el.value += ch; await sleep(text.length > 40 ? 12 : 30); }
+  await sleep(150); el.classList.remove("puppet");
+}
+async function press(el) { el.classList.add("puppet"); seeEl(el); await sleep(350); el.classList.remove("puppet"); }
+async function findItem(title) {
+  for (let k = 0; k < 20; k++) {
+    feed.last = null; await feed();
+    const el = [...document.querySelectorAll("#feed .item")].find(x => x.querySelector(".t")?.textContent === title);
+    if (el) return el;
+    await sleep(500);
+  }
+  return null;
+}
+async function puppet(a) {
+  if (a.do === "post") {
+    $("topic").value = String(a.topic); $("photo").checked = !!a.photo;
+    await typeInto($("title"), a.title || ""); if (a.body) await typeInto($("body"), a.body);
+    if (a.photo) await press($("photo").parentElement);
+    await press(document.querySelector("button[onclick='post()']"));
+    return {status: 200, result: await post()};
+  }
+  if (a.do === "search") {
+    await typeInto($("q"), a.q); await press(document.querySelector("button[onclick='search()']"));
+    return {status: 200, result: await search()};
+  }
+  if (a.do === "room") {
+    await typeInto($("roomtext"), a.body); await press(document.querySelector("button[onclick='roomSend()']"));
+    return {status: 200, result: await roomSend()};
+  }
+  if (a.do === "misbehave") {
+    const b = document.querySelector("button[onclick='misbehave()']"); await press(b);
+    return {status: 200, result: await misbehave()};
+  }
+  const el = await findItem(a.title);
+  if (!el) return {status: 0, result: {error: "not in this client's feed: " + a.title}};
+  seeEl(el, true);
+  const mid = el.id.slice(1);
+  if (a.do === "vote") {
+    await press(el.querySelectorAll("button")[a.dir > 0 ? 0 : 1]);
+    return {status: 200, result: await vote(mid, a.dir)};
+  }
+  if (a.do === "delete") {
+    const b = [...el.querySelectorAll("button")].find(x => x.textContent === "delete"); await press(b);
+    return {status: 200, result: await del(mid)};
+  }
+  if (a.do === "delete_other") {             // no delete button on someone else's post: ask the box directly
+    await press(el);
+    note("No delete button on someone else's post. Asking this box to delete it anyway …");
+    const r = await fetch("/api/delete", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({mid})});
+    const body = await r.json();
+    note(`The box says ${r.status}: ${body.error || "ok"}`);
+    return {status: r.status, result: body};
+  }
+  return {status: 0, result: {error: "unknown act " + a.do}};
+}
+if (STAGE) {
+  const stageOrigins = [`http://127.0.0.1:${STAGE}`, `http://localhost:${STAGE}`];
+  window.addEventListener("message", async e => {
+    if (!stageOrigins.includes(e.origin) || !e.data || !e.data.cp32) return;
+    let out;
+    try { out = await puppet(e.data.act); } catch (err) { out = {status: 0, result: {error: String(err)}}; }
+    e.source.postMessage({cp32: true, id: e.data.id, ...out}, e.origin);
+  });
+}
 stats(); feed(); room();
-setInterval(() => { stats(); feed(); room(); }, 5000);
+setInterval(() => { stats(); feed(); room(); }, STAGE ? 1000 : 5000);
 </script>
 </body>
 </html>

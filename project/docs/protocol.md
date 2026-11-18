@@ -78,6 +78,7 @@ When two boxes meet, they compare their sets instead of trusting each other's cl
 | 2 directed scenes (holes H1–H11 and the new rules) | all as predicted | estimate (model) |
 | 3 exhaustive small scope (3 boxes, adversary) | 2,496 states with 0 violations; clean-flag rule 17,408 states with 0 violations; 3 deliberate bugs caught | estimate (model) |
 | 4 real boxes (4 processes: link cuts, clock offsets, kills, forged copies, a held session) | 12 scripts pass; regressions L1–L7, P1–P4 pass | measured |
+| demo (CP32): five users on one screen, 15 steps | 14 pass; step 3 fails (H12) | measured |
 
 Cost (model, CP26 scenes, n = 10–1000):
 
@@ -98,6 +99,17 @@ Re-run:
 .venv/Scripts/python.exe -W ignore experiments/sync_scenes.py props   # layer 3b: the reconciler alone -> results/sync/props.json
 .venv/Scripts/python.exe -W ignore tests/sync_check.py           # layer 4 (~12 min)                 -> results/tests/sync_check.json
 ```
+
+## Open hole H12 (found in CP32)
+
+Set reconciliation compares every id a box holds, whatever its sub (topic), and a box accepts a message of a sub it never joined. So every box ends up receiving, verifying and storing every sub. Without the sub's key it cannot read the post, so nothing shows on its screen, but the cost is there. Since CP29 this has replaced the design's "replicate only the subs you joined" (P-sub, CP16) with "replicate everything" (P-all).
+
+- Push (ids first) does respect subs. Only reconciliation leaks.
+- The sync model (`sim/sync.py`, `sim/recon.py`) has no subs, so layers 1–3 could not see it.
+- It was seen in the one-screen demo (`box/stage.py`, step 3): a sub-B post reached a box outside sub B within seconds, and every box held it at the end (`results/demo/`).
+- Cost (source CP16, behaviour model): P-all is 1/0.78 ≈ 1.28× the average box's load and 1/0.94 ≈ 1.06× the top 1 % box's.
+
+The fix (CP33): reconcile per sub, over the subs both boxes hold, then re-run layers 1–4.
 
 ## Not covered
 

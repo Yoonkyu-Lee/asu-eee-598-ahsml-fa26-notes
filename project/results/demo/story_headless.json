@@ -1,0 +1,384 @@
+{
+ "cp": 32,
+ "mode": "headless",
+ "what": "one-screen demo story on five lan.py boxes (journal/cp/CP32.md)",
+ "label": "measured on one PC over loopback; times are not network latency",
+ "settings": {
+  "boxes": 5,
+  "ports": [
+   8621,
+   8622,
+   8623,
+   8624,
+   8625
+  ],
+  "exchange": "recon (default)",
+  "push": "lazy (default)",
+  "timers": "test timers (tests/sync_check.py)",
+  "pae_s": [
+   20.0,
+   40.0
+  ],
+  "probe_max_s": 20.0
+ },
+ "pass": false,
+ "steps": [
+  {
+   "n": 1,
+   "say_en": "Ana posts in sub A. Posts carry no author name: on the other screens it is just a post.",
+   "pass": true,
+   "check": "held",
+   "arrival_s": {
+    "0": 0.02,
+    "1": 0.03,
+    "2": 0.05,
+    "3": 0.06,
+    "4": 0.08
+   }
+  },
+  {
+   "n": 2,
+   "say_en": "Cho searches 'cycling to school'. Cho's own box searches its own index (no server).",
+   "pass": true,
+   "check": "search",
+   "top": [
+    "Bike lanes on Mill Ave are finally open"
+   ]
+  },
+  {
+   "n": 3,
+   "say_en": "Ana posts in sub B. Only the boxes holding sub B (Ana, Cho, Eve) get it; Ben's and Dev's never do.",
+   "pass": false,
+   "check": "held",
+   "arrival_s": {
+    "0": 0.0,
+    "2": 0.01,
+    "4": 0.03
+   },
+   "held_where_it_should_not": [
+    3
+   ]
+  },
+  {
+   "n": 4,
+   "say_en": "Ben writes in room R. Only Ana, Ben and Dev (told the password) can read it. Cho's and Eve's boxes carry the encrypted envelope and cannot open it.",
+   "pass": true,
+   "check": "room",
+   "readers_s": 0.37,
+   "relays": {
+    "2": {
+     "holds_envelope": true,
+     "member": false
+    },
+    "4": {
+     "holds_envelope": true,
+     "member": false
+    }
+   }
+  },
+  {
+   "n": 5,
+   "say_en": "Dev closes the laptop. Box 3 goes off (no goodbye: the process is killed).",
+   "pass": true,
+   "check": "down"
+  },
+  {
+   "n": 6,
+   "say_en": "While Dev is away, Cho posts a photo (a COCO picture). The four boxes that are on get it.",
+   "pass": true,
+   "check": "held",
+   "arrival_s": {
+    "0": 0.0,
+    "1": 0.28,
+    "2": 0.02,
+    "4": 0.02
+   }
+  },
+  {
+   "n": 7,
+   "say_en": "Ben upvotes the photo. A vote is a message too: every box that is on counts the score itself.",
+   "pass": true,
+   "check": "score",
+   "seconds": 0.37
+  },
+  {
+   "n": 8,
+   "say_en": "Dev opens the laptop. As soon as box 3 is on it reconciles with its neighbours and gets the missed photo post and vote.",
+   "pass": true,
+   "check": "caught",
+   "seconds_after_box_answered": 0.04,
+   "box_start_s": 2.3,
+   "recon": {
+    "recon_sessions": 4,
+    "recon_fetched": 0,
+    "recon_bytes": 1388,
+    "offer_want": 2
+   }
+  },
+  {
+   "n": 9,
+   "say_en": "Ana deletes the first post. All five boxes drop the original and remember its id so it never comes back (forgetting).",
+   "pass": true,
+   "check": "gone",
+   "seconds": 0.06
+  },
+  {
+   "n": 10,
+   "say_en": "Eve tries to delete Cho's photo. There is no delete button on someone else's post, and asking the box directly is refused (no author key). With no operator, nobody can delete someone else's post.",
+   "pass": true,
+   "check": "refused",
+   "status": 403,
+   "error": "only the author holds this post's key",
+   "still_held_on": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "n": 11,
+   "say_en": "The network splits: {Ana, Ben} | {Cho, Dev, Eve}. One person on each side posts. Nothing crosses.",
+   "pass": true,
+   "check": "split",
+   "p11a": {
+    "arrival_s": {
+     "0": 0.0,
+     "1": 0.02
+    },
+    "crossed_to": []
+   },
+   "p11b": {
+    "arrival_s": {
+     "2": 0.0,
+     "3": 0.0,
+     "4": 0.02
+    },
+    "crossed_to": []
+   }
+  },
+  {
+   "n": 12,
+   "say_en": "The network heals. Nobody announces it; the boxes meet again and exchange only what the other lacks.",
+   "pass": true,
+   "check": "held_all",
+   "seconds": 2.18
+  },
+  {
+   "n": 13,
+   "say_en": "An attacker: while Ben's box is cut off, Dev posts, and the attacker hands Ben's box a forged copy first (same id, other content). Ben's box refuses it (the id is not the content's hash) and gets the real one when the links come back.",
+   "pass": true,
+   "check": "forged",
+   "held_forged": false,
+   "rej_id_delta": 1,
+   "real_after_heal_s": 0.5
+  },
+  {
+   "n": 14,
+   "say_en": "Eve breaks the limit: two posts on the same message index. Any box holding both can compute Eve's identity secret and publish it, and every box removes Eve from the group. Not an operator's ban: math.",
+   "pass": true,
+   "check": "slashed",
+   "seconds": 0.05,
+   "offender_sees_slashed": true
+  },
+  {
+   "n": 15,
+   "say_en": "Eve posts again. The other four boxes drop it: the proof no longer verifies.",
+   "pass": true,
+   "check": "dropped",
+   "held_by": [],
+   "author_holds": false,
+   "rejected": {
+    "0": {
+     "rej_slash": 3,
+     "rej_bad_proof": 1
+    },
+    "1": {
+     "rej_id": 1,
+     "rej_slash": 2,
+     "rej_bad_proof": 1
+    },
+    "2": {
+     "rej_slash": 2,
+     "rej_bad_proof": 1
+    },
+    "3": {
+     "rej_slash": 3,
+     "rej_bad_proof": 1
+    }
+   }
+  }
+ ],
+ "total_s": 21.3,
+ "boxes_at_end": {
+  "0": {
+   "count": {
+    "recon_rx": 12,
+    "hello": 23,
+    "fence_held": 10,
+    "recon_sessions": 13,
+    "recon_b": 9,
+    "recon_bytes": 3940,
+    "recon_fetched": 1,
+    "recon_pushed": 0,
+    "lookup": 10,
+    "proof": 10,
+    "ed25519": 11,
+    "rln": 10,
+    "send": 32,
+    "ihave_sent": 28,
+    "decrypt": 10,
+    "ihave_rx": 25,
+    "text": 8,
+    "insert": 9,
+    "recon_a": 4,
+    "env_rx": 9,
+    "image": 1,
+    "tally": 1,
+    "delete": 1,
+    "offer_want": 1,
+    "rej_slash": 3,
+    "slash_published": 1,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 641.0,
+   "items": 8,
+   "slashed": false
+  },
+  "1": {
+   "count": {
+    "hello": 20,
+    "recon_rx": 17,
+    "fence_held": 10,
+    "recon_sessions": 11,
+    "recon_b": 7,
+    "recon_bytes": 3438,
+    "recon_fetched": 1,
+    "recon_pushed": 0,
+    "ihave_rx": 23,
+    "env_rx": 12,
+    "lookup": 10,
+    "proof": 10,
+    "ed25519": 11,
+    "rln": 10,
+    "send": 32,
+    "ihave_sent": 29,
+    "decrypt": 10,
+    "text": 7,
+    "insert": 8,
+    "recon_a": 4,
+    "image": 1,
+    "tally": 1,
+    "delete": 1,
+    "offer_want": 2,
+    "rej_id": 1,
+    "rej_slash": 2,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 629.8,
+   "items": 7,
+   "slashed": false
+  },
+  "2": {
+   "count": {
+    "hello": 21,
+    "recon_rx": 11,
+    "fence_held": 7,
+    "recon_sessions": 8,
+    "recon_b": 4,
+    "recon_bytes": 4360,
+    "recon_fetched": 0,
+    "recon_pushed": 2,
+    "recon_a": 4,
+    "ihave_rx": 32,
+    "env_rx": 12,
+    "lookup": 10,
+    "proof": 10,
+    "ed25519": 11,
+    "rln": 10,
+    "send": 29,
+    "ihave_sent": 27,
+    "decrypt": 10,
+    "text": 7,
+    "insert": 8,
+    "query": 1,
+    "pull": 4,
+    "image": 1,
+    "tally": 1,
+    "delete": 1,
+    "rej_slash": 2,
+    "slash_published": 1,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 641.1,
+   "items": 7,
+   "slashed": false
+  },
+  "3": {
+   "count": {
+    "lookup": 10,
+    "proof": 10,
+    "ed25519": 11,
+    "rln": 10,
+    "decrypt": 10,
+    "text": 7,
+    "insert": 8,
+    "hello": 23,
+    "recon_rx": 10,
+    "offer_want": 2,
+    "env_rx": 7,
+    "send": 27,
+    "ihave_sent": 24,
+    "recon_sessions": 7,
+    "recon_a": 4,
+    "recon_bytes": 8486,
+    "recon_fetched": 2,
+    "recon_pushed": 2,
+    "tally": 1,
+    "image": 1,
+    "ihave_rx": 12,
+    "delete": 1,
+    "recon_b": 3,
+    "rej_slash": 3,
+    "slash_published": 1,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 629.9,
+   "items": 7,
+   "slashed": false
+  },
+  "4": {
+   "count": {
+    "hello": 21,
+    "fence_held": 9,
+    "recon_sessions": 11,
+    "recon_b": 7,
+    "recon_bytes": 3631,
+    "recon_fetched": 0,
+    "recon_pushed": 1,
+    "recon_rx": 9,
+    "recon_a": 4,
+    "ihave_rx": 34,
+    "env_rx": 10,
+    "lookup": 10,
+    "proof": 10,
+    "ed25519": 11,
+    "rln": 10,
+    "send": 36,
+    "ihave_sent": 26,
+    "decrypt": 10,
+    "text": 7,
+    "insert": 8,
+    "image": 1,
+    "tally": 1,
+    "delete": 1,
+    "rej_slash": 1,
+    "rej_bad_proof": 1
+   },
+   "chip_virtual_ms": 630.1,
+   "items": 7,
+   "slashed": true
+  }
+ }
+}

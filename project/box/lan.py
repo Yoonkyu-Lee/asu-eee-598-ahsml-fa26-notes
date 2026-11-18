@@ -166,7 +166,8 @@ def main() -> None:
           f"state kept in {state}")
     print(f"open http://127.0.0.1:{ports[a.me]}/ on this computer (Ctrl+C stops the box)", flush=True)
     import box_server                                  # same process, so Ctrl+C (or closing the window) stops the box
-    sys.argv = [sys.argv[0], "--cfg", str(path), "--id", str(a.me), "--bind", "0.0.0.0", "--state", str(state)]
+    bind = "127.0.0.1" if all(h.startswith("127.") for h in hosts) else "0.0.0.0"   # CP32: one-PC boxes stay off the LAN
+    sys.argv = [sys.argv[0], "--cfg", str(path), "--id", str(a.me), "--bind", bind, "--state", str(state)]
     try:
         box_server.main()
     except KeyboardInterrupt:

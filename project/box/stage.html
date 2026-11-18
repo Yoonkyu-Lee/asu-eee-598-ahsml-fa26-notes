@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five users, one screen</title>
+<style>
+:root { --bg:#f7f7f5; --card:#fff; --ink:#1d1d1b; --mute:#6b6b66; --line:#e2e1dc; --acc:#2f6f5e; --warn:#a1452b; --ok:#2f6f5e; --hl:#fff4d6; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161615; --card:#1f1f1d; --ink:#ecebe6; --mute:#a3a29b; --line:#33332f; --acc:#7cc4ad; --warn:#e58d6f; --ok:#7cc4ad; --hl:#3a3420; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; }
+header { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); }
+header h1 { font-size:17px; margin:0; }
+.m { color:var(--mute); font-size:12px; }
+button { font:inherit; border:none; border-radius:6px; padding:6px 10px; background:var(--acc); color:var(--card); cursor:pointer; }
+button.ghost { background:transparent; color:var(--acc); border:1px solid var(--line); }
+button:disabled { opacity:.45; cursor:default; }
+.spacer { flex:1; }
+#story { margin:10px 16px 0; padding:10px 14px; background:var(--card); border:1px solid var(--line); border-radius:8px; }
+#say { font-size:16px; min-height:2.9em; }
+#steps { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+#steps span { min-width:26px; text-align:center; padding:1px 6px; border-radius:10px; border:1px solid var(--line); font-size:12px; cursor:default; }
+#steps span.cur { border-color:var(--acc); font-weight:600; }
+#steps span.pass { background:var(--ok); color:var(--card); border-color:var(--ok); }
+#steps span.fail { background:var(--warn); color:var(--card); border-color:var(--warn); }
+#verdict { margin-top:6px; font-size:12px; font-family:ui-monospace, monospace; white-space:pre-wrap; word-break:break-word; color:var(--mute); }
+#verdict b.pass { color:var(--ok); } #verdict b.fail { color:var(--warn); }
+#grid { display:grid; grid-template-columns:repeat(5, minmax(250px, 1fr)); gap:10px; padding:10px 16px 16px; overflow-x:auto; }
+@media (max-width:1300px) { #grid { grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); } }
+.pane { background:var(--card); border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; min-width:0; transition:box-shadow .3s, border-color .3s; }
+.pane.acting { border-color:var(--acc); box-shadow:0 0 0 3px var(--acc); }
+.pane .top { padding:8px 10px; border-bottom:1px solid var(--line); }
+.pane .name { font-weight:700; font-size:15px; }
+.badge { display:inline-block; font-size:11px; padding:0 6px; border-radius:8px; border:1px solid var(--line); margin-right:4px; color:var(--mute); }
+.badge.key { border-color:var(--acc); color:var(--acc); }
+.pane .st { font-size:11px; color:var(--mute); margin-top:3px; min-height:2.6em; }
+.pane .ctl { display:flex; gap:6px; margin-top:4px; }
+.pane .ctl button { padding:2px 8px; font-size:12px; }
+.frame { position:relative; flex:1; min-height:560px; }
+.frame iframe { position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:0 0 8px 8px; background:var(--bg); }
+.frame .off { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:20px;
+  background:var(--bg); color:var(--mute); border-radius:0 0 8px 8px; font-size:13px; }
+.pane.down .frame .off { display:flex; }
+.pane.down .name::after { content:" · off"; color:var(--warn); font-weight:400; font-size:12px; }
+.pane.cut { border-style:dashed; }
+footer { padding:0 16px 16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="h1">Five users, one screen</h1>
+  <span class="m" id="status">connecting …</span>
+  <span class="spacer"></span>
+  <button id="play" onclick="play(true)" disabled>▶ Play</button>
+  <button id="next" class="ghost" onclick="play(false)" disabled>Next step</button>
+  <button class="ghost" id="split" onclick="net([[0,1],[2,3,4]])">Split</button>
+  <button class="ghost" id="heal" onclick="net(null)">Heal</button>
+  <button class="ghost" id="reset" onclick="reset()">Reset</button>
+  <button class="ghost" id="lang" onclick="toggleLang()">EN</button>
+</header>
+<div id="story">
+  <div id="say"></div>
+  <div id="steps"></div>
+  <div id="verdict"></div>
+</div>
+<div id="grid"></div>
+<footer class="m" id="foot"></footer>
+<script>
+const $ = id => document.getElementById(id);
+const get = p => fetch(p).then(r => r.json());
+const send = (p, b) => fetch(p, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b || {})}).then(r => r.json());
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+let lang = "ko", S = null, cur = 0, playing = false, stepMode = false, waitNext = null;
+const T = {
+  ko: {h1: "다섯 사용자, 한 화면", play: "▶ 이야기 재생", next: "다음 단계", split: "망 쪼개기", heal: "다시 붙이기", reset: "처음부터",
+       intro: "각 칸은 한 사용자의 클라 (그 사람 박스의 진짜 화면)임. ▶를 누르면 사용자들이 각자 자기 클라에 직접 입력하고 누름. 단계마다 무대가 모든 박스를 읽어 약속대로인지 판정함. 아무 칸에서나 직접 써 봐도 됨.",
+       on: "켜기", off: "끄기", boxoff: "박스가 꺼져 있음 (노트북 닫힘). 켜면 이웃들과 집합을 맞춰 놓친 것을 받음.",
+       subs: "서브", key: "방 R 열쇠", relay: "방 R 중계만", items: "보유", heard: "들은 이웃", rej: "거절", chip: "칩(모델)",
+       starting: "박스 다섯을 띄우는 중 …", ready: "준비됨", done: "끝. 결과 저장:", cutnote: "끊긴 링크:",
+       timers: t => t.real ? "시계: 박스 기본값 (바닥 10–30분)" : `시계: 시험 값 (바닥 ${t.pae_s[0]}–${t.pae_s[1]} s, probe cap ${t.probe_max_s} s; 기본값은 10–30분 / 5분)`,
+       foot: "모두 127.0.0.1에서만 열림. 박스끼리는 CP30 기본 프로토콜 (집합 맞추기 + ID 먼저 push). 무대는 각 박스의 주인 API를 읽기만 함 (관찰자). 망 쪼개기와 위조본은 시험 훅. 시간은 이 PC 한 대 안의 시간이라 망 지연이 아님."},
+  en: {h1: "Five users, one screen", play: "▶ Play the story", next: "Next step", split: "Split the network", heal: "Heal", reset: "Start over",
+       intro: "Each pane is one user's client (the real UI of that person's box). Press ▶ and the users type and click in their own clients. After each step the stage reads every box and checks the protocol's promise. You can also use any pane by hand.",
+       on: "on", off: "off", boxoff: "The box is off (laptop closed). When it comes on it reconciles with its neighbours and gets what it missed.",
+       subs: "subs", key: "room R key", relay: "relays room R", items: "items", heard: "heard", rej: "rejected", chip: "chip (model)",
+       starting: "starting five boxes …", ready: "ready", done: "Done. Saved:", cutnote: "links cut:",
+       timers: t => t.real ? "timers: box defaults (floor 10–30 min)" : `timers: test values (floor ${t.pae_s[0]}–${t.pae_s[1]} s, probe cap ${t.probe_max_s} s; defaults 10–30 min / 5 min)`,
+       foot: "Everything listens on 127.0.0.1 only. Box to box: the CP30 default protocol (set reconciliation + ids-first push). The stage only reads each box's owner API (an observer). Network splits and the forged copy are test hooks. Times are on one PC, not network latency."},
+};
+const L = () => T[lang];
+function toggleLang() { lang = lang === "ko" ? "en" : "ko"; chrome(); showStep(cur); }
+function chrome() {
+  $("h1").textContent = L().h1; $("play").textContent = L().play; $("next").textContent = L().next;
+  $("split").textContent = L().split; $("heal").textContent = L().heal; $("reset").textContent = L().reset;
+  $("lang").textContent = lang === "ko" ? "EN" : "한";
+  $("foot").textContent = L().foot + " · " + L().timers(S.timers);
+  S.personas.forEach((p, i) => {
+    $("role" + i).textContent = p.role[lang];
+    $("badges" + i).innerHTML = `<span class="badge">${L().subs} ${esc(p.subs)}</span><span class="badge ${p.room ? "key" : ""}">${p.room ? L().key : L().relay}</span>`;
+    $("pbtn" + i).textContent = L().off; $("offtxt" + i).textContent = L().boxoff;
+  });
+}
+const titleOf = {};
+async function init() {
+  S = await get("/api/story");
+  for (const s of S.steps) for (const a of s.acts) if (a.label && a.title) titleOf[a.label] = a.title;
+  $("grid").innerHTML = S.personas.map((p, i) => `
+    <div class="pane" id="pane${i}">
+      <div class="top">
+        <div class="name">${esc(p.name)} <span class="m">· box ${i}</span></div>
+        <div class="m" id="role${i}"></div>
+        <div id="badges${i}"></div>
+        <div class="st" id="st${i}"></div>
+        <div class="ctl"><button class="ghost" id="pbtn${i}" onclick="power(${i})"></button></div>
+      </div>
+      <div class="frame"><iframe id="f${i}" title="${esc(p.name)}'s client"></iframe><div class="off" id="offtxt${i}"></div></div>
+    </div>`).join("");
+  $("steps").innerHTML = S.steps.map(s => `<span id="sn${s.n}">${s.n}</span>`).join("");
+  chrome(); showStep(0); poll();
+}
+function frameUrl(i) { return `http://127.0.0.1:${S.ports[i]}/?stage=${location.port}&name=${encodeURIComponent(S.personas[i].name)}`; }
+let loaded = {};
+async function poll() {
+  try {
+    const st = await get("/api/state");
+    $("status").textContent = (st.status === "ready" ? L().ready : st.status === "starting boxes" ? L().starting : st.status);
+    const ready = st.status === "ready";
+    $("play").disabled = !ready || playing; $("next").disabled = !ready || (playing && !stepMode);
+    for (const b of st.boxes) {
+      const pane = $("pane" + b.i);
+      pane.classList.toggle("down", !b.on);
+      pane.classList.toggle("cut", b.drop.length > 0);
+      $("pbtn" + b.i).textContent = b.on ? L().off : L().on;
+      if (b.on && b.items !== undefined && !loaded[b.i]) { $("f" + b.i).src = frameUrl(b.i); loaded[b.i] = true; }
+      if (!b.on) loaded[b.i] = false;
+      const heard = b.heard ? Object.keys(b.heard).map(Number).sort().map(j => S.personas[j].name).join(", ") : "";
+      $("st" + b.i).innerHTML = b.on && b.items !== undefined
+        ? `${L().items} ${b.items} · ${L().rej} ${b.rejected} · ${L().chip} ${b.chip_ms} ms<br>${L().heard}: ${esc(heard) || "—"}` +
+          (b.drop.length ? `<br>${L().cutnote} ${b.drop.map(j => S.personas[j].name).join(", ")}` : "")
+        : (b.on ? "…" : "");
+    }
+  } catch (e) { $("status").textContent = "stage not answering"; }
+  setTimeout(poll, 2000);
+}
+function showStep(n) {
+  cur = n;
+  document.querySelectorAll("#steps span").forEach(x => x.classList.remove("cur"));
+  if (n > 0) { $("sn" + n).classList.add("cur"); $("say").textContent = `${n}. ` + S.steps[n - 1].say[lang]; }
+  else $("say").textContent = L().intro;
+}
+let reqId = 0;
+function puppet(i, act) {        // tell user i's client what its user does; it types and clicks, then answers
+  return new Promise((ok) => {
+    const id = ++reqId, origin = `http://127.0.0.1:${S.ports[i]}`;
+    const h = e => { if (e.origin === origin && e.data && e.data.cp32 && e.data.id === id) { window.removeEventListener("message", h); ok({status: e.data.status, result: e.data.result}); } };
+    window.addEventListener("message", h);
+    $("f" + i).contentWindow.postMessage({cp32: true, id, act}, origin);
+    setTimeout(() => { window.removeEventListener("message", h); ok({status: 0, result: {error: "the client did not answer in 90 s"}}); }, 90000);
+  });
+}
+function verdict(r) {
+  const rest = Object.fromEntries(Object.entries(r).filter(([k]) => !["n", "pass", "check"].includes(k)));
+  $("verdict").innerHTML = `<b class="${r.pass ? "pass" : "fail"}">${r.pass ? "✓ PASS" : "✗ FAIL"}</b> ${esc(r.check)} ${esc(JSON.stringify(rest))}`;
+  $("sn" + r.n).classList.add(r.pass ? "pass" : "fail");
+  const known = S.steps[r.n - 1].known;
+  if (!r.pass && known) $("verdict").innerHTML += `<br><b class="fail">${esc(known[lang])}</b>`;
+}
+async function runStep(s) {
+  showStep(s.n); $("verdict").textContent = "";
+  await send("/api/begin", {n: s.n});
+  for (let k = 0; k < s.acts.length; k++) {
+    const a = s.acts[k];
+    if (a.who !== undefined) $("pane" + a.who).classList.add("acting");
+    if (S.ui_acts.includes(a.do)) {
+      const act = {...a, title: a.target ? titleOf[a.target] : a.title};
+      const got = await puppet(a.who, act);
+      await send("/api/act", {n: s.n, k, given: got});
+    } else {
+      await send("/api/act", {n: s.n, k});
+      if (a.do === "power") { loaded[a.who] = false; }
+    }
+    if (a.who !== undefined) { await sleep(400); $("pane" + a.who).classList.remove("acting"); }
+  }
+  const r = await send("/api/check", {n: s.n});
+  verdict(r);
+  return r;
+}
+async function play(auto) {
+  if (playing) { if (stepMode && waitNext) { const w = waitNext; waitNext = null; w(); } return; }
+  playing = true; stepMode = !auto;
+  $("play").disabled = true;
+  S.steps.forEach(s => $("sn" + s.n).classList.remove("pass", "fail"));
+  for (const s of S.steps) {
+    await runStep(s);
+    if (s.n === S.steps.length) break;
+    if (stepMode) await new Promise(r => waitNext = r);
+    else await sleep(2500);
+  }
+  const f = await send("/api/finish", {mode: "browser"});
+  $("say").textContent = L().done + " " + (f.saved || f.error);
+  playing = false;
+}
+async function power(i) {
+  const on = $("pane" + i).classList.contains("down");
+  $("pbtn" + i).disabled = true;
+  await send("/api/power", {i, on});
+  loaded[i] = false; $("pbtn" + i).disabled = false;
+}
+async function net(sides) { await send("/api/net", {sides}); }
+async function reset() {
+  $("status").textContent = L().starting; loaded = {};
+  S.steps.forEach(s => $("sn" + s.n).classList.remove("pass", "fail"));
+  $("verdict").textContent = ""; showStep(0);
+  await send("/api/reset");
+}
+init();
+</script>
+</body>
+</html>

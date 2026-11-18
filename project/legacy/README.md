@@ -18,6 +18,7 @@ What is here and why it is not current:
 | `src/sim_cp16.py` … `sim_cp28.py` | `src/` | per-CP experiment runners (community load, scenarios, spam limits, consistency, exchange, audit, precision). Conclusions in `journal/` and `docs/` |
 | `src/sim/exchange.py`, `src/demo/x2.py`, `src/demo/exchange_check.py`, `src/demo/REMOTE.md` | `src/sim`, `src/demo` | the CP26 exchange (X2) model and its box/model cross-check, the CP25 remote-run notes. Replaced by set reconciliation (CP29–CP30) |
 | `src/prep_coco.py` | `src/` | one-off data preparation (CP20) |
+| `box/run_demo.py` | `box/` (moved in CP32) | the CP21 five-box demo launcher. It never set the sync exchange, so its boxes did not run the current design. `box/stage.py` (CP32) replaced it |
 | `rtl/mont_mul.sv`, `tb_mont_mul.sv`, `syn.tcl`, `run_cp9.csh` | `rtl/` | CP9's first multiplier (6 cycles, 295 MHz). CP10's design at S = 1 (`chip/rtl/mont_mul_pipe.sv`) replaced it |
 | `results/cpN/` | `results/` | every CP's outputs except those in `results/chip`, `results/sync`, `results/bench`, `results/tests` |
 

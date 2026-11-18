@@ -20,6 +20,7 @@ Why this direction and what may not change: [NORTHSTAR.md](NORTHSTAR.md).
 | Chip load | Each valid message is verified and encoded exactly once per box, so the chip's work is what the box receives | counted in the model | [docs/protocol.md](docs/protocol.md) |
 
 Known gaps:
+- **H12 (found in CP32):** sync reconciles every message regardless of sub, so a box also receives, verifies and stores the subs it never joined (it cannot read them without their key, so they never show). The design replicates only joined subs (CP16). Next: CP33.
 - The 16 × 16 FP16 encoder was not mapped, so the area is a lower bound.
 - Power was not re-estimated for it.
 - Only the multiplier has RTL.
@@ -33,13 +34,13 @@ See the "Open" section of [docs/chip.md](docs/chip.md).
 | [docs/](docs/) | chip design, protocol, numbers with sources | understand the design |
 | [chip/rtl/](chip/rtl/) | the multiplier (SystemVerilog), testbench, synthesis scripts | see the real circuit |
 | [chip/model/](chip/model/) | `chip.py` (the latest chip, one source), encoder (Timeloop/Accelergy), verification-unit cycle model, roll-up | check or change a chip number |
-| [box/](box/) | the node box: real crypto, embeddings, search, sync, web UI; chip time from `chip.py` (virtual accelerator) | run the community |
+| [box/](box/) | the node box: real crypto, embeddings, search, sync, web UI; chip time from `chip.py` (virtual accelerator); `stage.py`: five users on one screen | run the community |
 | [sim/](sim/) | protocol core shared with the box; community and sync simulators; oracle; model checker | reason about thousands of boxes |
 | [bench/](bench/) | workload measurements (ingest stages, CPU energy, crypto in Rust) | see why the chip is shaped this way |
 | [experiments/](experiments/) | scripts that reproduce the conclusions | re-run a result |
 | [tests/](tests/) | real box processes with faults injected | check the box still behaves |
 | [results/](results/) | `chip/`, `sync/`, `bench/`, `tests/`: the numbers behind the conclusions | read the raw numbers |
-| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP31), plus a plain-Korean walkthrough | follow how we got here (Korean) |
+| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP32), plus a plain-Korean walkthrough | follow how we got here (Korean) |
 | [legacy/](legacy/) | code and results the conclusions no longer need, frozen at tag `cp30` | reproduce an old checkpoint |
 
 ## Try it (CPU only, a few minutes)
@@ -49,7 +50,7 @@ python -m venv .venv
 .venv/Scripts/pip install -r box/requirements.txt      # numpy, onnxruntime, tokenizers, cryptography
 .venv/Scripts/python.exe box/fetch_models.py           # MiniLM + CLIP ONNX from Hugging Face, SHA-256 checked
 .venv/Scripts/python.exe chip/model/chip.py            # the chip and where each number comes from
-.venv/Scripts/python.exe box/run_demo.py               # five boxes on 127.0.0.1:8601-8605, open them in a browser
+.venv/Scripts/python.exe box/stage.py                  # five users' clients on one page: open http://127.0.0.1:8620/, press Play
 .venv/Scripts/python.exe -W ignore experiments/sync.py holes   # the protocol's directed scenes (< 1 min)
 ```
 (On macOS/Linux use `.venv/bin/python`.) Several computers: [box/LAN.md](box/LAN.md).
