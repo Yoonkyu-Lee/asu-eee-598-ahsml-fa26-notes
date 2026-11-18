@@ -46,7 +46,7 @@ class Oracle:
             self.bad("S1", box=box.i, mid=claimed, kind=msg.kind)
         if msg.kind != "delete" and msg.mid in box.applied_del and box.now() - self.sim.sc.R <= msg.t0:
             self.bad("S2", box=box.i, mid=msg.mid)
-        if self.sim.sc.topics and msg.topic not in box.subs:
+        if self.sim.sc.topics and msg.topic not in box.subs and msg.topic not in self.sim.small:   # CP38: relayed
             self.bad("S5", box=box.i, mid=claimed, topic=msg.topic)
 
     def on_apply_delete(self, box, d):

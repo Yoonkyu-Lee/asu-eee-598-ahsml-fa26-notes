@@ -138,6 +138,104 @@ def run_judge():
     log(j)
 
 
+# ---------------------------------------------------------------- after the owner's check (2026-11-18): two verdicts
+# The delivery rule re-registered after the results (corrected, CP38.md): P99 of the wait counted from the first member
+# path <= leak P99 + 1 s, misses as in CP33. The availability cost is reported on the original metric by sub size.
+SIZES = ((1, 4), (5, 9), (10, 29), (30, 99), (100, 10 ** 9))        # member boxes of a sub
+EXPLORE10 = "d3_r600_e600_noK"                                       # the 10-minute explore, nothing else changed
+WORKERS = int(__import__("os").environ.get("WORKERS", "14"))   # fewer while real-box tests run elsewhere
+OVERHEAD_MAX = 52.5                                                  # KB per box-day, CP30's S2+KE maximum (owner)
+VARIANTS.update({f"sr{k}": dict(VARIANTS[BASE], small_relay=k) for k in (4, 9, 29)})
+
+
+def pct(xs, q=99.0):
+    xs = sorted(xs)
+    return xs[int(q / 100 * (len(xs) - 1))] if xs else None
+
+
+def avail(r, sizes) -> dict:
+    """Live member deliveries by sub size: count, share with no member path, P99 of all and of the no-path ones."""
+    out = {}
+    for lo, hi in sizes:
+        rows = [x for x in r["diag_rows"] if lo <= r["sub_size"][x[0]] <= hi]
+        nop = [x[1] for x in rows if x[2]]
+        out[f"{lo}-{hi if hi < 10 ** 9 else ''}"] = {"n": len(rows), "no_path": len(nop),
+                                                      "p99_s": pct([x[1] for x in rows]), "no_path_p99_s": pct(nop)}
+    return out
+
+
+def _cell(job):
+    """kind 'rand': CP33 layer 1 (faults, 3 days); kind 'cost': CP33 cost scenes (CP26 faults, 2 days). Diagnosis on."""
+    kind, s, n, seed, var, mode = job
+    t = time.time()
+    if kind == "rand":
+        sc = c33.scene(n, mode, seed=seed, days=3.0, miss_at=(DAY, 2 * DAY, 3 * DAY - 400.0), topics=c33.TOPICS,
+                       tail_diag=True, **VARIANTS[var], **c29.SCENES[s], **c29.FAULTS)
+        days = 3.0
+    else:
+        kw = dict(c29.SCENES[s])
+        kw.update(c29.CP26_FAULTS)
+        sc = c33.scene(n, mode, seed=seed, days=2.0, miss_at=c30.MISS_AT, topics=c33.TOPICS, tail_diag=True,
+                       **VARIANTS[var], **kw)
+        days = 2.0
+    r = Sync(sc).run()
+    w = r["work"]
+    keep = {**c30.metrics(r, n, days), "ev": r["ev"], "verify_per_box_day": r["verify_per_box_day"],
+            "verify_foreign_per_box_day": r["verify_per_box_day"] * w["verify_foreign"] / max(w["verify"], 1),
+            "live_path_p99_s": r.get("live_path_p99_s"), "avail": avail(r, SIZES),
+            "small_subs": sorted(t for t, h in r["sub_size"].items() if h <= sc.small_relay) if sc.small_relay else []}
+    keep.update(kind=kind, scene=s, n=n, seed=seed, variant=var, mode=mode, secs=round(time.time() - t, 1))
+    return keep
+
+
+def new_rule(r, L) -> bool:
+    e, el = r["ev"], L["ev"]
+    return (e.get("miss", 0) <= el.get("miss", 0) + c33.MISS_TOL * max(e.get("miss_pairs", 0), 1)
+            and (r["live_path_p99_s"] or 0) <= (L["live_p99_s"] or 0) + c33.P99_TOL)
+
+
+def rand_cells(failing_only: bool):
+    by, failing = cp33()
+    if failing_only:
+        return by, failing
+    return by, [(s, n, seed) for n in sorted(c29.NS, reverse=True) for s in c29.SCENES for seed in c29.SEEDS
+                if n < 1000 or seed <= 2]
+
+
+def run_protocol(var, failing_only=True):
+    """New rule on CP33's layer 1 (the 16 failing cells, or all 110), against CP33's leak runs of the same seeds."""
+    by, cells = rand_cells(failing_only)
+    out = c30._pool([("rand", *c, var, "sub") for c in cells], _cell, f"protocol {var}", workers=WORKERS)
+    rows = []
+    for r in out:
+        k = (r["scene"], r["n"], r["seed"])
+        L = by[(*k, "leak")]
+        rows.append({"cell": k, "new_rule": new_rule(r, L), "path_p99": r["live_path_p99_s"], "p99": r["live_p99_s"],
+                     "leak_p99": L["live_p99_s"], "miss": r["ev"].get("miss", 0), "leak_miss": L["ev"].get("miss", 0),
+                     "violations": r["violations"]})
+    name = f"protocol_{var}_{'16' if failing_only else '110'}.json"
+    save(name, {"variant": var, "cells": len(rows), "pass": sum(x["new_rule"] for x in rows),
+                "violations": [x for x in rows if x["violations"]], "rows": rows,
+                "raw": [{k: v for k, v in r.items() if k != "avail"} for r in out]})
+    log(name, sum(x["new_rule"] for x in rows), "/", len(rows), "violations", sum(1 for x in rows if x["violations"]))
+
+
+def run_cost(var, mode):
+    """CP33's cost grid (sync_subs.run_cost) with the diagnosis: overhead and availability by sub size."""
+    jobs = [("cost", s, n, 1, var, mode) for n in (1000, 300, 100, 30, 10) for s in ("C-a", "C-b", "C-c")]
+    jobs += [("cost", s, n, seed, var, mode) for n in (100, 30, 10) for s in ("C-a", "C-b", "C-c") for seed in (2, 3)]
+    out = c30._pool(jobs, _cell, f"cost {var} {mode}", workers=WORKERS)
+    save(f"cost_{var}_{mode}.json", {"variant": var, "mode": mode, "exch_max": max(r["exch_kb_box_day"] for r in out),
+                                     "dup_max": max(r["dup_ratio"] for r in out), "rows": out})
+    log(var, mode, "exch max", round(max(r["exch_kb_box_day"] for r in out), 1),
+        "violations", [(r["scene"], r["n"], r["violations"]) for r in out if r["violations"]])
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "diag"
-    {"diag": run_diag, "sweep": run_sweep, "judge": run_judge}.get(cmd, lambda: run_confirm(sys.argv[2]))()
+    if cmd == "protocol":
+        run_protocol(sys.argv[2], failing_only=sys.argv[3] == "16")
+    elif cmd == "cost":
+        run_cost(sys.argv[2], sys.argv[3])
+    else:
+        {"diag": run_diag, "sweep": run_sweep, "judge": run_judge}.get(cmd, lambda: run_confirm(sys.argv[2]))()

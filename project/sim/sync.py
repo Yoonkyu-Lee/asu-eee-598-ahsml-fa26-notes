@@ -111,6 +111,8 @@ class SyncScene:
     explore_s: float = 3600.0           # CP38: one random hello this often (CP30 E)
     known_first: bool = False           # CP38 K: hello members of the sub I met before (most recent first), no timer
     tail_diag: bool = False             # CP38: for late live deliveries, the share of the wait a member path existed
+    small_relay: int = 0                # CP38 availability: subs held by <= this many boxes are reconciled, held and
+                                        # relayed by every box (0: off). Their verification count is verify_foreign
 
     @property
     def t_bound(self) -> float:          # L1 deadline: floor period max + probe cap + slack (cp/CP29.md L1)
@@ -227,6 +229,7 @@ class Sync:
                 B.subs = frozenset(pick)
                 for j in pick:
                     self.holders[j].append(B.i)
+        self.small = self._small()
         self.link_down: set[tuple] = set()
         self.group: dict[int, int] = {}                # partition: box -> side
         self.kind_of: dict[int, str] = {}
@@ -237,6 +240,7 @@ class Sync:
         self.pend: dict[int, dict] = {}                 # CP38 diag: mid -> {box on at creation: [samples, member path]}
         self.msg_by: dict[int, Msg] = {}
         self.live_path: list[float] = []                # CP38 diag: live latency counted from a member path
+        self.diag_rows: list[tuple] = []                # CP38 diag: (sub, latency, no member path) per live pair
         self.tail: list[tuple] = []                     # CP38 diag: (latency s, samples, samples with a member path, sub,
                                                         # s from the first sample with a path to delivery, or None)
         self.ev = Counter()
@@ -250,7 +254,13 @@ class Sync:
         """CP33: the subs a session between a and b reconciles (None: everything)."""
         if not self.subbed:
             return None
-        return self.boxes[a].subs & self.boxes[b].subs
+        return (self.boxes[a].subs & self.boxes[b].subs) | self.small
+
+    def _small(self) -> frozenset:
+        """CP38: the subs every box relays (small_relay); empty unless small_relay and sub_mode "sub"."""
+        if not (self.sc.small_relay and self.subbed):
+            return frozenset()
+        return frozenset(t for t, h in self.holders.items() if len(h) <= self.sc.small_relay)
 
     def shares(self, a: int, b: int) -> bool:
         return not self.subbed or bool(self.boxes[a].subs & self.boxes[b].subs)
@@ -579,7 +589,7 @@ class Sync:
         if claimed != m.mid:                              # content id check (cheap hash), before any verification
             B.c["rej_id"] += 1
             return False
-        if self.subbed and m.topic not in B.subs:        # CP33: not my sub (header), refused before verifying
+        if self.subbed and m.topic not in B.subs and m.topic not in self.small:   # CP33: not my sub (header)
             B.c["rej_sub"] += 1
             return False
         B.c["verify"] += 1
@@ -624,6 +634,8 @@ class Sync:
                     # CP38 re-registered rule: the wait counted from the first sample with a member path (a pair
                     # with no sample that saw a path had one for at most DIAG_S; an upper bound either way)
                     self.live_path.append(min(lat, DIAG_S if first is None else first + DIAG_S))
+                    # CP38 availability: (sub, latency, no member path for >= 90 % of a wait of >= 1 sample)
+                    self.diag_rows.append((m.topic, lat, s[0] > 0 and s[1] < 0.1 * s[0]))
                     if lat > 30.0:
                         self.tail.append((round(lat, 1), s[0], s[1], m.topic, first))
                     if not d:
@@ -901,6 +913,7 @@ class Sync:
         """CP33 script: box b's subs (the holders table follows)."""
         self.boxes[b].subs = frozenset(subs)
         self.holders = {j: [B.i for B in self.boxes if j in B.subs] for j in range(max(self.sc.topics, 1))}
+        self.small = self._small()
 
     def publish(self, b: int, kind: str = None, tag: str = None, stamp_dt: float = 0.0, target: str | int = None,
                 valid: bool = True, foreign: bool = False, topic_set: int | None = None):
@@ -1274,6 +1287,7 @@ class Sync:
             "world_trace": self.trace,
             "world_trace_times": self.trace_nokind,
             "cells": {"|".join(k): v for k, v in self.oracle.cells.items()},
-            **({"tail_diag": self.tail, "live_path_p99_s": sorted(self.live_path)[int(0.99 * (len(self.live_path) - 1))]
+            **({"tail_diag": self.tail, "diag_rows": self.diag_rows,
+                "sub_size": {t: len(h) for t, h in self.holders.items()}, "live_path_p99_s": sorted(self.live_path)[int(0.99 * (len(self.live_path) - 1))]
                 if self.live_path else None} if sc.tail_diag else {}),
         }
