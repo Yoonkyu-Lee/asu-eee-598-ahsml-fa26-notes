@@ -1,0 +1,4827 @@
+{
+ "what": "CP35 connection policy vs chip (journal/cp/CP35.md)",
+ "label": "estimate (model)",
+ "assumptions": {
+  "c_rej_s": {
+   "base": 1e-05,
+   "low": 2e-06,
+   "high": 5e-05
+  },
+  "lambdas": [
+   100.0,
+   1000.0,
+   3000.0,
+   10000.0,
+   30000.0,
+   100000.0
+  ],
+  "phis": [
+   0.5,
+   0.9,
+   1.0
+  ],
+  "A_grid": [
+   1,
+   3,
+   10,
+   30,
+   100,
+   300,
+   1000,
+   3000,
+   10000
+  ],
+  "link_syn_per_s": 168918.9189189189,
+  "K_cand": 10,
+  "D_join": 3,
+  "try_s": 0.1,
+  "J_s": 60.0,
+  "dur_s": 60.0,
+  "seeds": 3,
+  "chip_machine": "6x6"
+ },
+ "join": {
+  "100|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "100|0.9": {
+   "A_star": 3,
+   "p99_s_by_A": {
+    "1": 67.5,
+    "3": 22.401000000000025,
+    "10": 7.001000000000022,
+    "30": 2.7,
+    "100": 1.1,
+    "300": 0.7000000000000001,
+    "1000": 0.5,
+    "3000": 0.4,
+    "10000": 0.4
+   }
+  },
+  "100|1.0": {
+   "A_star": 3,
+   "p99_s_by_A": {
+    "1": 85.30300000000008,
+    "3": 28.201000000000025,
+    "10": 8.9,
+    "30": 3.3000000000000003,
+    "100": 1.3,
+    "300": 0.8,
+    "1000": 0.5,
+    "3000": 0.4,
+    "10000": 0.4
+   }
+  },
+  "1000|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "1000|0.9": {
+   "A_star": 30,
+   "p99_s_by_A": {
+    "1": 659.0150000000003,
+    "3": 221.1080000000002,
+    "10": 67.5,
+    "30": 22.401000000000025,
+    "100": 7.001000000000022,
+    "300": 2.7,
+    "1000": 1.1,
+    "3000": 0.7000000000000001,
+    "10000": 0.5
+   }
+  },
+  "1000|1.0": {
+   "A_star": 30,
+   "p99_s_by_A": {
+    "1": 838.0590000000013,
+    "3": 284.90000000000003,
+    "10": 85.30300000000008,
+    "30": 28.201000000000025,
+    "100": 8.9,
+    "300": 3.3000000000000003,
+    "1000": 1.3,
+    "3000": 0.8,
+    "10000": 0.5
+   }
+  },
+  "3000|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "3000|0.9": {
+   "A_star": 100,
+   "p99_s_by_A": {
+    "1": 1962.1110000000024,
+    "3": 659.0150000000003,
+    "10": 199.00900000000019,
+    "30": 67.5,
+    "100": 20.401000000000025,
+    "300": 7.001000000000022,
+    "1000": 2.4000000000000004,
+    "3000": 1.1,
+    "10000": 0.7000000000000001
+   }
+  },
+  "3000|1.0": {
+   "A_star": 100,
+   "p99_s_by_A": {
+    "1": 2530.470000000004,
+    "3": 838.0590000000013,
+    "10": 254.10000000000002,
+    "30": 85.30300000000008,
+    "100": 25.5,
+    "300": 8.9,
+    "1000": 3.1,
+    "3000": 1.3,
+    "10000": 0.7000000000000001
+   }
+  },
+  "10000|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "10000|0.9": {
+   "A_star": 300,
+   "p99_s_by_A": {
+    "1": 6600.303000000003,
+    "3": 2216.4750000000017,
+    "10": 659.0150000000003,
+    "30": 221.1080000000002,
+    "100": 67.5,
+    "300": 22.401000000000025,
+    "1000": 7.001000000000022,
+    "3000": 2.7,
+    "10000": 1.1
+   }
+  },
+  "10000|1.0": {
+   "A_star": 300,
+   "p99_s_by_A": {
+    "1": 8468.432,
+    "3": 2784.8930000000023,
+    "10": 838.0590000000013,
+    "30": 284.90000000000003,
+    "100": 85.30300000000008,
+    "300": 28.201000000000025,
+    "1000": 8.9,
+    "3000": 3.3000000000000003,
+    "10000": 1.3
+   }
+  },
+  "30000|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "30000|0.9": {
+   "A_star": 1000,
+   "p99_s_by_A": {
+    "1": 19836.413,
+    "3": 6600.303000000003,
+    "10": 1962.1110000000024,
+    "30": 659.0150000000003,
+    "100": 199.00900000000019,
+    "300": 67.5,
+    "1000": 20.401000000000025,
+    "3000": 7.001000000000022,
+    "10000": 2.4000000000000004
+   }
+  },
+  "30000|1.0": {
+   "A_star": 1000,
+   "p99_s_by_A": {
+    "1": 25442.851000000002,
+    "3": 8468.432,
+    "10": 2530.470000000004,
+    "30": 838.0590000000013,
+    "100": 254.10000000000002,
+    "300": 85.30300000000008,
+    "1000": 25.5,
+    "3000": 8.9,
+    "10000": 3.1
+   }
+  },
+  "100000|0.5": {
+   "A_star": 1,
+   "p99_s_by_A": {
+    "1": 0.8,
+    "3": 0.8,
+    "10": 0.8,
+    "30": 0.8,
+    "100": 0.8,
+    "300": 0.8,
+    "1000": 0.8,
+    "3000": 0.8,
+    "10000": 0.8
+   }
+  },
+  "100000|0.9": {
+   "A_star": 3000,
+   "p99_s_by_A": {
+    "1": 66178.07500000001,
+    "3": 22089.677000000025,
+    "10": 6600.303000000003,
+    "30": 2216.4750000000017,
+    "100": 659.0150000000003,
+    "300": 221.1080000000002,
+    "1000": 67.5,
+    "3000": 22.401000000000025,
+    "10000": 7.001000000000022
+   }
+  },
+  "100000|1.0": {
+   "A_star": 3000,
+   "p99_s_by_A": {
+    "1": 84755.22000000003,
+    "3": 28204.537000000015,
+    "10": 8468.432,
+    "30": 2784.8930000000023,
+    "100": 838.0590000000013,
+    "300": 284.90000000000003,
+    "1000": 85.30300000000008,
+    "3000": 28.201000000000025,
+    "10000": 8.9
+   }
+  }
+ },
+ "same_frame": {
+  "cp35": {
+   "chip_W": 0.9898285231916452,
+   "verify_busy": 0.845507968741047,
+   "host_cores": 0.8549241607241035
+  },
+  "cp34": {
+   "S1_chip_mW": 16.649807879194118,
+   "S1_chip_J_day": 1438.5434007623717,
+   "S1_text_p99_s": 0.039855588009231724,
+   "S4_chip_W": 0.9898285231916452,
+   "S4_verify_busy": 0.845507968741047,
+   "S4_text_p99_s": 0.04479651023197402
+  }
+ },
+ "box": [
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.035347326623362485,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.04434732662335939,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06434732662335657,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.1343473266233687,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.33434732662336447,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0343473266232521,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.04458911957562481,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 1000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.0535891195756211,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 3000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 2997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07358911957561957,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 10000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 9997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.14358911957563902,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 30000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 29997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3435891195756388,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 100000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 99997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0435891195757692,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 100.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 90.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07583606898235655,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 1000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.08483606898235253,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 3000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 2990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10483606898236114,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 10000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 9990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.17483606898237328,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 30000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 29990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3748360689823578,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10,
+   "lam": 100000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 99990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0748360689824303,
+   "chip_W": 0.14127876419210034,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.1103060916697896,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 100.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 70.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.17382982780194378,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.18282982780194817,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 3000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 2970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.20282982780192585,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 10000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 9970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.2728298278019367,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 30000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 29970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.4728298278019608,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 100000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 99970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.1728298278018536,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 100.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.503206414520912,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 1000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5122064145209241,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5322064145208827,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 10000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 9900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.6022064145210304,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 30000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 29900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.8022064145209444,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388709320996923,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 100000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 99900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.5022064145209926,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.044406117692724026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.503206414520912,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 1000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.451542571681432,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 3000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 2700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.471542571681578,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.5415425716813975,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 30000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 29700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.7415425716814659,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 100000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 99700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 2.4415425716815253,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7742949335777722,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.503206414520912,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 4.724433408418421,
+   "chip_W": 0.1508577641588502,
+   "text_p99_s": 20.518080963947746,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.725621067125667,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 3000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 2000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 4.744433408418999,
+   "chip_W": 0.1508577641588502,
+   "text_p99_s": 21.038370746129914,
+   "unfinished_text": 0,
+   "query_p99_ms": 8.603404136184016,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 10000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 9000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 4.814433408418992,
+   "chip_W": 0.15085776415885016,
+   "text_p99_s": 22.978969391266332,
+   "unfinished_text": 0,
+   "query_p99_ms": 7.703693983672231,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 5.014433408420232,
+   "chip_W": 0.1508577641588502,
+   "text_p99_s": 28.28138025996227,
+   "unfinished_text": 0,
+   "query_p99_ms": 7.696611016201814,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 100000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 99000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 5.714433408422421,
+   "chip_W": 0.15085776415885008,
+   "text_p99_s": 45.91641242742415,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.7258889371900334,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.503206414520912,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 4.724433408418421,
+   "chip_W": 0.1508577641588502,
+   "text_p99_s": 20.518080963947746,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.725621067125667,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 14.140908491341058,
+   "chip_W": 0.062452631463738695,
+   "text_p99_s": NaN,
+   "unfinished_text": 257,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 10000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 7000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 14.210901900122233,
+   "chip_W": 0.0622283207369269,
+   "text_p99_s": NaN,
+   "unfinished_text": 258,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 30000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 27000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 14.41084297485004,
+   "chip_W": 0.06015458016507471,
+   "text_p99_s": NaN,
+   "unfinished_text": 264,
+   "query_p99_ms": 4.673344765259522,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 15.110686998485003,
+   "chip_W": 0.05424205050082716,
+   "text_p99_s": NaN,
+   "unfinished_text": 283,
+   "query_p99_ms": 6.001083494261796,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.503206414520912,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 4.724433408418421,
+   "chip_W": 0.1508577641588502,
+   "text_p99_s": 20.518080963947746,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.725621067125667,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 14.140908491341058,
+   "chip_W": 0.062452631463738695,
+   "text_p99_s": NaN,
+   "unfinished_text": 257,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 10000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 36.36762914165765,
+   "chip_W": 0.014480005838263815,
+   "text_p99_s": NaN,
+   "unfinished_text": 429,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 30000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 20000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 36.31183768525046,
+   "chip_W": 0.014031384384640251,
+   "text_p99_s": NaN,
+   "unfinished_text": 431,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 10000,
+   "lam": 100000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 90000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 36.36174916333085,
+   "chip_W": 0.014031384384640262,
+   "text_p99_s": NaN,
+   "unfinished_text": 431,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.004253197834862437,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.004288283674010529,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.013253197834863385,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.013288283674011346,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.03325319783485838,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.033288283674006686,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10325319783486786,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10328828367401646,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3032531978348722,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3032882836740178,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0032531978347516,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 10,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.003288283673911,
+   "chip_W": 0.14131619064384884,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.005320761054066261,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.005672395633478393,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 1000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.014320761054066914,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 1000.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.01467239563347855,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 3000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 2997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.03432076105406679,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 3000.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 2997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.03467239563347904,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 10000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 9997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10432076105407782,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 10000.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 9997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10467239563349164,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 30000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 29997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.30432076105407574,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 30000.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 29997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.30467239563347986,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100000.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 99997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.004320761054201,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100000.0,
+   "admitted_per_s": 3,
+   "per_conn": 10,
+   "rejected_per_s": 99997.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0046723956336447,
+   "chip_W": 0.14575829642685662,
+   "text_p99_s": 0.04682499782281074,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 100.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 90.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.009251587011104378,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 100.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 90.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.010371729224683187,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 1000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.01825158701110365,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 1000.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.01937172922468212,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 3000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 2990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.03825158701110828,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 3000.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 2990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.03937172922468657,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 10000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 9990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10825158701111808,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 10000.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 9990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10937172922470313,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 30000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 29990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3082515870111226,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 30000.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 29990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.3093717292246752,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 100000.0,
+   "admitted_per_s": 10,
+   "per_conn": 1,
+   "rejected_per_s": 99990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0082515870111728,
+   "chip_W": 0.14253159481286543,
+   "text_p99_s": 0.03985484392271875,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.0429797017753915,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10,
+   "lam": 100000.0,
+   "admitted_per_s": 10,
+   "per_conn": 10,
+   "rejected_per_s": 99990.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0093717292248536,
+   "chip_W": 0.14494551732153435,
+   "text_p99_s": 0.03985558606547812,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 100.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 70.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.020534399054501277,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 100.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 70.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.024214256108114618,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.029534399054502957,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.0332142561081193,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 3000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 2970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.049534399054503984,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 3000.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 2970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.05321425610810256,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 10000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 9970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.11953439905449344,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 10000.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 9970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.1232142561081295,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 30000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 29970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.319534399054518,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 30000.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 29970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.323214256108044,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 100000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 99970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0195343990544254,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 100000.0,
+   "admitted_per_s": 30,
+   "per_conn": 10,
+   "rejected_per_s": 99970.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0232142561083586,
+   "chip_W": 0.15957378879691347,
+   "text_p99_s": 0.039854843922718874,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.273892149404127,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 100.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06028680680019656,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 100.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07227367554069837,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 1000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06928680680020159,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 1000.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.08127367554074044,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.0892868068001965,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.10127367554078034,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 10000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 9900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.15928680680019627,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 10000.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 9900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.17127367554069153,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 30000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 29900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.35928680680018843,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 30000.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 29900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.37127367554040963,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 100000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 99900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0592868068003416,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 100000.0,
+   "admitted_per_s": 100,
+   "per_conn": 10,
+   "rejected_per_s": 99900.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.0712736755420331,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06028680680019656,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07227367554069837,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 1000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.18291127591163914,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 1000.0,
+   "admitted_per_s": 300,
+   "per_conn": 10,
+   "rejected_per_s": 700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.2188005603308202,
+   "chip_W": 0.3485756294596921,
+   "text_p99_s": 0.03991898055723628,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 3000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 2700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.20291127591169286,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 3000.0,
+   "admitted_per_s": 300,
+   "per_conn": 10,
+   "rejected_per_s": 2700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.23880056033078736,
+   "chip_W": 0.3485756294596921,
+   "text_p99_s": 0.03991898055723628,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.2729112759116757,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 10,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.30880056033044273,
+   "chip_W": 0.3485756294596921,
+   "text_p99_s": 0.03991898055723628,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 30000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 29700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.47291127591148524,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 30000.0,
+   "admitted_per_s": 300,
+   "per_conn": 10,
+   "rejected_per_s": 29700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5088005603299827,
+   "chip_W": 0.3485756294596921,
+   "text_p99_s": 0.03991898055723628,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 100000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 99700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.1729112759119305,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 100000.0,
+   "admitted_per_s": 300,
+   "per_conn": 10,
+   "rejected_per_s": 99700.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.2088005603355216,
+   "chip_W": 0.3485756294596921,
+   "text_p99_s": 0.03991898055723628,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06028680680019656,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07227367554069837,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5807629468110227,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190443710631403,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.7002529463198803,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 3000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 2000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.6007629468110761,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190848726381994,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 3000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 10,
+   "rejected_per_s": 2000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.7202529463205359,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 10000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 9000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.6707629468114409,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190848726381994,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 10000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 10,
+   "rejected_per_s": 9000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.7902529463228155,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.8707629468117589,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190848726381994,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 10,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.9902529463271155,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 100000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 99000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.5707629468126902,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.0420440371870999,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 100000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 10,
+   "rejected_per_s": 99000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.6902529463347258,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.04427701736593324,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06028680680019656,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07227367554069837,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5807629468110227,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190443710631403,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.7002529463198803,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.7379408007186223,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.04524334630737334,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.889901496057201,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.8602180006444484,
+   "chip_W": 0.987438409404467,
+   "text_p99_s": 0.0405989081602355,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.977172262316468,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 10000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 7000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.8079408007185436,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.04535085931976446,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.891418777691135,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 10000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 10,
+   "rejected_per_s": 7000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.9302180006446645,
+   "chip_W": 0.987438409404467,
+   "text_p99_s": 0.04066435578254452,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.977172262316468,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 30000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 27000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 2.0079408007191093,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.04535085931976446,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.891418777691135,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 30000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 10,
+   "rejected_per_s": 27000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 2.1302180006460367,
+   "chip_W": 0.987438409404467,
+   "text_p99_s": 0.04067311410365928,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.977172262316468,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 2.707940800719477,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.045389975257579415,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.891418777691135,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 10,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 2.830218000616119,
+   "chip_W": 0.987438409404467,
+   "text_p99_s": 0.04106897762989777,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.010177069617484,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.06028680680019656,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 100.0,
+   "admitted_per_s": 100.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.07227367554069837,
+   "chip_W": 0.2163256386252749,
+   "text_p99_s": 0.03991017800189267,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.5807629468110227,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190443710631403,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 1000.0,
+   "admitted_per_s": 1000.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 0.7002529463198803,
+   "chip_W": 0.8443967326778197,
+   "text_p99_s": 0.044246495337646054,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7860284928877537,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000.0,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.7379408007186223,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.04524334630737334,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.889901496057201,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 3000.0,
+   "admitted_per_s": 3000.0,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 1.8602180006444484,
+   "chip_W": 0.987438409404467,
+   "text_p99_s": 0.0405989081602355,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.977172262316468,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 10000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 5.788743353528199,
+   "chip_W": 0.8394891098569786,
+   "text_p99_s": 57.595402528370855,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.913054400607211,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 10000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 10,
+   "rejected_per_s": 0.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 5.818064649859503,
+   "chip_W": 0.9915079228358926,
+   "text_p99_s": 58.473633263997904,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.393051596071473,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 30000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 20000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 5.988743353535839,
+   "chip_W": 0.8394891098569786,
+   "text_p99_s": 62.54220602991174,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.752483734616286,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 30000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 10,
+   "rejected_per_s": 20000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 6.0180646498682595,
+   "chip_W": 0.9915079228358926,
+   "text_p99_s": 63.17787909072823,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.061530502537209,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 100000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 1,
+   "rejected_per_s": 90000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 6.688743353556861,
+   "chip_W": 0.8394891098569783,
+   "text_p99_s": 78.5052741470475,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.182073934284643,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 10000,
+   "lam": 100000.0,
+   "admitted_per_s": 10000,
+   "per_conn": 10,
+   "rejected_per_s": 90000.0,
+   "c_rej_s": 1e-05,
+   "host_cores": 6.718064649892641,
+   "chip_W": 0.9915079228358924,
+   "text_p99_s": 78.98380417437272,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.352619949148054,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  }
+ ],
+ "verdict": {
+  "100|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "100|0.9": {
+   "A_star": 3,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "100|1.0": {
+   "A_star": 3,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "1000|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "1000|0.9": {
+   "A_star": 30,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "1000|1.0": {
+   "A_star": 30,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "3000|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "3000|0.9": {
+   "A_star": 100,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "3000|1.0": {
+   "A_star": 100,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "10000|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "10000|0.9": {
+   "A_star": 300,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "10000|1.0": {
+   "A_star": 300,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "30000|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "30000|0.9": {
+   "A_star": 1000,
+   "W-cpu": false,
+   "W-chip": true
+  },
+  "30000|1.0": {
+   "A_star": 1000,
+   "W-cpu": false,
+   "W-chip": true
+  },
+  "100000|0.5": {
+   "A_star": 1,
+   "W-cpu": true,
+   "W-chip": true
+  },
+  "100000|0.9": {
+   "A_star": 3000,
+   "W-cpu": false,
+   "W-chip": false
+  },
+  "100000|1.0": {
+   "A_star": 3000,
+   "W-cpu": false,
+   "W-chip": false
+  }
+ },
+ "sensitivity": [
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.0034611978348626318,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.008213197834861389,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.005261197834861941,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.05321319783486797,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.009261197834862199,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.15321319783487436,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.02326119783486423,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.5032131978348782,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.06326119783486614,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 1.5032131978349645,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.2032611978348818,
+   "chip_W": 0.1432864898918614,
+   "text_p99_s": 0.04244307153023026,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 5.003213197835587,
+   "chip_W": 0.1432864898918615,
+   "text_p99_s": 36.374410022003424,
+   "unfinished_text": 0,
+   "query_p99_ms": 9.500381428965953,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.00454476105406637,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.009200761054066685,
+   "chip_W": 0.14160690431190145,
+   "text_p99_s": 0.039855296629802014,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.62017899579619,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.021774399054501258,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.06833439905449026,
+   "chip_W": 0.14612773308283097,
+   "text_p99_s": 0.04388258911159666,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.74288524959584,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.06608680680019745,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.2052868068002238,
+   "chip_W": 0.14881312252124307,
+   "text_p99_s": 0.03985484392271849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.19531127591166447,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.6609112759115628,
+   "chip_W": 0.16454912074977898,
+   "text_p99_s": 0.049594401140144975,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.6387629468112019,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04190848726381994,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 2.030762946812691,
+   "chip_W": 0.22079462350793386,
+   "text_p99_s": 0.04230173453019655,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 1.9319408007190342,
+   "chip_W": 0.3479436879055409,
+   "text_p99_s": 0.04535085931976446,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.891418777691135,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-chip",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 6.587940800750004,
+   "chip_W": 0.3479436879055407,
+   "text_p99_s": 76.06188317260651,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.132559421290442,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.03455532662335995,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.03930732662336246,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.03635532662336339,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 1000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.08430732662337098,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.040355326623366376,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 3000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 2999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.1843073266233655,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.054355326623369546,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 10000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 9999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.5343073266233821,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.09435532662335575,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 30000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 29999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 1.5343073266234541,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.23435532662339137,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 0.04647489779610846,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1,
+   "lam": 100000.0,
+   "admitted_per_s": 1,
+   "per_conn": 1,
+   "rejected_per_s": 99999.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 5.034307326624159,
+   "chip_W": 0.1426276664536858,
+   "text_p99_s": 44.87380416085998,
+   "unfinished_text": 0,
+   "query_p99_ms": 6.570066952414717,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.04381311957562939,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 3,
+   "lam": 100.0,
+   "admitted_per_s": 3,
+   "per_conn": 1,
+   "rejected_per_s": 97.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.04846911957562637,
+   "chip_W": 0.14081287785710508,
+   "text_p99_s": 0.04616804441976986,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.515448041426717,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.17506982780192482,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 30,
+   "lam": 1000.0,
+   "admitted_per_s": 30,
+   "per_conn": 1,
+   "rejected_per_s": 970.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.2216298278019227,
+   "chip_W": 0.14341712305685586,
+   "text_p99_s": 0.04791441537747487,
+   "unfinished_text": 0,
+   "query_p99_ms": 4.170057246609817,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 0.5090064145208554,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 100,
+   "lam": 3000.0,
+   "admitted_per_s": 100,
+   "per_conn": 1,
+   "rejected_per_s": 2900.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 0.6482064145208802,
+   "chip_W": 0.14122122536390214,
+   "text_p99_s": 0.04388667018859849,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 1.463942571681392,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 300,
+   "lam": 10000.0,
+   "admitted_per_s": 300,
+   "per_conn": 1,
+   "rejected_per_s": 9700.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 1.9295425716813825,
+   "chip_W": 0.14304692845674102,
+   "text_p99_s": 0.053626227406023144,
+   "unfinished_text": 0,
+   "query_p99_ms": 3.7742949335777722,
+   "K": {
+    "K1": true,
+    "K2": true,
+    "K4": true,
+    "K5": true
+   },
+   "pass": true
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 4.7824334084193945,
+   "chip_W": 0.15085776415885016,
+   "text_p99_s": 22.0959942747814,
+   "unfinished_text": 0,
+   "query_p99_ms": 7.61885190874999,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 1000,
+   "lam": 30000.0,
+   "admitted_per_s": 1000,
+   "per_conn": 1,
+   "rejected_per_s": 29000.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 6.174433408424283,
+   "chip_W": 0.15085776415884997,
+   "text_p99_s": 56.89167163841992,
+   "unfinished_text": 0,
+   "query_p99_ms": 5.2104347099449635,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 2e-06,
+   "host_cores": 14.334864675498642,
+   "chip_W": 0.06105530666417786,
+   "text_p99_s": NaN,
+   "unfinished_text": 261,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  },
+  {
+   "world": "W-cpu",
+   "A": 3000,
+   "lam": 100000.0,
+   "admitted_per_s": 3000,
+   "per_conn": 1,
+   "rejected_per_s": 97000.0,
+   "c_rej_s": 5e-05,
+   "host_cores": 18.989956587334866,
+   "chip_W": 0.027559893429588776,
+   "text_p99_s": NaN,
+   "unfinished_text": 370,
+   "query_p99_ms": 3.739483271324673,
+   "K": {
+    "K1": false,
+    "K2": true,
+    "K4": false,
+    "K5": true
+   },
+   "pass": false
+  }
+ ],
+ "D1": "narrowed",
+ "only_chip_cells": [
+  "30000|0.9",
+  "30000|1.0"
+ ],
+ "neither_cells": [
+  "100000|0.9",
+  "100000|1.0"
+ ]
+}

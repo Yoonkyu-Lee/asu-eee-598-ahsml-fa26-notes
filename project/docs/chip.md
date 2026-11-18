@@ -14,6 +14,7 @@ A server-blind community has no operator, so each member's always-on **node box*
 | Edge AI accelerators (Hailo, Coral, Jetson NPU, RK3588) cannot do this math | 8/16-bit MAC arrays, no 254-bit modular arithmetic | sourced (`journal/cp/cp6_survey.md`) | 6 |
 | A real community sends a box far less than "a million posts a day" | top-1 % box at peak: 1/26 of the earlier assumption | estimate (community simulator) | 16 |
 | Each valid message is verified exactly once per box, also with the CP30 sync | counted over 21 M receptions | estimate (model, counted) | 29, 30 |
+| **The flood numbers above assume no limit on new connections.** With a connection policy (known neighbours first, a cap on unknown connections, cut on the first invalid proof), a Pi 5 without the verification unit survives unless an attacker hits almost all of a newcomer's candidate boxes with about 3×10⁴ connection attempts/s each; at 10⁵/s the handshakes alone overload the host with or without the chip. The unit's remaining job: an admitted unknown connection costs the host 0.57 ms instead of 4.9 ms, so the cap can be about 8× higher | band 1–10 × 10⁴ attempts/s, sensitive to the unmeasured cost of refusing a connection (2–50 µs) | estimate (model) | 35 |
 
 ## The chip (45 nm)
 
