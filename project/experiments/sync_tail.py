@@ -231,9 +231,19 @@ def run_cost(var, mode):
         "violations", [(r["scene"], r["n"], r["violations"]) for r in out if r["violations"]])
 
 
+def run_layer1(var, mode):
+    """Availability by sub size on CP33's layer 1 (all 110 cells; faults: liars, link drops, partitions, outages)."""
+    _, cells = rand_cells(False)
+    out = c30._pool([("rand", *c, var, mode) for c in cells], _cell, f"layer1 {var} {mode}", workers=WORKERS)
+    save(f"layer1_{var}_{mode}.json", {"variant": var, "mode": mode, "rows": out})
+    log(var, mode, "runs", len(out), "violations", sum(1 for r in out if set(r["violations"]) - {"S5"}))
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "diag"
-    if cmd == "protocol":
+    if cmd == "layer1":
+        run_layer1(sys.argv[2], sys.argv[3])
+    elif cmd == "protocol":
         run_protocol(sys.argv[2], failing_only=sys.argv[3] == "16")
     elif cmd == "cost":
         run_cost(sys.argv[2], sys.argv[3])

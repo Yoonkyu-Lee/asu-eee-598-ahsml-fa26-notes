@@ -1,0 +1,3253 @@
+{
+ "variant": "sr29",
+ "mode": "sub",
+ "exch_max": 70.51502666666667,
+ "dup_max": 0.0,
+ "rows": [
+  {
+   "needed_env": 2885,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 18.57731,
+   "recon_kb": 2.1931100000000003,
+   "probe_kb": 16.166,
+   "fetch_kb": 0.21819999999999998,
+   "push_ctl_kb": 0.29302,
+   "over_over_needed": 1.276029809358752,
+   "sent_kb_box_day": 32.83173,
+   "miss": 0,
+   "miss_pairs": 98,
+   "live_p99_s": 14639.239264908312,
+   "violations": {},
+   "world_trace": 722431791,
+   "world_trace_times": 3304895675,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 404,
+    "recon_f": 380,
+    "recon_e": 727,
+    "recon_a": 410,
+    "recon_d": 25
+   },
+   "ev": {
+    "come_on": 217,
+    "xfer_fail": 80346,
+    "pub_post": 78,
+    "pub_vote": 10,
+    "pub_comment": 18,
+    "miss": 0,
+    "miss_pairs": 98,
+    "stranded": 8,
+    "stranded_pairs": 110,
+    "pub_delete": 2
+   },
+   "verify_per_box_day": 14.425,
+   "verify_foreign_per_box_day": 8.35,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 3,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 29,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 71,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 100,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 1.2
+  },
+  {
+   "needed_env": 8865,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 43.32047,
+   "recon_kb": 28.98443,
+   "probe_kb": 13.17,
+   "fetch_kb": 1.16604,
+   "push_ctl_kb": 4.61526,
+   "over_over_needed": 1.0918021432600113,
+   "sent_kb_box_day": 92.71913,
+   "miss": 0,
+   "miss_pairs": 3212,
+   "live_p99_s": 8522.176183256925,
+   "violations": {},
+   "world_trace": 2259366277,
+   "world_trace_times": 3952824960,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 1181,
+    "recon_a": 3079,
+    "recon_f": 36227,
+    "recon_e": 9429,
+    "recon_d": 42
+   },
+   "ev": {
+    "come_on": 265,
+    "xfer_fail": 58836,
+    "pub_post": 97,
+    "silent_loss": 1,
+    "pub_comment": 33,
+    "pub_vote": 13,
+    "pub_delete": 3,
+    "miss": 0,
+    "miss_pairs": 3212,
+    "stranded": 0,
+    "stranded_pairs": 3220
+   },
+   "verify_per_box_day": 44.325,
+   "verify_foreign_per_box_day": 29.39,
+   "live_path_p99_s": 0.5999999998603016,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 98,
+     "no_path": 0,
+     "p99_s": 274.5037478053273,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 628,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 1359,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 100,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 5.4
+  },
+  {
+   "needed_env": 1599,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 39.26161666666667,
+   "recon_kb": 35.67981666666667,
+   "probe_kb": 2.7733333333333334,
+   "fetch_kb": 0.8084666666666667,
+   "push_ctl_kb": 4.902733333333334,
+   "over_over_needed": 1.6596003752345216,
+   "sent_kb_box_day": 70.87835000000001,
+   "miss": 0,
+   "miss_pairs": 977,
+   "live_p99_s": 845.6065827387283,
+   "violations": {},
+   "world_trace": 951155442,
+   "world_trace_times": 4078370615,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 293,
+    "recon_f": 21222,
+    "recon_a": 774,
+    "recon_e": 1804,
+    "recon_d": 1
+   },
+   "ev": {
+    "come_on": 97,
+    "xfer_fail": 1937,
+    "pub_post": 37,
+    "pub_vote": 5,
+    "pub_delete": 1,
+    "pub_comment": 16,
+    "silent_loss": 2,
+    "miss": 0,
+    "miss_pairs": 977,
+    "stranded": 0,
+    "stranded_pairs": 977
+   },
+   "verify_per_box_day": 26.65,
+   "verify_foreign_per_box_day": 15.666666666666666,
+   "live_path_p99_s": 0.45000000002619345,
+   "avail": {
+    "1-4": {
+     "n": 16,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 121,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 454,
+     "no_path": 0,
+     "p99_s": 0.4500000000016371,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 30,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 1.6
+  },
+  {
+   "needed_env": 238,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 6.739949999999999,
+   "recon_kb": 0.40501666666666664,
+   "probe_kb": 6.272,
+   "fetch_kb": 0.06293333333333333,
+   "push_ctl_kb": 0.05633333333333333,
+   "over_over_needed": 1.583936974789916,
+   "sent_kb_box_day": 10.249616666666666,
+   "miss": 0,
+   "miss_pairs": 28,
+   "live_p99_s": 994.4114278560737,
+   "violations": {},
+   "world_trace": 1597211030,
+   "world_trace_times": 3849366996,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 46,
+    "recon_f": 77,
+    "recon_e": 20,
+    "recon_a": 47,
+    "recon_d": 1
+   },
+   "ev": {
+    "come_on": 59,
+    "xfer_fail": 9356,
+    "pub_post": 16,
+    "pub_delete": 3,
+    "pub_vote": 6,
+    "pub_comment": 8,
+    "miss": 0,
+    "miss_pairs": 28,
+    "stranded": 3,
+    "stranded_pairs": 31
+   },
+   "verify_per_box_day": 3.966666666666667,
+   "verify_foreign_per_box_day": 2.2833333333333337,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 18,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 2,
+     "no_path": 0,
+     "p99_s": 0.1499999999650754,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 30,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.1
+  },
+  {
+   "needed_env": 985,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 26.165433333333333,
+   "recon_kb": 17.440566666666665,
+   "probe_kb": 8.257333333333333,
+   "fetch_kb": 0.46753333333333336,
+   "push_ctl_kb": 1.4612,
+   "over_over_needed": 1.6604649746192894,
+   "sent_kb_box_day": 43.67596666666667,
+   "miss": 0,
+   "miss_pairs": 243,
+   "live_p99_s": 40926.3820314411,
+   "violations": {},
+   "world_trace": 2147107774,
+   "world_trace_times": 26493830,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 266,
+    "recon_f": 8374,
+    "recon_e": 1989,
+    "recon_a": 405,
+    "recon_d": 7
+   },
+   "ev": {
+    "come_on": 74,
+    "xfer_fail": 11750,
+    "pub_post": 37,
+    "pub_comment": 6,
+    "pub_vote": 5,
+    "miss": 0,
+    "miss_pairs": 243,
+    "stranded": 0,
+    "stranded_pairs": 243,
+    "silent_loss": 1
+   },
+   "verify_per_box_day": 16.416666666666668,
+   "verify_foreign_per_box_day": 11.716666666666669,
+   "live_path_p99_s": 0.3000000000174623,
+   "avail": {
+    "1-4": {
+     "n": 12,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 70,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 74,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 30,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 1.1
+  },
+  {
+   "needed_env": 139,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 17.614150000000002,
+   "recon_kb": 16.598950000000002,
+   "probe_kb": 0.832,
+   "fetch_kb": 0.1832,
+   "push_ctl_kb": 0.8423999999999999,
+   "over_over_needed": 2.5528848920863307,
+   "sent_kb_box_day": 24.69255,
+   "miss": 0,
+   "miss_pairs": 111,
+   "live_p99_s": 687.3076212561573,
+   "violations": {},
+   "world_trace": 2295969257,
+   "world_trace_times": 2807064437,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_f": 4083,
+    "recon_e": 159,
+    "recon_b": 35,
+    "recon_a": 96
+   },
+   "ev": {
+    "come_on": 29,
+    "xfer_fail": 257,
+    "pub_post": 13,
+    "pub_comment": 3,
+    "pub_vote": 2,
+    "pub_delete": 1,
+    "miss": 0,
+    "miss_pairs": 111,
+    "stranded": 0,
+    "stranded_pairs": 111
+   },
+   "verify_per_box_day": 6.95,
+   "verify_foreign_per_box_day": 3.6,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 18,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 30,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 10,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.3
+  },
+  {
+   "needed_env": 31,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 3.05985,
+   "recon_kb": 0.31085,
+   "probe_kb": 2.722,
+   "fetch_kb": 0.027,
+   "push_ctl_kb": 0.0416,
+   "over_over_needed": 1.699,
+   "sent_kb_box_day": 4.18345,
+   "miss": 0,
+   "miss_pairs": 11,
+   "live_p99_s": 925.6763054647163,
+   "violations": {},
+   "world_trace": 509034597,
+   "world_trace_times": 2632026720,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 14,
+    "recon_f": 41,
+    "recon_e": 5,
+    "recon_a": 14
+   },
+   "ev": {
+    "come_on": 18,
+    "xfer_fail": 1346,
+    "pub_post": 7,
+    "miss": 0,
+    "miss_pairs": 11,
+    "stranded": 0,
+    "stranded_pairs": 11,
+    "pub_delete": 1,
+    "pub_comment": 1,
+    "pub_vote": 1
+   },
+   "verify_per_box_day": 1.55,
+   "verify_foreign_per_box_day": 0.65,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 7,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 10,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.0
+  },
+  {
+   "needed_env": 112,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 10.730799999999999,
+   "recon_kb": 7.142399999999999,
+   "probe_kb": 3.424,
+   "fetch_kb": 0.16440000000000002,
+   "push_ctl_kb": 0.2652,
+   "over_over_needed": 1.8557142857142856,
+   "sent_kb_box_day": 15.992,
+   "miss": 0,
+   "miss_pairs": 42,
+   "live_p99_s": 993.1380747982475,
+   "violations": {},
+   "world_trace": 3028698113,
+   "world_trace_times": 3320595159,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_f": 1525,
+    "recon_b": 48,
+    "recon_e": 155,
+    "recon_a": 81
+   },
+   "ev": {
+    "come_on": 31,
+    "xfer_fail": 1598,
+    "pub_post": 10,
+    "pub_comment": 4,
+    "miss": 0,
+    "miss_pairs": 42,
+    "stranded": 0,
+    "stranded_pairs": 42,
+    "pub_delete": 1
+   },
+   "verify_per_box_day": 5.6,
+   "verify_foreign_per_box_day": 3.6999999999999997,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 16,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 10,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.1
+  },
+  {
+   "needed_env": 21486,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 37.57987,
+   "recon_kb": 6.0430633333333335,
+   "probe_kb": 31.027466666666665,
+   "fetch_kb": 0.50934,
+   "push_ctl_kb": 1.4924000000000002,
+   "over_over_needed": 1.0786317602159545,
+   "sent_kb_box_day": 74.43580333333333,
+   "miss": 0,
+   "miss_pairs": 574,
+   "live_p99_s": 1557.612426500702,
+   "violations": {},
+   "world_trace": 3087102567,
+   "world_trace_times": 3245330612,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 2807,
+    "recon_f": 1283,
+    "recon_e": 8737,
+    "recon_a": 2859,
+    "recon_d": 253
+   },
+   "ev": {
+    "come_on": 624,
+    "xfer_fail": 461962,
+    "pub_post": 232,
+    "pub_comment": 75,
+    "pub_delete": 13,
+    "pub_vote": 38,
+    "miss": 0,
+    "miss_pairs": 574,
+    "stranded": 33,
+    "stranded_pairs": 614,
+    "silent_loss": 1
+   },
+   "verify_per_box_day": 35.81,
+   "verify_foreign_per_box_day": 12.698333333333334,
+   "live_path_p99_s": 0.3000000000174623,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 18,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 239,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 512,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 300,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 13.0
+  },
+  {
+   "needed_env": 17442,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 64.25664,
+   "recon_kb": 57.70344,
+   "probe_kb": 3.8935999999999997,
+   "fetch_kb": 2.6595999999999997,
+   "push_ctl_kb": 11.15452,
+   "over_over_needed": 0.8910510262584566,
+   "sent_kb_box_day": 164.91855999999999,
+   "miss": 0,
+   "miss_pairs": 9864,
+   "live_p99_s": 686.0613497481972,
+   "violations": {},
+   "world_trace": 3491033453,
+   "world_trace_times": 1113736051,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 1123,
+    "recon_a": 4492,
+    "recon_f": 78002,
+    "recon_e": 6320
+   },
+   "ev": {
+    "come_on": 313,
+    "xfer_fail": 6020,
+    "pub_post": 124,
+    "silent_loss": 12,
+    "pub_comment": 63,
+    "pub_vote": 24,
+    "pub_delete": 4,
+    "miss": 0,
+    "miss_pairs": 9864,
+    "stranded": 0,
+    "stranded_pairs": 9864
+   },
+   "verify_per_box_day": 87.21,
+   "verify_foreign_per_box_day": 53.445,
+   "live_path_p99_s": 0.8999999999869033,
+   "avail": {
+    "1-4": {
+     "n": 2,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 280,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 1304,
+     "no_path": 0,
+     "p99_s": 83.73656347994984,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 4901,
+     "no_path": 0,
+     "p99_s": 0.6000000000349246,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 100,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 13.4
+  },
+  {
+   "needed_env": 3860,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 21.124225,
+   "recon_kb": 2.556625,
+   "probe_kb": 18.282799999999998,
+   "fetch_kb": 0.2848,
+   "push_ctl_kb": 0.38844,
+   "over_over_needed": 1.0871121761658031,
+   "sent_kb_box_day": 40.281265,
+   "miss": 0,
+   "miss_pairs": 116,
+   "live_p99_s": 7843.221328949847,
+   "violations": {},
+   "world_trace": 4075585430,
+   "world_trace_times": 1499313535,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 509,
+    "recon_f": 465,
+    "recon_e": 1044,
+    "recon_a": 505,
+    "recon_d": 40
+   },
+   "ev": {
+    "come_on": 219,
+    "xfer_fail": 90814,
+    "pub_post": 80,
+    "pub_comment": 31,
+    "pub_delete": 4,
+    "pub_vote": 10,
+    "miss": 0,
+    "miss_pairs": 116,
+    "stranded": 1,
+    "stranded_pairs": 118
+   },
+   "verify_per_box_day": 19.3,
+   "verify_foreign_per_box_day": 10.675,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 1,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 36,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 116,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 100,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 2.1
+  },
+  {
+   "needed_env": 2450,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 14.1676,
+   "recon_kb": 1.52454,
+   "probe_kb": 12.4502,
+   "fetch_kb": 0.19286,
+   "push_ctl_kb": 0.17836000000000002,
+   "over_over_needed": 1.1349355102040817,
+   "sent_kb_box_day": 26.15296,
+   "miss": 0,
+   "miss_pairs": 36,
+   "live_p99_s": 42898.56095324431,
+   "violations": {},
+   "world_trace": 57277961,
+   "world_trace_times": 7615445,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 265,
+    "recon_f": 257,
+    "recon_e": 321,
+    "recon_a": 266,
+    "recon_d": 31
+   },
+   "ev": {
+    "come_on": 189,
+    "xfer_fail": 61916,
+    "pub_post": 71,
+    "pub_comment": 23,
+    "pub_delete": 2,
+    "miss": 0,
+    "miss_pairs": 36,
+    "stranded": 0,
+    "stranded_pairs": 36,
+    "pub_vote": 7
+   },
+   "verify_per_box_day": 12.25,
+   "verify_foreign_per_box_day": 8.66,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 2,
+     "no_path": 0,
+     "p99_s": 0.1499999999650754,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 38,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 28,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 100,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 1.1
+  },
+  {
+   "needed_env": 11816,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 46.304404999999996,
+   "recon_kb": 32.002345,
+   "probe_kb": 13.0648,
+   "fetch_kb": 1.23726,
+   "push_ctl_kb": 9.033700000000001,
+   "over_over_needed": 0.9473240521327014,
+   "sent_kb_box_day": 115.047905,
+   "miss": 0,
+   "miss_pairs": 5694,
+   "live_p99_s": 586.6341310991556,
+   "violations": {},
+   "world_trace": 3275046953,
+   "world_trace_times": 138531256,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 1142,
+    "recon_a": 3124,
+    "recon_f": 37945,
+    "recon_e": 10621,
+    "recon_d": 46
+   },
+   "ev": {
+    "come_on": 269,
+    "xfer_fail": 58649,
+    "pub_post": 125,
+    "pub_comment": 47,
+    "pub_vote": 11,
+    "silent_loss": 2,
+    "pub_delete": 3,
+    "miss": 0,
+    "miss_pairs": 5694,
+    "stranded": 0,
+    "stranded_pairs": 5747
+   },
+   "verify_per_box_day": 59.08,
+   "verify_foreign_per_box_day": 29.49,
+   "live_path_p99_s": 0.45000000002619345,
+   "avail": {
+    "1-4": {
+     "n": 2,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 140,
+     "no_path": 0,
+     "p99_s": 141.74140072899172,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 551,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 3202,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 100,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 6.4
+  },
+  {
+   "needed_env": 17067,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 61.338955,
+   "recon_kb": 55.075555,
+   "probe_kb": 4.0485999999999995,
+   "fetch_kb": 2.2148000000000003,
+   "push_ctl_kb": 14.500200000000001,
+   "over_over_needed": 0.9150378508232261,
+   "sent_kb_box_day": 163.419755,
+   "miss": 0,
+   "miss_pairs": 11361,
+   "live_p99_s": 641.231194529013,
+   "violations": {},
+   "world_trace": 983721860,
+   "world_trace_times": 411753913,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 1118,
+    "recon_f": 79563,
+    "recon_a": 5003,
+    "recon_e": 6187,
+    "recon_d": 59
+   },
+   "ev": {
+    "come_on": 323,
+    "xfer_fail": 5983,
+    "pub_post": 131,
+    "pub_comment": 53,
+    "pub_vote": 22,
+    "silent_loss": 7,
+    "pub_delete": 5,
+    "miss": 0,
+    "miss_pairs": 11361,
+    "stranded": 0,
+    "stranded_pairs": 11361
+   },
+   "verify_per_box_day": 85.335,
+   "verify_foreign_per_box_day": 44.339999999999996,
+   "live_path_p99_s": 0.6000000000349246,
+   "avail": {
+    "1-4": {
+     "n": 9,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 138,
+     "no_path": 0,
+     "p99_s": 0.6000000000349246,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 1268,
+     "no_path": 0,
+     "p99_s": 17.986457971623167,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 6517,
+     "no_path": 0,
+     "p99_s": 0.6000000000349246,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 100,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 13.8
+  },
+  {
+   "needed_env": 2130,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 43.86126666666667,
+   "recon_kb": 40.3836,
+   "probe_kb": 2.3713333333333333,
+   "fetch_kb": 1.1063333333333332,
+   "push_ctl_kb": 6.023333333333333,
+   "over_over_needed": 1.4103267605633802,
+   "sent_kb_box_day": 85.56660000000001,
+   "miss": 0,
+   "miss_pairs": 1074,
+   "live_p99_s": 701.3328384498163,
+   "violations": {},
+   "world_trace": 2316765156,
+   "world_trace_times": 3607585075,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 240,
+    "recon_f": 23472,
+    "recon_a": 759,
+    "recon_e": 1574
+   },
+   "ev": {
+    "come_on": 87,
+    "xfer_fail": 1408,
+    "pub_post": 51,
+    "pub_comment": 14,
+    "pub_delete": 3,
+    "pub_vote": 3,
+    "miss": 0,
+    "miss_pairs": 1074,
+    "stranded": 0,
+    "stranded_pairs": 1074,
+    "silent_loss": 2
+   },
+   "verify_per_box_day": 35.5,
+   "verify_foreign_per_box_day": 21.933333333333334,
+   "live_path_p99_s": 0.45000000002619345,
+   "avail": {
+    "1-4": {
+     "n": 42,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 98,
+     "no_path": 0,
+     "p99_s": 86.99305550870486,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 594,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 30,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 2.3
+  },
+  {
+   "needed_env": 17186,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 63.15835,
+   "recon_kb": 57.000730000000004,
+   "probe_kb": 3.4914,
+   "fetch_kb": 2.6662199999999996,
+   "push_ctl_kb": 10.992540000000002,
+   "over_over_needed": 0.8893295705807053,
+   "sent_kb_box_day": 162.35009,
+   "miss": 0,
+   "miss_pairs": 8863,
+   "live_p99_s": 676.2566950194305,
+   "violations": {},
+   "world_trace": 4177359617,
+   "world_trace_times": 3840140460,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 901,
+    "recon_f": 79595,
+    "recon_a": 4238,
+    "recon_e": 4739
+   },
+   "ev": {
+    "come_on": 273,
+    "xfer_fail": 4529,
+    "pub_post": 132,
+    "pub_comment": 70,
+    "pub_vote": 9,
+    "silent_loss": 6,
+    "miss": 0,
+    "miss_pairs": 8863,
+    "stranded": 0,
+    "stranded_pairs": 8863
+   },
+   "verify_per_box_day": 85.93,
+   "verify_foreign_per_box_day": 53.09,
+   "live_path_p99_s": 30.0,
+   "avail": {
+    "1-4": {
+     "n": 25,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 97,
+     "no_path": 0,
+     "p99_s": 19.84602830574522,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 2130,
+     "no_path": 0,
+     "p99_s": 71.75370681477943,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 4078,
+     "no_path": 0,
+     "p99_s": 0.6000000000349246,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 100,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 14.7
+  },
+  {
+   "needed_env": 239,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 9.074283333333334,
+   "recon_kb": 0.52195,
+   "probe_kb": 8.484666666666666,
+   "fetch_kb": 0.06766666666666667,
+   "push_ctl_kb": 0.046799999999999994,
+   "over_over_needed": 2.1776778242677826,
+   "sent_kb_box_day": 12.65775,
+   "miss": 0,
+   "miss_pairs": 19,
+   "live_p99_s": 2745.4290932987933,
+   "violations": {},
+   "world_trace": 2102084819,
+   "world_trace_times": 3621066858,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_f": 133,
+    "recon_b": 68,
+    "recon_e": 41,
+    "recon_a": 69
+   },
+   "ev": {
+    "come_on": 65,
+    "xfer_fail": 12647,
+    "pub_post": 20,
+    "pub_comment": 6,
+    "pub_delete": 1,
+    "pub_vote": 2,
+    "miss": 0,
+    "miss_pairs": 19,
+    "stranded": 0,
+    "stranded_pairs": 20
+   },
+   "verify_per_box_day": 3.9833333333333334,
+   "verify_foreign_per_box_day": 2.316666666666667,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 15,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 30,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.2
+  },
+  {
+   "needed_env": 48723,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 49.65285166666667,
+   "recon_kb": 32.000251666666664,
+   "probe_kb": 16.26493333333333,
+   "fetch_kb": 1.3876666666666668,
+   "push_ctl_kb": 11.839879999999999,
+   "over_over_needed": 0.7761763232970055,
+   "sent_kb_box_day": 144.23439833333333,
+   "miss": 9,
+   "miss_pairs": 29645,
+   "live_p99_s": 635.1778133889966,
+   "violations": {},
+   "world_trace": 1174096642,
+   "world_trace_times": 3487576458,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 2962,
+    "recon_a": 11725,
+    "recon_f": 112313,
+    "recon_e": 28018,
+    "recon_d": 101
+   },
+   "ev": {
+    "come_on": 758,
+    "xfer_fail": 217683,
+    "pub_post": 269,
+    "pub_comment": 106,
+    "pub_vote": 44,
+    "silent_loss": 19,
+    "pub_delete": 7,
+    "miss": 9,
+    "miss_pairs": 29645,
+    "stranded": 9,
+    "stranded_pairs": 29944
+   },
+   "verify_per_box_day": 81.205,
+   "verify_foreign_per_box_day": 29.718333333333334,
+   "live_path_p99_s": 0.7500000000436557,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 881,
+     "no_path": 0,
+     "p99_s": 138.07742669206345,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 4019,
+     "no_path": 0,
+     "p99_s": 691.1737406890934,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 15885,
+     "no_path": 0,
+     "p99_s": 0.749999999825377,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 300,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 28.0
+  },
+  {
+   "needed_env": 215,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 5.793733333333334,
+   "recon_kb": 0.34286666666666665,
+   "probe_kb": 5.402666666666667,
+   "fetch_kb": 0.0482,
+   "push_ctl_kb": 0.06326666666666667,
+   "over_over_needed": 1.4797209302325582,
+   "sent_kb_box_day": 8.885666666666665,
+   "miss": 0,
+   "miss_pairs": 24,
+   "live_p99_s": 28635.29939637777,
+   "violations": {},
+   "world_trace": 799522858,
+   "world_trace_times": 949591950,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 38,
+    "recon_f": 71,
+    "recon_e": 11,
+    "recon_a": 37
+   },
+   "ev": {
+    "come_on": 66,
+    "xfer_fail": 8061,
+    "pub_post": 25,
+    "pub_comment": 7,
+    "miss": 0,
+    "miss_pairs": 24,
+    "stranded": 0,
+    "stranded_pairs": 24,
+    "pub_delete": 3
+   },
+   "verify_per_box_day": 3.5833333333333335,
+   "verify_foreign_per_box_day": 1.5666666666666669,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 20,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 2,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 30,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.1
+  },
+  {
+   "needed_env": 2040,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 42.31048333333333,
+   "recon_kb": 38.98981666666666,
+   "probe_kb": 1.9973333333333332,
+   "fetch_kb": 1.3233333333333333,
+   "push_ctl_kb": 3.108733333333333,
+   "over_over_needed": 1.339839705882353,
+   "sent_kb_box_day": 79.55455,
+   "miss": 0,
+   "miss_pairs": 565,
+   "live_p99_s": 963.1131416009157,
+   "violations": {},
+   "world_trace": 972611899,
+   "world_trace_times": 2588671111,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 218,
+    "recon_f": 21581,
+    "recon_e": 1310,
+    "recon_a": 575
+   },
+   "ev": {
+    "come_on": 82,
+    "xfer_fail": 1332,
+    "pub_post": 44,
+    "pub_comment": 15,
+    "pub_vote": 5,
+    "pub_delete": 4,
+    "miss": 0,
+    "miss_pairs": 565,
+    "stranded": 0,
+    "stranded_pairs": 565
+   },
+   "verify_per_box_day": 34.0,
+   "verify_foreign_per_box_day": 26.283333333333335,
+   "live_path_p99_s": 76.2,
+   "avail": {
+    "1-4": {
+     "n": 34,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 194,
+     "no_path": 0,
+     "p99_s": 99.87895614827721,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 164,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 30,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 2.1
+  },
+  {
+   "needed_env": 220,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 25.505200000000002,
+   "recon_kb": 23.785,
+   "probe_kb": 1.364,
+   "fetch_kb": 0.35619999999999996,
+   "push_ctl_kb": 1.2766,
+   "over_over_needed": 2.370709090909091,
+   "sent_kb_box_day": 37.0778,
+   "miss": 0,
+   "miss_pairs": 108,
+   "live_p99_s": 1196.6530341467433,
+   "violations": {},
+   "world_trace": 3973403991,
+   "world_trace_times": 1694752407,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_a": 183,
+    "recon_b": 55,
+    "recon_f": 5698,
+    "recon_e": 303
+   },
+   "ev": {
+    "come_on": 35,
+    "xfer_fail": 356,
+    "pub_post": 17,
+    "pub_comment": 4,
+    "pub_vote": 1,
+    "miss": 0,
+    "miss_pairs": 108,
+    "stranded": 0,
+    "stranded_pairs": 108
+   },
+   "verify_per_box_day": 11.0,
+   "verify_foreign_per_box_day": 6.85,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 13,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 48,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 10,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.3
+  },
+  {
+   "needed_env": 255,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 16.05585,
+   "recon_kb": 15.079450000000001,
+   "probe_kb": 0.54,
+   "fetch_kb": 0.43639999999999995,
+   "push_ctl_kb": 0.6864,
+   "over_over_needed": 1.2254313725490196,
+   "sent_kb_box_day": 28.37425,
+   "miss": 0,
+   "miss_pairs": 119,
+   "live_p99_s": 1149.8405741824827,
+   "violations": {},
+   "world_trace": 267978852,
+   "world_trace_times": 3699685569,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_f": 3516,
+    "recon_e": 63,
+    "recon_b": 19,
+    "recon_a": 67
+   },
+   "ev": {
+    "come_on": 25,
+    "xfer_fail": 155,
+    "pub_post": 20,
+    "pub_vote": 5,
+    "pub_comment": 6,
+    "miss": 0,
+    "miss_pairs": 119,
+    "stranded": 0,
+    "stranded_pairs": 119
+   },
+   "verify_per_box_day": 12.75,
+   "verify_foreign_per_box_day": 8.7,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 50,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 10,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.2
+  },
+  {
+   "needed_env": 33,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 3.7625,
+   "recon_kb": 0.2739,
+   "probe_kb": 3.454,
+   "fetch_kb": 0.0346,
+   "push_ctl_kb": 0.0208,
+   "over_over_needed": 2.0686666666666667,
+   "sent_kb_box_day": 5.0633,
+   "miss": 0,
+   "miss_pairs": 5,
+   "live_p99_s": 776.2969381669536,
+   "violations": {},
+   "world_trace": 2729685322,
+   "world_trace_times": 669300899,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 15,
+    "recon_f": 29,
+    "recon_e": 2,
+    "recon_a": 15
+   },
+   "ev": {
+    "come_on": 20,
+    "xfer_fail": 1712,
+    "pub_post": 7,
+    "miss": 0,
+    "miss_pairs": 5,
+    "stranded": 0,
+    "stranded_pairs": 5,
+    "pub_delete": 1
+   },
+   "verify_per_box_day": 1.65,
+   "verify_foreign_per_box_day": 0.7999999999999999,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 3,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 1,
+     "no_path": 0,
+     "p99_s": 0.1499999999650754,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 10,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.0
+  },
+  {
+   "needed_env": 18,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 1.62585,
+   "recon_kb": 0.14485,
+   "probe_kb": 1.47,
+   "fetch_kb": 0.011,
+   "push_ctl_kb": 0.0156,
+   "over_over_needed": 1.2838333333333334,
+   "sent_kb_box_day": 2.05545,
+   "miss": 0,
+   "miss_pairs": 5,
+   "live_p99_s": 0.1499999999650754,
+   "violations": {},
+   "world_trace": 3211064857,
+   "world_trace_times": 2950327824,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 9,
+    "recon_f": 18,
+    "recon_e": 1,
+    "recon_a": 10
+   },
+   "ev": {
+    "come_on": 18,
+    "xfer_fail": 724,
+    "pub_post": 7,
+    "miss": 0,
+    "miss_pairs": 5,
+    "stranded": 0,
+    "stranded_pairs": 5,
+    "pub_delete": 3
+   },
+   "verify_per_box_day": 0.9,
+   "verify_foreign_per_box_day": 0.15000000000000002,
+   "live_path_p99_s": 0.1499999999650754,
+   "avail": {
+    "1-4": {
+     "n": 3,
+     "no_path": 0,
+     "p99_s": 0.1499999999650754,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 10,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.0
+  },
+  {
+   "needed_env": 890,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 22.40335,
+   "recon_kb": 16.482216666666666,
+   "probe_kb": 5.526666666666667,
+   "fetch_kb": 0.39446666666666663,
+   "push_ctl_kb": 1.3277333333333334,
+   "over_over_needed": 1.5753539325842696,
+   "sent_kb_box_day": 38.20108333333334,
+   "miss": 0,
+   "miss_pairs": 229,
+   "live_p99_s": 17242.7658284684,
+   "violations": {},
+   "world_trace": 1976337613,
+   "world_trace_times": 3558446676,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 212,
+    "recon_a": 298,
+    "recon_f": 9222,
+    "recon_e": 1565,
+    "recon_d": 8
+   },
+   "ev": {
+    "come_on": 62,
+    "xfer_fail": 7871,
+    "pub_post": 27,
+    "pub_comment": 12,
+    "pub_vote": 4,
+    "miss": 0,
+    "miss_pairs": 229,
+    "stranded": 0,
+    "stranded_pairs": 229
+   },
+   "verify_per_box_day": 14.833333333333334,
+   "verify_foreign_per_box_day": 11.1,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 16,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 127,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 5,
+     "no_path": 0,
+     "p99_s": 0.1499999999650754,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 30,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.8
+  },
+  {
+   "needed_env": 145,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 12.127,
+   "recon_kb": 7.7896,
+   "probe_kb": 4.154,
+   "fetch_kb": 0.1834,
+   "push_ctl_kb": 0.45239999999999997,
+   "over_over_needed": 1.6070896551724139,
+   "sent_kb_box_day": 18.901400000000002,
+   "miss": 0,
+   "miss_pairs": 51,
+   "live_p99_s": 950.5465466433379,
+   "violations": {},
+   "world_trace": 2775490001,
+   "world_trace_times": 3668209881,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 49,
+    "recon_f": 1650,
+    "recon_e": 163,
+    "recon_a": 66,
+    "recon_d": 1
+   },
+   "ev": {
+    "come_on": 22,
+    "xfer_fail": 1989,
+    "pub_post": 16,
+    "pub_comment": 4,
+    "pub_vote": 2,
+    "miss": 0,
+    "miss_pairs": 51,
+    "stranded": 0,
+    "stranded_pairs": 51
+   },
+   "verify_per_box_day": 7.25,
+   "verify_foreign_per_box_day": 4.3,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 4,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 20,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 10,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.1
+  },
+  {
+   "needed_env": 31,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 5.73665,
+   "recon_kb": 3.31205,
+   "probe_kb": 2.378,
+   "fetch_kb": 0.0466,
+   "push_ctl_kb": 0.0442,
+   "over_over_needed": 3.5308709677419357,
+   "sent_kb_box_day": 7.02285,
+   "miss": 0,
+   "miss_pairs": 15,
+   "live_p99_s": 1419.9143935310713,
+   "violations": {},
+   "world_trace": 528481793,
+   "world_trace_times": 2366751710,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_f": 780,
+    "recon_b": 26,
+    "recon_e": 45,
+    "recon_a": 35
+   },
+   "ev": {
+    "come_on": 22,
+    "xfer_fail": 1145,
+    "pub_post": 6,
+    "pub_delete": 1,
+    "miss": 0,
+    "miss_pairs": 15,
+    "stranded": 0,
+    "stranded_pairs": 16
+   },
+   "verify_per_box_day": 1.55,
+   "verify_foreign_per_box_day": 0.95,
+   "live_path_p99_s": 0.15000000000873115,
+   "avail": {
+    "1-4": {
+     "n": 4,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 10,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 0.1
+  },
+  {
+   "needed_env": 1095,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 31.689833333333333,
+   "recon_kb": 21.533966666666668,
+   "probe_kb": 9.717333333333334,
+   "fetch_kb": 0.4385333333333334,
+   "push_ctl_kb": 3.0732,
+   "over_over_needed": 1.8873625570776256,
+   "sent_kb_box_day": 52.69436666666667,
+   "miss": 0,
+   "miss_pairs": 446,
+   "live_p99_s": 573.6880504613819,
+   "violations": {},
+   "world_trace": 1060935210,
+   "world_trace_times": 161413367,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 319,
+    "recon_f": 10937,
+    "recon_e": 2583,
+    "recon_a": 583,
+    "recon_d": 10
+   },
+   "ev": {
+    "come_on": 82,
+    "xfer_fail": 13550,
+    "pub_post": 31,
+    "pub_vote": 5,
+    "pub_comment": 10,
+    "pub_delete": 2,
+    "miss": 0,
+    "miss_pairs": 446,
+    "stranded": 0,
+    "stranded_pairs": 452
+   },
+   "verify_per_box_day": 18.25,
+   "verify_foreign_per_box_day": 10.516666666666667,
+   "live_path_p99_s": 0.3000000000174623,
+   "avail": {
+    "1-4": {
+     "n": 24,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 26,
+     "no_path": 0,
+     "p99_s": 0.2999999999301508,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 244,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 30,
+   "seed": 2,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 1.0
+  },
+  {
+   "needed_env": 10529,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 48.939345,
+   "recon_kb": 32.345785,
+   "probe_kb": 15.1894,
+   "fetch_kb": 1.40416,
+   "push_ctl_kb": 4.8484799999999995,
+   "over_over_needed": 1.0317337828853643,
+   "sent_kb_box_day": 106.960625,
+   "miss": 0,
+   "miss_pairs": 3197,
+   "live_p99_s": 949.2149732555263,
+   "violations": {},
+   "world_trace": 52508448,
+   "world_trace_times": 2741006426,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_b": 1374,
+    "recon_a": 3067,
+    "recon_f": 36233,
+    "recon_e": 10601,
+    "recon_d": 58
+   },
+   "ev": {
+    "come_on": 267,
+    "xfer_fail": 69145,
+    "pub_post": 105,
+    "pub_comment": 36,
+    "silent_loss": 2,
+    "pub_vote": 20,
+    "pub_delete": 3,
+    "miss": 0,
+    "miss_pairs": 3197,
+    "stranded": 0,
+    "stranded_pairs": 3202
+   },
+   "verify_per_box_day": 52.645,
+   "verify_foreign_per_box_day": 34.795,
+   "live_path_p99_s": 0.6000000000349246,
+   "avail": {
+    "1-4": {
+     "n": 5,
+     "no_path": 0,
+     "p99_s": 0.15000000000873115,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 34,
+     "no_path": 0,
+     "p99_s": 0.3000000000174623,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 804,
+     "no_path": 0,
+     "p99_s": 12.052715990799697,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 1314,
+     "no_path": 0,
+     "p99_s": 0.5999999998603016,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 100,
+   "seed": 3,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 7.0
+  },
+  {
+   "needed_env": 88049,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 70.51502666666667,
+   "recon_kb": 63.01451333333333,
+   "probe_kb": 4.790866666666667,
+   "fetch_kb": 2.7096466666666665,
+   "push_ctl_kb": 26.179573333333334,
+   "over_over_needed": 0.6920142193551319,
+   "sent_kb_box_day": 248.30026666666666,
+   "miss": 2,
+   "miss_pairs": 79191,
+   "live_p99_s": 680.4641085415255,
+   "violations": {},
+   "world_trace": 2573601268,
+   "world_trace_times": 2613812377,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_a": 19720,
+    "recon_b": 3931,
+    "recon_f": 232883,
+    "recon_e": 20940,
+    "recon_d": 1
+   },
+   "ev": {
+    "come_on": 923,
+    "xfer_fail": 20333,
+    "pub_post": 387,
+    "pub_comment": 137,
+    "silent_loss": 52,
+    "pub_vote": 41,
+    "pub_delete": 8,
+    "miss": 2,
+    "miss_pairs": 79191,
+    "stranded": 2,
+    "stranded_pairs": 79191
+   },
+   "verify_per_box_day": 146.74833333333333,
+   "verify_foreign_per_box_day": 53.056666666666665,
+   "live_path_p99_s": 1.2000000000698492,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 2528,
+     "no_path": 0,
+     "p99_s": 286.95772530700197,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 12458,
+     "no_path": 0,
+     "p99_s": 827.7585993802641,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 40201,
+     "no_path": 0,
+     "p99_s": 0.7500000000436557,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 300,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 56.6
+  },
+  {
+   "needed_env": 157435,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 51.5755985,
+   "recon_kb": 10.905646500000001,
+   "probe_kb": 39.68338,
+   "fetch_kb": 0.986572,
+   "push_ctl_kb": 6.0964279999999995,
+   "over_over_needed": 0.7288837488487312,
+   "sent_kb_box_day": 136.09340650000001,
+   "miss": 0,
+   "miss_pairs": 2786,
+   "live_p99_s": 0.45000000002619345,
+   "violations": {},
+   "world_trace": 740484458,
+   "world_trace_times": 267696190,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_a": 18057,
+    "recon_b": 14480,
+    "recon_f": 2821,
+    "recon_e": 47006,
+    "recon_d": 1222
+   },
+   "ev": {
+    "come_on": 1919,
+    "xfer_fail": 1955375,
+    "pub_post": 714,
+    "pub_vote": 101,
+    "pub_comment": 249,
+    "pub_delete": 28,
+    "silent_loss": 9,
+    "miss": 0,
+    "miss_pairs": 2786,
+    "stranded": 35,
+    "stranded_pairs": 2873
+   },
+   "verify_per_box_day": 78.7175,
+   "verify_foreign_per_box_day": 0.0,
+   "live_path_p99_s": 0.45000000002619345,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 284,
+     "no_path": 0,
+     "p99_s": 1.3521284478192683,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 7235,
+     "no_path": 0,
+     "p99_s": 0.45000000002619345,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [],
+   "kind": "cost",
+   "scene": "C-b",
+   "n": 1000,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 89.2
+  },
+  {
+   "needed_env": 374662,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 41.819716500000006,
+   "recon_kb": 24.4194945,
+   "probe_kb": 16.56542,
+   "fetch_kb": 0.834802,
+   "push_ctl_kb": 40.063634,
+   "over_over_needed": 0.46066817825133055,
+   "sent_kb_box_day": 273.62843050000004,
+   "miss": 4,
+   "miss_pairs": 353455,
+   "live_p99_s": 0.9000000000523869,
+   "violations": {},
+   "world_trace": 3508535465,
+   "world_trace_times": 2536420642,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_a": 48893,
+    "recon_b": 8850,
+    "recon_f": 363923,
+    "recon_e": 105789,
+    "recon_d": 194
+   },
+   "ev": {
+    "come_on": 2526,
+    "xfer_fail": 724179,
+    "pub_post": 956,
+    "pub_comment": 380,
+    "pub_vote": 149,
+    "silent_loss": 242,
+    "pub_delete": 22,
+    "miss": 4,
+    "miss_pairs": 353455,
+    "stranded": 4,
+    "stranded_pairs": 357145
+   },
+   "verify_per_box_day": 187.331,
+   "verify_foreign_per_box_day": 0.0,
+   "live_path_p99_s": 0.9000000000523869,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 10260,
+     "no_path": 0,
+     "p99_s": 1537.6777159481135,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 239082,
+     "no_path": 0,
+     "p99_s": 0.9000000000523869,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [],
+   "kind": "cost",
+   "scene": "C-c",
+   "n": 1000,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 106.3
+  },
+  {
+   "needed_env": 628847,
+   "dup_env": 0,
+   "dup_ratio": 0.0,
+   "exch_kb_box_day": 43.062349999999995,
+   "recon_kb": 37.721082,
+   "probe_kb": 5.21814,
+   "fetch_kb": 0.123128,
+   "push_ctl_kb": 85.32953,
+   "over_over_needed": 0.4459737901270102,
+   "sent_kb_box_day": 454.64814,
+   "miss": 63,
+   "miss_pairs": 895770,
+   "live_p99_s": 1.499999999650754,
+   "violations": {},
+   "world_trace": 2864214781,
+   "world_trace_times": 4193116942,
+   "floor_skip": 0,
+   "triggers": {
+    "recon_a": 77576,
+    "recon_b": 14756,
+    "recon_f": 758759,
+    "recon_e": 80565,
+    "recon_d": 142
+   },
+   "ev": {
+    "come_on": 3001,
+    "xfer_fail": 76375,
+    "pub_post": 1193,
+    "silent_loss": 631,
+    "pub_comment": 474,
+    "pub_vote": 203,
+    "pub_delete": 39,
+    "miss": 63,
+    "miss_pairs": 895770,
+    "stranded": 63,
+    "stranded_pairs": 895770
+   },
+   "verify_per_box_day": 314.4235,
+   "verify_foreign_per_box_day": 0.0,
+   "live_path_p99_s": 1.499999999650754,
+   "avail": {
+    "1-4": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "5-9": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "10-29": {
+     "n": 0,
+     "no_path": 0,
+     "p99_s": null,
+     "no_path_p99_s": null
+    },
+    "30-99": {
+     "n": 23281,
+     "no_path": 0,
+     "p99_s": 2616.5984772978554,
+     "no_path_p99_s": null
+    },
+    "100-": {
+     "n": 599375,
+     "no_path": 0,
+     "p99_s": 1.050000000061118,
+     "no_path_p99_s": null
+    }
+   },
+   "small_subs": [],
+   "kind": "cost",
+   "scene": "C-a",
+   "n": 1000,
+   "seed": 1,
+   "variant": "sr29",
+   "mode": "sub",
+   "secs": 218.6
+  }
+ ]
+}
