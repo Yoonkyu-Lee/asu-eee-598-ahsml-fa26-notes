@@ -3631,5 +3631,9342 @@
   "seed": 4,
   "mode": "sub",
   "secs": 110.3
+ },
+ {
+  "n": 300,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 113336,
+  "l1_items": 1856,
+  "live_p99_s": 2573.237845684591,
+  "ev": {
+   "come_on": 1351,
+   "xfer_fail": 124409,
+   "link_drop": 1792,
+   "pub_post": 563,
+   "pub_vote": 96,
+   "silent_loss": 77,
+   "want_timeout": 921,
+   "pub_comment": 176,
+   "partition": 2,
+   "pub_delete": 16,
+   "miss": 2,
+   "miss_pairs": 67332,
+   "stranded": 2,
+   "stranded_pairs": 67332,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 74240,
+   "verify_invalid": 1553,
+   "encode": 41757,
+   "needed_env": 72687,
+   "dup_env": 0,
+   "rej_id": 4765,
+   "rej_sig": 1553,
+   "refuse_window": 0,
+   "recon_sessions": 453239,
+   "fetch_keys": 7244,
+   "floor_skip": 0,
+   "rej_sub": 209,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 91.65432098765433,
+  "encode_per_box_day": 51.55185185185186,
+  "subs_per_box": 3.12,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 107.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40839,
+  "l1_items": 260,
+  "live_p99_s": 1253.6758370767639,
+  "ev": {
+   "come_on": 419,
+   "xfer_fail": 32422,
+   "link_drop": 603,
+   "pub_post": 173,
+   "want_timeout": 163,
+   "silent_loss": 13,
+   "pub_vote": 30,
+   "pub_comment": 83,
+   "pub_delete": 13,
+   "partition": 2,
+   "miss": 1,
+   "miss_pairs": 9605,
+   "stranded": 1,
+   "stranded_pairs": 9605
+  },
+  "work": {
+   "verify": 11491,
+   "verify_invalid": 1275,
+   "encode": 5135,
+   "needed_env": 10216,
+   "dup_env": 0,
+   "rej_id": 158,
+   "rej_sig": 1275,
+   "refuse_window": 0,
+   "recon_sessions": 147394,
+   "fetch_keys": 1602,
+   "floor_skip": 0,
+   "rej_sub": 40,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 42.55925925925926,
+  "encode_per_box_day": 19.01851851851852,
+  "subs_per_box": 2.92,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 20.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40787,
+  "l1_items": 147,
+  "live_p99_s": 340.5466385302134,
+  "ev": {
+   "come_on": 398,
+   "xfer_fail": 18875,
+   "link_drop": 626,
+   "pub_post": 173,
+   "want_timeout": 143,
+   "pub_vote": 14,
+   "pub_comment": 57,
+   "silent_loss": 6,
+   "partition": 1,
+   "miss": 4,
+   "miss_pairs": 6516,
+   "stranded": 4,
+   "stranded_pairs": 6516,
+   "pub_delete": 8
+  },
+  "work": {
+   "verify": 7302,
+   "verify_invalid": 265,
+   "encode": 4466,
+   "needed_env": 7037,
+   "dup_env": 1,
+   "rej_id": 164,
+   "rej_sig": 265,
+   "refuse_window": 0,
+   "recon_sessions": 144061,
+   "fetch_keys": 511,
+   "floor_skip": 0,
+   "rej_sub": 55,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 27.044444444444448,
+  "encode_per_box_day": 16.54074074074074,
+  "subs_per_box": 3.09,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 18.1
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 14852
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1033.885,
+     "box": 9,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 74,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 82,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 83,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 85,
+     "mid": 585426393779146406,
+     "topic": 3
+    }
+   ]
+  },
+  "l1_checks": 40879,
+  "l1_items": 4787,
+  "live_p99_s": 1556.191525202681,
+  "ev": {
+   "come_on": 421,
+   "xfer_fail": 34985,
+   "link_drop": 579,
+   "pub_post": 193,
+   "want_timeout": 209,
+   "pub_vote": 25,
+   "pub_comment": 70,
+   "pub_delete": 12,
+   "partition": 3,
+   "silent_loss": 8,
+   "miss": 0,
+   "miss_pairs": 8974,
+   "stranded": 0,
+   "stranded_pairs": 8974
+  },
+  "work": {
+   "verify": 27408,
+   "verify_invalid": 2780,
+   "encode": 5682,
+   "needed_env": 24628,
+   "dup_env": 0,
+   "rej_id": 841,
+   "rej_sig": 2780,
+   "refuse_window": 0,
+   "recon_sessions": 149645,
+   "fetch_keys": 18853,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 17112
+  },
+  "verify_per_box_day": 101.51111111111112,
+  "encode_per_box_day": 21.044444444444444,
+  "subs_per_box": 2.92,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 61.1
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 41212,
+  "l1_items": 186,
+  "live_p99_s": 8184.7355264923535,
+  "ev": {
+   "come_on": 383,
+   "xfer_fail": 27443,
+   "link_drop": 644,
+   "pub_post": 184,
+   "want_timeout": 163,
+   "pub_vote": 22,
+   "pub_comment": 85,
+   "silent_loss": 6,
+   "pub_delete": 8,
+   "miss": 0,
+   "miss_pairs": 8288,
+   "stranded": 0,
+   "stranded_pairs": 8288,
+   "partition": 2
+  },
+  "work": {
+   "verify": 10199,
+   "verify_invalid": 1126,
+   "encode": 4779,
+   "needed_env": 9073,
+   "dup_env": 0,
+   "rej_id": 181,
+   "rej_sig": 1126,
+   "refuse_window": 0,
+   "recon_sessions": 143454,
+   "fetch_keys": 1432,
+   "floor_skip": 0,
+   "rej_sub": 47,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 37.77407407407407,
+  "encode_per_box_day": 17.7,
+  "subs_per_box": 3.19,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 16.7
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 15651
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 69.83,
+     "box": 70,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 69.83,
+     "box": 14,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 64,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 79,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 86,
+     "mid": 2617789011050107415,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 42022,
+  "l1_items": 4428,
+  "live_p99_s": 774.3525340415363,
+  "ev": {
+   "come_on": 390,
+   "xfer_fail": 20194,
+   "link_drop": 666,
+   "pub_post": 184,
+   "want_timeout": 151,
+   "pub_vote": 22,
+   "pub_comment": 59,
+   "silent_loss": 16,
+   "partition": 1,
+   "miss": 0,
+   "miss_pairs": 7031,
+   "stranded": 0,
+   "stranded_pairs": 7031,
+   "pub_delete": 9
+  },
+  "work": {
+   "verify": 23927,
+   "verify_invalid": 619,
+   "encode": 4731,
+   "needed_env": 23308,
+   "dup_env": 0,
+   "rej_id": 134,
+   "rej_sig": 619,
+   "refuse_window": 0,
+   "recon_sessions": 147317,
+   "fetch_keys": 16747,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 16192
+  },
+  "verify_per_box_day": 88.61851851851851,
+  "encode_per_box_day": 17.522222222222222,
+  "subs_per_box": 3.09,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 56.9
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 17091
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2721.512,
+     "box": 38,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2725.652,
+     "box": 86,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2726.486,
+     "box": 80,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2730.212,
+     "box": 8,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2731.805,
+     "box": 17,
+     "mid": 8231650171469071552,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 41203,
+  "l1_items": 5325,
+  "live_p99_s": 1154.6476165503263,
+  "ev": {
+   "come_on": 384,
+   "xfer_fail": 28315,
+   "link_drop": 611,
+   "pub_post": 191,
+   "pub_vote": 22,
+   "pub_comment": 76,
+   "want_timeout": 111,
+   "pub_delete": 12,
+   "miss": 0,
+   "miss_pairs": 8045,
+   "stranded": 0,
+   "stranded_pairs": 8045,
+   "silent_loss": 10,
+   "partition": 3
+  },
+  "work": {
+   "verify": 26930,
+   "verify_invalid": 1100,
+   "encode": 5091,
+   "needed_env": 25830,
+   "dup_env": 0,
+   "rej_id": 228,
+   "rej_sig": 1100,
+   "refuse_window": 0,
+   "recon_sessions": 147888,
+   "fetch_keys": 18702,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 18083
+  },
+  "verify_per_box_day": 99.74074074074075,
+  "encode_per_box_day": 18.855555555555558,
+  "subs_per_box": 3.19,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 51.2
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 5585
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 8944.064,
+     "box": 0,
+     "mid": 6394881717761029216,
+     "topic": 1
+    },
+    {
+     "t": 9037.17,
+     "box": 80,
+     "mid": 6394881717761029216,
+     "topic": 1
+    },
+    {
+     "t": 9097.737,
+     "box": 64,
+     "mid": 6394881717761029216,
+     "topic": 1
+    },
+    {
+     "t": 10080.665,
+     "box": 20,
+     "mid": 6394881717761029216,
+     "topic": 1
+    },
+    {
+     "t": 10704.95,
+     "box": 55,
+     "mid": 6394881717761029216,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 154,
+  "l1_items": 1995,
+  "live_p99_s": 870.9854323934997,
+  "ev": {
+   "come_on": 315,
+   "xfer_fail": 103448,
+   "link_drop": 582,
+   "pub_post": 125,
+   "pub_comment": 63,
+   "pub_delete": 8,
+   "pub_vote": 15,
+   "miss": 0,
+   "miss_pairs": 92,
+   "stranded": 0,
+   "stranded_pairs": 94,
+   "want_timeout": 28,
+   "partition": 1
+  },
+  "work": {
+   "verify": 8732,
+   "verify_invalid": 32,
+   "encode": 1707,
+   "needed_env": 8700,
+   "dup_env": 0,
+   "rej_id": 21,
+   "rej_sig": 32,
+   "refuse_window": 0,
+   "recon_sessions": 4379,
+   "fetch_keys": 9106,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 5604
+  },
+  "verify_per_box_day": 32.34074074074074,
+  "encode_per_box_day": 6.322222222222222,
+  "subs_per_box": 2.88,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 2.4
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 41372,
+  "l1_items": 237,
+  "live_p99_s": 801.1801985724014,
+  "ev": {
+   "come_on": 434,
+   "xfer_fail": 19463,
+   "link_drop": 625,
+   "pub_post": 189,
+   "pub_vote": 28,
+   "want_timeout": 121,
+   "pub_comment": 67,
+   "pub_delete": 10,
+   "silent_loss": 9,
+   "miss": 0,
+   "miss_pairs": 7679,
+   "stranded": 0,
+   "stranded_pairs": 7679,
+   "partition": 1
+  },
+  "work": {
+   "verify": 8982,
+   "verify_invalid": 621,
+   "encode": 5014,
+   "needed_env": 8360,
+   "dup_env": 0,
+   "rej_id": 644,
+   "rej_sig": 621,
+   "refuse_window": 1,
+   "recon_sessions": 144841,
+   "fetch_keys": 1290,
+   "floor_skip": 0,
+   "rej_sub": 35,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 33.266666666666666,
+  "encode_per_box_day": 18.57037037037037,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 18.1
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 108,
+  "l1_items": 651,
+  "live_p99_s": 491.36342346601305,
+  "ev": {
+   "come_on": 315,
+   "xfer_fail": 105862,
+   "link_drop": 582,
+   "pub_post": 128,
+   "pub_comment": 60,
+   "want_timeout": 9,
+   "pub_delete": 8,
+   "pub_vote": 15,
+   "miss": 0,
+   "miss_pairs": 96,
+   "stranded": 0,
+   "stranded_pairs": 98,
+   "partition": 1
+  },
+  "work": {
+   "verify": 2729,
+   "verify_invalid": 21,
+   "encode": 1336,
+   "needed_env": 2708,
+   "dup_env": 0,
+   "rej_id": 8,
+   "rej_sig": 21,
+   "refuse_window": 0,
+   "recon_sessions": 2525,
+   "fetch_keys": 2407,
+   "floor_skip": 0,
+   "rej_sub": 7,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 10.107407407407408,
+  "encode_per_box_day": 4.948148148148149,
+  "subs_per_box": 2.88,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 3.1
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 5059
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 23855.947,
+     "box": 0,
+     "mid": 6247185799624544679,
+     "topic": 8
+    },
+    {
+     "t": 23857.997,
+     "box": 74,
+     "mid": 6247185799624544679,
+     "topic": 8
+    },
+    {
+     "t": 23857.997,
+     "box": 15,
+     "mid": 6247185799624544679,
+     "topic": 8
+    },
+    {
+     "t": 24179.12,
+     "box": 16,
+     "mid": 6247185799624544679,
+     "topic": 8
+    },
+    {
+     "t": 24794.009,
+     "box": 76,
+     "mid": 6247185799624544679,
+     "topic": 8
+    }
+   ]
+  },
+  "l1_checks": 160,
+  "l1_items": 1400,
+  "live_p99_s": 1114.8791372106061,
+  "ev": {
+   "come_on": 305,
+   "xfer_fail": 102775,
+   "link_drop": 615,
+   "pub_post": 121,
+   "partition": 1,
+   "pub_comment": 33,
+   "want_timeout": 8,
+   "miss": 0,
+   "miss_pairs": 99,
+   "stranded": 0,
+   "stranded_pairs": 102,
+   "pub_delete": 5,
+   "pub_vote": 15
+  },
+  "work": {
+   "verify": 7500,
+   "verify_invalid": 13,
+   "encode": 1523,
+   "needed_env": 7487,
+   "dup_env": 0,
+   "rej_id": 7,
+   "rej_sig": 13,
+   "refuse_window": 0,
+   "recon_sessions": 3848,
+   "fetch_keys": 7823,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 5068
+  },
+  "verify_per_box_day": 27.777777777777775,
+  "encode_per_box_day": 5.64074074074074,
+  "subs_per_box": 2.92,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 2.6
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 113,
+  "l1_items": 316,
+  "live_p99_s": 8.349999999947613,
+  "ev": {
+   "come_on": 305,
+   "xfer_fail": 126011,
+   "link_drop": 615,
+   "pub_post": 122,
+   "partition": 1,
+   "pub_comment": 32,
+   "want_timeout": 6,
+   "miss": 0,
+   "miss_pairs": 101,
+   "stranded": 7,
+   "stranded_pairs": 111,
+   "pub_delete": 5,
+   "pub_vote": 15
+  },
+  "work": {
+   "verify": 2081,
+   "verify_invalid": 4,
+   "encode": 1240,
+   "needed_env": 2077,
+   "dup_env": 0,
+   "rej_id": 1,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 2319,
+   "fetch_keys": 1818,
+   "floor_skip": 0,
+   "rej_sub": 9,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.707407407407408,
+  "encode_per_box_day": 4.592592592592593,
+  "subs_per_box": 2.92,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 3.6
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 4146
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 6370.412,
+     "box": 29,
+     "mid": 9193561362740284065,
+     "topic": 16
+    },
+    {
+     "t": 6528.183,
+     "box": 0,
+     "mid": 9193561362740284065,
+     "topic": 16
+    },
+    {
+     "t": 8019.742,
+     "box": 32,
+     "mid": 9193561362740284065,
+     "topic": 16
+    },
+    {
+     "t": 8224.887,
+     "box": 19,
+     "mid": 9193561362740284065,
+     "topic": 16
+    },
+    {
+     "t": 9864.9,
+     "box": 6,
+     "mid": 9193561362740284065,
+     "topic": 16
+    }
+   ]
+  },
+  "l1_checks": 94,
+  "l1_items": 1323,
+  "live_p99_s": 40787.82134583598,
+  "ev": {
+   "come_on": 285,
+   "xfer_fail": 91231,
+   "link_drop": 566,
+   "pub_post": 114,
+   "pub_delete": 11,
+   "pub_comment": 38,
+   "pub_vote": 16,
+   "want_timeout": 15,
+   "miss": 0,
+   "miss_pairs": 78,
+   "stranded": 1,
+   "stranded_pairs": 79,
+   "partition": 1
+  },
+  "work": {
+   "verify": 6717,
+   "verify_invalid": 23,
+   "encode": 1624,
+   "needed_env": 6694,
+   "dup_env": 0,
+   "rej_id": 13,
+   "rej_sig": 23,
+   "refuse_window": 0,
+   "recon_sessions": 2967,
+   "fetch_keys": 6721,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 4165
+  },
+  "verify_per_box_day": 24.87777777777778,
+  "encode_per_box_day": 6.014814814814815,
+  "subs_per_box": 3.09,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 2.5
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 46,
+  "l1_items": 98,
+  "live_p99_s": 8.349999999947613,
+  "ev": {
+   "come_on": 285,
+   "xfer_fail": 91023,
+   "link_drop": 566,
+   "pub_post": 115,
+   "pub_delete": 12,
+   "pub_comment": 37,
+   "want_timeout": 14,
+   "pub_vote": 15,
+   "miss": 0,
+   "miss_pairs": 60,
+   "stranded": 23,
+   "stranded_pairs": 84,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1202,
+   "verify_invalid": 4,
+   "encode": 751,
+   "needed_env": 1198,
+   "dup_env": 0,
+   "rej_id": 3,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 1365,
+   "fetch_keys": 975,
+   "floor_skip": 0,
+   "rej_sub": 25,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.451851851851852,
+  "encode_per_box_day": 2.7814814814814817,
+  "subs_per_box": 3.09,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 2.7
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 6674
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 10577.259,
+     "box": 66,
+     "mid": 42164980352646334,
+     "topic": 1
+    },
+    {
+     "t": 10591.308,
+     "box": 0,
+     "mid": 42164980352646334,
+     "topic": 1
+    },
+    {
+     "t": 11389.946,
+     "box": 66,
+     "mid": 5921759234529878835,
+     "topic": 1
+    },
+    {
+     "t": 11519.855,
+     "box": 0,
+     "mid": 5921759234529878835,
+     "topic": 1
+    },
+    {
+     "t": 12152.552,
+     "box": 79,
+     "mid": 42164980352646334,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 161,
+  "l1_items": 2324,
+  "live_p99_s": 737.4191622579237,
+  "ev": {
+   "come_on": 313,
+   "xfer_fail": 108251,
+   "link_drop": 572,
+   "pub_post": 142,
+   "pub_comment": 58,
+   "pub_vote": 19,
+   "pub_delete": 6,
+   "miss": 0,
+   "miss_pairs": 137,
+   "stranded": 2,
+   "stranded_pairs": 139,
+   "want_timeout": 13
+  },
+  "work": {
+   "verify": 10615,
+   "verify_invalid": 22,
+   "encode": 2219,
+   "needed_env": 10593,
+   "dup_env": 0,
+   "rej_id": 14,
+   "rej_sig": 22,
+   "refuse_window": 0,
+   "recon_sessions": 4225,
+   "fetch_keys": 10623,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 6685
+  },
+  "verify_per_box_day": 39.31481481481482,
+  "encode_per_box_day": 8.218518518518518,
+  "subs_per_box": 3.19,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 2.4
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 6927
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 22564.59,
+     "box": 70,
+     "mid": 4516251593540916397,
+     "topic": 13
+    },
+    {
+     "t": 22987.025,
+     "box": 34,
+     "mid": 4516251593540916397,
+     "topic": 13
+    },
+    {
+     "t": 23003.788,
+     "box": 50,
+     "mid": 4516251593540916397,
+     "topic": 13
+    },
+    {
+     "t": 23090.802,
+     "box": 55,
+     "mid": 4516251593540916397,
+     "topic": 13
+    },
+    {
+     "t": 25497.575,
+     "box": 85,
+     "mid": 4516251593540916397,
+     "topic": 13
+    }
+   ]
+  },
+  "l1_checks": 147,
+  "l1_items": 1726,
+  "live_p99_s": 1492.7008398903126,
+  "ev": {
+   "come_on": 312,
+   "xfer_fail": 111228,
+   "link_drop": 574,
+   "pub_post": 139,
+   "pub_comment": 49,
+   "pub_vote": 30,
+   "miss": 0,
+   "miss_pairs": 40,
+   "stranded": 2,
+   "stranded_pairs": 42,
+   "pub_delete": 4,
+   "partition": 3
+  },
+  "work": {
+   "verify": 9965,
+   "verify_invalid": 18,
+   "encode": 1687,
+   "needed_env": 9947,
+   "dup_env": 0,
+   "rej_id": 6,
+   "rej_sig": 18,
+   "refuse_window": 0,
+   "recon_sessions": 4119,
+   "fetch_keys": 10085,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 6940
+  },
+  "verify_per_box_day": 36.90740740740741,
+  "encode_per_box_day": 6.248148148148148,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 2.8
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 111,
+  "l1_items": 693,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 313,
+   "xfer_fail": 116736,
+   "link_drop": 572,
+   "pub_post": 147,
+   "pub_comment": 55,
+   "pub_vote": 17,
+   "pub_delete": 6,
+   "miss": 0,
+   "miss_pairs": 152,
+   "stranded": 13,
+   "stranded_pairs": 165,
+   "want_timeout": 6
+  },
+  "work": {
+   "verify": 3443,
+   "verify_invalid": 2,
+   "encode": 1657,
+   "needed_env": 3441,
+   "dup_env": 0,
+   "rej_id": 8,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 2380,
+   "fetch_keys": 3138,
+   "floor_skip": 0,
+   "rej_sub": 15,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 12.751851851851852,
+  "encode_per_box_day": 6.137037037037037,
+  "subs_per_box": 3.19,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 3.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 23,
+  "l1_items": 40,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 312,
+   "xfer_fail": 97941,
+   "link_drop": 574,
+   "pub_post": 146,
+   "pub_comment": 42,
+   "pub_delete": 5,
+   "pub_vote": 29,
+   "want_timeout": 2,
+   "miss": 0,
+   "miss_pairs": 15,
+   "stranded": 21,
+   "stranded_pairs": 36,
+   "partition": 3
+  },
+  "work": {
+   "verify": 1329,
+   "verify_invalid": 5,
+   "encode": 796,
+   "needed_env": 1324,
+   "dup_env": 0,
+   "rej_id": 4,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 1286,
+   "fetch_keys": 1060,
+   "floor_skip": 0,
+   "rej_sub": 5,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.9222222222222225,
+  "encode_per_box_day": 2.948148148148148,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 2.8
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 23764,
+  "l1_items": 842,
+  "live_p99_s": 361.379290277604,
+  "ev": {
+   "come_on": 362,
+   "xfer_fail": 104856,
+   "link_drop": 594,
+   "pub_post": 157,
+   "want_timeout": 70,
+   "pub_comment": 53,
+   "pub_vote": 22,
+   "partition": 3,
+   "pub_delete": 8,
+   "silent_loss": 5,
+   "miss": 0,
+   "miss_pairs": 3185,
+   "stranded": 1,
+   "stranded_pairs": 3226
+  },
+  "work": {
+   "verify": 4842,
+   "verify_invalid": 48,
+   "encode": 2833,
+   "needed_env": 4794,
+   "dup_env": 0,
+   "rej_id": 40,
+   "rej_sig": 48,
+   "refuse_window": 0,
+   "recon_sessions": 81365,
+   "fetch_keys": 1394,
+   "floor_skip": 0,
+   "rej_sub": 41,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 17.933333333333334,
+  "encode_per_box_day": 10.492592592592592,
+  "subs_per_box": 2.88,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 11.9
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 16934
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1211.122,
+     "box": 64,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 2,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 7,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 83,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 57,
+     "mid": 6732470114566978641,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 41251,
+  "l1_items": 5156,
+  "live_p99_s": 782.8748893873417,
+  "ev": {
+   "come_on": 423,
+   "xfer_fail": 19195,
+   "link_drop": 635,
+   "pub_post": 189,
+   "silent_loss": 12,
+   "pub_vote": 25,
+   "want_timeout": 134,
+   "pub_comment": 66,
+   "pub_delete": 9,
+   "miss": 0,
+   "miss_pairs": 6953,
+   "stranded": 0,
+   "stranded_pairs": 6953,
+   "partition": 1
+  },
+  "work": {
+   "verify": 25768,
+   "verify_invalid": 1108,
+   "encode": 4522,
+   "needed_env": 24660,
+   "dup_env": 0,
+   "rej_id": 204,
+   "rej_sig": 1108,
+   "refuse_window": 0,
+   "recon_sessions": 148253,
+   "fetch_keys": 18519,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 17514
+  },
+  "verify_per_box_day": 95.43703703703704,
+  "encode_per_box_day": 16.74814814814815,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 54.9
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 11847
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 7951.82,
+     "box": 17,
+     "mid": 4230407932238401250,
+     "topic": 4
+    },
+    {
+     "t": 7952.406,
+     "box": 45,
+     "mid": 4230407932238401250,
+     "topic": 4
+    },
+    {
+     "t": 7973.302,
+     "box": 9,
+     "mid": 4230407932238401250,
+     "topic": 4
+    },
+    {
+     "t": 7973.925,
+     "box": 34,
+     "mid": 4230407932238401250,
+     "topic": 4
+    },
+    {
+     "t": 7987.169,
+     "box": 11,
+     "mid": 4230407932238401250,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 24766,
+  "l1_items": 5283,
+  "live_p99_s": 781.7372497139731,
+  "ev": {
+   "come_on": 362,
+   "xfer_fail": 90223,
+   "link_drop": 594,
+   "pub_post": 157,
+   "pub_comment": 53,
+   "silent_loss": 4,
+   "pub_vote": 22,
+   "want_timeout": 81,
+   "partition": 3,
+   "pub_delete": 8,
+   "miss": 0,
+   "miss_pairs": 3201,
+   "stranded": 0,
+   "stranded_pairs": 3243
+  },
+  "work": {
+   "verify": 16720,
+   "verify_invalid": 51,
+   "encode": 2843,
+   "needed_env": 16669,
+   "dup_env": 0,
+   "rej_id": 53,
+   "rej_sig": 51,
+   "refuse_window": 0,
+   "recon_sessions": 86603,
+   "fetch_keys": 13436,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 11878
+  },
+  "verify_per_box_day": 61.925925925925924,
+  "encode_per_box_day": 10.52962962962963,
+  "subs_per_box": 2.88,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 22.8
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 24936,
+  "l1_items": 1272,
+  "live_p99_s": 45.312466874718666,
+  "ev": {
+   "come_on": 375,
+   "xfer_fail": 112478,
+   "pub_post": 160,
+   "link_drop": 578,
+   "pub_comment": 64,
+   "want_timeout": 74,
+   "silent_loss": 9,
+   "pub_delete": 5,
+   "pub_vote": 22,
+   "partition": 4,
+   "miss": 0,
+   "miss_pairs": 5024,
+   "stranded": 12,
+   "stranded_pairs": 5060
+  },
+  "work": {
+   "verify": 7635,
+   "verify_invalid": 37,
+   "encode": 4239,
+   "needed_env": 7598,
+   "dup_env": 0,
+   "rej_id": 16,
+   "rej_sig": 37,
+   "refuse_window": 0,
+   "recon_sessions": 87283,
+   "fetch_keys": 2397,
+   "floor_skip": 0,
+   "rej_sub": 26,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 28.277777777777775,
+  "encode_per_box_day": 15.700000000000001,
+  "subs_per_box": 2.92,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 10.7
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 10621
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 89.071,
+     "box": 33,
+     "mid": 7559730053272725968,
+     "topic": 0
+    },
+    {
+     "t": 89.071,
+     "box": 33,
+     "mid": 3492915970214669927,
+     "topic": 0
+    },
+    {
+     "t": 89.071,
+     "box": 10,
+     "mid": 7559730053272725968,
+     "topic": 0
+    },
+    {
+     "t": 89.071,
+     "box": 10,
+     "mid": 3492915970214669927,
+     "topic": 0
+    },
+    {
+     "t": 502.346,
+     "box": 76,
+     "mid": 7559730053272725968,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 23990,
+  "l1_items": 6652,
+  "live_p99_s": 1022.1871527732292,
+  "ev": {
+   "come_on": 379,
+   "xfer_fail": 101114,
+   "pub_post": 170,
+   "want_timeout": 72,
+   "link_drop": 614,
+   "pub_comment": 52,
+   "pub_delete": 6,
+   "pub_vote": 27,
+   "partition": 6,
+   "silent_loss": 5,
+   "miss": 0,
+   "miss_pairs": 4846,
+   "stranded": 0,
+   "stranded_pairs": 4907
+  },
+  "work": {
+   "verify": 18092,
+   "verify_invalid": 93,
+   "encode": 4503,
+   "needed_env": 17999,
+   "dup_env": 0,
+   "rej_id": 59,
+   "rej_sig": 93,
+   "refuse_window": 0,
+   "recon_sessions": 89711,
+   "fetch_keys": 13078,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 10684
+  },
+  "verify_per_box_day": 67.0074074074074,
+  "encode_per_box_day": 16.677777777777777,
+  "subs_per_box": 2.92,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 28.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 24940,
+  "l1_items": 1117,
+  "live_p99_s": 6033.979336548655,
+  "ev": {
+   "come_on": 329,
+   "xfer_fail": 106235,
+   "link_drop": 613,
+   "pub_post": 180,
+   "want_timeout": 96,
+   "pub_vote": 31,
+   "pub_comment": 56,
+   "pub_delete": 8,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 4104,
+   "stranded": 0,
+   "stranded_pairs": 4163,
+   "silent_loss": 5
+  },
+  "work": {
+   "verify": 6855,
+   "verify_invalid": 57,
+   "encode": 3962,
+   "needed_env": 6798,
+   "dup_env": 0,
+   "rej_id": 29,
+   "rej_sig": 57,
+   "refuse_window": 0,
+   "recon_sessions": 82141,
+   "fetch_keys": 2412,
+   "floor_skip": 0,
+   "rej_sub": 55,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 25.38888888888889,
+  "encode_per_box_day": 14.674074074074076,
+  "subs_per_box": 3.09,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 11.8
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 11635
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2155.107,
+     "box": 16,
+     "mid": 906321775674878758,
+     "topic": 0
+    },
+    {
+     "t": 2165.765,
+     "box": 42,
+     "mid": 906321775674878758,
+     "topic": 0
+    },
+    {
+     "t": 2194.668,
+     "box": 3,
+     "mid": 906321775674878758,
+     "topic": 0
+    },
+    {
+     "t": 2205.161,
+     "box": 8,
+     "mid": 906321775674878758,
+     "topic": 0
+    },
+    {
+     "t": 2206.074,
+     "box": 15,
+     "mid": 906321775674878758,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 24926,
+  "l1_items": 5683,
+  "live_p99_s": 6006.273968010297,
+  "ev": {
+   "come_on": 329,
+   "xfer_fail": 77977,
+   "link_drop": 613,
+   "pub_post": 180,
+   "pub_vote": 31,
+   "want_timeout": 75,
+   "pub_comment": 56,
+   "pub_delete": 8,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 4165,
+   "stranded": 0,
+   "stranded_pairs": 4250,
+   "silent_loss": 2
+  },
+  "work": {
+   "verify": 18638,
+   "verify_invalid": 108,
+   "encode": 3962,
+   "needed_env": 18530,
+   "dup_env": 0,
+   "rej_id": 22,
+   "rej_sig": 108,
+   "refuse_window": 0,
+   "recon_sessions": 86410,
+   "fetch_keys": 14212,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 11705
+  },
+  "verify_per_box_day": 69.02962962962964,
+  "encode_per_box_day": 14.674074074074076,
+  "subs_per_box": 3.09,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 25.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 25620,
+  "l1_items": 768,
+  "live_p99_s": 334.0189170906233,
+  "ev": {
+   "come_on": 329,
+   "xfer_fail": 94118,
+   "link_drop": 604,
+   "pub_post": 138,
+   "want_timeout": 88,
+   "pub_comment": 48,
+   "pub_vote": 23,
+   "pub_delete": 11,
+   "partition": 3,
+   "miss": 1,
+   "miss_pairs": 3133,
+   "stranded": 1,
+   "stranded_pairs": 3144,
+   "silent_loss": 3
+  },
+  "work": {
+   "verify": 4670,
+   "verify_invalid": 9,
+   "encode": 2551,
+   "needed_env": 4661,
+   "dup_env": 0,
+   "rej_id": 17,
+   "rej_sig": 9,
+   "refuse_window": 0,
+   "recon_sessions": 84563,
+   "fetch_keys": 1263,
+   "floor_skip": 0,
+   "rej_sub": 36,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 17.296296296296294,
+  "encode_per_box_day": 9.448148148148148,
+  "subs_per_box": 3.19,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 11.6
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 9633
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 3024.123,
+     "box": 0,
+     "mid": 8416538578059871906,
+     "topic": 1
+    },
+    {
+     "t": 3024.123,
+     "box": 12,
+     "mid": 8416538578059871906,
+     "topic": 1
+    },
+    {
+     "t": 3024.123,
+     "box": 28,
+     "mid": 8416538578059871906,
+     "topic": 1
+    },
+    {
+     "t": 3038.869,
+     "box": 4,
+     "mid": 8416538578059871906,
+     "topic": 1
+    },
+    {
+     "t": 3044.287,
+     "box": 29,
+     "mid": 8416538578059871906,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 25491,
+  "l1_items": 5083,
+  "live_p99_s": 623.9006658695289,
+  "ev": {
+   "come_on": 348,
+   "xfer_fail": 76449,
+   "link_drop": 596,
+   "pub_post": 140,
+   "silent_loss": 3,
+   "want_timeout": 47,
+   "pub_comment": 49,
+   "pub_vote": 21,
+   "pub_delete": 20,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 3449,
+   "stranded": 0,
+   "stranded_pairs": 3506
+  },
+  "work": {
+   "verify": 15185,
+   "verify_invalid": 121,
+   "encode": 3049,
+   "needed_env": 15064,
+   "dup_env": 0,
+   "rej_id": 87,
+   "rej_sig": 121,
+   "refuse_window": 0,
+   "recon_sessions": 88636,
+   "fetch_keys": 11415,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 9723
+  },
+  "verify_per_box_day": 56.24074074074074,
+  "encode_per_box_day": 11.292592592592593,
+  "subs_per_box": 3.19,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 24.3
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 24681,
+  "l1_items": 1111,
+  "live_p99_s": 704.6600081463039,
+  "ev": {
+   "come_on": 332,
+   "xfer_fail": 96476,
+   "link_drop": 568,
+   "pub_post": 180,
+   "silent_loss": 9,
+   "pub_comment": 75,
+   "want_timeout": 110,
+   "partition": 1,
+   "pub_vote": 21,
+   "pub_delete": 7,
+   "miss": 1,
+   "miss_pairs": 3952,
+   "stranded": 1,
+   "stranded_pairs": 3997
+  },
+  "work": {
+   "verify": 6091,
+   "verify_invalid": 11,
+   "encode": 3592,
+   "needed_env": 6080,
+   "dup_env": 0,
+   "rej_id": 32,
+   "rej_sig": 11,
+   "refuse_window": 0,
+   "recon_sessions": 80925,
+   "fetch_keys": 1811,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 22.55925925925926,
+  "encode_per_box_day": 13.303703703703704,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 11.3
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 3807
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 19386.476,
+     "box": 4,
+     "mid": 8680359411911463650,
+     "topic": 0
+    },
+    {
+     "t": 19386.476,
+     "box": 4,
+     "mid": 1430417124190015908,
+     "topic": 0
+    },
+    {
+     "t": 19386.476,
+     "box": 4,
+     "mid": 7881707437782485099,
+     "topic": 0
+    },
+    {
+     "t": 31454.694,
+     "box": 76,
+     "mid": 2874898628271021340,
+     "topic": 19
+    },
+    {
+     "t": 32268.547,
+     "box": 30,
+     "mid": 2874898628271021340,
+     "topic": 19
+    }
+   ]
+  },
+  "l1_checks": 39,
+  "l1_items": 643,
+  "live_p99_s": 927.499947404227,
+  "ev": {
+   "come_on": 292,
+   "xfer_fail": 80671,
+   "link_drop": 547,
+   "pub_post": 155,
+   "pub_vote": 21,
+   "pub_comment": 51,
+   "want_timeout": 12,
+   "pub_delete": 9,
+   "miss": 0,
+   "miss_pairs": 80,
+   "stranded": 28,
+   "stranded_pairs": 111
+  },
+  "work": {
+   "verify": 6199,
+   "verify_invalid": 8,
+   "encode": 1464,
+   "needed_env": 6191,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 2059,
+   "fetch_keys": 5915,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 3813
+  },
+  "verify_per_box_day": 22.95925925925926,
+  "encode_per_box_day": 5.422222222222222,
+  "subs_per_box": 2.88,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 1.9
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 3370
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 28799.728,
+     "box": 9,
+     "mid": 329044482689725529,
+     "topic": 11
+    },
+    {
+     "t": 28803.678,
+     "box": 27,
+     "mid": 329044482689725529,
+     "topic": 11
+    },
+    {
+     "t": 28803.678,
+     "box": 14,
+     "mid": 329044482689725529,
+     "topic": 11
+    },
+    {
+     "t": 28805.678,
+     "box": 21,
+     "mid": 329044482689725529,
+     "topic": 11
+    },
+    {
+     "t": 28988.58,
+     "box": 45,
+     "mid": 329044482689725529,
+     "topic": 11
+    }
+   ]
+  },
+  "l1_checks": 47,
+  "l1_items": 529,
+  "live_p99_s": 728.812010677153,
+  "ev": {
+   "come_on": 285,
+   "xfer_fail": 83259,
+   "link_drop": 597,
+   "pub_post": 130,
+   "pub_comment": 42,
+   "pub_vote": 15,
+   "pub_delete": 10,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "want_timeout": 5,
+   "partition": 1
+  },
+  "work": {
+   "verify": 5596,
+   "verify_invalid": 21,
+   "encode": 1355,
+   "needed_env": 5575,
+   "dup_env": 0,
+   "rej_id": 8,
+   "rej_sig": 21,
+   "refuse_window": 0,
+   "recon_sessions": 2019,
+   "fetch_keys": 5370,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 3382
+  },
+  "verify_per_box_day": 20.725925925925925,
+  "encode_per_box_day": 5.018518518518518,
+  "subs_per_box": 2.92,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 1.4
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 26,
+  "l1_items": 102,
+  "live_p99_s": 8.349999999962165,
+  "ev": {
+   "come_on": 292,
+   "xfer_fail": 84747,
+   "link_drop": 547,
+   "pub_post": 156,
+   "pub_vote": 21,
+   "pub_comment": 50,
+   "pub_delete": 9,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 51,
+   "stranded": 58,
+   "stranded_pairs": 110,
+   "want_timeout": 3
+  },
+  "work": {
+   "verify": 1458,
+   "verify_invalid": 1,
+   "encode": 854,
+   "needed_env": 1457,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 1034,
+   "fetch_keys": 1148,
+   "floor_skip": 0,
+   "rej_sub": 1,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 5.3999999999999995,
+  "encode_per_box_day": 3.162962962962963,
+  "subs_per_box": 2.88,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 2.5
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 4261
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 10637.667,
+     "box": 57,
+     "mid": 4563763221653706608,
+     "topic": 6
+    },
+    {
+     "t": 11099.513,
+     "box": 88,
+     "mid": 4563763221653706608,
+     "topic": 6
+    },
+    {
+     "t": 11228.612,
+     "box": 38,
+     "mid": 4563763221653706608,
+     "topic": 6
+    },
+    {
+     "t": 12058.926,
+     "box": 3,
+     "mid": 4563763221653706608,
+     "topic": 6
+    },
+    {
+     "t": 12410.007,
+     "box": 55,
+     "mid": 4563763221653706608,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 50,
+  "l1_items": 1371,
+  "live_p99_s": 770.4019546344352,
+  "ev": {
+   "come_on": 307,
+   "xfer_fail": 85273,
+   "link_drop": 613,
+   "pub_post": 133,
+   "pub_delete": 10,
+   "pub_comment": 45,
+   "pub_vote": 16,
+   "want_timeout": 17,
+   "miss": 0,
+   "miss_pairs": 27,
+   "stranded": 3,
+   "stranded_pairs": 31,
+   "partition": 1,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 6290,
+   "verify_invalid": 15,
+   "encode": 1164,
+   "needed_env": 6275,
+   "dup_env": 0,
+   "rej_id": 4,
+   "rej_sig": 15,
+   "refuse_window": 0,
+   "recon_sessions": 2373,
+   "fetch_keys": 6106,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 4271
+  },
+  "verify_per_box_day": 23.296296296296294,
+  "encode_per_box_day": 4.311111111111111,
+  "subs_per_box": 3.09,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 1.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 33,
+  "l1_items": 110,
+  "live_p99_s": 0.2999999999301508,
+  "ev": {
+   "come_on": 285,
+   "xfer_fail": 96560,
+   "link_drop": 597,
+   "pub_post": 131,
+   "pub_comment": 41,
+   "pub_vote": 15,
+   "pub_delete": 10,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "want_timeout": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1220,
+   "verify_invalid": 8,
+   "encode": 725,
+   "needed_env": 1212,
+   "dup_env": 0,
+   "rej_id": 7,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 1279,
+   "fetch_keys": 888,
+   "floor_skip": 0,
+   "rej_sub": 4,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.518518518518518,
+  "encode_per_box_day": 2.685185185185185,
+  "subs_per_box": 2.92,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 2.5
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 4712
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2003.786,
+     "box": 17,
+     "mid": 2882743504697679977,
+     "topic": 8
+    },
+    {
+     "t": 2076.385,
+     "box": 40,
+     "mid": 2882743504697679977,
+     "topic": 8
+    },
+    {
+     "t": 3251.051,
+     "box": 20,
+     "mid": 2882743504697679977,
+     "topic": 8
+    },
+    {
+     "t": 3505.656,
+     "box": 17,
+     "mid": 8867982855876156600,
+     "topic": 8
+    },
+    {
+     "t": 3536.028,
+     "box": 20,
+     "mid": 8867982855876156600,
+     "topic": 8
+    }
+   ]
+  },
+  "l1_checks": 61,
+  "l1_items": 904,
+  "live_p99_s": 848.2717663126241,
+  "ev": {
+   "come_on": 301,
+   "xfer_fail": 86557,
+   "link_drop": 579,
+   "pub_post": 133,
+   "pub_delete": 9,
+   "pub_comment": 44,
+   "want_timeout": 13,
+   "pub_vote": 22,
+   "miss": 0,
+   "miss_pairs": 43,
+   "stranded": 10,
+   "stranded_pairs": 53,
+   "silent_loss": 2,
+   "partition": 2
+  },
+  "work": {
+   "verify": 7215,
+   "verify_invalid": 20,
+   "encode": 1387,
+   "needed_env": 7195,
+   "dup_env": 0,
+   "rej_id": 16,
+   "rej_sig": 20,
+   "refuse_window": 0,
+   "recon_sessions": 2490,
+   "fetch_keys": 7211,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 4728
+  },
+  "verify_per_box_day": 26.722222222222225,
+  "encode_per_box_day": 5.137037037037037,
+  "subs_per_box": 3.19,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 1.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 28,
+  "l1_items": 136,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 307,
+   "xfer_fail": 90053,
+   "link_drop": 613,
+   "pub_post": 136,
+   "pub_delete": 10,
+   "pub_comment": 42,
+   "pub_vote": 16,
+   "want_timeout": 10,
+   "miss": 0,
+   "miss_pairs": 18,
+   "stranded": 9,
+   "stranded_pairs": 28,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1305,
+   "verify_invalid": 6,
+   "encode": 671,
+   "needed_env": 1299,
+   "dup_env": 0,
+   "rej_id": 1,
+   "rej_sig": 6,
+   "refuse_window": 0,
+   "recon_sessions": 1238,
+   "fetch_keys": 1040,
+   "floor_skip": 0,
+   "rej_sub": 10,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.833333333333333,
+  "encode_per_box_day": 2.4851851851851854,
+  "subs_per_box": 3.09,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 2.7
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 13074
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2693.687,
+     "box": 12,
+     "mid": 1482122197724492718,
+     "topic": 3
+    },
+    {
+     "t": 2759.447,
+     "box": 2,
+     "mid": 1482122197724492718,
+     "topic": 3
+    },
+    {
+     "t": 2760.964,
+     "box": 5,
+     "mid": 1482122197724492718,
+     "topic": 3
+    },
+    {
+     "t": 2800.162,
+     "box": 11,
+     "mid": 1482122197724492718,
+     "topic": 3
+    },
+    {
+     "t": 2803.137,
+     "box": 44,
+     "mid": 1482122197724492718,
+     "topic": 3
+    }
+   ]
+  },
+  "l1_checks": 25736,
+  "l1_items": 7171,
+  "live_p99_s": 779.7946064858697,
+  "ev": {
+   "come_on": 335,
+   "xfer_fail": 75121,
+   "link_drop": 581,
+   "pub_post": 183,
+   "pub_comment": 71,
+   "want_timeout": 98,
+   "partition": 1,
+   "pub_vote": 23,
+   "pub_delete": 7,
+   "miss": 0,
+   "miss_pairs": 3994,
+   "stranded": 4,
+   "stranded_pairs": 4036,
+   "silent_loss": 2
+  },
+  "work": {
+   "verify": 19004,
+   "verify_invalid": 32,
+   "encode": 3582,
+   "needed_env": 18972,
+   "dup_env": 0,
+   "rej_id": 13,
+   "rej_sig": 32,
+   "refuse_window": 0,
+   "recon_sessions": 86780,
+   "fetch_keys": 15054,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 13091
+  },
+  "verify_per_box_day": 70.3851851851852,
+  "encode_per_box_day": 13.266666666666666,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 28.0
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 4779
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 6589.867,
+     "box": 27,
+     "mid": 1522436833285500140,
+     "topic": 15
+    },
+    {
+     "t": 6711.174,
+     "box": 14,
+     "mid": 1522436833285500140,
+     "topic": 15
+    },
+    {
+     "t": 23575.733,
+     "box": 33,
+     "mid": 2691018152875450688,
+     "topic": 0
+    },
+    {
+     "t": 27987.756,
+     "box": 53,
+     "mid": 2691018152875450688,
+     "topic": 0
+    },
+    {
+     "t": 27987.756,
+     "box": 53,
+     "mid": 2628695223766446653,
+     "topic": 5
+    }
+   ]
+  },
+  "l1_checks": 45,
+  "l1_items": 900,
+  "live_p99_s": 836.4398418809869,
+  "ev": {
+   "come_on": 286,
+   "xfer_fail": 82997,
+   "link_drop": 602,
+   "pub_post": 149,
+   "pub_delete": 10,
+   "pub_comment": 57,
+   "pub_vote": 16,
+   "miss": 0,
+   "miss_pairs": 39,
+   "stranded": 7,
+   "stranded_pairs": 46,
+   "silent_loss": 1,
+   "partition": 1,
+   "want_timeout": 8
+  },
+  "work": {
+   "verify": 7081,
+   "verify_invalid": 15,
+   "encode": 1332,
+   "needed_env": 7066,
+   "dup_env": 0,
+   "rej_id": 9,
+   "rej_sig": 15,
+   "refuse_window": 0,
+   "recon_sessions": 2278,
+   "fetch_keys": 6961,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 4787
+  },
+  "verify_per_box_day": 26.225925925925925,
+  "encode_per_box_day": 4.933333333333334,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 2.0
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 38,
+  "l1_items": 93,
+  "live_p99_s": 8.350000000013097,
+  "ev": {
+   "come_on": 328,
+   "xfer_fail": 104603,
+   "link_drop": 588,
+   "pub_post": 101,
+   "pub_delete": 11,
+   "want_timeout": 8,
+   "pub_comment": 39,
+   "pub_vote": 16,
+   "miss": 0,
+   "miss_pairs": 33,
+   "stranded": 15,
+   "stranded_pairs": 48,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1233,
+   "verify_invalid": 5,
+   "encode": 631,
+   "needed_env": 1228,
+   "dup_env": 0,
+   "rej_id": 9,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 1465,
+   "fetch_keys": 992,
+   "floor_skip": 0,
+   "rej_sub": 2,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.566666666666666,
+  "encode_per_box_day": 2.337037037037037,
+  "subs_per_box": 3.19,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 2.9
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 30,
+  "l1_items": 117,
+  "live_p99_s": 8.349999999947613,
+  "ev": {
+   "come_on": 286,
+   "xfer_fail": 92358,
+   "link_drop": 602,
+   "pub_post": 152,
+   "pub_delete": 10,
+   "pub_comment": 55,
+   "pub_vote": 15,
+   "miss": 0,
+   "miss_pairs": 24,
+   "stranded": 30,
+   "stranded_pairs": 54,
+   "want_timeout": 11,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1314,
+   "verify_invalid": 2,
+   "encode": 737,
+   "needed_env": 1312,
+   "dup_env": 0,
+   "rej_id": 6,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 1308,
+   "fetch_keys": 973,
+   "floor_skip": 0,
+   "rej_sub": 3,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.866666666666666,
+  "encode_per_box_day": 2.7296296296296294,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 2.6
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40378,
+  "l1_items": 329,
+  "live_p99_s": 461.2340693926517,
+  "ev": {
+   "come_on": 426,
+   "xfer_fail": 18275,
+   "link_drop": 582,
+   "pub_post": 192,
+   "silent_loss": 14,
+   "want_timeout": 153,
+   "pub_comment": 62,
+   "pub_vote": 23,
+   "pub_delete": 10,
+   "miss": 1,
+   "miss_pairs": 7003,
+   "stranded": 1,
+   "stranded_pairs": 7003,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 7957,
+   "verify_invalid": 227,
+   "encode": 4787,
+   "needed_env": 7730,
+   "dup_env": 0,
+   "rej_id": 162,
+   "rej_sig": 227,
+   "refuse_window": 0,
+   "recon_sessions": 137381,
+   "fetch_keys": 506,
+   "floor_skip": 0,
+   "rej_sub": 78,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 29.47037037037037,
+  "encode_per_box_day": 17.72962962962963,
+  "subs_per_box": 2.88,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 16.6
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40062,
+  "l1_items": 304,
+  "live_p99_s": 660.9233401487218,
+  "ev": {
+   "come_on": 472,
+   "xfer_fail": 38155,
+   "link_drop": 599,
+   "pub_post": 182,
+   "want_timeout": 162,
+   "silent_loss": 13,
+   "pub_vote": 26,
+   "pub_comment": 76,
+   "pub_delete": 12,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 9139,
+   "stranded": 0,
+   "stranded_pairs": 9139,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 11430,
+   "verify_invalid": 1508,
+   "encode": 5413,
+   "needed_env": 9922,
+   "dup_env": 0,
+   "rej_id": 174,
+   "rej_sig": 1508,
+   "refuse_window": 0,
+   "recon_sessions": 146023,
+   "fetch_keys": 1891,
+   "floor_skip": 0,
+   "rej_sub": 30,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 42.333333333333336,
+  "encode_per_box_day": 20.048148148148147,
+  "subs_per_box": 2.92,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 17.2
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 14680
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1033.885,
+     "box": 9,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 74,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 82,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 83,
+     "mid": 585426393779146406,
+     "topic": 3
+    },
+    {
+     "t": 1033.885,
+     "box": 85,
+     "mid": 585426393779146406,
+     "topic": 3
+    }
+   ]
+  },
+  "l1_checks": 39922,
+  "l1_items": 4442,
+  "live_p99_s": 3437.059009280565,
+  "ev": {
+   "come_on": 463,
+   "xfer_fail": 40749,
+   "link_drop": 589,
+   "pub_post": 185,
+   "want_timeout": 184,
+   "pub_vote": 32,
+   "pub_comment": 70,
+   "pub_delete": 10,
+   "partition": 3,
+   "silent_loss": 11,
+   "miss": 0,
+   "miss_pairs": 9026,
+   "stranded": 0,
+   "stranded_pairs": 9031,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 27421,
+   "verify_invalid": 2684,
+   "encode": 5554,
+   "needed_env": 24737,
+   "dup_env": 0,
+   "rej_id": 820,
+   "rej_sig": 2684,
+   "refuse_window": 0,
+   "recon_sessions": 147515,
+   "fetch_keys": 18643,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 16773
+  },
+  "verify_per_box_day": 101.55925925925926,
+  "encode_per_box_day": 20.57037037037037,
+  "subs_per_box": 2.92,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 48.4
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 16027
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1471.412,
+     "box": 60,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1489.567,
+     "box": 26,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1490.857,
+     "box": 33,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1491.444,
+     "box": 34,
+     "mid": 5821444835348249559,
+     "topic": 8
+    },
+    {
+     "t": 1515.226,
+     "box": 71,
+     "mid": 5821444835348249559,
+     "topic": 8
+    }
+   ]
+  },
+  "l1_checks": 40674,
+  "l1_items": 5790,
+  "live_p99_s": 819.7447990729415,
+  "ev": {
+   "come_on": 426,
+   "xfer_fail": 29395,
+   "link_drop": 585,
+   "pub_post": 190,
+   "want_timeout": 167,
+   "pub_comment": 69,
+   "pub_vote": 28,
+   "silent_loss": 12,
+   "pub_delete": 11,
+   "miss": 0,
+   "miss_pairs": 7856,
+   "stranded": 0,
+   "stranded_pairs": 7856,
+   "corr_outage": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 26244,
+   "verify_invalid": 1684,
+   "encode": 4890,
+   "needed_env": 24560,
+   "dup_env": 0,
+   "rej_id": 157,
+   "rej_sig": 1684,
+   "refuse_window": 0,
+   "recon_sessions": 144955,
+   "fetch_keys": 18269,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 17125
+  },
+  "verify_per_box_day": 97.2,
+  "encode_per_box_day": 18.11111111111111,
+  "subs_per_box": 2.88,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 50.9
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 39909,
+  "l1_items": 262,
+  "live_p99_s": 964.1920740008209,
+  "ev": {
+   "come_on": 440,
+   "xfer_fail": 23419,
+   "link_drop": 631,
+   "pub_post": 170,
+   "want_timeout": 137,
+   "pub_vote": 20,
+   "pub_comment": 48,
+   "silent_loss": 9,
+   "partition": 1,
+   "miss": 3,
+   "miss_pairs": 6011,
+   "stranded": 3,
+   "stranded_pairs": 6011,
+   "pub_delete": 5,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 6984,
+   "verify_invalid": 343,
+   "encode": 4161,
+   "needed_env": 6641,
+   "dup_env": 0,
+   "rej_id": 144,
+   "rej_sig": 343,
+   "refuse_window": 0,
+   "recon_sessions": 142523,
+   "fetch_keys": 664,
+   "floor_skip": 0,
+   "rej_sub": 60,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 25.866666666666664,
+  "encode_per_box_day": 15.411111111111111,
+  "subs_per_box": 3.09,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 14.3
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 13966
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 69.83,
+     "box": 70,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 69.83,
+     "box": 14,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 64,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 79,
+     "mid": 2617789011050107415,
+     "topic": 0
+    },
+    {
+     "t": 70.13,
+     "box": 86,
+     "mid": 2617789011050107415,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 40715,
+  "l1_items": 4670,
+  "live_p99_s": 724.1392673169466,
+  "ev": {
+   "come_on": 458,
+   "xfer_fail": 25604,
+   "link_drop": 647,
+   "pub_post": 170,
+   "want_timeout": 143,
+   "pub_vote": 22,
+   "pub_comment": 48,
+   "silent_loss": 13,
+   "partition": 1,
+   "miss": 0,
+   "miss_pairs": 6515,
+   "stranded": 0,
+   "stranded_pairs": 6515,
+   "pub_delete": 8,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 21904,
+   "verify_invalid": 853,
+   "encode": 4339,
+   "needed_env": 21051,
+   "dup_env": 0,
+   "rej_id": 129,
+   "rej_sig": 853,
+   "refuse_window": 0,
+   "recon_sessions": 145384,
+   "fetch_keys": 15354,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 14518
+  },
+  "verify_per_box_day": 81.12592592592593,
+  "encode_per_box_day": 16.07037037037037,
+  "subs_per_box": 3.09,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 41.7
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 39786,
+  "l1_items": 170,
+  "live_p99_s": 8994.258367640083,
+  "ev": {
+   "come_on": 436,
+   "xfer_fail": 31346,
+   "link_drop": 635,
+   "pub_post": 187,
+   "want_timeout": 138,
+   "pub_vote": 15,
+   "pub_comment": 80,
+   "silent_loss": 3,
+   "pub_delete": 7,
+   "miss": 0,
+   "miss_pairs": 7523,
+   "stranded": 0,
+   "stranded_pairs": 7523,
+   "partition": 2,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 9346,
+   "verify_invalid": 1135,
+   "encode": 4658,
+   "needed_env": 8211,
+   "dup_env": 0,
+   "rej_id": 164,
+   "rej_sig": 1135,
+   "refuse_window": 0,
+   "recon_sessions": 141881,
+   "fetch_keys": 1419,
+   "floor_skip": 0,
+   "rej_sub": 40,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 34.614814814814814,
+  "encode_per_box_day": 17.25185185185185,
+  "subs_per_box": 3.19,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 15.7
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 140628
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 396.214,
+     "box": 128,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 121,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 263,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 245,
+     "mid": 2634173484935892170,
+     "topic": 6
+    },
+    {
+     "t": 396.214,
+     "box": 221,
+     "mid": 2634173484935892170,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 124505,
+  "l1_items": 43461,
+  "live_p99_s": 785.5783430419251,
+  "ev": {
+   "come_on": 1330,
+   "xfer_fail": 67247,
+   "link_drop": 1803,
+   "pub_post": 547,
+   "want_timeout": 867,
+   "silent_loss": 68,
+   "pub_comment": 185,
+   "pub_vote": 75,
+   "pub_delete": 19,
+   "miss": 0,
+   "miss_pairs": 63754,
+   "stranded": 0,
+   "stranded_pairs": 63754,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 211392,
+   "verify_invalid": 1872,
+   "encode": 41098,
+   "needed_env": 209520,
+   "dup_env": 0,
+   "rej_id": 1486,
+   "rej_sig": 1872,
+   "refuse_window": 0,
+   "recon_sessions": 465707,
+   "fetch_keys": 147263,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 142018
+  },
+  "verify_per_box_day": 260.97777777777776,
+  "encode_per_box_day": 50.73827160493827,
+  "subs_per_box": 3.0866666666666664,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 515.9
+ },
+ {
+  "n": 100,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 40032,
+  "l1_items": 229,
+  "live_p99_s": 989.5089672954928,
+  "ev": {
+   "come_on": 475,
+   "xfer_fail": 24555,
+   "link_drop": 625,
+   "pub_post": 186,
+   "pub_vote": 25,
+   "want_timeout": 122,
+   "pub_comment": 74,
+   "pub_delete": 12,
+   "silent_loss": 7,
+   "miss": 1,
+   "miss_pairs": 7729,
+   "stranded": 1,
+   "stranded_pairs": 7729,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 8811,
+   "verify_invalid": 587,
+   "encode": 4908,
+   "needed_env": 8224,
+   "dup_env": 0,
+   "rej_id": 573,
+   "rej_sig": 587,
+   "refuse_window": 0,
+   "recon_sessions": 142209,
+   "fetch_keys": 1191,
+   "floor_skip": 0,
+   "rej_sub": 39,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 32.63333333333333,
+  "encode_per_box_day": 18.177777777777777,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 16.3
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 16065
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2721.512,
+     "box": 38,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2725.652,
+     "box": 86,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2726.486,
+     "box": 80,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2730.212,
+     "box": 8,
+     "mid": 8231650171469071552,
+     "topic": 0
+    },
+    {
+     "t": 2731.805,
+     "box": 17,
+     "mid": 8231650171469071552,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 40482,
+  "l1_items": 5287,
+  "live_p99_s": 795.1994508392381,
+  "ev": {
+   "come_on": 425,
+   "xfer_fail": 32022,
+   "link_drop": 627,
+   "pub_post": 184,
+   "pub_vote": 24,
+   "pub_comment": 64,
+   "want_timeout": 117,
+   "pub_delete": 12,
+   "miss": 0,
+   "miss_pairs": 7744,
+   "stranded": 0,
+   "stranded_pairs": 7744,
+   "silent_loss": 7,
+   "partition": 3,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 25301,
+   "verify_invalid": 911,
+   "encode": 4840,
+   "needed_env": 24390,
+   "dup_env": 0,
+   "rej_id": 212,
+   "rej_sig": 911,
+   "refuse_window": 0,
+   "recon_sessions": 146457,
+   "fetch_keys": 17531,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 16786
+  },
+  "verify_per_box_day": 93.7074074074074,
+  "encode_per_box_day": 17.925925925925927,
+  "subs_per_box": 3.19,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 46.7
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1458
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 8045.075,
+     "box": 1,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8079.005,
+     "box": 18,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8140.238,
+     "box": 9,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8148.798,
+     "box": 19,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8151.257,
+     "box": 0,
+     "mid": 8029728005270835333,
+     "topic": 9
+    }
+   ]
+  },
+  "l1_checks": 13003,
+  "l1_items": 480,
+  "live_p99_s": 665.6305554203645,
+  "ev": {
+   "come_on": 126,
+   "xfer_fail": 5264,
+   "link_drop": 179,
+   "pub_post": 53,
+   "pub_comment": 22,
+   "pub_vote": 5,
+   "partition": 1,
+   "want_timeout": 14,
+   "pub_delete": 1,
+   "miss": 0,
+   "miss_pairs": 614,
+   "stranded": 0,
+   "stranded_pairs": 614
+  },
+  "work": {
+   "verify": 2125,
+   "verify_invalid": 19,
+   "encode": 418,
+   "needed_env": 2106,
+   "dup_env": 0,
+   "rej_id": 24,
+   "rej_sig": 19,
+   "refuse_window": 0,
+   "recon_sessions": 43852,
+   "fetch_keys": 1500,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1470
+  },
+  "verify_per_box_day": 26.23456790123457,
+  "encode_per_box_day": 5.160493827160494,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 6.0
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12444,
+  "l1_items": 30,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 129,
+   "xfer_fail": 7523,
+   "link_drop": 179,
+   "pub_post": 57,
+   "partition": 3,
+   "pub_comment": 12,
+   "miss": 0,
+   "miss_pairs": 542,
+   "stranded": 0,
+   "stranded_pairs": 542,
+   "pub_vote": 4,
+   "want_timeout": 4
+  },
+  "work": {
+   "verify": 640,
+   "verify_invalid": 39,
+   "encode": 435,
+   "needed_env": 601,
+   "dup_env": 0,
+   "rej_id": 14,
+   "rej_sig": 39,
+   "refuse_window": 0,
+   "recon_sessions": 39042,
+   "fetch_keys": 44,
+   "floor_skip": 0,
+   "rej_sub": 12,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.901234567901234,
+  "encode_per_box_day": 5.37037037037037,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 3.1
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12742,
+  "l1_items": 37,
+  "live_p99_s": 938.1075647746184,
+  "ev": {
+   "come_on": 148,
+   "xfer_fail": 8183,
+   "link_drop": 161,
+   "pub_post": 59,
+   "want_timeout": 41,
+   "pub_vote": 4,
+   "pub_comment": 18,
+   "partition": 3,
+   "miss": 0,
+   "miss_pairs": 738,
+   "stranded": 0,
+   "stranded_pairs": 738,
+   "pub_delete": 3
+  },
+  "work": {
+   "verify": 822,
+   "verify_invalid": 3,
+   "encode": 551,
+   "needed_env": 819,
+   "dup_env": 0,
+   "rej_id": 30,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 42716,
+   "fetch_keys": 36,
+   "floor_skip": 0,
+   "rej_sub": 6,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 10.148148148148147,
+  "encode_per_box_day": 6.802469135802469,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 3.4
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1323
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2846.848,
+     "box": 15,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2858.042,
+     "box": 21,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2882.416,
+     "box": 25,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2895.461,
+     "box": 3,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2914.437,
+     "box": 1,
+     "mid": 2456932834709861817,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 12640,
+  "l1_items": 426,
+  "live_p99_s": 732.5138589333656,
+  "ev": {
+   "come_on": 133,
+   "xfer_fail": 7158,
+   "link_drop": 168,
+   "pub_post": 53,
+   "want_timeout": 48,
+   "silent_loss": 2,
+   "pub_vote": 9,
+   "pub_comment": 24,
+   "partition": 2,
+   "pub_delete": 1,
+   "miss": 0,
+   "miss_pairs": 823,
+   "stranded": 0,
+   "stranded_pairs": 823
+  },
+  "work": {
+   "verify": 2510,
+   "verify_invalid": 323,
+   "encode": 433,
+   "needed_env": 2187,
+   "dup_env": 0,
+   "rej_id": 26,
+   "rej_sig": 323,
+   "refuse_window": 0,
+   "recon_sessions": 43584,
+   "fetch_keys": 1684,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1616
+  },
+  "verify_per_box_day": 30.987654320987655,
+  "encode_per_box_day": 5.34567901234568,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 5.9
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 11811,
+  "l1_items": 8,
+  "live_p99_s": 1834.2353020344744,
+  "ev": {
+   "come_on": 115,
+   "xfer_fail": 5128,
+   "link_drop": 176,
+   "pub_post": 61,
+   "pub_vote": 10,
+   "want_timeout": 26,
+   "pub_comment": 12,
+   "pub_delete": 5,
+   "miss": 0,
+   "miss_pairs": 473,
+   "stranded": 0,
+   "stranded_pairs": 473,
+   "silent_loss": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 622,
+   "verify_invalid": 132,
+   "encode": 337,
+   "needed_env": 490,
+   "dup_env": 0,
+   "rej_id": 15,
+   "rej_sig": 132,
+   "refuse_window": 0,
+   "recon_sessions": 38317,
+   "fetch_keys": 140,
+   "floor_skip": 0,
+   "rej_sub": 22,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.679012345679013,
+  "encode_per_box_day": 4.160493827160494,
+  "subs_per_box": 2.6,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 2.7
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1724
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 3751.131,
+     "box": 5,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3775.454,
+     "box": 26,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3778.124,
+     "box": 17,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3783.69,
+     "box": 22,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3796.578,
+     "box": 3,
+     "mid": 4918353253666356821,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 12937,
+  "l1_items": 557,
+  "live_p99_s": 850.6543675951252,
+  "ev": {
+   "come_on": 115,
+   "xfer_fail": 5976,
+   "link_drop": 176,
+   "pub_post": 61,
+   "pub_vote": 10,
+   "want_timeout": 29,
+   "pub_comment": 12,
+   "pub_delete": 5,
+   "miss": 0,
+   "miss_pairs": 473,
+   "stranded": 0,
+   "stranded_pairs": 473,
+   "partition": 1
+  },
+  "work": {
+   "verify": 2233,
+   "verify_invalid": 19,
+   "encode": 337,
+   "needed_env": 2214,
+   "dup_env": 0,
+   "rej_id": 25,
+   "rej_sig": 19,
+   "refuse_window": 0,
+   "recon_sessions": 42965,
+   "fetch_keys": 1739,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1734
+  },
+  "verify_per_box_day": 27.567901234567902,
+  "encode_per_box_day": 4.160493827160494,
+  "subs_per_box": 2.6,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 6.6
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 13246,
+  "l1_items": 13,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 112,
+   "xfer_fail": 5651,
+   "link_drop": 193,
+   "pub_post": 53,
+   "want_timeout": 20,
+   "pub_comment": 22,
+   "pub_delete": 3,
+   "pub_vote": 3,
+   "miss": 0,
+   "miss_pairs": 515,
+   "stranded": 0,
+   "stranded_pairs": 515,
+   "silent_loss": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 602,
+   "verify_invalid": 8,
+   "encode": 369,
+   "needed_env": 594,
+   "dup_env": 0,
+   "rej_id": 11,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 42237,
+   "fetch_keys": 21,
+   "floor_skip": 0,
+   "rej_sub": 15,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.432098765432099,
+  "encode_per_box_day": 4.555555555555555,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 2.9
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1512
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5749.894,
+     "box": 1,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5756.224,
+     "box": 15,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5792.751,
+     "box": 2,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5793.92,
+     "box": 13,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5820.089,
+     "box": 24,
+     "mid": 4054258205851890539,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 13327,
+  "l1_items": 448,
+  "live_p99_s": 695.2575363264477,
+  "ev": {
+   "come_on": 112,
+   "xfer_fail": 5975,
+   "link_drop": 194,
+   "pub_post": 53,
+   "want_timeout": 12,
+   "pub_comment": 23,
+   "pub_delete": 2,
+   "pub_vote": 3,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 520,
+   "stranded": 0,
+   "stranded_pairs": 520,
+   "partition": 2
+  },
+  "work": {
+   "verify": 2559,
+   "verify_invalid": 453,
+   "encode": 369,
+   "needed_env": 2106,
+   "dup_env": 0,
+   "rej_id": 20,
+   "rej_sig": 453,
+   "refuse_window": 0,
+   "recon_sessions": 43976,
+   "fetch_keys": 1981,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1870
+  },
+  "verify_per_box_day": 31.59259259259259,
+  "encode_per_box_day": 4.555555555555555,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 5.6
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 561
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 8359.071,
+     "box": 0,
+     "mid": 4380312347017278455,
+     "topic": 4
+    },
+    {
+     "t": 9533.884,
+     "box": 0,
+     "mid": 3868335400494650917,
+     "topic": 4
+    },
+    {
+     "t": 10007.497,
+     "box": 0,
+     "mid": 9112783419103892087,
+     "topic": 4
+    },
+    {
+     "t": 10080.665,
+     "box": 20,
+     "mid": 4380312347017278455,
+     "topic": 4
+    },
+    {
+     "t": 10080.665,
+     "box": 20,
+     "mid": 3868335400494650917,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 46,
+  "l1_items": 302,
+  "live_p99_s": 1024.7185368104256,
+  "ev": {
+   "come_on": 88,
+   "xfer_fail": 17093,
+   "link_drop": 194,
+   "pub_post": 46,
+   "pub_vote": 5,
+   "pub_comment": 17,
+   "partition": 4,
+   "miss": 0,
+   "miss_pairs": 46,
+   "stranded": 0,
+   "stranded_pairs": 46,
+   "pub_delete": 2,
+   "want_timeout": 2
+  },
+  "work": {
+   "verify": 888,
+   "verify_invalid": 8,
+   "encode": 200,
+   "needed_env": 880,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 544,
+   "fetch_keys": 801,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 569
+  },
+  "verify_per_box_day": 10.962962962962962,
+  "encode_per_box_day": 2.4691358024691357,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 37,
+  "l1_items": 87,
+  "live_p99_s": 588.522652128042,
+  "ev": {
+   "come_on": 88,
+   "xfer_fail": 15799,
+   "link_drop": 194,
+   "pub_post": 47,
+   "pub_vote": 5,
+   "pub_comment": 16,
+   "partition": 4,
+   "miss": 0,
+   "miss_pairs": 47,
+   "stranded": 0,
+   "stranded_pairs": 47,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 256,
+   "verify_invalid": 1,
+   "encode": 164,
+   "needed_env": 255,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 374,
+   "fetch_keys": 155,
+   "floor_skip": 0,
+   "rej_sub": 13,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 3.1604938271604937,
+  "encode_per_box_day": 2.0246913580246915,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 768
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 34697.348,
+     "box": 25,
+     "mid": 6424895229741506801,
+     "topic": 4
+    },
+    {
+     "t": 34954.192,
+     "box": 13,
+     "mid": 6424895229741506801,
+     "topic": 4
+    },
+    {
+     "t": 35641.296,
+     "box": 9,
+     "mid": 6424895229741506801,
+     "topic": 4
+    },
+    {
+     "t": 36476.557,
+     "box": 13,
+     "mid": 1757489542066191452,
+     "topic": 16
+    },
+    {
+     "t": 36476.557,
+     "box": 25,
+     "mid": 1757489542066191452,
+     "topic": 16
+    }
+   ]
+  },
+  "l1_checks": 29,
+  "l1_items": 266,
+  "live_p99_s": 32583.23640169308,
+  "ev": {
+   "come_on": 93,
+   "xfer_fail": 15993,
+   "link_drop": 183,
+   "pub_post": 47,
+   "pub_delete": 4,
+   "want_timeout": 5,
+   "pub_comment": 19,
+   "miss": 0,
+   "miss_pairs": 15,
+   "stranded": 0,
+   "stranded_pairs": 15,
+   "pub_vote": 3,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1008,
+   "verify_invalid": 7,
+   "encode": 158,
+   "needed_env": 1001,
+   "dup_env": 0,
+   "rej_id": 4,
+   "rej_sig": 7,
+   "refuse_window": 0,
+   "recon_sessions": 510,
+   "fetch_keys": 948,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 771
+  },
+  "verify_per_box_day": 12.444444444444445,
+  "encode_per_box_day": 1.9506172839506173,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 11757,
+  "l1_items": 66,
+  "live_p99_s": 1933.1824830600235,
+  "ev": {
+   "come_on": 114,
+   "xfer_fail": 12478,
+   "link_drop": 180,
+   "pub_post": 43,
+   "want_timeout": 34,
+   "pub_comment": 26,
+   "partition": 6,
+   "pub_vote": 7,
+   "silent_loss": 3,
+   "pub_delete": 3,
+   "miss": 0,
+   "miss_pairs": 629,
+   "stranded": 0,
+   "stranded_pairs": 629
+  },
+  "work": {
+   "verify": 661,
+   "verify_invalid": 4,
+   "encode": 301,
+   "needed_env": 657,
+   "dup_env": 0,
+   "rej_id": 5,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 39748,
+   "fetch_keys": 40,
+   "floor_skip": 0,
+   "rej_sub": 12,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 8.160493827160494,
+  "encode_per_box_day": 3.7160493827160495,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 2.9
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 24,
+  "l1_items": 41,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 93,
+   "xfer_fail": 15540,
+   "link_drop": 183,
+   "pub_post": 48,
+   "pub_delete": 4,
+   "pub_comment": 19,
+   "want_timeout": 5,
+   "miss": 0,
+   "miss_pairs": 22,
+   "stranded": 0,
+   "stranded_pairs": 22,
+   "pub_vote": 2,
+   "partition": 1
+  },
+  "work": {
+   "verify": 240,
+   "verify_invalid": 2,
+   "encode": 128,
+   "needed_env": 238,
+   "dup_env": 0,
+   "rej_id": 2,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 346,
+   "fetch_keys": 177,
+   "floor_skip": 0,
+   "rej_sub": 4,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.9629629629629632,
+  "encode_per_box_day": 1.5802469135802468,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 527
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 35796.34,
+     "box": 0,
+     "mid": 4050427376970017596,
+     "topic": 0
+    },
+    {
+     "t": 35994.33,
+     "box": 0,
+     "mid": 3401228234138889542,
+     "topic": 0
+    },
+    {
+     "t": 37904.283,
+     "box": 19,
+     "mid": 3401228234138889542,
+     "topic": 0
+    },
+    {
+     "t": 39684.188,
+     "box": 24,
+     "mid": 3401228234138889542,
+     "topic": 0
+    },
+    {
+     "t": 48327.712,
+     "box": 11,
+     "mid": 3401228234138889542,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 38,
+  "l1_items": 195,
+  "live_p99_s": 13262.816090248874,
+  "ev": {
+   "come_on": 92,
+   "xfer_fail": 17247,
+   "link_drop": 178,
+   "pub_post": 40,
+   "pub_delete": 2,
+   "pub_vote": 2,
+   "pub_comment": 13,
+   "want_timeout": 1,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 8,
+   "stranded": 0,
+   "stranded_pairs": 8
+  },
+  "work": {
+   "verify": 714,
+   "verify_invalid": 2,
+   "encode": 122,
+   "needed_env": 712,
+   "dup_env": 0,
+   "rej_id": 2,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 510,
+   "fetch_keys": 679,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 529
+  },
+  "verify_per_box_day": 8.814814814814815,
+  "encode_per_box_day": 1.5061728395061726,
+  "subs_per_box": 2.6,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 10,
+  "l1_items": 6,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 92,
+   "xfer_fail": 11545,
+   "link_drop": 178,
+   "pub_post": 40,
+   "pub_delete": 2,
+   "pub_vote": 2,
+   "pub_comment": 13,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 8,
+   "stranded": 0,
+   "stranded_pairs": 8
+  },
+  "work": {
+   "verify": 100,
+   "verify_invalid": 0,
+   "encode": 65,
+   "needed_env": 100,
+   "dup_env": 0,
+   "rej_id": 1,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 172,
+   "fetch_keys": 36,
+   "floor_skip": 0,
+   "rej_sub": 1,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.2345679012345678,
+  "encode_per_box_day": 0.8024691358024691,
+  "subs_per_box": 2.6,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 484
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 55533.472,
+     "box": 0,
+     "mid": 6012364447003576876,
+     "topic": 17
+    },
+    {
+     "t": 56185.284,
+     "box": 0,
+     "mid": 7700126483757890437,
+     "topic": 12
+    },
+    {
+     "t": 56185.284,
+     "box": 0,
+     "mid": 967054456073523410,
+     "topic": 16
+    },
+    {
+     "t": 57049.096,
+     "box": 23,
+     "mid": 6012364447003576876,
+     "topic": 17
+    },
+    {
+     "t": 57049.096,
+     "box": 23,
+     "mid": 7700126483757890437,
+     "topic": 12
+    }
+   ]
+  },
+  "l1_checks": 36,
+  "l1_items": 154,
+  "live_p99_s": 4300.117174270563,
+  "ev": {
+   "come_on": 86,
+   "xfer_fail": 15627,
+   "link_drop": 178,
+   "pub_post": 40,
+   "miss": 0,
+   "miss_pairs": 18,
+   "stranded": 0,
+   "stranded_pairs": 18,
+   "pub_vote": 4,
+   "pub_comment": 7,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 723,
+   "verify_invalid": 0,
+   "encode": 156,
+   "needed_env": 723,
+   "dup_env": 0,
+   "rej_id": 1,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 450,
+   "fetch_keys": 697,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 484
+  },
+  "verify_per_box_day": 8.925925925925926,
+  "encode_per_box_day": 1.9259259259259258,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 0.3
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 25,
+  "l1_items": 27,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 86,
+   "xfer_fail": 14017,
+   "link_drop": 178,
+   "pub_post": 41,
+   "miss": 0,
+   "miss_pairs": 16,
+   "stranded": 0,
+   "stranded_pairs": 16,
+   "pub_vote": 4,
+   "pub_comment": 6,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 171,
+   "verify_invalid": 0,
+   "encode": 102,
+   "needed_env": 171,
+   "dup_env": 0,
+   "rej_id": 2,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 249,
+   "fetch_keys": 105,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.111111111111111,
+  "encode_per_box_day": 1.2592592592592593,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2,
+  "l1_items": 1,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 94,
+   "xfer_fail": 13314,
+   "link_drop": 197,
+   "pub_post": 38,
+   "pub_comment": 4,
+   "pub_vote": 8,
+   "miss": 0,
+   "miss_pairs": 3,
+   "stranded": 4,
+   "stranded_pairs": 7,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 64,
+   "verify_invalid": 0,
+   "encode": 49,
+   "needed_env": 64,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 104,
+   "fetch_keys": 10,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.7901234567901234,
+  "encode_per_box_day": 0.6049382716049383,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 448
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 26073.172,
+     "box": 25,
+     "mid": 8308722148059740000,
+     "topic": 13
+    },
+    {
+     "t": 26237.393,
+     "box": 24,
+     "mid": 8308722148059740000,
+     "topic": 13
+    },
+    {
+     "t": 31184.044,
+     "box": 14,
+     "mid": 8308722148059740000,
+     "topic": 13
+    },
+    {
+     "t": 31487.373,
+     "box": 0,
+     "mid": 1106320631796174703,
+     "topic": 19
+    },
+    {
+     "t": 34219.824,
+     "box": 23,
+     "mid": 8308722148059740000,
+     "topic": 13
+    }
+   ]
+  },
+  "l1_checks": 37,
+  "l1_items": 81,
+  "live_p99_s": 21441.612127517204,
+  "ev": {
+   "come_on": 94,
+   "xfer_fail": 17550,
+   "link_drop": 197,
+   "pub_post": 35,
+   "pub_comment": 6,
+   "pub_vote": 10,
+   "miss": 0,
+   "miss_pairs": 6,
+   "stranded": 2,
+   "stranded_pairs": 8
+  },
+  "work": {
+   "verify": 591,
+   "verify_invalid": 1,
+   "encode": 91,
+   "needed_env": 590,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 504,
+   "fetch_keys": 556,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 449
+  },
+  "verify_per_box_day": 7.296296296296297,
+  "encode_per_box_day": 1.1234567901234567,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1498
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2731.042,
+     "box": 14,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2753.326,
+     "box": 4,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2782.175,
+     "box": 22,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2794.597,
+     "box": 1,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2796.126,
+     "box": 18,
+     "mid": 3015712171453067046,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 13150,
+  "l1_items": 479,
+  "live_p99_s": 702.8170965461613,
+  "ev": {
+   "come_on": 112,
+   "xfer_fail": 5975,
+   "link_drop": 167,
+   "pub_post": 53,
+   "want_timeout": 35,
+   "pub_comment": 22,
+   "partition": 3,
+   "pub_vote": 6,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 586,
+   "stranded": 0,
+   "stranded_pairs": 586,
+   "pub_delete": 4
+  },
+  "work": {
+   "verify": 2168,
+   "verify_invalid": 8,
+   "encode": 386,
+   "needed_env": 2160,
+   "dup_env": 0,
+   "rej_id": 13,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 43467,
+   "fetch_keys": 1536,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1504
+  },
+  "verify_per_box_day": 26.76543209876543,
+  "encode_per_box_day": 4.765432098765432,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 5.0
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 6087,
+  "l1_items": 66,
+  "live_p99_s": 296.2822087438544,
+  "ev": {
+   "come_on": 110,
+   "xfer_fail": 20737,
+   "link_drop": 160,
+   "pub_post": 48,
+   "pub_comment": 14,
+   "pub_vote": 4,
+   "want_timeout": 4,
+   "miss": 0,
+   "miss_pairs": 278,
+   "stranded": 0,
+   "stranded_pairs": 278,
+   "pub_delete": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 435,
+   "verify_invalid": 5,
+   "encode": 284,
+   "needed_env": 430,
+   "dup_env": 0,
+   "rej_id": 35,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 18961,
+   "fetch_keys": 138,
+   "floor_skip": 0,
+   "rej_sub": 10,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 5.37037037037037,
+  "encode_per_box_day": 3.506172839506173,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 1.5
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 883
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 9817.143,
+     "box": 6,
+     "mid": 3460486730426132316,
+     "topic": 4
+    },
+    {
+     "t": 9846.035,
+     "box": 3,
+     "mid": 3460486730426132316,
+     "topic": 4
+    },
+    {
+     "t": 9934.923,
+     "box": 0,
+     "mid": 3460486730426132316,
+     "topic": 4
+    },
+    {
+     "t": 9934.923,
+     "box": 9,
+     "mid": 3460486730426132316,
+     "topic": 4
+    },
+    {
+     "t": 9934.923,
+     "box": 7,
+     "mid": 3460486730426132316,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 8270,
+  "l1_items": 497,
+  "live_p99_s": 616.6673501343466,
+  "ev": {
+   "come_on": 110,
+   "xfer_fail": 23407,
+   "link_drop": 160,
+   "pub_post": 48,
+   "pub_comment": 14,
+   "pub_vote": 4,
+   "want_timeout": 18,
+   "miss": 0,
+   "miss_pairs": 275,
+   "stranded": 0,
+   "stranded_pairs": 275,
+   "pub_delete": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 1342,
+   "verify_invalid": 32,
+   "encode": 284,
+   "needed_env": 1310,
+   "dup_env": 0,
+   "rej_id": 38,
+   "rej_sig": 32,
+   "refuse_window": 0,
+   "recon_sessions": 26601,
+   "fetch_keys": 1064,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 909
+  },
+  "verify_per_box_day": 16.567901234567902,
+  "encode_per_box_day": 3.506172839506173,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 2.9
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 7852,
+  "l1_items": 233,
+  "live_p99_s": 282.887648925971,
+  "ev": {
+   "come_on": 113,
+   "xfer_fail": 22186,
+   "link_drop": 199,
+   "pub_post": 61,
+   "pub_vote": 8,
+   "pub_delete": 4,
+   "pub_comment": 22,
+   "miss": 0,
+   "miss_pairs": 538,
+   "stranded": 0,
+   "stranded_pairs": 538,
+   "partition": 1,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 907,
+   "verify_invalid": 27,
+   "encode": 475,
+   "needed_env": 880,
+   "dup_env": 0,
+   "rej_id": 47,
+   "rej_sig": 27,
+   "refuse_window": 0,
+   "recon_sessions": 24260,
+   "fetch_keys": 343,
+   "floor_skip": 0,
+   "rej_sub": 8,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 11.197530864197532,
+  "encode_per_box_day": 5.864197530864197,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 1.9
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1048
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5161.635,
+     "box": 0,
+     "mid": 4000296879185698982,
+     "topic": 2
+    },
+    {
+     "t": 5232.214,
+     "box": 4,
+     "mid": 4000296879185698982,
+     "topic": 2
+    },
+    {
+     "t": 5241.473,
+     "box": 14,
+     "mid": 4000296879185698982,
+     "topic": 2
+    },
+    {
+     "t": 5246.859,
+     "box": 5,
+     "mid": 4000296879185698982,
+     "topic": 2
+    },
+    {
+     "t": 5288.811,
+     "box": 3,
+     "mid": 4000296879185698982,
+     "topic": 2
+    }
+   ]
+  },
+  "l1_checks": 8537,
+  "l1_items": 849,
+  "live_p99_s": 658.2131766452221,
+  "ev": {
+   "come_on": 106,
+   "xfer_fail": 22181,
+   "link_drop": 193,
+   "pub_post": 50,
+   "want_timeout": 8,
+   "pub_vote": 10,
+   "pub_delete": 5,
+   "pub_comment": 19,
+   "silent_loss": 2,
+   "miss": 0,
+   "miss_pairs": 441,
+   "stranded": 0,
+   "stranded_pairs": 441,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1835,
+   "verify_invalid": 26,
+   "encode": 367,
+   "needed_env": 1809,
+   "dup_env": 0,
+   "rej_id": 29,
+   "rej_sig": 26,
+   "refuse_window": 0,
+   "recon_sessions": 26633,
+   "fetch_keys": 1302,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1073
+  },
+  "verify_per_box_day": 22.65432098765432,
+  "encode_per_box_day": 4.530864197530865,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 3.5
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 6595,
+  "l1_items": 53,
+  "live_p99_s": 697.5119532337994,
+  "ev": {
+   "come_on": 111,
+   "xfer_fail": 14985,
+   "link_drop": 185,
+   "pub_post": 44,
+   "pub_comment": 14,
+   "pub_vote": 10,
+   "miss": 0,
+   "miss_pairs": 271,
+   "stranded": 0,
+   "stranded_pairs": 271,
+   "want_timeout": 2,
+   "partition": 1
+  },
+  "work": {
+   "verify": 357,
+   "verify_invalid": 4,
+   "encode": 221,
+   "needed_env": 353,
+   "dup_env": 0,
+   "rej_id": 17,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 19016,
+   "fetch_keys": 60,
+   "floor_skip": 0,
+   "rej_sub": 1,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.407407407407407,
+  "encode_per_box_day": 2.728395061728395,
+  "subs_per_box": 2.6,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 1.3
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 998
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 7147.717,
+     "box": 10,
+     "mid": 1625264750621147283,
+     "topic": 0
+    },
+    {
+     "t": 7183.729,
+     "box": 2,
+     "mid": 1625264750621147283,
+     "topic": 0
+    },
+    {
+     "t": 7235.103,
+     "box": 14,
+     "mid": 1625264750621147283,
+     "topic": 0
+    },
+    {
+     "t": 7254.283,
+     "box": 12,
+     "mid": 1625264750621147283,
+     "topic": 0
+    },
+    {
+     "t": 7391.667,
+     "box": 5,
+     "mid": 1625264750621147283,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 8493,
+  "l1_items": 562,
+  "live_p99_s": 1996.9570681194018,
+  "ev": {
+   "come_on": 98,
+   "xfer_fail": 20284,
+   "link_drop": 194,
+   "pub_post": 42,
+   "want_timeout": 2,
+   "pub_vote": 5,
+   "pub_comment": 13,
+   "miss": 0,
+   "miss_pairs": 231,
+   "stranded": 0,
+   "stranded_pairs": 231,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1325,
+   "verify_invalid": 0,
+   "encode": 215,
+   "needed_env": 1325,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 25280,
+   "fetch_keys": 1076,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 998
+  },
+  "verify_per_box_day": 16.358024691358025,
+  "encode_per_box_day": 2.654320987654321,
+  "subs_per_box": 2.6,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 2.5
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 7359,
+  "l1_items": 87,
+  "live_p99_s": 8.349999999947613,
+  "ev": {
+   "come_on": 110,
+   "xfer_fail": 20826,
+   "link_drop": 175,
+   "partition": 2,
+   "pub_post": 59,
+   "pub_comment": 15,
+   "pub_vote": 8,
+   "want_timeout": 37,
+   "miss": 0,
+   "miss_pairs": 410,
+   "stranded": 0,
+   "stranded_pairs": 410,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 593,
+   "verify_invalid": 4,
+   "encode": 398,
+   "needed_env": 589,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 23064,
+   "fetch_keys": 139,
+   "floor_skip": 0,
+   "rej_sub": 11,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.320987654320987,
+  "encode_per_box_day": 4.91358024691358,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 1.6
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1187
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5731.78,
+     "box": 11,
+     "mid": 596176227825048154,
+     "topic": 6
+    },
+    {
+     "t": 5753.863,
+     "box": 0,
+     "mid": 596176227825048154,
+     "topic": 6
+    },
+    {
+     "t": 5791.704,
+     "box": 8,
+     "mid": 596176227825048154,
+     "topic": 6
+    },
+    {
+     "t": 5865.286,
+     "box": 10,
+     "mid": 596176227825048154,
+     "topic": 6
+    },
+    {
+     "t": 5905.414,
+     "box": 7,
+     "mid": 596176227825048154,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 8522,
+  "l1_items": 853,
+  "live_p99_s": 628.2116535089444,
+  "ev": {
+   "come_on": 110,
+   "xfer_fail": 22023,
+   "link_drop": 175,
+   "partition": 2,
+   "pub_post": 59,
+   "pub_comment": 15,
+   "want_timeout": 31,
+   "pub_vote": 8,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 408,
+   "stranded": 3,
+   "stranded_pairs": 411,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 1777,
+   "verify_invalid": 4,
+   "encode": 394,
+   "needed_env": 1773,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 26657,
+   "fetch_keys": 1313,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1189
+  },
+  "verify_per_box_day": 21.93827160493827,
+  "encode_per_box_day": 4.864197530864198,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 3.3
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 122
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 89945.678,
+     "box": 4,
+     "mid": 6765783701641804375,
+     "topic": 7
+    },
+    {
+     "t": 89945.678,
+     "box": 12,
+     "mid": 1178223313794609531,
+     "topic": 4
+    },
+    {
+     "t": 89945.678,
+     "box": 12,
+     "mid": 832378447311094000,
+     "topic": 6
+    },
+    {
+     "t": 91416.66,
+     "box": 4,
+     "mid": 4111072782280269149,
+     "topic": 7
+    },
+    {
+     "t": 91416.66,
+     "box": 12,
+     "mid": 5700046981489606533,
+     "topic": 17
+    }
+   ]
+  },
+  "l1_checks": 5,
+  "l1_items": 6,
+  "live_p99_s": 718.6916826323722,
+  "ev": {
+   "come_on": 88,
+   "xfer_fail": 12776,
+   "link_drop": 172,
+   "pub_post": 50,
+   "pub_delete": 6,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_comment": 16,
+   "partition": 1,
+   "pub_vote": 4
+  },
+  "work": {
+   "verify": 270,
+   "verify_invalid": 0,
+   "encode": 97,
+   "needed_env": 270,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 124,
+   "fetch_keys": 184,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 122
+  },
+  "verify_per_box_day": 3.3333333333333335,
+  "encode_per_box_day": 1.1975308641975309,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 6800,
+  "l1_items": 95,
+  "live_p99_s": 8.350000000013097,
+  "ev": {
+   "come_on": 112,
+   "xfer_fail": 23730,
+   "link_drop": 180,
+   "pub_post": 62,
+   "partition": 2,
+   "pub_comment": 19,
+   "want_timeout": 2,
+   "pub_vote": 11,
+   "pub_delete": 5,
+   "miss": 0,
+   "miss_pairs": 382,
+   "stranded": 0,
+   "stranded_pairs": 384
+  },
+  "work": {
+   "verify": 595,
+   "verify_invalid": 6,
+   "encode": 349,
+   "needed_env": 589,
+   "dup_env": 0,
+   "rej_id": 3,
+   "rej_sig": 6,
+   "refuse_window": 0,
+   "recon_sessions": 20841,
+   "fetch_keys": 158,
+   "floor_skip": 0,
+   "rej_sub": 20,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 7.34567901234568,
+  "encode_per_box_day": 4.308641975308642,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 1.8
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3,
+  "l1_items": 2,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 88,
+   "xfer_fail": 11500,
+   "link_drop": 172,
+   "pub_post": 50,
+   "pub_delete": 6,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_comment": 16,
+   "partition": 1,
+   "pub_vote": 4
+  },
+  "work": {
+   "verify": 144,
+   "verify_invalid": 0,
+   "encode": 96,
+   "needed_env": 144,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 76,
+   "fetch_keys": 56,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.7777777777777777,
+  "encode_per_box_day": 1.1851851851851851,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 209
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 59439.065,
+     "box": 11,
+     "mid": 5159982089022372180,
+     "topic": 6
+    },
+    {
+     "t": 60398.22,
+     "box": 11,
+     "mid": 750424073509985939,
+     "topic": 6
+    },
+    {
+     "t": 60398.22,
+     "box": 11,
+     "mid": 6226661798905977262,
+     "topic": 6
+    },
+    {
+     "t": 61036.264,
+     "box": 6,
+     "mid": 5159982089022372180,
+     "topic": 6
+    },
+    {
+     "t": 61036.264,
+     "box": 6,
+     "mid": 750424073509985939,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 5,
+  "l1_items": 32,
+  "live_p99_s": 1273.37697669903,
+  "ev": {
+   "come_on": 96,
+   "xfer_fail": 14117,
+   "link_drop": 201,
+   "pub_post": 44,
+   "pub_comment": 13,
+   "pub_vote": 6,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 341,
+   "verify_invalid": 0,
+   "encode": 88,
+   "needed_env": 341,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 138,
+   "fetch_keys": 272,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 209
+  },
+  "verify_per_box_day": 4.209876543209877,
+  "encode_per_box_day": 1.0864197530864197,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3,
+  "l1_items": 5,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 96,
+   "xfer_fail": 13571,
+   "link_drop": 201,
+   "pub_post": 45,
+   "pub_comment": 12,
+   "pub_vote": 6,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 103,
+   "verify_invalid": 0,
+   "encode": 64,
+   "needed_env": 103,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 79,
+   "fetch_keys": 41,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.271604938271605,
+  "encode_per_box_day": 0.7901234567901234,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 251
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 53306.535,
+     "box": 23,
+     "mid": 1473228478504400284,
+     "topic": 5
+    },
+    {
+     "t": 53306.535,
+     "box": 23,
+     "mid": 5868908868417278307,
+     "topic": 5
+    },
+    {
+     "t": 53306.535,
+     "box": 23,
+     "mid": 4267231903951039202,
+     "topic": 11
+    },
+    {
+     "t": 54866.101,
+     "box": 23,
+     "mid": 3946117767604821061,
+     "topic": 11
+    },
+    {
+     "t": 55566.335,
+     "box": 23,
+     "mid": 814830538841414930,
+     "topic": 11
+    }
+   ]
+  },
+  "l1_checks": 11,
+  "l1_items": 0,
+  "live_p99_s": 633.9999606400816,
+  "ev": {
+   "link_drop": 180,
+   "come_on": 117,
+   "xfer_fail": 16137,
+   "pub_post": 43,
+   "pub_comment": 18,
+   "pub_delete": 3,
+   "pub_vote": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "partition": 2
+  },
+  "work": {
+   "verify": 361,
+   "verify_invalid": 3,
+   "encode": 73,
+   "needed_env": 358,
+   "dup_env": 0,
+   "rej_id": 2,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 284,
+   "fetch_keys": 305,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 254
+  },
+  "verify_per_box_day": 4.45679012345679,
+  "encode_per_box_day": 0.9012345679012346,
+  "subs_per_box": 2.6,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 77
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 49716.977,
+     "box": 13,
+     "mid": 4692075422564455840,
+     "topic": 7
+    },
+    {
+     "t": 68049.259,
+     "box": 13,
+     "mid": 3990141242130313306,
+     "topic": 4
+    },
+    {
+     "t": 85676.012,
+     "box": 18,
+     "mid": 8731331978766136354,
+     "topic": 12
+    },
+    {
+     "t": 120295.97,
+     "box": 7,
+     "mid": 4692075422564455840,
+     "topic": 7
+    },
+    {
+     "t": 122939.661,
+     "box": 5,
+     "mid": 3990141242130313306,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 11,
+  "l1_items": 32,
+  "live_p99_s": 809.4139556764567,
+  "ev": {
+   "come_on": 86,
+   "xfer_fail": 12934,
+   "link_drop": 166,
+   "pub_post": 44,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_vote": 3,
+   "pub_comment": 12,
+   "pub_delete": 1,
+   "want_timeout": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 159,
+   "verify_invalid": 0,
+   "encode": 58,
+   "needed_env": 159,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 140,
+   "fetch_keys": 108,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 77
+  },
+  "verify_per_box_day": 1.962962962962963,
+  "encode_per_box_day": 0.7160493827160495,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 5,
+  "l1_items": 0,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "link_drop": 180,
+   "come_on": 117,
+   "xfer_fail": 12054,
+   "pub_post": 46,
+   "pub_comment": 16,
+   "pub_delete": 2,
+   "pub_vote": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "want_timeout": 1,
+   "partition": 2
+  },
+  "work": {
+   "verify": 92,
+   "verify_invalid": 0,
+   "encode": 64,
+   "needed_env": 92,
+   "dup_env": 0,
+   "rej_id": 1,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 123,
+   "fetch_keys": 19,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.1358024691358024,
+  "encode_per_box_day": 0.7901234567901234,
+  "subs_per_box": 2.6,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 87
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 45582.824,
+     "box": 4,
+     "mid": 3861486831001197571,
+     "topic": 10
+    },
+    {
+     "t": 56738.772,
+     "box": 0,
+     "mid": 3360663141231063983,
+     "topic": 0
+    },
+    {
+     "t": 56738.772,
+     "box": 0,
+     "mid": 7265262374960948029,
+     "topic": 3
+    },
+    {
+     "t": 56738.772,
+     "box": 0,
+     "mid": 3027051104397394658,
+     "topic": 2
+    },
+    {
+     "t": 179843.204,
+     "box": 9,
+     "mid": 2853294374973636789,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": 355.6952557154582,
+  "ev": {
+   "link_drop": 166,
+   "come_on": 99,
+   "xfer_fail": 11454,
+   "pub_post": 40,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "want_timeout": 5,
+   "partition": 3,
+   "pub_delete": 3,
+   "pub_vote": 2
+  },
+  "work": {
+   "verify": 156,
+   "verify_invalid": 0,
+   "encode": 49,
+   "needed_env": 156,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 93,
+   "fetch_keys": 115,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 87
+  },
+  "verify_per_box_day": 1.9259259259259258,
+  "encode_per_box_day": 0.6049382716049383,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 6,
+  "l1_items": 4,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 86,
+   "xfer_fail": 12203,
+   "link_drop": 166,
+   "pub_post": 44,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_vote": 3,
+   "pub_comment": 12,
+   "pub_delete": 1,
+   "want_timeout": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 74,
+   "verify_invalid": 0,
+   "encode": 53,
+   "needed_env": 74,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 74,
+   "fetch_keys": 12,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.9135802469135803,
+  "encode_per_box_day": 0.654320987654321,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1427
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 11045.593,
+     "box": 6,
+     "mid": 2303214118531077483,
+     "topic": 2
+    },
+    {
+     "t": 11045.593,
+     "box": 8,
+     "mid": 2303214118531077483,
+     "topic": 2
+    },
+    {
+     "t": 11045.593,
+     "box": 12,
+     "mid": 2303214118531077483,
+     "topic": 2
+    },
+    {
+     "t": 11045.593,
+     "box": 14,
+     "mid": 2303214118531077483,
+     "topic": 2
+    },
+    {
+     "t": 11045.893,
+     "box": 0,
+     "mid": 2303214118531077483,
+     "topic": 2
+    }
+   ]
+  },
+  "l1_checks": 8459,
+  "l1_items": 776,
+  "live_p99_s": 607.4198437077866,
+  "ev": {
+   "come_on": 111,
+   "xfer_fail": 24569,
+   "link_drop": 175,
+   "pub_post": 62,
+   "partition": 2,
+   "pub_comment": 20,
+   "silent_loss": 3,
+   "want_timeout": 4,
+   "pub_vote": 9,
+   "pub_delete": 4,
+   "miss": 0,
+   "miss_pairs": 367,
+   "stranded": 0,
+   "stranded_pairs": 368
+  },
+  "work": {
+   "verify": 2030,
+   "verify_invalid": 35,
+   "encode": 359,
+   "needed_env": 1995,
+   "dup_env": 0,
+   "rej_id": 12,
+   "rej_sig": 35,
+   "refuse_window": 0,
+   "recon_sessions": 26426,
+   "fetch_keys": 1618,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1459
+  },
+  "verify_per_box_day": 25.06172839506173,
+  "encode_per_box_day": 4.432098765432099,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 3.4
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "link_drop": 166,
+   "come_on": 99,
+   "xfer_fail": 10758,
+   "pub_post": 40,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "want_timeout": 6,
+   "partition": 3,
+   "pub_delete": 3,
+   "pub_vote": 2
+  },
+  "work": {
+   "verify": 63,
+   "verify_invalid": 0,
+   "encode": 47,
+   "needed_env": 63,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 61,
+   "fetch_keys": 13,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.7777777777777778,
+  "encode_per_box_day": 0.5802469135802469,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12042,
+  "l1_items": 35,
+  "live_p99_s": 4913.858708424843,
+  "ev": {
+   "come_on": 143,
+   "xfer_fail": 8621,
+   "link_drop": 201,
+   "pub_post": 47,
+   "partition": 3,
+   "pub_comment": 15,
+   "miss": 0,
+   "miss_pairs": 498,
+   "stranded": 0,
+   "stranded_pairs": 498,
+   "pub_vote": 4,
+   "want_timeout": 6,
+   "corr_outage": 1,
+   "pub_delete": 2
+  },
+  "work": {
+   "verify": 539,
+   "verify_invalid": 4,
+   "encode": 322,
+   "needed_env": 535,
+   "dup_env": 0,
+   "rej_id": 11,
+   "rej_sig": 4,
+   "refuse_window": 0,
+   "recon_sessions": 37816,
+   "fetch_keys": 28,
+   "floor_skip": 0,
+   "rej_sub": 9,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 6.65432098765432,
+  "encode_per_box_day": 3.9753086419753085,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 2.7
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1375
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 8045.075,
+     "box": 1,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8079.005,
+     "box": 18,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8140.238,
+     "box": 9,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8148.798,
+     "box": 19,
+     "mid": 8029728005270835333,
+     "topic": 9
+    },
+    {
+     "t": 8151.257,
+     "box": 0,
+     "mid": 8029728005270835333,
+     "topic": 9
+    }
+   ]
+  },
+  "l1_checks": 12734,
+  "l1_items": 475,
+  "live_p99_s": 634.9609841819693,
+  "ev": {
+   "come_on": 140,
+   "xfer_fail": 6632,
+   "link_drop": 186,
+   "pub_post": 46,
+   "pub_comment": 23,
+   "pub_vote": 8,
+   "partition": 1,
+   "want_timeout": 15,
+   "pub_delete": 2,
+   "miss": 0,
+   "miss_pairs": 599,
+   "stranded": 0,
+   "stranded_pairs": 599,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 2052,
+   "verify_invalid": 28,
+   "encode": 378,
+   "needed_env": 2024,
+   "dup_env": 0,
+   "rej_id": 31,
+   "rej_sig": 28,
+   "refuse_window": 0,
+   "recon_sessions": 43227,
+   "fetch_keys": 1420,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1393
+  },
+  "verify_per_box_day": 25.333333333333332,
+  "encode_per_box_day": 4.666666666666667,
+  "subs_per_box": 2.7333333333333334,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 5.8
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1236
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2846.848,
+     "box": 15,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2858.042,
+     "box": 21,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2882.416,
+     "box": 25,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2895.461,
+     "box": 3,
+     "mid": 2456932834709861817,
+     "topic": 0
+    },
+    {
+     "t": 2914.437,
+     "box": 1,
+     "mid": 2456932834709861817,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 12513,
+  "l1_items": 416,
+  "live_p99_s": 599.3358916732541,
+  "ev": {
+   "come_on": 147,
+   "xfer_fail": 9778,
+   "link_drop": 176,
+   "pub_post": 52,
+   "want_timeout": 45,
+   "silent_loss": 2,
+   "pub_vote": 5,
+   "pub_comment": 25,
+   "partition": 3,
+   "pub_delete": 2,
+   "miss": 0,
+   "miss_pairs": 803,
+   "stranded": 0,
+   "stranded_pairs": 803,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 2409,
+   "verify_invalid": 330,
+   "encode": 449,
+   "needed_env": 2079,
+   "dup_env": 0,
+   "rej_id": 24,
+   "rej_sig": 330,
+   "refuse_window": 0,
+   "recon_sessions": 44272,
+   "fetch_keys": 1604,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1535
+  },
+  "verify_per_box_day": 29.740740740740744,
+  "encode_per_box_day": 5.54320987654321,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 6.2
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12530,
+  "l1_items": 49,
+  "live_p99_s": 938.1075647746184,
+  "ev": {
+   "come_on": 151,
+   "xfer_fail": 7735,
+   "link_drop": 150,
+   "pub_post": 51,
+   "want_timeout": 45,
+   "pub_vote": 8,
+   "pub_comment": 17,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 741,
+   "stranded": 0,
+   "stranded_pairs": 741,
+   "pub_delete": 1,
+   "corr_outage": 1,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 809,
+   "verify_invalid": 0,
+   "encode": 458,
+   "needed_env": 809,
+   "dup_env": 0,
+   "rej_id": 28,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 41205,
+   "fetch_keys": 36,
+   "floor_skip": 0,
+   "rej_sub": 2,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 9.987654320987653,
+  "encode_per_box_day": 5.65432098765432,
+  "subs_per_box": 2.966666666666667,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 3.5
+ },
+ {
+  "n": 100,
+  "violations": {
+   "S5": 17056
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 1211.122,
+     "box": 64,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 2,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 7,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 83,
+     "mid": 6732470114566978641,
+     "topic": 4
+    },
+    {
+     "t": 1211.122,
+     "box": 57,
+     "mid": 6732470114566978641,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 40703,
+  "l1_items": 4983,
+  "live_p99_s": 796.8782682589808,
+  "ev": {
+   "come_on": 464,
+   "xfer_fail": 27949,
+   "link_drop": 668,
+   "pub_post": 188,
+   "silent_loss": 9,
+   "pub_vote": 23,
+   "want_timeout": 142,
+   "pub_comment": 74,
+   "pub_delete": 4,
+   "miss": 8,
+   "miss_pairs": 7102,
+   "stranded": 8,
+   "stranded_pairs": 7102,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 25764,
+   "verify_invalid": 1109,
+   "encode": 4454,
+   "needed_env": 24655,
+   "dup_env": 0,
+   "rej_id": 228,
+   "rej_sig": 1109,
+   "refuse_window": 0,
+   "recon_sessions": 145869,
+   "fetch_keys": 18621,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 17500
+  },
+  "verify_per_box_day": 95.42222222222222,
+  "encode_per_box_day": 16.496296296296297,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 50.3
+ },
+ {
+  "n": 300,
+  "violations": {
+   "S5": 137430
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 619.878,
+     "box": 206,
+     "mid": 1631748797766852309,
+     "topic": 7
+    },
+    {
+     "t": 620.065,
+     "box": 155,
+     "mid": 8673784057153341315,
+     "topic": 14
+    },
+    {
+     "t": 650.775,
+     "box": 102,
+     "mid": 8673784057153341315,
+     "topic": 14
+    },
+    {
+     "t": 661.164,
+     "box": 176,
+     "mid": 1631748797766852309,
+     "topic": 7
+    },
+    {
+     "t": 661.754,
+     "box": 23,
+     "mid": 1631748797766852309,
+     "topic": 7
+    }
+   ]
+  },
+  "l1_checks": 123290,
+  "l1_items": 41784,
+  "live_p99_s": 829.6430750497384,
+  "ev": {
+   "come_on": 1340,
+   "xfer_fail": 79339,
+   "link_drop": 1797,
+   "pub_post": 551,
+   "pub_vote": 78,
+   "want_timeout": 976,
+   "pub_comment": 178,
+   "silent_loss": 70,
+   "pub_delete": 23,
+   "miss": 0,
+   "miss_pairs": 66076,
+   "stranded": 0,
+   "stranded_pairs": 66076,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 212332,
+   "verify_invalid": 3080,
+   "encode": 43065,
+   "needed_env": 209252,
+   "dup_env": 0,
+   "rej_id": 2401,
+   "rej_sig": 3080,
+   "refuse_window": 0,
+   "recon_sessions": 470555,
+   "fetch_keys": 146260,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 139212
+  },
+  "verify_per_box_day": 262.13827160493827,
+  "encode_per_box_day": 53.166666666666664,
+  "subs_per_box": 3.11,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 518.4
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 11841,
+  "l1_items": 7,
+  "live_p99_s": 416.9977109503525,
+  "ev": {
+   "come_on": 123,
+   "xfer_fail": 4989,
+   "link_drop": 189,
+   "pub_post": 57,
+   "pub_vote": 11,
+   "want_timeout": 29,
+   "pub_comment": 16,
+   "pub_delete": 3,
+   "miss": 0,
+   "miss_pairs": 445,
+   "stranded": 0,
+   "stranded_pairs": 445,
+   "corr_outage": 1,
+   "silent_loss": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 483,
+   "verify_invalid": 6,
+   "encode": 305,
+   "needed_env": 477,
+   "dup_env": 0,
+   "rej_id": 10,
+   "rej_sig": 6,
+   "refuse_window": 0,
+   "recon_sessions": 37555,
+   "fetch_keys": 16,
+   "floor_skip": 0,
+   "rej_sub": 24,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 5.962962962962963,
+  "encode_per_box_day": 3.765432098765432,
+  "subs_per_box": 2.6,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 3.4
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12777,
+  "l1_items": 16,
+  "live_p99_s": 8.35000000000582,
+  "ev": {
+   "come_on": 136,
+   "xfer_fail": 7282,
+   "link_drop": 202,
+   "pub_post": 55,
+   "want_timeout": 21,
+   "pub_comment": 22,
+   "pub_delete": 3,
+   "pub_vote": 4,
+   "miss": 0,
+   "miss_pairs": 593,
+   "stranded": 0,
+   "stranded_pairs": 593,
+   "silent_loss": 2,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 1044,
+   "verify_invalid": 405,
+   "encode": 398,
+   "needed_env": 639,
+   "dup_env": 0,
+   "rej_id": 16,
+   "rej_sig": 405,
+   "refuse_window": 0,
+   "recon_sessions": 40744,
+   "fetch_keys": 427,
+   "floor_skip": 0,
+   "rej_sub": 15,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 12.888888888888888,
+  "encode_per_box_day": 4.91358024691358,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 2.9
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 127
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 9864.001,
+     "box": 3,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 9887.984,
+     "box": 0,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 9894.176,
+     "box": 8,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 10135.199,
+     "box": 6,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 10177.638,
+     "box": 7,
+     "mid": 2610557766046809554,
+     "topic": 17
+    }
+   ]
+  },
+  "l1_checks": 4546,
+  "l1_items": 36,
+  "live_p99_s": 518.3082831125503,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 2131,
+   "link_drop": 71,
+   "pub_post": 16,
+   "pub_comment": 1,
+   "miss": 0,
+   "miss_pairs": 62,
+   "stranded": 0,
+   "stranded_pairs": 62,
+   "pub_vote": 5,
+   "want_timeout": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 196,
+   "verify_invalid": 7,
+   "encode": 42,
+   "needed_env": 189,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 7,
+   "refuse_window": 0,
+   "recon_sessions": 14471,
+   "fetch_keys": 112,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 134
+  },
+  "verify_per_box_day": 7.2592592592592595,
+  "encode_per_box_day": 1.5555555555555556,
+  "subs_per_box": 2.5,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 1.9
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2083,
+  "l1_items": 0,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 1160,
+   "link_drop": 71,
+   "pub_post": 16,
+   "pub_comment": 1,
+   "miss": 0,
+   "miss_pairs": 62,
+   "stranded": 0,
+   "stranded_pairs": 62,
+   "pub_vote": 5,
+   "partition": 1,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 62,
+   "verify_invalid": 0,
+   "encode": 42,
+   "needed_env": 62,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 6697,
+   "fetch_keys": 0,
+   "floor_skip": 0,
+   "rej_sub": 12,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.2962962962962963,
+  "encode_per_box_day": 1.5555555555555556,
+  "subs_per_box": 2.5,
+  "scene": "C-a",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.8
+ },
+ {
+  "n": 30,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 12075,
+  "l1_items": 39,
+  "live_p99_s": 999.7611389471858,
+  "ev": {
+   "come_on": 120,
+   "xfer_fail": 9351,
+   "link_drop": 177,
+   "pub_post": 42,
+   "want_timeout": 31,
+   "pub_comment": 30,
+   "partition": 4,
+   "pub_vote": 9,
+   "silent_loss": 1,
+   "pub_delete": 5,
+   "miss": 0,
+   "miss_pairs": 692,
+   "stranded": 0,
+   "stranded_pairs": 692,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 772,
+   "verify_invalid": 11,
+   "encode": 312,
+   "needed_env": 761,
+   "dup_env": 0,
+   "rej_id": 5,
+   "rej_sig": 11,
+   "refuse_window": 0,
+   "recon_sessions": 39460,
+   "fetch_keys": 34,
+   "floor_skip": 0,
+   "rej_sub": 14,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 9.530864197530864,
+  "encode_per_box_day": 3.8518518518518516,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 3.4
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1515
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5749.894,
+     "box": 1,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5756.224,
+     "box": 15,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5792.751,
+     "box": 2,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5793.92,
+     "box": 13,
+     "mid": 4054258205851890539,
+     "topic": 6
+    },
+    {
+     "t": 5820.089,
+     "box": 24,
+     "mid": 4054258205851890539,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 12934,
+  "l1_items": 478,
+  "live_p99_s": 684.2304988156247,
+  "ev": {
+   "come_on": 127,
+   "xfer_fail": 7409,
+   "link_drop": 207,
+   "pub_post": 60,
+   "want_timeout": 16,
+   "pub_comment": 17,
+   "pub_delete": 2,
+   "pub_vote": 5,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 622,
+   "stranded": 0,
+   "stranded_pairs": 622,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 2589,
+   "verify_invalid": 402,
+   "encode": 461,
+   "needed_env": 2187,
+   "dup_env": 0,
+   "rej_id": 24,
+   "rej_sig": 402,
+   "refuse_window": 0,
+   "recon_sessions": 42643,
+   "fetch_keys": 1947,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1593
+  },
+  "verify_per_box_day": 31.962962962962962,
+  "encode_per_box_day": 5.6913580246913575,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 6.9
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1710
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 3751.131,
+     "box": 5,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3775.454,
+     "box": 26,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3778.124,
+     "box": 17,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3783.69,
+     "box": 22,
+     "mid": 4918353253666356821,
+     "topic": 4
+    },
+    {
+     "t": 3796.578,
+     "box": 3,
+     "mid": 4918353253666356821,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 13036,
+  "l1_items": 522,
+  "live_p99_s": 670.837170374667,
+  "ev": {
+   "come_on": 123,
+   "xfer_fail": 5791,
+   "link_drop": 189,
+   "pub_post": 57,
+   "pub_vote": 11,
+   "want_timeout": 33,
+   "pub_comment": 16,
+   "pub_delete": 3,
+   "miss": 0,
+   "miss_pairs": 445,
+   "stranded": 0,
+   "stranded_pairs": 445,
+   "corr_outage": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 2198,
+   "verify_invalid": 11,
+   "encode": 305,
+   "needed_env": 2187,
+   "dup_env": 0,
+   "rej_id": 30,
+   "rej_sig": 11,
+   "refuse_window": 0,
+   "recon_sessions": 42939,
+   "fetch_keys": 1727,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1716
+  },
+  "verify_per_box_day": 27.1358024691358,
+  "encode_per_box_day": 3.765432098765432,
+  "subs_per_box": 2.6,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 7.6
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 227
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5403.585,
+     "box": 0,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5424.802,
+     "box": 2,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5572.777,
+     "box": 3,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5578.402,
+     "box": 7,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5599.436,
+     "box": 1,
+     "mid": 4232574425325313197,
+     "topic": 9
+    }
+   ]
+  },
+  "l1_checks": 4483,
+  "l1_items": 50,
+  "live_p99_s": 568.4333351484674,
+  "ev": {
+   "come_on": 48,
+   "xfer_fail": 1346,
+   "pub_post": 28,
+   "link_drop": 66,
+   "pub_delete": 2,
+   "want_timeout": 3,
+   "pub_comment": 11,
+   "miss": 0,
+   "miss_pairs": 115,
+   "stranded": 0,
+   "stranded_pairs": 115,
+   "pub_vote": 1,
+   "silent_loss": 1
+  },
+  "work": {
+   "verify": 376,
+   "verify_invalid": 16,
+   "encode": 74,
+   "needed_env": 360,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 16,
+   "refuse_window": 0,
+   "recon_sessions": 14218,
+   "fetch_keys": 183,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 235
+  },
+  "verify_per_box_day": 13.925925925925926,
+  "encode_per_box_day": 2.7407407407407405,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 1.2
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1862,
+  "l1_items": 0,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 34,
+   "xfer_fail": 626,
+   "link_drop": 67,
+   "pub_post": 19,
+   "pub_delete": 1,
+   "pub_vote": 3,
+   "miss": 0,
+   "miss_pairs": 59,
+   "stranded": 0,
+   "stranded_pairs": 59,
+   "pub_comment": 6
+  },
+  "work": {
+   "verify": 67,
+   "verify_invalid": 3,
+   "encode": 43,
+   "needed_env": 64,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 5938,
+   "fetch_keys": 1,
+   "floor_skip": 0,
+   "rej_sub": 18,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.4814814814814814,
+  "encode_per_box_day": 1.5925925925925926,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3966,
+  "l1_items": 0,
+  "live_p99_s": 2.349999999947613,
+  "ev": {
+   "come_on": 48,
+   "xfer_fail": 1076,
+   "pub_post": 28,
+   "link_drop": 66,
+   "pub_delete": 2,
+   "pub_comment": 11,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 115,
+   "stranded": 0,
+   "stranded_pairs": 115,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 141,
+   "verify_invalid": 8,
+   "encode": 74,
+   "needed_env": 133,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 10352,
+   "fetch_keys": 2,
+   "floor_skip": 0,
+   "rej_sub": 8,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 5.222222222222222,
+  "encode_per_box_day": 2.7407407407407405,
+  "subs_per_box": 3.1,
+  "scene": "C-a",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.6
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2646,
+  "l1_items": 0,
+  "live_p99_s": 0.3000000000174623,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 1076,
+   "link_drop": 56,
+   "pub_post": 21,
+   "miss": 0,
+   "miss_pairs": 58,
+   "stranded": 0,
+   "stranded_pairs": 58,
+   "partition": 1,
+   "pub_vote": 2,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 69,
+   "verify_invalid": 3,
+   "encode": 54,
+   "needed_env": 66,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 7798,
+   "fetch_keys": 1,
+   "floor_skip": 0,
+   "rej_sub": 16,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.555555555555556,
+  "encode_per_box_day": 2.0,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.5
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 188
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 7171.23,
+     "box": 3,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7319.658,
+     "box": 8,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7489.498,
+     "box": 0,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7511.239,
+     "box": 5,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7571.831,
+     "box": 1,
+     "mid": 8253094041346320749,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 4776,
+  "l1_items": 54,
+  "live_p99_s": 503.0124099541572,
+  "ev": {
+   "come_on": 34,
+   "xfer_fail": 1290,
+   "link_drop": 67,
+   "pub_post": 19,
+   "pub_delete": 1,
+   "pub_vote": 3,
+   "miss": 0,
+   "miss_pairs": 59,
+   "stranded": 0,
+   "stranded_pairs": 59,
+   "pub_comment": 6,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 260,
+   "verify_invalid": 8,
+   "encode": 43,
+   "needed_env": 252,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 14343,
+   "fetch_keys": 157,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 193
+  },
+  "verify_per_box_day": 9.62962962962963,
+  "encode_per_box_day": 1.5925925925925926,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 1.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 154
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 64811.58,
+     "box": 1,
+     "mid": 1767582146114623534,
+     "topic": 2
+    },
+    {
+     "t": 65111.561,
+     "box": 4,
+     "mid": 3460486730426132316,
+     "topic": 0
+    },
+    {
+     "t": 65111.561,
+     "box": 4,
+     "mid": 1767582146114623534,
+     "topic": 2
+    },
+    {
+     "t": 65111.561,
+     "box": 4,
+     "mid": 8936698038681035467,
+     "topic": 0
+    },
+    {
+     "t": 65111.561,
+     "box": 4,
+     "mid": 8234582494650375869,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 13,
+  "l1_items": 38,
+  "live_p99_s": 1276.8010749001114,
+  "ev": {
+   "come_on": 37,
+   "xfer_fail": 3963,
+   "link_drop": 62,
+   "pub_post": 30,
+   "pub_vote": 1,
+   "pub_comment": 9,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 22,
+   "stranded": 1,
+   "stranded_pairs": 23,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 238,
+   "verify_invalid": 3,
+   "encode": 67,
+   "needed_env": 235,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 143,
+   "fetch_keys": 187,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 157
+  },
+  "verify_per_box_day": 8.814814814814815,
+  "encode_per_box_day": 2.4814814814814814,
+  "subs_per_box": 2.5,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 7,
+  "l1_items": 1,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 37,
+   "xfer_fail": 2377,
+   "link_drop": 62,
+   "pub_post": 30,
+   "pub_vote": 1,
+   "pub_comment": 9,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 19,
+   "stranded": 4,
+   "stranded_pairs": 23,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 71,
+   "verify_invalid": 0,
+   "encode": 58,
+   "needed_env": 71,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 95,
+   "fetch_keys": 18,
+   "floor_skip": 0,
+   "rej_sub": 3,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.6296296296296298,
+  "encode_per_box_day": 2.1481481481481484,
+  "subs_per_box": 2.5,
+  "scene": "C-b",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 121
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 43128.972,
+     "box": 3,
+     "mid": 676489133885829355,
+     "topic": 0
+    },
+    {
+     "t": 43128.972,
+     "box": 3,
+     "mid": 6568124965598743782,
+     "topic": 0
+    },
+    {
+     "t": 65514.574,
+     "box": 0,
+     "mid": 4763110307425928694,
+     "topic": 15
+    },
+    {
+     "t": 72147.22,
+     "box": 5,
+     "mid": 4763110307425928694,
+     "topic": 15
+    },
+    {
+     "t": 79453.759,
+     "box": 6,
+     "mid": 4763110307425928694,
+     "topic": 15
+    }
+   ]
+  },
+  "l1_checks": 19,
+  "l1_items": 55,
+  "live_p99_s": 1104.6899993611005,
+  "ev": {
+   "come_on": 35,
+   "xfer_fail": 3643,
+   "link_drop": 56,
+   "partition": 4,
+   "pub_post": 29,
+   "pub_comment": 7,
+   "miss": 0,
+   "miss_pairs": 16,
+   "stranded": 0,
+   "stranded_pairs": 16,
+   "pub_delete": 5,
+   "pub_vote": 2
+  },
+  "work": {
+   "verify": 218,
+   "verify_invalid": 3,
+   "encode": 62,
+   "needed_env": 215,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 141,
+   "fetch_keys": 161,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 124
+  },
+  "verify_per_box_day": 8.074074074074074,
+  "encode_per_box_day": 2.2962962962962963,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 132
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5804.438,
+     "box": 4,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5815.293,
+     "box": 6,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5819.856,
+     "box": 0,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5884.672,
+     "box": 5,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 6024.563,
+     "box": 2,
+     "mid": 7831016414316146116,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 4553,
+  "l1_items": 32,
+  "live_p99_s": 430.7377413211798,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 1592,
+   "link_drop": 56,
+   "pub_post": 21,
+   "want_timeout": 2,
+   "miss": 0,
+   "miss_pairs": 58,
+   "stranded": 0,
+   "stranded_pairs": 58,
+   "partition": 1,
+   "pub_vote": 2
+  },
+  "work": {
+   "verify": 204,
+   "verify_invalid": 6,
+   "encode": 54,
+   "needed_env": 198,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 6,
+   "refuse_window": 0,
+   "recon_sessions": 14643,
+   "fetch_keys": 103,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 135
+  },
+  "verify_per_box_day": 7.555555555555556,
+  "encode_per_box_day": 2.0,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 1.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 19,
+  "l1_items": 12,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 35,
+   "xfer_fail": 3103,
+   "link_drop": 56,
+   "partition": 4,
+   "pub_post": 31,
+   "pub_comment": 6,
+   "miss": 0,
+   "miss_pairs": 16,
+   "stranded": 0,
+   "stranded_pairs": 16,
+   "pub_delete": 5,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 86,
+   "verify_invalid": 0,
+   "encode": 58,
+   "needed_env": 86,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 117,
+   "fetch_keys": 37,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 3.185185185185185,
+  "encode_per_box_day": 2.1481481481481484,
+  "subs_per_box": 3.1,
+  "scene": "C-b",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3,
+  "l1_items": 0,
+  "live_p99_s": 0.1499999999650754,
+  "ev": {
+   "come_on": 31,
+   "xfer_fail": 1466,
+   "link_drop": 44,
+   "pub_post": 16,
+   "partition": 2,
+   "pub_comment": 3,
+   "miss": 0,
+   "miss_pairs": 3,
+   "stranded": 0,
+   "stranded_pairs": 3,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 24,
+   "verify_invalid": 1,
+   "encode": 19,
+   "needed_env": 23,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 56,
+   "fetch_keys": 4,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.8888888888888888,
+  "encode_per_box_day": 0.7037037037037037,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 67
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 25288.7,
+     "box": 0,
+     "mid": 6533431210567038935,
+     "topic": 5
+    },
+    {
+     "t": 26223.41,
+     "box": 0,
+     "mid": 7858215244573755985,
+     "topic": 5
+    },
+    {
+     "t": 28010.164,
+     "box": 0,
+     "mid": 578079384707184171,
+     "topic": 5
+    },
+    {
+     "t": 54486.581,
+     "box": 5,
+     "mid": 6533431210567038935,
+     "topic": 5
+    },
+    {
+     "t": 54486.581,
+     "box": 5,
+     "mid": 7858215244573755985,
+     "topic": 5
+    }
+   ]
+  },
+  "l1_checks": 4,
+  "l1_items": 4,
+  "live_p99_s": 1045.2872977954685,
+  "ev": {
+   "come_on": 31,
+   "xfer_fail": 2823,
+   "link_drop": 44,
+   "pub_post": 15,
+   "partition": 2,
+   "pub_comment": 4,
+   "miss": 0,
+   "miss_pairs": 3,
+   "stranded": 0,
+   "stranded_pairs": 3,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 96,
+   "verify_invalid": 1,
+   "encode": 22,
+   "needed_env": 95,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 89,
+   "fetch_keys": 74,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 67
+  },
+  "verify_per_box_day": 3.5555555555555554,
+  "encode_per_box_day": 0.8148148148148149,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3,
+  "l1_items": 1,
+  "live_p99_s": 0.1499999999650754,
+  "ev": {
+   "come_on": 28,
+   "xfer_fail": 1606,
+   "link_drop": 62,
+   "pub_post": 15,
+   "miss": 0,
+   "miss_pairs": 5,
+   "stranded": 0,
+   "stranded_pairs": 5,
+   "pub_comment": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 28,
+   "verify_invalid": 0,
+   "encode": 26,
+   "needed_env": 28,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 54,
+   "fetch_keys": 7,
+   "floor_skip": 0,
+   "rej_sub": 1,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.037037037037037,
+  "encode_per_box_day": 0.9629629629629629,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 49
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 66843.806,
+     "box": 0,
+     "mid": 6635714114231098598,
+     "topic": 4
+    },
+    {
+     "t": 73531.31,
+     "box": 1,
+     "mid": 6635714114231098598,
+     "topic": 4
+    },
+    {
+     "t": 73531.31,
+     "box": 1,
+     "mid": 2006399185921721928,
+     "topic": 0
+    },
+    {
+     "t": 73531.31,
+     "box": 1,
+     "mid": 2392160470953212868,
+     "topic": 8
+    },
+    {
+     "t": 115061.572,
+     "box": 3,
+     "mid": 6635714114231098598,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 6,
+  "l1_items": 10,
+  "live_p99_s": 37221.639022638265,
+  "ev": {
+   "come_on": 28,
+   "xfer_fail": 2775,
+   "link_drop": 62,
+   "pub_post": 15,
+   "miss": 0,
+   "miss_pairs": 5,
+   "stranded": 0,
+   "stranded_pairs": 5,
+   "pub_comment": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 87,
+   "verify_invalid": 2,
+   "encode": 33,
+   "needed_env": 85,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 93,
+   "fetch_keys": 68,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 51
+  },
+  "verify_per_box_day": 3.222222222222222,
+  "encode_per_box_day": 1.222222222222222,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1,
+  "l1_items": 5,
+  "live_p99_s": 0.1499999999650754,
+  "ev": {
+   "come_on": 34,
+   "xfer_fail": 1579,
+   "link_drop": 69,
+   "partition": 4,
+   "pub_post": 29,
+   "pub_comment": 6,
+   "miss": 0,
+   "miss_pairs": 6,
+   "stranded": 0,
+   "stranded_pairs": 6,
+   "pub_vote": 4,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 46,
+   "verify_invalid": 0,
+   "encode": 31,
+   "needed_env": 46,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 17,
+   "fetch_keys": 5,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.7037037037037035,
+  "encode_per_box_day": 1.1481481481481481,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 166
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 32725.846,
+     "box": 5,
+     "mid": 3292017292514191626,
+     "topic": 13
+    },
+    {
+     "t": 48613.836,
+     "box": 2,
+     "mid": 3292017292514191626,
+     "topic": 13
+    },
+    {
+     "t": 49012.239,
+     "box": 3,
+     "mid": 3292017292514191626,
+     "topic": 13
+    },
+    {
+     "t": 67897.885,
+     "box": 7,
+     "mid": 3292017292514191626,
+     "topic": 13
+    },
+    {
+     "t": 67897.885,
+     "box": 7,
+     "mid": 9161538844057232422,
+     "topic": 13
+    }
+   ]
+  },
+  "l1_checks": 16,
+  "l1_items": 60,
+  "live_p99_s": 742.1244198970962,
+  "ev": {
+   "come_on": 34,
+   "xfer_fail": 3753,
+   "link_drop": 69,
+   "partition": 4,
+   "pub_post": 29,
+   "pub_comment": 6,
+   "miss": 0,
+   "miss_pairs": 6,
+   "stranded": 0,
+   "stranded_pairs": 6,
+   "pub_vote": 4,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 239,
+   "verify_invalid": 2,
+   "encode": 47,
+   "needed_env": 237,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 2,
+   "refuse_window": 0,
+   "recon_sessions": 143,
+   "fetch_keys": 200,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 168
+  },
+  "verify_per_box_day": 8.851851851851853,
+  "encode_per_box_day": 1.7407407407407407,
+  "subs_per_box": 3.0,
+  "scene": "C-b",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2812,
+  "l1_items": 0,
+  "live_p99_s": 2.3500000000058208,
+  "ev": {
+   "come_on": 40,
+   "xfer_fail": 806,
+   "link_drop": 54,
+   "partition": 1,
+   "pub_post": 17,
+   "want_timeout": 1,
+   "pub_comment": 4,
+   "pub_vote": 2,
+   "miss": 0,
+   "miss_pairs": 62,
+   "stranded": 0,
+   "stranded_pairs": 62
+  },
+  "work": {
+   "verify": 64,
+   "verify_invalid": 0,
+   "encode": 37,
+   "needed_env": 64,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 6881,
+   "fetch_keys": 4,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.3703703703703702,
+  "encode_per_box_day": 1.3703703703703702,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 123
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 11045.593,
+     "box": 6,
+     "mid": 9117888751160644090,
+     "topic": 2
+    },
+    {
+     "t": 11045.593,
+     "box": 7,
+     "mid": 9117888751160644090,
+     "topic": 2
+    },
+    {
+     "t": 11052.693,
+     "box": 0,
+     "mid": 9117888751160644090,
+     "topic": 2
+    },
+    {
+     "t": 11052.693,
+     "box": 8,
+     "mid": 9117888751160644090,
+     "topic": 2
+    },
+    {
+     "t": 12299.546,
+     "box": 0,
+     "mid": 85150094471342032,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 4538,
+  "l1_items": 34,
+  "live_p99_s": 575.7268922427029,
+  "ev": {
+   "come_on": 40,
+   "xfer_fail": 1298,
+   "link_drop": 57,
+   "partition": 1,
+   "pub_post": 17,
+   "pub_comment": 3,
+   "pub_vote": 1,
+   "miss": 0,
+   "miss_pairs": 55,
+   "stranded": 0,
+   "stranded_pairs": 55
+  },
+  "work": {
+   "verify": 188,
+   "verify_invalid": 8,
+   "encode": 38,
+   "needed_env": 180,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 14367,
+   "fetch_keys": 109,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 131
+  },
+  "verify_per_box_day": 6.962962962962963,
+  "encode_per_box_day": 1.4074074074074074,
+  "subs_per_box": 3.0,
+  "scene": "C-a",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 1.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1097,
+  "l1_items": 8,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 35,
+   "xfer_fail": 1994,
+   "link_drop": 66,
+   "pub_post": 23,
+   "miss": 0,
+   "miss_pairs": 48,
+   "stranded": 0,
+   "stranded_pairs": 48,
+   "pub_vote": 4,
+   "pub_comment": 8,
+   "pub_delete": 1,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 84,
+   "verify_invalid": 5,
+   "encode": 50,
+   "needed_env": 79,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 2786,
+   "fetch_keys": 7,
+   "floor_skip": 0,
+   "rej_sub": 10,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 3.111111111111111,
+  "encode_per_box_day": 1.8518518518518519,
+  "subs_per_box": 2.5,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 176
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 10008.265,
+     "box": 3,
+     "mid": 7240293510070231808,
+     "topic": 4
+    },
+    {
+     "t": 10142.786,
+     "box": 0,
+     "mid": 7240293510070231808,
+     "topic": 4
+    },
+    {
+     "t": 25166.419,
+     "box": 0,
+     "mid": 2025657321789400201,
+     "topic": 4
+    },
+    {
+     "t": 25277.868,
+     "box": 3,
+     "mid": 2025657321789400201,
+     "topic": 4
+    },
+    {
+     "t": 54631.83,
+     "box": 4,
+     "mid": 3579641659100157380,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 1413,
+  "l1_items": 153,
+  "live_p99_s": 732.8111842689395,
+  "ev": {
+   "come_on": 35,
+   "xfer_fail": 4589,
+   "link_drop": 66,
+   "pub_post": 23,
+   "miss": 0,
+   "miss_pairs": 49,
+   "stranded": 0,
+   "stranded_pairs": 49,
+   "pub_vote": 4,
+   "pub_comment": 8,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 266,
+   "verify_invalid": 9,
+   "encode": 50,
+   "needed_env": 257,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 9,
+   "refuse_window": 0,
+   "recon_sessions": 3869,
+   "fetch_keys": 177,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 180
+  },
+  "verify_per_box_day": 9.851851851851853,
+  "encode_per_box_day": 1.8518518518518519,
+  "subs_per_box": 2.5,
+  "scene": "C-c",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1181,
+  "l1_items": 0,
+  "live_p99_s": 8.350000000013097,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 4045,
+   "link_drop": 48,
+   "pub_post": 23,
+   "want_timeout": 2,
+   "miss": 0,
+   "miss_pairs": 57,
+   "stranded": 0,
+   "stranded_pairs": 57,
+   "pub_comment": 3,
+   "partition": 1
+  },
+  "work": {
+   "verify": 74,
+   "verify_invalid": 0,
+   "encode": 59,
+   "needed_env": 74,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 3165,
+   "fetch_keys": 14,
+   "floor_skip": 0,
+   "rej_sub": 4,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.7407407407407405,
+  "encode_per_box_day": 2.185185185185185,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 108
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 6229.259,
+     "box": 1,
+     "mid": 2245993096498633025,
+     "topic": 6
+    },
+    {
+     "t": 6251.963,
+     "box": 4,
+     "mid": 2245993096498633025,
+     "topic": 6
+    },
+    {
+     "t": 6284.696,
+     "box": 2,
+     "mid": 2245993096498633025,
+     "topic": 6
+    },
+    {
+     "t": 6462.21,
+     "box": 0,
+     "mid": 2245993096498633025,
+     "topic": 6
+    },
+    {
+     "t": 32984.427,
+     "box": 8,
+     "mid": 2245993096498633025,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 1315,
+  "l1_items": 44,
+  "live_p99_s": 603.7566144643934,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 5294,
+   "link_drop": 48,
+   "pub_post": 23,
+   "miss": 0,
+   "miss_pairs": 57,
+   "stranded": 0,
+   "stranded_pairs": 57,
+   "pub_comment": 3,
+   "partition": 1
+  },
+  "work": {
+   "verify": 187,
+   "verify_invalid": 5,
+   "encode": 59,
+   "needed_env": 182,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 3821,
+   "fetch_keys": 122,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 113
+  },
+  "verify_per_box_day": 6.9259259259259265,
+  "encode_per_box_day": 2.185185185185185,
+  "subs_per_box": 3.1,
+  "scene": "C-c",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 0.5
+ },
+ {
+  "n": 30,
+  "violations": {
+   "S5": 1412
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 2731.042,
+     "box": 14,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2753.326,
+     "box": 4,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2782.175,
+     "box": 22,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2794.597,
+     "box": 1,
+     "mid": 3015712171453067046,
+     "topic": 4
+    },
+    {
+     "t": 2796.126,
+     "box": 18,
+     "mid": 3015712171453067046,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 13021,
+  "l1_items": 479,
+  "live_p99_s": 629.8156873046082,
+  "ev": {
+   "come_on": 125,
+   "xfer_fail": 7662,
+   "link_drop": 170,
+   "pub_post": 47,
+   "want_timeout": 36,
+   "pub_comment": 24,
+   "partition": 3,
+   "pub_vote": 8,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 571,
+   "stranded": 0,
+   "stranded_pairs": 571,
+   "pub_delete": 3,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 2063,
+   "verify_invalid": 8,
+   "encode": 314,
+   "needed_env": 2055,
+   "dup_env": 0,
+   "rej_id": 11,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 43358,
+   "fetch_keys": 1445,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 1418
+  },
+  "verify_per_box_day": 25.469135802469136,
+  "encode_per_box_day": 3.876543209876543,
+  "subs_per_box": 3.433333333333333,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 5.7
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 507,
+  "l1_items": 4,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 40,
+   "xfer_fail": 2337,
+   "link_drop": 53,
+   "pub_post": 21,
+   "pub_comment": 9,
+   "miss": 0,
+   "miss_pairs": 36,
+   "stranded": 0,
+   "stranded_pairs": 36,
+   "partition": 3,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 64,
+   "verify_invalid": 1,
+   "encode": 44,
+   "needed_env": 63,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 1,
+   "refuse_window": 0,
+   "recon_sessions": 1446,
+   "fetch_keys": 12,
+   "floor_skip": 0,
+   "rej_sub": 6,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.3703703703703702,
+  "encode_per_box_day": 1.6296296296296298,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 154
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 12252.539,
+     "box": 0,
+     "mid": 3277547517303085198,
+     "topic": 4
+    },
+    {
+     "t": 12364.519,
+     "box": 3,
+     "mid": 3277547517303085198,
+     "topic": 4
+    },
+    {
+     "t": 12403.511,
+     "box": 1,
+     "mid": 3277547517303085198,
+     "topic": 4
+    },
+    {
+     "t": 12488.601,
+     "box": 2,
+     "mid": 3277547517303085198,
+     "topic": 4
+    },
+    {
+     "t": 29325.607,
+     "box": 0,
+     "mid": 7928134388627303286,
+     "topic": 4
+    }
+   ]
+  },
+  "l1_checks": 1305,
+  "l1_items": 56,
+  "live_p99_s": 647.8044885138224,
+  "ev": {
+   "come_on": 40,
+   "xfer_fail": 5376,
+   "link_drop": 54,
+   "pub_post": 20,
+   "pub_comment": 9,
+   "miss": 0,
+   "miss_pairs": 36,
+   "stranded": 0,
+   "stranded_pairs": 36,
+   "partition": 3,
+   "pub_delete": 1
+  },
+  "work": {
+   "verify": 221,
+   "verify_invalid": 5,
+   "encode": 43,
+   "needed_env": 216,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 5,
+   "refuse_window": 0,
+   "recon_sessions": 3911,
+   "fetch_keys": 147,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 158
+  },
+  "verify_per_box_day": 8.185185185185185,
+  "encode_per_box_day": 1.5925925925925926,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 8
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 25636.671,
+     "box": 8,
+     "mid": 4587082967823539804,
+     "topic": 4
+    },
+    {
+     "t": 25636.671,
+     "box": 8,
+     "mid": 3240918429540399208,
+     "topic": 4
+    },
+    {
+     "t": 175525.145,
+     "box": 8,
+     "mid": 7390678267477043362,
+     "topic": 8
+    },
+    {
+     "t": 175525.145,
+     "box": 8,
+     "mid": 105498861198755648,
+     "topic": 8
+    },
+    {
+     "t": 175525.145,
+     "box": 8,
+     "mid": 8277087380967831287,
+     "topic": 8
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 43,
+   "come_on": 31,
+   "xfer_fail": 2670,
+   "pub_post": 18,
+   "pub_comment": 4,
+   "pub_delete": 2,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0
+  },
+  "work": {
+   "verify": 30,
+   "verify_invalid": 0,
+   "encode": 16,
+   "needed_env": 30,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 12,
+   "fetch_keys": 9,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 8
+  },
+  "verify_per_box_day": 1.1111111111111112,
+  "encode_per_box_day": 0.5925925925925926,
+  "subs_per_box": 2.5,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 386,
+  "l1_items": 1,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 33,
+   "xfer_fail": 2864,
+   "pub_post": 19,
+   "link_drop": 74,
+   "pub_comment": 2,
+   "miss": 0,
+   "miss_pairs": 28,
+   "stranded": 0,
+   "stranded_pairs": 28,
+   "pub_delete": 2,
+   "pub_vote": 2,
+   "partition": 1
+  },
+  "work": {
+   "verify": 51,
+   "verify_invalid": 0,
+   "encode": 43,
+   "needed_env": 51,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 1066,
+   "fetch_keys": 13,
+   "floor_skip": 0,
+   "rej_sub": 3,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 1.888888888888889,
+  "encode_per_box_day": 1.5925925925925926,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.2
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 43,
+   "come_on": 31,
+   "xfer_fail": 1065,
+   "pub_post": 18,
+   "pub_comment": 4,
+   "pub_delete": 2,
+   "partition": 2,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0
+  },
+  "work": {
+   "verify": 22,
+   "verify_invalid": 0,
+   "encode": 16,
+   "needed_env": 22,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 2,
+   "fetch_keys": 0,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.8148148148148149,
+  "encode_per_box_day": 0.5925925925925926,
+  "subs_per_box": 2.5,
+  "scene": "C-0",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 26
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 59192.776,
+     "box": 8,
+     "mid": 638936567757556852,
+     "topic": 3
+    },
+    {
+     "t": 59192.776,
+     "box": 8,
+     "mid": 5521482130540130607,
+     "topic": 3
+    },
+    {
+     "t": 59194.726,
+     "box": 5,
+     "mid": 638936567757556852,
+     "topic": 3
+    },
+    {
+     "t": 59194.726,
+     "box": 5,
+     "mid": 5521482130540130607,
+     "topic": 3
+    },
+    {
+     "t": 59606.143,
+     "box": 8,
+     "mid": 2772020986748876770,
+     "topic": 15
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": 487.4503410164907,
+  "ev": {
+   "link_drop": 69,
+   "come_on": 42,
+   "xfer_fail": 3332,
+   "pub_post": 18,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 3,
+   "pub_vote": 2,
+   "partition": 2
+  },
+  "work": {
+   "verify": 53,
+   "verify_invalid": 0,
+   "encode": 18,
+   "needed_env": 53,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 37,
+   "fetch_keys": 24,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 26
+  },
+  "verify_per_box_day": 1.962962962962963,
+  "encode_per_box_day": 0.6666666666666666,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 0.1
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 69,
+   "come_on": 42,
+   "xfer_fail": 2931,
+   "pub_post": 18,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 3,
+   "pub_vote": 2,
+   "partition": 2
+  },
+  "work": {
+   "verify": 25,
+   "verify_invalid": 0,
+   "encode": 16,
+   "needed_env": 25,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 12,
+   "fetch_keys": 1,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.9259259259259259,
+  "encode_per_box_day": 0.5925925925925926,
+  "subs_per_box": 3.1,
+  "scene": "C-0",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 64,
+   "come_on": 29,
+   "xfer_fail": 1191,
+   "pub_post": 13,
+   "pub_comment": 2,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "partition": 3,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 13,
+   "verify_invalid": 0,
+   "encode": 11,
+   "needed_env": 13,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 5,
+   "fetch_keys": 0,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.48148148148148145,
+  "encode_per_box_day": 0.40740740740740744,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 3
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 87576.379,
+     "box": 5,
+     "mid": 7583618236406771655,
+     "topic": 8
+    },
+    {
+     "t": 88778.275,
+     "box": 6,
+     "mid": 5962324643849312525,
+     "topic": 3
+    },
+    {
+     "t": 160377.223,
+     "box": 1,
+     "mid": 8391926702207099396,
+     "topic": 5
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": 234.8561454998271,
+  "ev": {
+   "link_drop": 64,
+   "come_on": 29,
+   "xfer_fail": 2490,
+   "pub_post": 13,
+   "pub_comment": 2,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "partition": 3,
+   "pub_vote": 1
+  },
+  "work": {
+   "verify": 16,
+   "verify_invalid": 0,
+   "encode": 11,
+   "needed_env": 16,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 8,
+   "fetch_keys": 3,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 3
+  },
+  "verify_per_box_day": 0.5925925925925926,
+  "encode_per_box_day": 0.40740740740740744,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 11
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 70035.75,
+     "box": 1,
+     "mid": 6791857532027042641,
+     "topic": 0
+    },
+    {
+     "t": 70035.75,
+     "box": 1,
+     "mid": 9133486842822633988,
+     "topic": 0
+    },
+    {
+     "t": 70035.75,
+     "box": 1,
+     "mid": 4104674032076924213,
+     "topic": 17
+    },
+    {
+     "t": 70035.75,
+     "box": 1,
+     "mid": 5982712288109237799,
+     "topic": 0
+    },
+    {
+     "t": 72872.591,
+     "box": 0,
+     "mid": 4104674032076924213,
+     "topic": 17
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "come_on": 24,
+   "xfer_fail": 2287,
+   "link_drop": 47,
+   "pub_post": 10,
+   "pub_vote": 3,
+   "pub_comment": 1,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "partition": 1
+  },
+  "work": {
+   "verify": 31,
+   "verify_invalid": 0,
+   "encode": 12,
+   "needed_env": 31,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 12,
+   "fetch_keys": 18,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 11
+  },
+  "verify_per_box_day": 1.1481481481481481,
+  "encode_per_box_day": 0.4444444444444444,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "come_on": 24,
+   "xfer_fail": 1616,
+   "link_drop": 47,
+   "pub_post": 10,
+   "pub_vote": 3,
+   "pub_comment": 1,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "partition": 1
+  },
+  "work": {
+   "verify": 19,
+   "verify_invalid": 0,
+   "encode": 11,
+   "needed_env": 19,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 10,
+   "fetch_keys": 6,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.7037037037037037,
+  "encode_per_box_day": 0.40740740740740744,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 3
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 130572.589,
+     "box": 2,
+     "mid": 7786019720839467744,
+     "topic": 11
+    },
+    {
+     "t": 130819.573,
+     "box": 0,
+     "mid": 7786019720839467744,
+     "topic": 11
+    },
+    {
+     "t": 130819.573,
+     "box": 0,
+     "mid": 2273723152508504209,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 58,
+   "come_on": 31,
+   "xfer_fail": 2678,
+   "pub_post": 19,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 2,
+   "pub_vote": 3,
+   "partition": 1,
+   "pub_comment": 2
+  },
+  "work": {
+   "verify": 26,
+   "verify_invalid": 0,
+   "encode": 18,
+   "needed_env": 26,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 13,
+   "fetch_keys": 4,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 3
+  },
+  "verify_per_box_day": 0.9629629629629629,
+  "encode_per_box_day": 0.6666666666666666,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 112
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5728.154,
+     "box": 1,
+     "mid": 311851833646129028,
+     "topic": 6
+    },
+    {
+     "t": 5903.27,
+     "box": 4,
+     "mid": 311851833646129028,
+     "topic": 6
+    },
+    {
+     "t": 6097.942,
+     "box": 0,
+     "mid": 311851833646129028,
+     "topic": 6
+    },
+    {
+     "t": 6156.922,
+     "box": 2,
+     "mid": 311851833646129028,
+     "topic": 6
+    },
+    {
+     "t": 13938.161,
+     "box": 8,
+     "mid": 311851833646129028,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 1294,
+  "l1_items": 28,
+  "live_p99_s": 663.7172276060446,
+  "ev": {
+   "come_on": 33,
+   "xfer_fail": 4597,
+   "pub_post": 19,
+   "link_drop": 71,
+   "pub_comment": 2,
+   "miss": 0,
+   "miss_pairs": 27,
+   "stranded": 0,
+   "stranded_pairs": 27,
+   "pub_delete": 2,
+   "pub_vote": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 171,
+   "verify_invalid": 10,
+   "encode": 43,
+   "needed_env": 161,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 10,
+   "refuse_window": 0,
+   "recon_sessions": 3602,
+   "fetch_keys": 126,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 122
+  },
+  "verify_per_box_day": 6.333333333333333,
+  "encode_per_box_day": 1.5925925925925926,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 0,
+  "l1_items": 0,
+  "live_p99_s": null,
+  "ev": {
+   "link_drop": 58,
+   "come_on": 31,
+   "xfer_fail": 1445,
+   "pub_post": 19,
+   "miss": 0,
+   "miss_pairs": 0,
+   "stranded": 0,
+   "stranded_pairs": 0,
+   "pub_delete": 2,
+   "pub_vote": 3,
+   "partition": 1,
+   "pub_comment": 2
+  },
+  "work": {
+   "verify": 23,
+   "verify_invalid": 0,
+   "encode": 18,
+   "needed_env": 23,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 4,
+   "fetch_keys": 1,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 0.8518518518518517,
+  "encode_per_box_day": 0.6666666666666666,
+  "subs_per_box": 3.0,
+  "scene": "C-0",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 770,
+  "l1_items": 14,
+  "live_p99_s": 0.15000000000873115,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 2804,
+   "link_drop": 67,
+   "pub_post": 18,
+   "pub_vote": 5,
+   "pub_comment": 12,
+   "pub_delete": 3,
+   "miss": 0,
+   "miss_pairs": 46,
+   "stranded": 0,
+   "stranded_pairs": 46,
+   "partition": 1
+  },
+  "work": {
+   "verify": 85,
+   "verify_invalid": 0,
+   "encode": 40,
+   "needed_env": 85,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 2139,
+   "fetch_keys": 19,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 3.1481481481481484,
+  "encode_per_box_day": 1.4814814814814816,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 198
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 11045.593,
+     "box": 0,
+     "mid": 85150094471342032,
+     "topic": 1
+    },
+    {
+     "t": 11045.593,
+     "box": 1,
+     "mid": 85150094471342032,
+     "topic": 1
+    },
+    {
+     "t": 11045.593,
+     "box": 4,
+     "mid": 85150094471342032,
+     "topic": 1
+    },
+    {
+     "t": 12421.999,
+     "box": 1,
+     "mid": 4759684953200996287,
+     "topic": 1
+    },
+    {
+     "t": 12525.89,
+     "box": 0,
+     "mid": 4759684953200996287,
+     "topic": 1
+    }
+   ]
+  },
+  "l1_checks": 1310,
+  "l1_items": 87,
+  "live_p99_s": 953.2101227535677,
+  "ev": {
+   "come_on": 41,
+   "xfer_fail": 5575,
+   "link_drop": 67,
+   "pub_post": 18,
+   "pub_vote": 5,
+   "pub_comment": 12,
+   "pub_delete": 3,
+   "miss": 0,
+   "miss_pairs": 48,
+   "stranded": 0,
+   "stranded_pairs": 48,
+   "partition": 1
+  },
+  "work": {
+   "verify": 287,
+   "verify_invalid": 0,
+   "encode": 42,
+   "needed_env": 287,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 3733,
+   "fetch_keys": 230,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 198
+  },
+  "verify_per_box_day": 10.62962962962963,
+  "encode_per_box_day": 1.5555555555555556,
+  "subs_per_box": 3.0,
+  "scene": "C-c",
+  "seed": 5,
+  "mode": "leak",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2038,
+  "l1_items": 0,
+  "live_p99_s": 2.349999999947613,
+  "ev": {
+   "come_on": 45,
+   "xfer_fail": 1245,
+   "link_drop": 66,
+   "pub_post": 24,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 100,
+   "stranded": 0,
+   "stranded_pairs": 100,
+   "pub_vote": 4,
+   "corr_outage": 1,
+   "pub_delete": 1,
+   "partition": 1,
+   "want_timeout": 1
+  },
+  "work": {
+   "verify": 103,
+   "verify_invalid": 0,
+   "encode": 75,
+   "needed_env": 103,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 6595,
+   "fetch_keys": 2,
+   "floor_skip": 0,
+   "rej_sub": 11,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 3.814814814814815,
+  "encode_per_box_day": 2.777777777777778,
+  "subs_per_box": 2.5,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "sub",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 3789,
+  "l1_items": 0,
+  "live_p99_s": 8.349999999947613,
+  "ev": {
+   "come_on": 54,
+   "xfer_fail": 1606,
+   "pub_post": 25,
+   "link_drop": 66,
+   "pub_delete": 4,
+   "pub_comment": 5,
+   "silent_loss": 1,
+   "miss": 0,
+   "miss_pairs": 95,
+   "stranded": 0,
+   "stranded_pairs": 95,
+   "corr_outage": 1,
+   "pub_vote": 2,
+   "want_timeout": 2
+  },
+  "work": {
+   "verify": 115,
+   "verify_invalid": 6,
+   "encode": 70,
+   "needed_env": 109,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 6,
+   "refuse_window": 0,
+   "recon_sessions": 9910,
+   "fetch_keys": 3,
+   "floor_skip": 0,
+   "rej_sub": 3,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 4.2592592592592595,
+  "encode_per_box_day": 2.5925925925925926,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "sub",
+  "secs": 0.6
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 1822,
+  "l1_items": 0,
+  "live_p99_s": 0.2999999999301508,
+  "ev": {
+   "come_on": 38,
+   "xfer_fail": 689,
+   "link_drop": 66,
+   "pub_post": 23,
+   "pub_delete": 1,
+   "pub_vote": 1,
+   "miss": 0,
+   "miss_pairs": 58,
+   "stranded": 0,
+   "stranded_pairs": 58,
+   "corr_outage": 1,
+   "pub_comment": 5
+  },
+  "work": {
+   "verify": 66,
+   "verify_invalid": 3,
+   "encode": 46,
+   "needed_env": 63,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 3,
+   "refuse_window": 0,
+   "recon_sessions": 5437,
+   "fetch_keys": 1,
+   "floor_skip": 0,
+   "rej_sub": 11,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.444444444444444,
+  "encode_per_box_day": 1.7037037037037035,
+  "subs_per_box": 3.0,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "sub",
+  "secs": 0.3
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 203
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 9864.001,
+     "box": 3,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 9887.984,
+     "box": 0,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 9894.176,
+     "box": 8,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 10135.199,
+     "box": 6,
+     "mid": 2610557766046809554,
+     "topic": 17
+    },
+    {
+     "t": 10177.638,
+     "box": 7,
+     "mid": 2610557766046809554,
+     "topic": 17
+    }
+   ]
+  },
+  "l1_checks": 4353,
+  "l1_items": 60,
+  "live_p99_s": 518.3082831125503,
+  "ev": {
+   "come_on": 45,
+   "xfer_fail": 2154,
+   "link_drop": 66,
+   "pub_post": 24,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 100,
+   "stranded": 0,
+   "stranded_pairs": 100,
+   "pub_vote": 4,
+   "corr_outage": 1,
+   "pub_delete": 1,
+   "partition": 1
+  },
+  "work": {
+   "verify": 306,
+   "verify_invalid": 0,
+   "encode": 75,
+   "needed_env": 306,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 13652,
+   "fetch_keys": 189,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 203
+  },
+  "verify_per_box_day": 11.333333333333334,
+  "encode_per_box_day": 2.777777777777778,
+  "subs_per_box": 2.5,
+  "scene": "C-x",
+  "seed": 1,
+  "mode": "leak",
+  "secs": 0.9
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 198
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 7171.23,
+     "box": 3,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7319.658,
+     "box": 8,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7489.498,
+     "box": 0,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7511.239,
+     "box": 5,
+     "mid": 8253094041346320749,
+     "topic": 0
+    },
+    {
+     "t": 7571.831,
+     "box": 1,
+     "mid": 8253094041346320749,
+     "topic": 0
+    }
+   ]
+  },
+  "l1_checks": 4545,
+  "l1_items": 102,
+  "live_p99_s": 533.1104201896233,
+  "ev": {
+   "come_on": 38,
+   "xfer_fail": 1470,
+   "link_drop": 66,
+   "pub_post": 23,
+   "pub_delete": 1,
+   "pub_vote": 1,
+   "miss": 0,
+   "miss_pairs": 58,
+   "stranded": 0,
+   "stranded_pairs": 58,
+   "corr_outage": 1,
+   "pub_comment": 5
+  },
+  "work": {
+   "verify": 269,
+   "verify_invalid": 8,
+   "encode": 46,
+   "needed_env": 261,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 13556,
+   "fetch_keys": 187,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 203
+  },
+  "verify_per_box_day": 9.962962962962964,
+  "encode_per_box_day": 1.7037037037037035,
+  "subs_per_box": 3.0,
+  "scene": "C-x",
+  "seed": 3,
+  "mode": "leak",
+  "secs": 1.0
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2591,
+  "l1_items": 0,
+  "live_p99_s": 0.2999999999301508,
+  "ev": {
+   "come_on": 44,
+   "xfer_fail": 1247,
+   "link_drop": 52,
+   "pub_post": 22,
+   "miss": 0,
+   "miss_pairs": 67,
+   "stranded": 0,
+   "stranded_pairs": 67,
+   "partition": 1,
+   "corr_outage": 1,
+   "silent_loss": 1,
+   "pub_vote": 2,
+   "pub_comment": 1
+  },
+  "work": {
+   "verify": 74,
+   "verify_invalid": 0,
+   "encode": 62,
+   "needed_env": 74,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 7463,
+   "fetch_keys": 0,
+   "floor_skip": 0,
+   "rej_sub": 8,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.7407407407407405,
+  "encode_per_box_day": 2.2962962962962963,
+  "subs_per_box": 3.0,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "sub",
+  "secs": 0.5
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 206
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5403.585,
+     "box": 0,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5424.802,
+     "box": 2,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5572.777,
+     "box": 3,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5578.402,
+     "box": 7,
+     "mid": 4232574425325313197,
+     "topic": 9
+    },
+    {
+     "t": 5599.436,
+     "box": 1,
+     "mid": 4232574425325313197,
+     "topic": 9
+    }
+   ]
+  },
+  "l1_checks": 4368,
+  "l1_items": 77,
+  "live_p99_s": 533.2402993215364,
+  "ev": {
+   "come_on": 54,
+   "xfer_fail": 2096,
+   "pub_post": 25,
+   "link_drop": 66,
+   "pub_delete": 4,
+   "want_timeout": 4,
+   "pub_comment": 5,
+   "miss": 0,
+   "miss_pairs": 95,
+   "stranded": 0,
+   "stranded_pairs": 95,
+   "corr_outage": 1,
+   "pub_vote": 2
+  },
+  "work": {
+   "verify": 323,
+   "verify_invalid": 8,
+   "encode": 70,
+   "needed_env": 315,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 8,
+   "refuse_window": 0,
+   "recon_sessions": 14035,
+   "fetch_keys": 159,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 208
+  },
+  "verify_per_box_day": 11.962962962962962,
+  "encode_per_box_day": 2.5925925925925926,
+  "subs_per_box": 3.1,
+  "scene": "C-x",
+  "seed": 2,
+  "mode": "leak",
+  "secs": 1.3
+ },
+ {
+  "n": 10,
+  "violations": {},
+  "examples": {},
+  "l1_checks": 2705,
+  "l1_items": 0,
+  "live_p99_s": 2.3500000000058208,
+  "ev": {
+   "come_on": 45,
+   "xfer_fail": 1109,
+   "link_drop": 51,
+   "partition": 1,
+   "pub_post": 18,
+   "want_timeout": 1,
+   "pub_comment": 3,
+   "pub_vote": 1,
+   "miss": 0,
+   "miss_pairs": 55,
+   "stranded": 0,
+   "stranded_pairs": 55,
+   "corr_outage": 1
+  },
+  "work": {
+   "verify": 55,
+   "verify_invalid": 0,
+   "encode": 39,
+   "needed_env": 55,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 6683,
+   "fetch_keys": 2,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 0
+  },
+  "verify_per_box_day": 2.0370370370370368,
+  "encode_per_box_day": 1.4444444444444444,
+  "subs_per_box": 3.0,
+  "scene": "C-x",
+  "seed": 5,
+  "mode": "sub",
+  "secs": 0.4
+ },
+ {
+  "n": 10,
+  "violations": {
+   "S5": 151
+  },
+  "examples": {
+   "S5": [
+    {
+     "t": 5804.438,
+     "box": 4,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5815.293,
+     "box": 6,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5819.856,
+     "box": 0,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 5884.672,
+     "box": 5,
+     "mid": 7831016414316146116,
+     "topic": 6
+    },
+    {
+     "t": 6024.563,
+     "box": 2,
+     "mid": 7831016414316146116,
+     "topic": 6
+    }
+   ]
+  },
+  "l1_checks": 4344,
+  "l1_items": 47,
+  "live_p99_s": 457.32940933606005,
+  "ev": {
+   "come_on": 44,
+   "xfer_fail": 2074,
+   "link_drop": 52,
+   "pub_post": 22,
+   "want_timeout": 3,
+   "miss": 0,
+   "miss_pairs": 67,
+   "stranded": 0,
+   "stranded_pairs": 67,
+   "partition": 1,
+   "corr_outage": 1,
+   "pub_vote": 2,
+   "pub_comment": 1
+  },
+  "work": {
+   "verify": 225,
+   "verify_invalid": 0,
+   "encode": 62,
+   "needed_env": 225,
+   "dup_env": 0,
+   "rej_id": 0,
+   "rej_sig": 0,
+   "refuse_window": 0,
+   "recon_sessions": 13800,
+   "fetch_keys": 138,
+   "floor_skip": 0,
+   "rej_sub": 0,
+   "verify_foreign": 151
+  },
+  "verify_per_box_day": 8.333333333333334,
+  "encode_per_box_day": 2.2962962962962963,
+  "subs_per_box": 3.0,
+  "scene": "C-x",
+  "seed": 4,
+  "mode": "leak",
+  "secs": 1.1
  }
 ]

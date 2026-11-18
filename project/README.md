@@ -20,7 +20,7 @@ Why this direction and what may not change: [NORTHSTAR.md](NORTHSTAR.md).
 | Chip load | Each valid message is verified and encoded exactly once per box, so the chip's work is what the box receives | counted in the model | [docs/protocol.md](docs/protocol.md) |
 
 Known gaps:
-- Sync: per-sub reconciliation (CP33) fixed H12 (every box received every sub). Two always-on scenes keep a P99 delivery tail of 60-188 s, and CP33's random layer was still running at commit.
+- Sync: per-sub reconciliation (CP33) fixed H12 (every box received every sub) and passes every safety check, but it fails the pre-registered delivery-latency rule in 12 of 100 fault-injected runs (P99 up to 8,994 s vs 795 s), so it is provisional.
 - The 16 × 16 FP16 encoder was not mapped, so the area is a lower bound.
 - Power was not re-estimated for it.
 - Only the multiplier has RTL.
