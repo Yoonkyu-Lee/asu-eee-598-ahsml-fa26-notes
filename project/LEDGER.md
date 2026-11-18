@@ -19,6 +19,10 @@
 | 2026-11-18 | 리메이크 대 리캐스트 | 리캐스트, 브랜치에서 R2 → R3 → R1 → R4 | 결과 JSON·재현 명령·데모가 지금 계약에 기댐 (journal/recast/REVIEW.md 6i) | 소유자 |
 | 2026-11-18 | `--exchange` CLI 계약 | R1에서 바꿔도 됨. 옛 재현 명령은 태그로 | | 소유자 |
 | 2026-11-18 | gate.py | G-a 지금 (`tests/fast/`), G-c 학기 뒤 | journal/recast/DRAFT_CLAUDE.md | 소유자 |
+| 2026-11-18 | 박스 교류 `poll`, `x2` (`--exchange`) | Drop (R1a), 태그 `pre-r1` | poll: CP25가 찾은 n³ 폴링 (CP24 데모의 지름길). x2: CP26 사건 교류, CP29에서 H1–H8 구멍, CP30에서 recon(S2+KE)으로 기본값 교체. 오라클의 `lan_x2` 단계도 같이 빠짐 | 소유자 (계약 변경 허락) |
+| 2026-11-18 | 박스 CP21 수집 경로 (p24 아님), `cfg["sync"]`, 공유 시드 신원 | Drop (R1a), 태그 `pre-r1` | CP24부터 모든 실행기(`lan.py`)가 proto cp24. 쓰던 것은 `legacy/box/run_demo.py`뿐 (CP32에서 은퇴) | 빌더 (근거: 실행기 확인) |
+| 2026-11-18 | eager push (`--push eager`) | Drop (R1a), 태그 `pre-r1` | CP27이 ID 먼저(lazy)를 고름 (바이트 6.8배 → 1.2배) | 빌더 |
+| 2026-11-18 | `--text int8`, `--floor-skip` (F′), `/inject`, `/sync` | Keep | int8: CP36(D2) 결과에 따라 다시 쓸 수 있음. F′: CP30 소유자 결정. `/sync`: P3가 루프백으로 읽음 (이웃 호출은 막음). `/inject`: 호출부 없음, 다음 조각에서 판단 | 빌더 |
 | 2026-11-18 | `sync_check`의 고정 `sleep` | 조건 대기로 바꾸지 않음 (R3) | 대부분 "바닥·찔러보기 타이머가 도는 동안 아무 일도 없어야 한다"는 부정 검사라 기다림 자체가 시험이다 (`tests/sync_check.py`의 3 × (PMAX + PAE) 등). 대신 3분 스모크 층(`tests/oracle.py smoke`)을 둠 | 빌더 (근거: 코드) |
 | 2026-11-18 | 대상보다 먼저 온 투표 | 버리지 않고 대상 글이 올 때 점수에 더함 (`sim/box.py` `early`) | 무대 8단계 간헐 실패(7번 중 2번)의 원인. 집합 맞추기·offer는 순서를 보장하지 않음. 고친 뒤 6/6 통과, `tests/fast/vote_order.py`는 고치기 전 실패·되돌리면 실패 | 측정 |
 
