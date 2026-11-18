@@ -1,0 +1,516 @@
+{
+ "what": "CP39 R2-R5 (journal/cp/CP39.md)",
+ "label": "estimate (model) on measured embeddings",
+ "r2_always": {
+  "recall_60s": 0.6859011495397286,
+  "recall_1h": 0.6859011495397286,
+  "recall_small_60s": 0.4704176077532853,
+  "recall_small_1h": 0.4704176077532853,
+  "waste_share": 0.9135337757582843,
+  "receipts_per_box_day": 377.70944444444444,
+  "members_receipts_per_box_day": 47.59166666666666,
+  "flood_receipts_per_box_day": 901.9833333333335,
+  "exposure_top1": 0.9788888888888888,
+  "secs": [
+   19.8,
+   19.8,
+   20.3
+  ]
+ },
+ "r2_laptops": {
+  "recall_60s": 0.4582034111260425,
+  "recall_1h": 0.4582034111260425,
+  "recall_small_60s": 0.49021604273688313,
+  "recall_small_1h": 0.49021604273688313,
+  "waste_share": 0.8385997603285009,
+  "receipts_per_box_day": 39.67666666666667,
+  "members_receipts_per_box_day": 13.739444444444445,
+  "flood_receipts_per_box_day": 487.5361111111111,
+  "exposure_top1": 0.9544444444444444,
+  "secs": [
+   4.9,
+   4.5,
+   5.4
+  ]
+ },
+ "r4_sigma_0.5": {
+  "recall_60s": 0.4225361666628092,
+  "recall_1h": 0.4225361666628092,
+  "recall_small_60s": 0.3034697679977876,
+  "recall_small_1h": 0.3034697679977876,
+  "waste_share": 0.874204212426545,
+  "receipts_per_box_day": 159.1538888888889,
+  "members_receipts_per_box_day": 47.35277777777778,
+  "flood_receipts_per_box_day": 897.8305555555556,
+  "exposure_top1": 0.9622222222222222,
+  "secs": [
+   54.4,
+   53.4,
+   54.2
+  ]
+ },
+ "r4_sigma_1": {
+  "recall_60s": 0.15787035807709895,
+  "recall_1h": 0.15787035807709895,
+  "recall_small_60s": 0.17186100692718956,
+  "recall_small_1h": 0.17186100692718956,
+  "waste_share": 0.7789128848313958,
+  "receipts_per_box_day": 33.435,
+  "members_receipts_per_box_day": 46.821111111111115,
+  "flood_receipts_per_box_day": 891.6844444444445,
+  "exposure_top1": 0.8744444444444445,
+  "secs": [
+   42.8,
+   42.4,
+   41.7
+  ]
+ },
+ "r5_tol0_votes0": {
+  "recall_60s": 0.6763989204788712,
+  "recall_1h": 0.6763989204788712,
+  "recall_small_60s": 0.47442424488460294,
+  "recall_small_1h": 0.47442424488460294,
+  "waste_share": 0.9118591956527183,
+  "receipts_per_box_day": 349.2229885057471,
+  "members_receipts_per_box_day": 45.42988505747127,
+  "flood_receipts_per_box_day": 860.0241379310345,
+  "exposure_top1": 0.9873563218390805,
+  "spam_reach_target": 0.14497635755117966,
+  "spam_reach_all": 0.12823213225555025,
+  "secs": [
+   20.0,
+   19.2,
+   20.7
+  ]
+ },
+ "r5_tol0_votes31": {
+  "recall_60s": 0.6763989204788712,
+  "recall_1h": 0.6763989204788712,
+  "recall_small_60s": 0.47442424488460294,
+  "recall_small_1h": 0.47442424488460294,
+  "waste_share": 0.9118591956527183,
+  "receipts_per_box_day": 349.2229885057471,
+  "members_receipts_per_box_day": 45.42988505747127,
+  "flood_receipts_per_box_day": 860.0241379310345,
+  "exposure_top1": 0.9873563218390805,
+  "spam_reach_target": 0.9891590983145836,
+  "spam_reach_all": 0.9841872528084097,
+  "secs": [
+   24.8,
+   24.0,
+   25.5
+  ]
+ },
+ "r5_tol12_votes0": {
+  "recall_60s": 0.6763989204788712,
+  "recall_1h": 0.6763989204788712,
+  "recall_small_60s": 0.47442424488460294,
+  "recall_small_1h": 0.47442424488460294,
+  "waste_share": 0.9118591956527183,
+  "receipts_per_box_day": 349.2229885057471,
+  "members_receipts_per_box_day": 45.42988505747127,
+  "flood_receipts_per_box_day": 860.0241379310345,
+  "exposure_top1": 0.9873563218390805,
+  "spam_reach_target": 0.5185228884746832,
+  "spam_reach_all": 0.2661835123697538,
+  "secs": [
+   21.6,
+   20.6,
+   21.6
+  ]
+ },
+ "r5_tol12_votes31": {
+  "recall_60s": 0.6763989204788712,
+  "recall_1h": 0.6763989204788712,
+  "recall_small_60s": 0.47442424488460294,
+  "recall_small_1h": 0.47442424488460294,
+  "waste_share": 0.9118591956527183,
+  "receipts_per_box_day": 349.2229885057471,
+  "members_receipts_per_box_day": 45.42988505747127,
+  "flood_receipts_per_box_day": 860.0241379310345,
+  "exposure_top1": 0.9873563218390805,
+  "spam_reach_target": 0.9901363504496663,
+  "spam_reach_all": 0.9850556521876971,
+  "secs": [
+   25.6,
+   24.0,
+   23.5
+  ]
+ },
+ "r3_travel": [
+  {
+   "box": 179,
+   "sub": 20,
+   "hours_to_half": 13,
+   "posts_after": 4
+  },
+  {
+   "box": 227,
+   "sub": 36,
+   "hours_to_half": 8,
+   "posts_after": 22
+  },
+  {
+   "box": 102,
+   "sub": 31,
+   "hours_to_half": 11,
+   "posts_after": 22
+  },
+  {
+   "box": 38,
+   "sub": 3,
+   "hours_to_half": null,
+   "posts_after": 0
+  },
+  {
+   "box": 198,
+   "sub": 21,
+   "hours_to_half": 10,
+   "posts_after": 12
+  },
+  {
+   "box": 114,
+   "sub": 20,
+   "hours_to_half": 14,
+   "posts_after": 4
+  },
+  {
+   "box": 197,
+   "sub": 4,
+   "hours_to_half": 3,
+   "posts_after": 10
+  },
+  {
+   "box": 106,
+   "sub": 1,
+   "hours_to_half": null,
+   "posts_after": 0
+  },
+  {
+   "box": 290,
+   "sub": 14,
+   "hours_to_half": null,
+   "posts_after": 3
+  },
+  {
+   "box": 255,
+   "sub": 15,
+   "hours_to_half": null,
+   "posts_after": 0
+  },
+  {
+   "box": 67,
+   "sub": 50,
+   "hours_to_half": 1,
+   "posts_after": 4
+  },
+  {
+   "box": 85,
+   "sub": 53,
+   "hours_to_half": 4,
+   "posts_after": 30
+  },
+  {
+   "box": 87,
+   "sub": 48,
+   "hours_to_half": 19,
+   "posts_after": 6
+  },
+  {
+   "box": 39,
+   "sub": 27,
+   "hours_to_half": 1,
+   "posts_after": 42
+  },
+  {
+   "box": 170,
+   "sub": 41,
+   "hours_to_half": 17,
+   "posts_after": 3
+  },
+  {
+   "box": 266,
+   "sub": 40,
+   "hours_to_half": 17,
+   "posts_after": 5
+  },
+  {
+   "box": 269,
+   "sub": 26,
+   "hours_to_half": 10,
+   "posts_after": 20
+  },
+  {
+   "box": 224,
+   "sub": 24,
+   "hours_to_half": 4,
+   "posts_after": 16
+  },
+  {
+   "box": 107,
+   "sub": 58,
+   "hours_to_half": null,
+   "posts_after": 1
+  },
+  {
+   "box": 21,
+   "sub": 26,
+   "hours_to_half": 10,
+   "posts_after": 20
+  },
+  {
+   "box": 102,
+   "sub": 43,
+   "hours_to_half": 19,
+   "posts_after": 7
+  },
+  {
+   "box": 72,
+   "sub": 15,
+   "hours_to_half": 20,
+   "posts_after": 3
+  },
+  {
+   "box": 45,
+   "sub": 55,
+   "hours_to_half": 4,
+   "posts_after": 5
+  },
+  {
+   "box": 16,
+   "sub": 40,
+   "hours_to_half": null,
+   "posts_after": 0
+  },
+  {
+   "box": 236,
+   "sub": 8,
+   "hours_to_half": 14,
+   "posts_after": 1
+  },
+  {
+   "box": 124,
+   "sub": 19,
+   "hours_to_half": 7,
+   "posts_after": 5
+  },
+  {
+   "box": 198,
+   "sub": 36,
+   "hours_to_half": 6,
+   "posts_after": 24
+  },
+  {
+   "box": 69,
+   "sub": 49,
+   "hours_to_half": 2,
+   "posts_after": 25
+  },
+  {
+   "box": 25,
+   "sub": 3,
+   "hours_to_half": 16,
+   "posts_after": 5
+  },
+  {
+   "box": 82,
+   "sub": 17,
+   "hours_to_half": 2,
+   "posts_after": 38
+  },
+  {
+   "box": 188,
+   "sub": 44,
+   "hours_to_half": 3,
+   "posts_after": 24
+  },
+  {
+   "box": 180,
+   "sub": 38,
+   "hours_to_half": 1,
+   "posts_after": 44
+  },
+  {
+   "box": 295,
+   "sub": 34,
+   "hours_to_half": 1,
+   "posts_after": 29
+  },
+  {
+   "box": 167,
+   "sub": 29,
+   "hours_to_half": 3,
+   "posts_after": 21
+  },
+  {
+   "box": 135,
+   "sub": 8,
+   "hours_to_half": 14,
+   "posts_after": 1
+  },
+  {
+   "box": 262,
+   "sub": 48,
+   "hours_to_half": null,
+   "posts_after": 5
+  },
+  {
+   "box": 235,
+   "sub": 6,
+   "hours_to_half": null,
+   "posts_after": 0
+  },
+  {
+   "box": 85,
+   "sub": 20,
+   "hours_to_half": 7,
+   "posts_after": 8
+  },
+  {
+   "box": 153,
+   "sub": 31,
+   "hours_to_half": 1,
+   "posts_after": 18
+  },
+  {
+   "box": 166,
+   "sub": 16,
+   "hours_to_half": 12,
+   "posts_after": 7
+  },
+  {
+   "box": 247,
+   "sub": 39,
+   "hours_to_half": 11,
+   "posts_after": 8
+  },
+  {
+   "box": 204,
+   "sub": 30,
+   "hours_to_half": 1,
+   "posts_after": 22
+  },
+  {
+   "box": 52,
+   "sub": 11,
+   "hours_to_half": 2,
+   "posts_after": 23
+  },
+  {
+   "box": 208,
+   "sub": 59,
+   "hours_to_half": 3,
+   "posts_after": 27
+  },
+  {
+   "box": 84,
+   "sub": 2,
+   "hours_to_half": 1,
+   "posts_after": 24
+  },
+  {
+   "box": 21,
+   "sub": 27,
+   "hours_to_half": 7,
+   "posts_after": 20
+  },
+  {
+   "box": 151,
+   "sub": 50,
+   "hours_to_half": null,
+   "posts_after": 2
+  },
+  {
+   "box": 174,
+   "sub": 24,
+   "hours_to_half": 1,
+   "posts_after": 26
+  },
+  {
+   "box": 88,
+   "sub": 21,
+   "hours_to_half": 7,
+   "posts_after": 1
+  },
+  {
+   "box": 30,
+   "sub": 20,
+   "hours_to_half": 5,
+   "posts_after": 3
+  },
+  {
+   "box": 131,
+   "sub": 13,
+   "hours_to_half": 1,
+   "posts_after": 3
+  },
+  {
+   "box": 93,
+   "sub": 40,
+   "hours_to_half": 1,
+   "posts_after": 5
+  },
+  {
+   "box": 181,
+   "sub": 23,
+   "hours_to_half": 6,
+   "posts_after": 6
+  },
+  {
+   "box": 195,
+   "sub": 2,
+   "hours_to_half": 1,
+   "posts_after": 24
+  },
+  {
+   "box": 286,
+   "sub": 9,
+   "hours_to_half": 1,
+   "posts_after": 8
+  },
+  {
+   "box": 155,
+   "sub": 38,
+   "hours_to_half": 2,
+   "posts_after": 13
+  },
+  {
+   "box": 28,
+   "sub": 4,
+   "hours_to_half": 5,
+   "posts_after": 4
+  },
+  {
+   "box": 241,
+   "sub": 11,
+   "hours_to_half": 2,
+   "posts_after": 23
+  },
+  {
+   "box": 248,
+   "sub": 1,
+   "hours_to_half": 8,
+   "posts_after": 4
+  },
+  {
+   "box": 63,
+   "sub": 54,
+   "hours_to_half": 1,
+   "posts_after": 42
+  }
+ ],
+ "r3_rumour_reach_by_votes": {
+  "0": 0.3558148197636936,
+  "1": 0.4137773436520431,
+  "3": 0.6476247865173929,
+  "7": 0.8710459580366644,
+  "15": 0.968175897865832,
+  "31": 0.9834844488675404,
+  "63": 0.9839017652460722
+ },
+ "r3_travel_summary": {
+  "boxes": 60,
+  "never": 9,
+  "median_hours": 5.0
+ }
+}
