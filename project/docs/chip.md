@@ -35,7 +35,7 @@ A server-blind community has no operator, so each member's always-on **node box*
 | One proof | 89.6 µs | estimate | CP19 |
 | Encoder | 16 × 16, 2 MB, text at FP16 (128-token post 17.9 ms on the chip) | estimate (direct 16-bit Timeloop/Accelergy mappings + CP28's latency/backlog rules) | `timeloop_fp16.py`, `encoder_resize_w16.py` (CP34); `timeloop_minilm.py`, `encoder_size.py` (CP12, CP18) |
 | Chip area | **10.3 mm²** (encoder 8.18, of which 2 MB SRAM 6.80; verifier 2.12) | estimate | `chip_w16.py` (CP34): CP12's roll-up on the 16-bit mapping with FP16 MACs |
-| Power | ordinary day 16.6 mW average, flood 0.99 W (budget 2 W) | estimate | `chip_w16.py` (CP34): CP19's box model, load = top-1 % box receiving every sub-community |
+| Power | ordinary day 16.6 mW average, flood 0.99 W (budget 2 W) | estimate | `chip_w16.py` (CP34): CP19's box model, load = top-1 % box receiving every sub-community (ordinary day is an upper bound: since CP33 a box receives only its subs, 0.25–0.51× the verifications) |
 
 The box asks `chip/model/chip.py` for these numbers (the virtual accelerator: real work in software, chip time from the model). `python chip/model/chip.py` prints them.
 

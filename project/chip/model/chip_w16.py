@@ -1,6 +1,7 @@
 """CP34: the whole chip with FP16 text from the direct 16-bit mappings: encoder area, chip area, chip power.
 
-  .venv/Scripts/python.exe -W ignore chip/model/chip_w16.py <cp30 worktree>/project   -> results/chip/cp34_chip.json
+  .venv/Scripts/python.exe -W ignore chip/model/chip_w16.py   -> results/chip/cp34_chip.json
+  (the CP19 box model runs at tag cp30: at_tag.tag_tree checks it out under .worktrees/ on first use)
 
 Area: rollup.Encoder (CP12's roll-up: Timeloop/Accelergy component areas + FP16 attention MACs + vector lanes) on the
 16-bit mapping's components, with the 16-bit integer MAC replaced by an FP16 MAC (area x 1.13 = Aladdin 45 nm, 2 ns,
@@ -41,7 +42,8 @@ def encoder_area(R: int, w16: bool) -> dict:
 
 
 def main() -> None:
-    wt = Path(sys.argv[1]).resolve()
+    from at_tag import tag_tree
+    wt = tag_tree("cp30")
     out = {"area": {}, "power": {}}
     for R in (8, 16):
         for w in (False, True):
