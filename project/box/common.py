@@ -24,15 +24,16 @@ COCO = ROOT / "data" / "coco"
 IMG_BYTES = 224 * 224 * 3
 
 
-def community(n: int = 5, D: int = 2, seed: int = 21, base_port: int = 8601, *, proto: str = "cp21",
+def community(n: int = 5, D: int = 2, seed: int = 21, base_port: int = 8601, *,
               hosts: list[str] | None = None, room: list[int] | None = None, tiers: list[str] | None = None) -> dict:
-    """proto "cp24" = the design's box (sim.proto24). hosts: one address per box (several computers, each box on
-    base_port); otherwise every box is on 127.0.0.1 with its own port. room: the room's members (default 1-3)."""
+    """The design's box (proto "cp24", sim.proto24; the CP21 box is at tag pre-r1). hosts: one address per box
+    (several computers, each box on base_port); otherwise every box is on 127.0.0.1 with its own port. room: the
+    room's members (default 1-3)."""
     holders = {A: list(range(n)), B: [i for i in (0, 2, 4) if i < n],
                ROOM: room if room is not None else [i for i in (1, 2, 3) if i < n], MEMB: list(range(n))}
     mesh = meshes({t: np.array(h) for t, h in holders.items()}, D, np.random.default_rng(seed))
     ports = [base_port] * n if hosts else [base_port + i for i in range(n)]
-    return {"n": n, "D": D, "seed": seed, "proto": proto, "ports": ports,
+    return {"n": n, "D": D, "seed": seed, "proto": "cp24", "ports": ports,
             "addr": [f"{hosts[i] if hosts else '127.0.0.1'}:{ports[i]}" for i in range(n)],
             "tiers": tiers or (["new"] * n),
             "holders": {str(t): h for t, h in holders.items()},

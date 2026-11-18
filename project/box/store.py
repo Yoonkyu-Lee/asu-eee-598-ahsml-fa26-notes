@@ -58,13 +58,6 @@ class Store:
     def save_keys(self, keys: dict) -> None:
         self._write("keys.json", keys, secret=True)
 
-    def meta(self) -> dict:
-        """CP26 exchange: coverage start, start of the last session, last time the box was seen alive."""
-        return self._read("sync.json", {})
-
-    def save_meta(self, d: dict) -> None:
-        self._write("sync.json", d)
-
     def tomb(self) -> dict:
         return {int(k): set(v) for k, v in self._read("tomb.json", {}).items()}
 
@@ -80,10 +73,6 @@ class Store:
         with self.lock:
             self._msgs.write(json.dumps({**d, "_frm": frm, "_at": time.time()}) + "\n")
             self._msgs.flush()
-
-    def messages_meta(self) -> list[dict]:
-        """mid and arrival time of every stored message (CP26: what to offer after a restart)."""
-        return [{"mid": r["mid"], "_at": r["_at"]} for r in self.messages() if "_at" in r]
 
     def forget(self, mid: int) -> None:
         """Drop a deleted post's envelope (rewrite the log without it) and its picture."""
