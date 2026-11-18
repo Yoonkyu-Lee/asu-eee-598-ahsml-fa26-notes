@@ -3,8 +3,9 @@
   .venv/Scripts/python.exe chip/model/build_table.py           # writes chip/model/chip_table.json
   .venv/Scripts/python.exe chip/model/build_table.py --check   # only compares with the stored table
 
-The same computation the boxes used through CP30 (sim_cp19.EncTable, CP28 FP16 factor): encoder_size.Encoder over the
-Timeloop mappings and part costs in results/chip/, per text length L = 1..256 and one 50-patch picture.
+encoder_size.Encoder over the INT8 Timeloop mappings and part costs in results/chip/, per text length L = 1..256 and
+one 50-patch picture; FP16 text = that x the CP34 factor per length (direct 16-bit mappings, encoder_resize_w16.py).
+Through CP33 the factor was CP28's flat x4.0.
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[1]))
 import encoder_size as m18  # noqa: E402
+import encoder_resize_w16 as rz  # noqa: E402
 from chip.model.chip import SPEC, TABLE  # noqa: E402
 
 
@@ -30,10 +32,10 @@ def enc_table(R: int, glb: int):
 
 
 def build() -> dict:
-    x = SPEC["encoder"]["fp16_text_factor"]
     t16, i16 = enc_table(16, 2048)
     t8, i8 = enc_table(8, 1024)
-    return {"text_fp16_16x16_2MB": [[s * x, J * x] for s, J in t16],
+    f = [rz.fac(16, L, "w16") for L in range(1, 257)]
+    return {"text_fp16_16x16_2MB": [[s * a, J * b] for (s, J), (a, b) in zip(t16, f)],
             "text_int8_8x8_1MB": [list(r) for r in t8],
             "img_16x16": list(i16), "img_8x8": list(i8),
             "note": "seconds and joules per item on the chip (estimates). Built by build_table.py from results/chip."}

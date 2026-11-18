@@ -1,0 +1,549 @@
+{
+ "assumptions": {
+  "GHz": 0.5,
+  "glb_KB": 2048,
+  "word_bits": 16,
+  "R": 8,
+  "mac": "Accelergy intmac 16-bit multiplier, 32-bit adder (proxy for FP16)",
+  "glb_port_bits": 128
+ },
+ "components": {
+  "DRAM": {
+   "instances": 1,
+   "area_um2": 0.0,
+   "estimator": "CactiDRAM",
+   "actions_pJ": {
+    "leak": 0.0,
+    "update": 512.0,
+    "read": 512.0,
+    "write": 512.0
+   }
+  },
+  "inter_PE_spatial": {
+   "instances": 1,
+   "area_um2": 1.0,
+   "estimator": "dummy"
+  },
+  "weight_reg": {
+   "instances": 64,
+   "area_um2": 166.336,
+   "estimator": "Library",
+   "actions_pJ": {
+    "leak": 0.0,
+    "update": 0.0,
+    "read": 0.182195,
+    "write": 0.0
+   }
+  },
+  "input_reg": {
+   "instances": 64,
+   "area_um2": 166.336,
+   "estimator": "Library",
+   "actions_pJ": {
+    "leak": 0.0,
+    "update": 0.0,
+    "read": 0.182195,
+    "write": 0.0
+   }
+  },
+  "psum_reg": {
+   "instances": 64,
+   "area_um2": 332.672,
+   "estimator": "Library",
+   "actions_pJ": {
+    "leak": 0.0,
+    "update": 0.0,
+    "read": 0.364389,
+    "write": 0.0
+   }
+  },
+  "glb": {
+   "instances": 1,
+   "area_um2": 6802340.0,
+   "estimator": [
+    "CactiSRAM",
+    "Aladdin_table"
+   ],
+   "actions_pJ": {
+    "write": 170.414,
+    "read": 205.087,
+    "leak": 0.101869,
+    "update": 170.414
+   }
+  },
+  "in_buf": {
+   "instances": 1,
+   "area_um2": 50761.3,
+   "estimator": [
+    "CactiSRAM",
+    "Aladdin_table"
+   ],
+   "actions_pJ": {
+    "write": 23.2492,
+    "read": 10.7749,
+    "leak": 0.00399559,
+    "update": 23.2492
+   }
+  },
+  "acc_buf": {
+   "instances": 1,
+   "area_um2": 53842.2,
+   "estimator": [
+    "CactiSRAM",
+    "Aladdin_table"
+   ],
+   "actions_pJ": {
+    "write": 44.5427,
+    "read": 14.3399,
+    "leak": 0.00369945,
+    "update": 44.5427
+   }
+  },
+  "mac": {
+   "instances": 64,
+   "area_um2": 3243.1,
+   "estimator": [
+    "Library",
+    "Library"
+   ],
+   "actions_pJ": {
+    "compute": 4.27651,
+    "leak": 0.0566828
+   }
+  }
+ },
+ "runs": [
+  {
+   "R": 8,
+   "gemm": "qkv",
+   "K": 384,
+   "N": 1152,
+   "P": 32,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 225792,
+   "energy_uJ": 260.73,
+   "utilization": 0.9795999999999999,
+   "computes": 14155776,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 170.94,
+    "glb": 3209.15,
+    "DRAM": 9111.11,
+    "Total": 18418.84
+   },
+   "mapping": "DRAM [ Weights:442368 (442368) Inputs:12288 (12288) Outputs:36864 (36864) ] \n---------------------------------------------------------------------------\n| for P in [0:2)\n|   for C in [0:2)\n|     for M in [0:72)\n\nglb [ Weights:3072 (3072) Inputs:3072 (3072) Outputs:256 (256) ] \nin_buf [ Inputs:3072 (3072) ] \n-----------------------------\n|       for C in [0:4)\n\nacc_buf [ Outputs:256 (256) ] \n-----------------------------\n|         for M in [0:2)\n|           for C in [0:6)\n\ninter_PE_spatial [ ] \n--------------------\n|             for M in [0:8) (Spatial-Y)\n|               for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                 for P in [0:16)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                   << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "qkv",
+   "K": 384,
+   "N": 1152,
+   "P": 128,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 884736,
+   "energy_uJ": 660.47,
+   "utilization": 1.0,
+   "computes": 56623104,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 259.24,
+    "glb": 2158.57,
+    "DRAM": 3333.33,
+    "Total": 11664.27
+   },
+   "mapping": "DRAM [ Weights:442368 (442368) Inputs:49152 (49152) Outputs:147456 (147456) ] \n-----------------------------------------------------------------------------\n| for M in [0:18)\n|   for P in [0:4)\n\nglb [ Weights:24576 (24576) Inputs:12288 (12288) Outputs:2048 (2048) ] \n----------------------------------------------------------------------\n|     for M in [0:2)\n|       for C in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|         for C in [0:3)\n\nacc_buf [ Outputs:1024 (1024) ] \n-------------------------------\n|           for C in [0:8)\n|             for M in [0:4)\n|               for P in [0:2)\n\ninter_PE_spatial [ ] \n--------------------\n|                 for M in [0:8) (Spatial-Y)\n|                   for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                     for P in [0:16)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                       << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "qkv",
+   "K": 384,
+   "N": 1152,
+   "P": 512,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 3612672,
+   "energy_uJ": 1954.11,
+   "utilization": 0.9795999999999999,
+   "computes": 226492416,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 183.56,
+    "glb": 1266.52,
+    "DRAM": 1250.0,
+    "Total": 8627.71
+   },
+   "mapping": "DRAM [ Weights:442368 (442368) Inputs:196608 (196608) Outputs:589824 (589824) ] \n-------------------------------------------------------------------------------\n| for M in [0:6)\n|   for C in [0:2)\n\nglb [ Weights:36864 (36864) Inputs:98304 (98304) Outputs:98304 (98304) ] \n------------------------------------------------------------------------\n|     for P in [0:16)\n|       for M in [0:8)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|         for C in [0:6)\n\nacc_buf [ Outputs:768 (768) ] \n-----------------------------\n|           for C in [0:4)\n|             for M in [0:3)\n\ninter_PE_spatial [ ] \n--------------------\n|               for M in [0:8) (Spatial-Y)\n|                 for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                   for P in [0:32)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                     << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "qkv",
+   "K": 384,
+   "N": 1152,
+   "P": 2048,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 14450688,
+   "energy_uJ": 7713.09,
+   "utilization": 0.9795999999999999,
+   "computes": 905969664,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 173.47,
+    "glb": 1127.82,
+    "DRAM": 1284.72,
+    "Total": 8513.63
+   },
+   "mapping": "DRAM [ Weights:442368 (442368) Inputs:786432 (786432) Outputs:2359296 (2359296) ] \n---------------------------------------------------------------------------------\n| for M in [0:2)\n|   for C in [0:2)\n|     for P in [0:16)\n\nglb [ Weights:110592 (110592) Inputs:24576 (24576) Outputs:73728 (73728) ] \n--------------------------------------------------------------------------\n|       for P in [0:4)\n|         for M in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|           for M in [0:9)\n|             for C in [0:12)\n\nacc_buf [ Outputs:1024 (1024) ] \n-------------------------------\n|               for M in [0:4)\n|                 for C in [0:2)\n|                   for P in [0:32)\n\ninter_PE_spatial [ ] \n--------------------\n|                     for M in [0:8) (Spatial-Y)\n|                       for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                         << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "attn_out",
+   "K": 384,
+   "N": 384,
+   "P": 32,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 75264,
+   "energy_uJ": 62.94,
+   "utilization": 0.9795999999999999,
+   "computes": 4718592,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 175.99,
+    "glb": 2569.49,
+    "DRAM": 4666.67,
+    "Total": 13339.77
+   },
+   "mapping": "DRAM [ Weights:147456 (147456) Inputs:12288 (12288) Outputs:12288 (12288) ] \n---------------------------------------------------------------------------\n| for C in [0:2)\n\nglb [ Weights:73728 (73728) Inputs:6144 (6144) Outputs:12288 (12288) ] \n----------------------------------------------------------------------\n|   for M in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|     for M in [0:2)\n|       for P in [0:2)\n|         for C in [0:4)\n\nacc_buf [ Outputs:1536 (1536) ] \n-------------------------------\n|           for C in [0:6)\n|             for M in [0:12)\n|               for P in [0:16)\n\ninter_PE_spatial [ ] \n--------------------\n|                 for M in [0:8) (Spatial-Y)\n|                   for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                     << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "attn_out",
+   "K": 384,
+   "N": 384,
+   "P": 128,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 294912,
+   "energy_uJ": 183.15,
+   "utilization": 1.0,
+   "computes": 18874368,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 175.99,
+    "glb": 1947.96,
+    "DRAM": 1666.67,
+    "Total": 9703.74
+   },
+   "mapping": "DRAM [ Weights:147456 (147456) Inputs:49152 (49152) Outputs:49152 (49152) ] \n---------------------------------------------------------------------------\n| for P in [0:2)\n\nglb [ Weights:147456 (147456) Inputs:24576 (24576) Outputs:24576 (24576) ] \n--------------------------------------------------------------------------\n|   for P in [0:4)\n|     for M in [0:4)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|       for C in [0:8)\n\nacc_buf [ Outputs:1536 (1536) ] \n-------------------------------\n|         for M in [0:12)\n|           for C in [0:6)\n|             for P in [0:8)\n\ninter_PE_spatial [ ] \n--------------------\n|               for M in [0:8) (Spatial-Y)\n|                 for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                   for P in [0:2)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                     << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "attn_out",
+   "K": 384,
+   "N": 384,
+   "P": 512,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 1179648,
+   "energy_uJ": 736.49,
+   "utilization": 1.0,
+   "computes": 75497472,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 191.12,
+    "glb": 2067.61,
+    "DRAM": 1583.33,
+    "Total": 9755.2
+   },
+   "mapping": "DRAM [ Weights:147456 (147456) Inputs:196608 (196608) Outputs:196608 (196608) ] \n-------------------------------------------------------------------------------\n| for M in [0:3)\n|   for P in [0:32)\n\nglb [ Weights:49152 (49152) Inputs:6144 (6144) Outputs:2048 (2048) ] \n--------------------------------------------------------------------\n|     for M in [0:4)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|       for M in [0:4)\n|         for C in [0:4)\n\nacc_buf [ Outputs:128 (128) ] \n-----------------------------\n|           for C in [0:12)\n\ninter_PE_spatial [ ] \n--------------------\n|             for M in [0:8) (Spatial-Y)\n|               for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                 for P in [0:16)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                   << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "attn_out",
+   "K": 384,
+   "N": 384,
+   "P": 2048,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 4718592,
+   "energy_uJ": 2821.65,
+   "utilization": 1.0,
+   "computes": 301989888,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 198.69,
+    "glb": 2065.03,
+    "DRAM": 1166.67,
+    "Total": 9343.52
+   },
+   "mapping": "DRAM [ Weights:147456 (147456) Inputs:786432 (786432) Outputs:786432 (786432) ] \n-------------------------------------------------------------------------------\n| for P in [0:8)\n|   for M in [0:4)\n\nglb [ Weights:36864 (36864) Inputs:98304 (98304) Outputs:24576 (24576) ] \n------------------------------------------------------------------------\n|     for P in [0:16)\n|       for M in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|         for C in [0:3)\n\nacc_buf [ Outputs:768 (768) ] \n-----------------------------\n|           for M in [0:6)\n|             for C in [0:16)\n|               for P in [0:8)\n\ninter_PE_spatial [ ] \n--------------------\n|                 for M in [0:8) (Spatial-Y)\n|                   for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                     for P in [0:2)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                       << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_in",
+   "K": 384,
+   "N": 1536,
+   "P": 32,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 301056,
+   "energy_uJ": 249.08,
+   "utilization": 0.9795999999999999,
+   "computes": 18874368,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 191.13,
+    "glb": 2661.4,
+    "DRAM": 4416.67,
+    "Total": 13196.82
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:12288 (12288) Outputs:49152 (49152) ] \n---------------------------------------------------------------------------\n| for M in [0:12)\n\nglb [ Weights:49152 (49152) Inputs:12288 (12288) Outputs:4096 (4096) ] \n----------------------------------------------------------------------\n|   for C in [0:2)\n|     for M in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|       for P in [0:2)\n\nacc_buf [ Outputs:1024 (1024) ] \n-------------------------------\n|         for M in [0:8)\n|           for C in [0:24)\n|             for P in [0:8)\n\ninter_PE_spatial [ ] \n--------------------\n|               for M in [0:8) (Spatial-Y)\n|                 for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                   for P in [0:2)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                     << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_in",
+   "K": 384,
+   "N": 1536,
+   "P": 128,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 1179648,
+   "energy_uJ": 696.73,
+   "utilization": 1.0,
+   "computes": 75497472,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 228.97,
+    "glb": 1586.42,
+    "DRAM": 1500.0,
+    "Total": 9228.52
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:49152 (49152) Outputs:196608 (196608) ] \n-----------------------------------------------------------------------------\n| for M in [0:2)\n|   for P in [0:4)\n\nglb [ Weights:294912 (294912) Inputs:12288 (12288) Outputs:24576 (24576) ] \n--------------------------------------------------------------------------\n|     for M in [0:16)\n|       for C in [0:24)\n\nin_buf [ Inputs:512 (512) ] \n---------------------------\n|         for C in [0:2)\n\nacc_buf [ Outputs:1536 (1536) ] \n-------------------------------\n|           for M in [0:6)\n|             for P in [0:2)\n\ninter_PE_spatial [ ] \n--------------------\n|               for M in [0:8) (Spatial-Y)\n|                 for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                   for P in [0:16)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                     << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_in",
+   "K": 384,
+   "N": 1536,
+   "P": 512,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 4816896,
+   "energy_uJ": 2613.77,
+   "utilization": 0.9795999999999999,
+   "computes": 301989888,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.93,
+    "in_buf": 172.21,
+    "glb": 1138.65,
+    "DRAM": 1416.67,
+    "Total": 8655.15
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:196608 (196608) Outputs:786432 (786432) ] \n-------------------------------------------------------------------------------\n| for M in [0:2)\n|   for C in [0:2)\n|     for P in [0:8)\n\nglb [ Weights:147456 (147456) Inputs:12288 (12288) Outputs:49152 (49152) ] \n--------------------------------------------------------------------------\n|       for P in [0:2)\n|         for M in [0:8)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|           for M in [0:12)\n\nacc_buf [ Outputs:256 (256) ] \n-----------------------------\n|             for C in [0:24)\n|               for P in [0:16)\n\ninter_PE_spatial [ ] \n--------------------\n|                 for M in [0:8) (Spatial-Y)\n|                   for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                     for P in [0:2)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                       << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_in",
+   "K": 384,
+   "N": 1536,
+   "P": 2048,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 18874368,
+   "energy_uJ": 12716.26,
+   "utilization": 1.0,
+   "computes": 1207959552,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 356.8,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 915.43,
+    "in_buf": 289.51,
+    "glb": 2907.76,
+    "DRAM": 1416.67,
+    "Total": 10527.06
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:786432 (786432) Outputs:3145728 (3145728) ] \n---------------------------------------------------------------------------------\n| for P in [0:16)\n|   for M in [0:4)\n\nglb [ Weights:147456 (147456) Inputs:49152 (49152) Outputs:49152 (49152) ] \n--------------------------------------------------------------------------\n|     for P in [0:8)\n|       for M in [0:16)\n|         for C in [0:2)\n\nin_buf [ Inputs:3072 (3072) ] \n-----------------------------\n|           for C in [0:12)\n\nacc_buf [ Outputs:384 (384) ] \n-----------------------------\n|             for M in [0:3)\n|               for C in [0:2)\n|                 for P in [0:4)\n\ninter_PE_spatial [ ] \n--------------------\n|                   for M in [0:8) (Spatial-Y)\n|                     for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                       for P in [0:4)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                         << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_out",
+   "K": 1536,
+   "N": 384,
+   "P": 32,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 299520,
+   "energy_uJ": 253.42,
+   "utilization": 0.9845999999999999,
+   "computes": 18874368,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 362.49,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.81,
+    "in_buf": 198.69,
+    "glb": 2711.46,
+    "DRAM": 4583.33,
+    "Total": 13426.69
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:49152 (49152) Outputs:12288 (12288) ] \n---------------------------------------------------------------------------\n| for C in [0:2)\n|   for M in [0:4)\n\nglb [ Weights:73728 (73728) Inputs:24576 (24576) Outputs:3072 (3072) ] \n----------------------------------------------------------------------\n|     for C in [0:2)\n|       for P in [0:2)\n|         for M in [0:4)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|           for M in [0:3)\n|             for C in [0:3)\n\nacc_buf [ Outputs:128 (128) ] \n-----------------------------\n|               for C in [0:16)\n\ninter_PE_spatial [ ] \n--------------------\n|                 for M in [0:8) (Spatial-Y)\n|                   for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|                     for P in [0:16)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                       << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_out",
+   "K": 1536,
+   "N": 384,
+   "P": 128,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 1179648,
+   "energy_uJ": 837.69,
+   "utilization": 1.0,
+   "computes": 75497472,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 362.49,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 918.93,
+    "in_buf": 350.05,
+    "glb": 2406.58,
+    "DRAM": 2416.67,
+    "Total": 11095.62
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:196608 (196608) Outputs:49152 (49152) ] \n-----------------------------------------------------------------------------\n| for P in [0:2)\n|   for M in [0:8)\n\nglb [ Weights:73728 (73728) Inputs:98304 (98304) Outputs:3072 (3072) ] \n----------------------------------------------------------------------\n|     for M in [0:3)\n|       for C in [0:192)\n\nin_buf [ Inputs:512 (512) ] \nacc_buf [ Outputs:1024 (1024) ] \n-------------------------------\n|         for M in [0:2)\n\ninter_PE_spatial [ ] \n--------------------\n|           for M in [0:8) (Spatial-Y)\n|             for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \n----------------------------\n|               for P in [0:64)\n\ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                 << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_out",
+   "K": 1536,
+   "N": 384,
+   "P": 512,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 4792320,
+   "energy_uJ": 3031.53,
+   "utilization": 0.9845999999999999,
+   "computes": 301989888,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 362.49,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.81,
+    "in_buf": 198.69,
+    "glb": 2239.94,
+    "DRAM": 1666.67,
+    "Total": 10038.5
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:786432 (786432) Outputs:196608 (196608) ] \n-------------------------------------------------------------------------------\n| for M in [0:4)\n|   for C in [0:4)\n\nglb [ Weights:36864 (36864) Inputs:196608 (196608) Outputs:49152 (49152) ] \n--------------------------------------------------------------------------\n|     for P in [0:32)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|       for M in [0:3)\n|         for C in [0:48)\n\nacc_buf [ Outputs:512 (512) ] \n-----------------------------\n|           for M in [0:4)\n|             for P in [0:16)\n\ninter_PE_spatial [ ] \n--------------------\n|               for M in [0:8) (Spatial-Y)\n|                 for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                   << Compute >>\n"
+  },
+  {
+   "R": 8,
+   "gemm": "ffn_out",
+   "K": 1536,
+   "N": 384,
+   "P": 2048,
+   "search": [
+    200,
+    2000
+   ],
+   "cycles": 19169280,
+   "energy_uJ": 10627.33,
+   "utilization": 0.9845999999999999,
+   "computes": 1207959552,
+   "fJ_per_compute": {
+    "mac": 4276.51,
+    "psum_reg": 362.49,
+    "input_reg": 182.2,
+    "weight_reg": 182.2,
+    "acc_buf": 929.81,
+    "in_buf": 191.13,
+    "glb": 2006.76,
+    "DRAM": 666.67,
+    "Total": 8797.75
+   },
+   "mapping": "DRAM [ Weights:589824 (589824) Inputs:3145728 (3145728) Outputs:786432 (786432) ] \n---------------------------------------------------------------------------------\n| for P in [0:4)\n|   for M in [0:3)\n\nglb [ Weights:196608 (196608) Inputs:786432 (786432) Outputs:65536 (65536) ] \n----------------------------------------------------------------------------\n|     for C in [0:4)\n|       for P in [0:32)\n|         for M in [0:2)\n\nin_buf [ Inputs:6144 (6144) ] \n-----------------------------\n|           for M in [0:4)\n|             for C in [0:12)\n\nacc_buf [ Outputs:256 (256) ] \n-----------------------------\n|               for C in [0:4)\n|                 for M in [0:2)\n|                   for P in [0:16)\n\ninter_PE_spatial [ ] \n--------------------\n|                     for M in [0:8) (Spatial-Y)\n|                       for C in [0:8) (Spatial-X)\n\nweight_reg [ Weights:1 (1) ] \ninput_reg [ Inputs:1 (1) ] \npsum_reg [ Outputs:1 (1) ] \n--------------------------\n|                         << Compute >>\n"
+  }
+ ]
+}

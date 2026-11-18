@@ -1,0 +1,63 @@
+{
+ "what": "CP34 addendum: can the hardware people keep on at home survive the 100 Mbps invalid-proof flood without the chip?",
+ "label": "estimate (laptop measurement x Geekbench 6 single-core ratios), Pi 5 from CP20, laptop measured (CP12)",
+ "rows": [
+  {
+   "platform": "Raspberry Pi 5 (4x Cortex-A76)",
+   "cores": 4,
+   "cores_needed": [
+    14,
+    37
+   ],
+   "survives": false,
+   "source": "CP20 model: laptop P-core proof time x 2.93 (Geekbench 6, CP12)"
+  },
+  {
+   "platform": "Intel N100 mini PC (4 E-cores, 6 W class)",
+   "cores": 4,
+   "cores_needed": [
+    8.4,
+    26.7
+   ],
+   "survives": false,
+   "n100_core_in_pi5_cores": [
+    1.39,
+    1.66
+   ],
+   "source": "Pi 5 need / (N100 core speed in Pi 5 cores); Geekbench 6 single-core 185H 2241 (Geekbench chart) and N100 1060-1270 (user runs)"
+  },
+  {
+   "platform": "Laptop, Core Ultra 9 185H",
+   "cores": 16,
+   "survives": true,
+   "flood_W": 46.3,
+   "source": "CP12, measured"
+  },
+  {
+   "platform": "Pi 5 + our chip",
+   "host_cores": 0.85,
+   "survives": true,
+   "chip_flood_W": 0.99,
+   "source": "CP19 host load, CP34 chip power (model)"
+  }
+ ],
+ "hailo_8l": {
+  "precision": "integer only (4/8/16-bit integer per layer, 8-bit default); rated 13 TOPS at INT8",
+  "consequence": "cannot run the encoder in FP16; INT8 misses the Recall@10 >= 0.95 contract (CP3); a 16-bit integer setting was not tested by us",
+  "sources": [
+   "Hailo-8L product brief / M.2 datasheet (13 TOPS, INT8)",
+   "Hailo staff answer on community.hailo.ai: 'Our architecture is based on integer computation only'"
+  ]
+ },
+ "urls": [
+  "https://hothardware.com/news/intel-285h-arrow-lake-mobile-leak",
+  "https://www.notebookcheck.net/Intel-Core-Ultra-9-185H-Meteor-Lake-processor-loses-to-Core-Ultra-7-185H-on-Geekbench.778261.0.html",
+  "https://browser.geekbench.com/v6/cpu/8744009",
+  "https://browser.geekbench.com/v6/cpu/9824085",
+  "https://www.intel.com/content/www/us/en/products/sku/231803/intel-processor-n100.html",
+  "https://hailo.ai/products/hailo-8L/",
+  "https://hailo.ai/wp-content/uploads/2023/10/Hailo-8L-Product-Brief-Rev1.1.pdf",
+  "https://community.hailo.ai/t/inference-output-dtype-leads-to-different-results/6719",
+  "https://community.hailo.ai/t/custom-onnx-models-on-h8l-raspberry/1368"
+ ]
+}

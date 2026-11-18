@@ -1,0 +1,90 @@
+{
+ "area": {
+  "8x8 2MB INT8 (CP12)": {
+   "parts_mm2": {
+    "weight_reg": 0.0053,
+    "input_reg": 0.0053,
+    "psum_reg": 0.0213,
+    "glb": 6.8023,
+    "in_buf": 0.0508,
+    "acc_buf": 0.0538,
+    "mac": 0.0751,
+    "fp16_attention": 0.0332,
+    "vector": 0.0332
+   },
+   "encoder_mm2": 7.08,
+   "chip_mm2": 9.2
+  },
+  "8x8 2MB w16 (FP16 MAC)": {
+   "parts_mm2": {
+    "weight_reg": 0.0106,
+    "input_reg": 0.0106,
+    "psum_reg": 0.0213,
+    "glb": 6.8023,
+    "in_buf": 0.0508,
+    "acc_buf": 0.0538,
+    "mac": 0.2349,
+    "fp16_attention": 0.0332,
+    "vector": 0.0332
+   },
+   "encoder_mm2": 7.251,
+   "chip_mm2": 9.37
+  },
+  "16x16 2MB INT8 (CP12)": {
+   "parts_mm2": {
+    "weight_reg": 0.0213,
+    "input_reg": 0.0213,
+    "psum_reg": 0.0852,
+    "glb": 6.8023,
+    "in_buf": 0.0508,
+    "acc_buf": 0.0538,
+    "mac": 0.3003,
+    "fp16_attention": 0.1326,
+    "vector": 0.0332
+   },
+   "encoder_mm2": 7.501,
+   "chip_mm2": 9.62
+  },
+  "16x16 2MB w16 (FP16 MAC)": {
+   "parts_mm2": {
+    "weight_reg": 0.0426,
+    "input_reg": 0.0426,
+    "psum_reg": 0.0852,
+    "glb": 6.8023,
+    "in_buf": 0.0508,
+    "acc_buf": 0.0538,
+    "mac": 0.9397,
+    "fp16_attention": 0.1326,
+    "vector": 0.0332
+   },
+   "encoder_mm2": 8.183,
+   "chip_mm2": 10.3
+  }
+ },
+ "power": {
+  "w16 16x16 2MB": {
+   "S1_chip_mW": 16.649807879194118,
+   "S1_chip_J_day": 1438.5434007623717,
+   "S1_text_p99_s": 0.039855588009231724,
+   "S4_chip_W": 0.9898285231916452,
+   "S4_verify_busy": 0.845507968741047,
+   "S4_text_p99_s": 0.04479651023197402
+  },
+  "w16 8x8 2MB": {
+   "S1_chip_mW": 15.78290630651119,
+   "S1_chip_J_day": 1363.6431048825668,
+   "S1_text_p99_s": 0.13616560782596934,
+   "S4_chip_W": 0.9827748602647897,
+   "S4_verify_busy": 0.845507968741047,
+   "S4_text_p99_s": 0.17633732928823284
+  },
+  "flat4 16x16 2MB": {
+   "S1_chip_mW": 10.848613223953018,
+   "S1_chip_J_day": 937.3201825495407,
+   "S1_text_p99_s": 0.13688930641452293,
+   "S4_chip_W": 0.9405344407047872,
+   "S4_verify_busy": 0.845507968741047,
+   "S4_text_p99_s": 0.18392824868131374
+  }
+ }
+}

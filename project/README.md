@@ -14,15 +14,14 @@ Why this direction and what may not change: [NORTHSTAR.md](NORTHSTAR.md).
 | | Result | Label | Details |
 |---|---|---|---|
 | Workload | On an ordinary day the box is easy: text encoding is ≈ 98 % of ingest, and a laptop NPU already meets the backlog goal. The box is defined by a **spam flood**: about 12,000 anonymous proofs per second to verify (24–181 W on CPUs), which edge AI accelerators cannot compute at all | measured / estimate / sourced | [docs/chip.md](docs/chip.md) |
-| Chip | Verification unit with 6 × 254-bit Montgomery multipliers + 6 adders (2.12 mm², ≥ 13,429 proofs/s in the worst flood) and a 16 × 16 FP16 encoder with 2 MB of SRAM. Chip **≥ 9.6 mm²** at 45 nm | estimate | [docs/chip.md](docs/chip.md) |
+| Chip | Verification unit with 6 × 254-bit Montgomery multipliers + 6 adders (2.12 mm², ≥ 13,429 proofs/s in the worst flood) and a 16 × 16 FP16 encoder with 2 MB of SRAM. Chip **10.3 mm²** at 45 nm; 16.6 mW on an ordinary day, 0.99 W in a flood | estimate | [docs/chip.md](docs/chip.md) |
 | RTL | The multiplier, synthesized with FreePDK45: 0.28 mm², 300 MHz, 1.76 nJ per multiply | measured (synthesis) | [chip/rtl/](chip/rtl/) |
 | Protocol | Boxes sync by set reconciliation and fetch each message once. 0 violations across random runs, directed scenes, exhaustive small-scope search and real-box fault tests. ≤ 52.5 KB per box per day of sync overhead | estimate (model) + measured (real boxes) | [docs/protocol.md](docs/protocol.md) |
 | Chip load | Each valid message is verified and encoded exactly once per box, so the chip's work is what the box receives | counted in the model | [docs/protocol.md](docs/protocol.md) |
 
 Known gaps:
 - Sync: per-sub reconciliation (CP33) fixed H12 (every box received every sub) and passes every safety check, but it fails the pre-registered delivery-latency rule in 16 of 110 fault-injected runs (P99 up to 8,994 s vs 795 s), so it is provisional.
-- The 16 × 16 FP16 encoder was not mapped, so the area is a lower bound.
-- Power was not re-estimated for it.
+- The FP16 MAC is scaled from published FP32 tables; whether it is fully pipelined decides between an 8 × 8 and a 16 × 16 encoder (CP34).
 - Only the multiplier has RTL.
 
 See the "Open" section of [docs/chip.md](docs/chip.md).
@@ -40,7 +39,7 @@ See the "Open" section of [docs/chip.md](docs/chip.md).
 | [experiments/](experiments/) | scripts that reproduce the conclusions | re-run a result |
 | [tests/](tests/) | real box processes with faults injected | check the box still behaves |
 | [results/](results/) | `chip/`, `sync/`, `bench/`, `tests/`: the numbers behind the conclusions | read the raw numbers |
-| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP33), plus a plain-Korean walkthrough | follow how we got here (Korean) |
+| [journal/](journal/) | research log: one entry per checkpoint (CP0–CP34), plus a plain-Korean walkthrough | follow how we got here (Korean) |
 | [legacy/](legacy/) | code and results the conclusions no longer need, frozen at tag `cp30` | reproduce an old checkpoint |
 
 ## Try it (CPU only, a few minutes)

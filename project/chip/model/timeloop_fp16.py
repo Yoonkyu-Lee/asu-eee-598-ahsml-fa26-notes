@@ -23,6 +23,7 @@ ROWS = (32, 128, 512, 2048)
 
 
 def main() -> None:
+    base.GLB_KB = int(sys.argv[sys.argv.index("--glb") + 1]) if "--glb" in sys.argv else base.GLB_KB
     base.WB = int(sys.argv[sys.argv.index("--bits") + 1]) if "--bits" in sys.argv else 16
     runs = os.path.expanduser("~/tl_runs")            # run as root (Accelergy's config is root's), like CP12
     os.makedirs(runs, exist_ok=True)
@@ -31,7 +32,8 @@ def main() -> None:
     else:
         work = Path(tempfile.mkdtemp(prefix=f"cp34_w{base.WB}_", dir=runs))
     print("work", work, flush=True)
-    jobs = [(16, g, P, work) for g in base.GEMMS for P in ROWS]
+    R = int(sys.argv[sys.argv.index("--R") + 1]) if "--R" in sys.argv else 16
+    jobs = [(R, g, P, work) for g in base.GEMMS for P in ROWS]
     out, comps = [], None
     with Pool(5) as pool:                      # forked workers inherit WB
         for r in pool.starmap(base.run, jobs):
@@ -42,13 +44,13 @@ def main() -> None:
                     comps = {"error": repr(e), "dir": r["_dir"]}
             r.pop("_dir")
             out.append(r)
-            print(f"w{base.WB} R=16 {r['gemm']:8s} P={r['P']:4d} cycles={r['cycles']:>9d} util={r['utilization']:.2f} "
+            print(f"w{base.WB} R={r['R']} {r['gemm']:8s} P={r['P']:4d} cycles={r['cycles']:>9d} util={r['utilization']:.2f} "
                   f"E={r['energy_uJ']:.2f} uJ", flush=True)
-    res = {"assumptions": {"GHz": base.GHZ, "glb_KB": base.GLB_KB, "word_bits": base.WB, "R": 16,
+    res = {"assumptions": {"GHz": base.GHZ, "glb_KB": base.GLB_KB, "word_bits": base.WB, "R": R,
                            "mac": f"Accelergy intmac {base.WB}-bit multiplier, 32-bit adder (proxy for FP16)",
                            "glb_port_bits": 128},
            "components": comps, "runs": out}
-    name = base.ROOT / "results" / "chip" / f"cp34_timeloop_w{base.WB}.json"
+    name = base.ROOT / "results" / "chip" / (f"cp34_timeloop_w{base.WB}.json" if R == 16 else f"cp34_timeloop_w{base.WB}_R{R}.json")
     name.write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding="utf-8")
     print("wrote", name)
 

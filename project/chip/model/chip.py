@@ -29,17 +29,18 @@ SPEC = {
     "encoder": {
         "what": "transformer encoder array (MiniLM text, CLIP image) with a global SRAM",
         "array": "16x16", "global_sram_MB": 2, "text_precision": "FP16 (the Recall@10 >= 0.95 contract, CP3/CP27)",
-        "source": "CP28 (smallest array meeting the latency/backlog rules at FP16 text); mappings from CP12/CP18 "
-                  "Timeloop runs (timeloop_minilm.py, timeloop_shapes.py, encoder_size.py)",
-        "fp16_text_factor": 0.545 / 0.136,
-        "fp16_text_factor_source": "CP28: FP16 text work over INT8 on the same array (estimate; the 16x16 FP16 "
-                                   "array itself was not mapped)",
+        "source": "CP34: direct 16-bit mappings (timeloop_fp16.py) of 8x8 and 16x16 with 2 MB, sized by CP28's "
+                  "rules (encoder_resize_w16.py). 8x8 passes if the FP16 MAC issues one op per cycle but fails at half "
+                  "speed, so by the rule written in advance 16x16 is kept",
+        "fp16_text_factor": "per text length, encoder_resize_w16.fac(16, L, 'w16'): time x1.12-1.36, energy "
+                            "x4.6-6.3 over the INT8 mapping (CP34; CP28 had assumed x4.0 for both)",
     },
-    "area_mm2_at_least": 9.6,
-    "area_source": "CP18 chip 5.61 mm2 (8x8, 1 MB) + CP20's 8x8 1 MB -> 16x16 2 MB step +3.98 mm2 at INT8 MACs "
-                   "(CP28). FP16 MACs are larger, so this is a lower bound",
-    "power": {"ordinary_day_mW": 3.4, "flood_W": 0.87,
-              "source": "CP19, for the 8x8 chip; not re-estimated for 16x16 FP16 (open, docs/chip.md)"},
+    "area_mm2": 10.3,
+    "area_source": "CP34 chip_w16.py: encoder 8.18 mm2 (CP12 roll-up on the 16-bit mapping, 2 MB SRAM 6.80, FP16 MACs "
+                   "0.94) + verification unit 2.12. The INT8 16x16 roll-up gives 9.62, matching CP28's lower bound",
+    "power": {"ordinary_day_mW": 16.6, "flood_W": 0.99,
+              "source": "CP34 chip_w16.py: CP19's box model (S1 ordinary day, S4 invalid-proof flood) with the 16-bit "
+                        "text times and energies; load = CP16's top-1 % box receiving every sub (P-all)"},
     "image_s": 0.552,
     "image_source": "CP20 FP16 CLIP image tower on the 8x8 array, as the demo box has used it since CP20 (open: "
                     "not re-estimated for 16x16, docs/chip.md)",
@@ -60,7 +61,7 @@ class TextTable:
 
 
 def text_table(name: str = "fp16_16x16") -> TextTable:
-    """fp16_16x16: the latest chip at contract precision (CP28). int8_8x8: the CP18-CP27 chip (INT8 text; breaks
+    """fp16_16x16: the latest chip at contract precision (CP28 size, CP34 times). int8_8x8: the CP18-CP27 chip (INT8 text; breaks
     the Recall contract, kept for the --text int8 boxes)."""
     t = json.loads(TABLE.read_text(encoding="utf-8"))
     return TextTable(t[{"fp16_16x16": "text_fp16_16x16_2MB", "int8_8x8": "text_int8_8x8_1MB"}[name]])
@@ -75,7 +76,7 @@ def summary() -> str:
         f"encoder: {e['array']}, {e['global_sram_MB']} MB, text {e['text_precision']}   [{e['source']}]",
         "  text on the chip (s): " + ", ".join(f"{L} tokens {t.text1(L)[0] * 1e3:.1f} ms" for L in (16, 64, 128, 256)),
         f"  one picture: {IMAGE_S} s   [{SPEC['image_source']}]",
-        f"chip area: >= {SPEC['area_mm2_at_least']} mm2   [{SPEC['area_source']}]",
+        f"chip area: {SPEC['area_mm2']} mm2   [{SPEC['area_source']}]",
         f"power: ordinary day {SPEC['power']['ordinary_day_mW']} mW, flood {SPEC['power']['flood_W']} W   "
         f"[{SPEC['power']['source']}]",
     ]
