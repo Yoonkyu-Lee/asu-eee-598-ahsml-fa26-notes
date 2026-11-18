@@ -8,7 +8,7 @@ judges the end state per sub (journal/cp/CP33.md). CP33_ONLY=1 runs 13-14 only -
   CP30_SCENES=0 ...                                    -> scenes 1-8 only (the CP29 run)
   CP30_ONLY=1 ...                                      -> scenes 9-12 only            -> results/tests/sync_check_30.json
 
-Four lan.py boxes on this computer (ports 8641-8644), --exchange recon --faults, floor period 20-40 s and probe cap
+Four lan.py boxes on this computer (ports 8641-8644), --faults, floor period 20-40 s and probe cap
 20 s so that a scene takes a minute, not half an hour (the rules are the same; cp/CP29.md layer 4). Each scene says
 what must hold at the end; the same scene on the model (sim/sync.py, layer 2) is named next to it. Per box: every
 verified message was verified once (no message is verified twice), recon sessions and their triggers.
@@ -56,7 +56,7 @@ class Run:
 
     def start(self, i):
         args = [sys.executable, str(ROOT / "box" / "lan.py"), "--hosts", self.hosts, "--me", str(i),
-                "--state", str(self.state / f"box{i}"), "--exchange", "recon", "--push", "lazy", "--faults",
+                "--state", str(self.state / f"box{i}"), "--faults",
                 "--pae", f"{PAE[0]},{PAE[1]}", "--probe-max", str(PMAX), "--room-pass", "cp29-test"] +                (["--floor-skip"] if CP30 else [])
         self.procs[i] = subprocess.Popen(args, stdout=open(LOGS / f"{'cp30' if CP30 else 'cp29'}_check_box{i}.log", "a"),
                                          stderr=subprocess.STDOUT)

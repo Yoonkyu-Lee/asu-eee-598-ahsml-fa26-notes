@@ -65,7 +65,7 @@ def main() -> None:
 
     def start(i, *extra):
         args = [py, str(ROOT / "box" / "lan.py"), "--hosts", hosts, "--me", str(i), "--room-pass", "said on the phone",
-                "--state", str(STATE / f"box{i}"), *extra] +             (["--exchange", os.environ["CP29_EXCHANGE"]] if os.environ.get("CP29_EXCHANGE") else [])
+                "--state", str(STATE / f"box{i}"), *extra]
         procs[i] = subprocess.Popen(args, stdout=open(LOGS / f"cp25_persist_box{i}.log", "a"), stderr=subprocess.STDOUT)
 
     def restart(i, *extra):
@@ -125,12 +125,11 @@ def main() -> None:
         W = p24.World24(1, seed=int.from_bytes(os.urandom(8), "big"))
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-        recon = os.environ.get("CP29_EXCHANGE") == "recon"       # CP29: content ids, deletes carry the target header
         made = {}
 
         def post(title):
             m = W.make(0, "post", A, time.time(), {"title": title, "body": ""}, 500.0, sub_key(A), tokens=6)
-            new = content_id(m) if recon else int.from_bytes(os.urandom(6), "big") + (1 << 48)
+            new = content_id(m)                                 # CP29: content ids, deletes carry the target header
             W.keys[new] = W.keys.pop(m.mid)
             m.mid = new
             made[new] = m
@@ -141,9 +140,9 @@ def main() -> None:
             if forged:
                 W.keys[target] = Ed25519PrivateKey.generate()
             m = W.make(0, "delete", A, time.time(), {"target": target}, 400.0, sub_key(A), target=target,
-                       ref=target_ref(made[target]) if recon else "")
+                       ref=target_ref(made[target]))
             W.keys[target] = real
-            m.mid = content_id(m) if recon else int.from_bytes(os.urandom(6), "big") + (1 << 48)
+            m.mid = content_id(m)
             return m
         t1, t2 = post("a forged delete came first"), post("the author's delete came first")
         gossip(2, delete(t1.mid, forged=True), 0)

@@ -2,7 +2,7 @@
 
 진짜 박스 프로세스 다섯 개가 `127.0.0.1:8621`–`8625`에 떠서 서로 메시지를 주고받는다 (Ed25519, 증명, RLN, 복호화, MiniLM·CLIP 임베딩). 운영자 서버는 없다. 칩은 진짜가 아니라 모델이다: 박스가 하는 일마다 "칩이었으면 몇 초"를 [chip/model/chip.py](../chip/model/chip.py)에서 가져와 더한다 (가상 가속기). 설계와 지난 결과는 [journal/cp/CP21.md](../journal/cp/CP21.md), [CP24](../journal/cp/CP24.md), 박스끼리 맞추는 규칙은 [docs/protocol.md](../docs/protocol.md).
 
-- 동기화: 기본값 `--exchange recon` (CP29 집합 맞추기 + CP30 한 번만 가져오기). `--floor-skip`은 CP30의 F′ (옵션), `--exchange x2`는 CP26 방식.
+- 동기화: CP29 집합 맞추기 + CP30 한 번만 가져오기, id 먼저 보내기 (CP28). `--floor-skip`은 CP30의 F′ (옵션). 옛 방식(`--exchange poll`/`x2`, `--push eager`, CP21 박스)은 태그 `pre-r1`.
 - CP24부터 박스는 설계대로 돈다: 증명 먼저(O-b), 텍스트 단위 + 사진 개수 한도(I5), 실시간 128토큰(F1), 인코더 우선순위(텍스트 먼저, 오래된 그룹 먼저). 신원은 박스가 직접 뽑는다.
 - CP32: 박스 다섯은 `lan.py`(여러 컴퓨터 모드와 같은 코드)를 루프백 주소로 띄운 것이다. 예전 `run_demo.py`는 동기화를 안 정해 최신 설계를 안 돌아서 `legacy/box/`로 옮김.
 - **여러 컴퓨터에서 각자 박스 하나씩**: [LAN.md](LAN.md) (영어, 팀원용).

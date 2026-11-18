@@ -16,10 +16,9 @@ starting it again keeps the same identity and posts. --new-identity retires the 
 revealed for breaking the limit); the posts it holds stay. Over Tailscale, use everyone's 100.x.y.z address
 (--whoami lists it when Tailscale is running).
 
-CP26: boxes exchange by events (--exchange x2): a box that comes on offers what it took last time and gets
-what it missed from one box; nothing is polled. --exchange poll is the CP24 way (every 20 s, every box, everything).
-CP30: the default is --exchange recon (CP29 set reconciliation + CP30 K: one fetch per id). --floor-skip adds F'
-(skip the floor for a pair with no change since a clean session that spoke lately; an option, cp/CP30.md).
+Boxes exchange by CP29 set reconciliation + CP30 K (one fetch per id) and push ids first (CP27 P2, CP28).
+--floor-skip adds F' (skip the floor for a pair with no change since a clean session that spoke lately; an option,
+cp/CP30.md). The poll and x2 exchanges (--exchange) and envelope-first push (--push eager) are at tag pre-r1.
 """
 from __future__ import annotations
 
@@ -103,13 +102,8 @@ def main() -> None:
     ap.add_argument("--old", default="", help="boxes in the old group, e.g. 0,2")
     ap.add_argument("--state", help="state folder (default state/box<me>)")
     ap.add_argument("--new-identity", action="store_true", help="retire the stored identity and draw a new one")
-    ap.add_argument("--push", choices=("lazy", "eager"), default="lazy",
-                    help="lazy: ids first, envelopes only on request (CP27 P2, CP28); eager: envelopes to every peer")
     ap.add_argument("--text", choices=("fp32", "int8"), default="fp32",
                     help="fp32: contract precision (CP3, CP27); int8: CP21-CP26 boxes")
-    ap.add_argument("--exchange", choices=("x2", "poll", "recon"), default="recon",
-                    help="x2: catch up when the box comes on (CP26); poll: ask every box for everything every 20 s (CP24);"
-                         " recon: set reconciliation on every contact (CP29)")
     ap.add_argument("--pae", default="", help="recon: anti-entropy floor period range in s, e.g. 20,40 (default 600,1800)")
     ap.add_argument("--retention", type=float, default=0.0, help="recon: R in s (default 7 days)")
     ap.add_argument("--faults", action="store_true", help="test only: accept /fault (link cuts, clock offset, losses)")
@@ -132,13 +126,11 @@ def main() -> None:
     if not 0 <= a.me < n:
         ap.error(f"--me must be 0..{n - 1}")
     old = {int(x) for x in a.old.split(",") if x.strip()}
-    cfg = community(n, D=6, seed=24, base_port=a.port, proto="cp24", hosts=hosts, room=list(range(n)),
+    cfg = community(n, D=6, seed=24, base_port=a.port, hosts=hosts, room=list(range(n)),
                     tiers=["old" if i in old else "new" for i in range(n)])
     cfg["ports"], cfg["addr"] = ports, [f"{x}:{p}" for x, p in zip(hosts, ports)]
     cfg["room_key"] = hashlib.blake2b(b"room-R|" + a.room_pass.encode(), digest_size=32).hexdigest() if a.room_pass else None
-    cfg["sync"] = True                                  # several computers: a picture is pulled from any box
-    cfg["exchange"] = a.exchange
-    cfg["push"], cfg["text"] = a.push, a.text          # CP28; mesh D = 6 as in DayNet (all peers for n <= 7)
+    cfg["text"] = a.text                               # CP28; mesh D = 6 as in DayNet (all peers for n <= 7)
     if a.pae:
         cfg["pae_s"] = [float(x) for x in a.pae.split(",")]
     if a.retention:
