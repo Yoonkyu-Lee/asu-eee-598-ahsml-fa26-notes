@@ -6,7 +6,9 @@
 
 ## 1. 한 문장
 
-> **운영자가 하던 일을 사용자 기기의 컴퓨트로 대신해서, 운영자 없이도 현실의 대화처럼 자유롭고 익명이면서 기존 커뮤니티만큼 쓰기 편한 커뮤니티를 만든다. 그 컴퓨트를 싸게 만드는 하드웨어가 우리 몫이다.**
+> **하드웨어의 컴퓨트로, 운영자 없이도 현실의 대화처럼 자유롭고 익명이면서 기존 커뮤니티만큼 쓰기 편한 커뮤니티를 만든다. 운영자의 힘과 사용성은 글의 내용만이 아니라 메타데이터(누가 누구와, 누가 무엇을 읽는지, 누구를 믿을지)에서 나오므로, 컴퓨트는 그것을 보지 않고 같은 사용성을 내는 데 쓴다. 우리 몫은 그 일 가운데 기존 하드웨어로 부족하다고 측정된 것을 싸게 만드는 하드웨어다.**
+>
+> (2026-11-18 개정. 이전: "운영자가 하던 일을 사용자 기기의 컴퓨트로 대신해서 … 그 컴퓨트를 싸게 만드는 하드웨어가 우리 몫이다." 근거: `journal/recast/REVIEW.md`)
 
 ## 2. 왜 (현실 대화가 가진 것, 지금 인터넷 커뮤니티에 없는 것)
 
@@ -17,6 +19,7 @@
 | 말은 사라진다. 녹음기는 없다 | 지운 글도 운영자가 복원한다 | **망각.** 작성자가 지우면 원본은 사라진다. 이미 복제한 사람이 지운다는 보장은 없다 (의도된 것, 현실에서 몰래 녹음한 사람을 막을 수 없는 것과 같다) |
 | 광장에서 외칠지, 방에서 속삭일지 고른다 | 플랫폼이 정한다 | **청중 선택.** 공개 광장과 사적 방 |
 | 지금 말하는 사람만 당사자다 | 계정 양산, 봇, 여론 조작 | **정체성 생성은 비싸다.** 익명이지만 1인 다계정은 어렵다 |
+| 누가 누구와 말하는지, 무엇에 귀 기울이는지는 곁에 있는 사람만 안다 | 운영자가 관계·관심·체류를 다 안다 | **메타데이터 최소 노출.** 지금 지키는 것(검색어·열람은 자기 박스 안)과 못 지키는 것(가입 서브, 통신 상대)을 CP마다 구분해 적는다 |
 
 그리고 이 모든 것에도 불구하고 **사용성은 양보하지 않는다**: 검색, 피드, 추천, 투표, 댓글, 채팅, 서브(갤러리·서브레딧).
 기존 P2P 커뮤니티는 "자율·익명"과 "사용성" 중 하나를 포기했다. 우리는 **컴퓨트를 대가로 둘 다** 얻는다.
@@ -24,9 +27,10 @@
 ## 3. 컴퓨트가 쓰이는 두 곳 (= 하드웨어가 들어갈 자리)
 
 1. **운영자 서비스 대신하기 → ML**: 검색(임베딩 + top-k), 피드·추천 랭킹, 스팸·봇 판별을 각 기기·홈 노드가 한다.
-2. **드러내지 않고 증명하기 → crypto**: 서명 검증, 복호화, 익명 자격·영지식 증명, 그룹 암호화.
+2. **드러내지 않고 증명하기 → crypto**: 서명 검증, 복호화, 익명 자격·영지식 증명, 그룹 암호화. *후보 (CP37 측정 전까지 칩 범위 밖)*: 익명 평판 증명의 **생성**.
+3. *후보 (CP37 측정 전까지 칩 범위 밖)* **메타데이터 숨기기**: 비공개 조회(PIR), 가입 서브 숨기기.
 
-사업 모델(가설): 참여에 필요한 컴퓨트를 주는 하드웨어를 판다. **대상 기기는 상시 켜진 홈 노드 박스** (공유기·NAS처럼 24시간 켜 두는 기기). 2026-10-31 결정: CP5에서 노트북의 NPU·iGPU가 이미 수집 시간 목표를 지켜서, 하드웨어의 몫은 상시 총전력(유휴 + 작업), ML과 암호의 공존, 스팸이 몰릴 때의 수집에서 찾는다.
+사업 모델(가설): 참여에 필요한 컴퓨트를 주는 하드웨어를 판다. **대상 기기는 상시 켜진 홈 노드 박스** (공유기·NAS처럼 24시간 켜 두는 기기). 2026-10-31 결정: CP5에서 노트북의 NPU·iGPU가 이미 수집 시간 목표를 지켜서, 하드웨어의 몫은 상시 총전력(유휴 + 작업), ML과 암호의 공존, 스팸이 몰릴 때의 수집에서 찾는다. **단, 2026-11-18부터 이 몫의 두 전제(틀린 증명 홍수를 프로토콜이 못 막는다, 텍스트는 FP16이어야 한다)는 대결 전이다 (CP35, CP36).**
 
 ## 4. 바꾸면 안 되는 것 (불변식)
 
@@ -34,19 +38,31 @@
 - **중앙 운영자에게 특권을 주지 않는다.** 소규모 운영자는 사용자가 자발적으로 만든 것만 허용.
 - **사용성 기능을 "P2P라서 안 된다"로 빼지 않는다.** 대체하더라도 같은 필요를 채운다 (예: 조회수 대신 엣지가 스스로 집계하는 유동성).
 - **스팸이 수집 자원을 고갈시키지 않아야 한다.** 이를 막는 알고리즘을 만들어야 하는 요구사항이다 (서명이 유효해도 막아야 함).
+- **검색어와 열람 기록은 자기 박스 밖으로 나가지 않는다.** 지금 설계가 이미 지킨다 (색인은 박스 안). 이걸 깨는 최적화(예: 남의 박스에 검색 맡기기)는 금지.
+
+**목표 (불변식 아님)**: 가입 서브와 통신 상대를 이웃에게 덜 드러낸다. 어디까지 지키고 어디부터 못 지키는지를 CP마다 적는다 (중간 보고서 "What anonymity covers"와 같은 형식). 통신 상대를 숨기는 믹스넷은 칩 몫이 아니다.
+
+## 4a. 규모 가정
+
+- **설계점: 회원 10⁶명** (CP16 출처 기반 행동 모델). **스트레스점: 10⁷명** (2026-11-18 결정).
+- 박스 부하는 공동체 전체가 아니라 **가입 서브의 합**으로 잰다 (CP33). 10⁷에서 묶이는 것은 가장 큰 서브 하나의 속도다.
+- 가정을 넘는 규모는 버그가 아니라 새 요구다.
 
 ## 5. 아직 열린 문제 (구현 범위 안. 하드웨어 이야기와 이어지는 것부터 푼다)
 
-- 정체성 비용의 단위 (돈 / 하드웨어 / 시간 / 계산). 아직 없다.
+- 정체성 비용의 단위 (돈 / 하드웨어 / 시간 / 계산). 아직 없다. **맞는 증명을 가진 스팸(신원을 가진 봇)이 실사용을 깨는 1순위다** (CP28 K_crit 수천 < 기준 10⁴).
 - 운영자 없는 스팸·봇 억제 알고리즘.
 - 복제본 가용성 vs 망각의 균형, 작성자 키 탈취 대응.
+- 메타데이터 노출: 가입 서브(CP17부터 이웃에게 보임), 통신 상대(CP29 H7).
 
 ## 6. EEE 598에서의 몫
 
 - 수업은 **ML을 위한 하드웨어·시스템**이지만, 교수님 확인으로 **crypto도 똑같이 범위 안**이다 (ML에만 한정할 필요 없음). 수업에서 평가받는 기여의 중심은 하드웨어·시스템이다. 하지만 **구현 범위는 제한하지 않는다** (2026-11-01 결정): 실물 기기와 반도체(실리콘)만 빼고 프로토콜, 노드 소프트웨어, 클라이언트, 커뮤니티 알고리즘, 여러 노드·사용자 시뮬레이션까지 역량이 되는 만큼 만든다. 실물이 없는 칩은 모델(사이클·에너지)로 대신해 소프트웨어에 붙인다.
 - 공식: 워크로드 **W**(server-blind가 만드는 일) → 기존 하드웨어가 비효율적인 성질 **P** → P를 이용하는 구조 **M** → 공정한 평가.
 - **메인 워크로드는 측정으로 정한다.** (CP1: 수집 경로는 인코더가 약 98%, Ed25519+ChaCha20은 0.5%. 쿼리 경로는 싸다.)
-- 공정한 비교 규칙: 같은 Recall(목표 Recall@10 ≥ 0.95, FP32 정확 검색 기준), 같은 자원(PE·SRAM·대역폭·정밀도), 한 번에 한 요소만 바꾸는 ablation, P99 지연, 새 게시물 5초 안 검색 가능(P99).
+- **공정한 비교 규칙**: 같은 품질에서, 같은 자원(PE·SRAM·대역폭·정밀도)으로, 한 번에 한 요소만 바꾸는 ablation. Recall@10 vs FP32 정확 검색은 "같은 품질"을 재는 **비교 도구**다.
+- **사용자 요구**: 검색 품질의 문턱은 레이블 있는 검색(nDCG@10) 또는 사람 판정으로 정한다 (CP36 전까지 미정. 이전에는 Recall@10 ≥ 0.95를 문턱으로 썼다). P99 지연, 새 게시물 5초 안 검색 가능(P99).
+- 문턱(K1–K5, Recall, 2 W, 100 Mbps)마다 출처 종류를 적는다: **사용자 필요 / 비교 규칙 / 가정**.
 - 결과물: 측정, Timeloop/Accelergy 모델, RTL 블록 하나 합성, 중간 보고서(13주) · 발표(15–16주) · 최종 보고서(16주).
 
 ## 7. 합리화 테스트 (방향을 바꿀 때 전부 "예"여야 한다)
@@ -57,6 +73,9 @@
 4. 6번의 공정한 비교 규칙으로 평가할 수 있는가?
 5. 남은 학기와 3명으로 끝낼 수 있는가? 아니면 무엇을 잘라 내는지 적었는가?
 6. 하드웨어로 줄이려는 일을 알고리즘·프로토콜로 착취할 수 있는 만큼 착취했는가? (2026-11-07 결정. 먼저 의심할 것: 사건 대신 타이머, 차이 대신 전체, 이웃 대신 모두, 같은 것을 여러 번, 모두가 같은 계산을 반복)
+7. 사전 규칙이 대안들을 **같은 방식으로** 재는가? (하드웨어는 모델로 재고 프로토콜 대안은 "출처가 있나"만 보면 비대칭이다. 한쪽을 말로 기각했으면 "아니오") (2026-11-18)
+8. 이 문턱은 사용자 필요인가, 비교 규칙인가, 가정인가? 비교 규칙이나 가정이 설계 크기를 정하면 "아니오" (2026-11-18)
+9. 지금 결론의 **위층 전제**가 열린 문제·빈칸 목록에 있는가? (2026-11-18)
 
 하나라도 "아니오"면 그 이유를 `CHECKPOINT.md`의 해당 CP에 적고 진행한다. 이유 없이 넘어가지 않는다.
 
@@ -66,4 +85,4 @@
 - 범용 "엣지 벡터 검색 가속기"도 아니다. 그건 이미 있다 (CP0: RoCR, IKS 등). 우리 차별점은 server-blind가 만드는 조건(수집 마감, 검색 중 삽입, 암호와 ML의 공존, 오프라인 후 밀린 수집)이다.
 
 ---
-English, for teammates and reviewers: *Replace the operator with compute on users' own devices, so a community can be operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. Our course contribution is hardware that makes that compute cheap, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest. The main workload is chosen by measurement, and every design is compared at equal recall and equal resources. A hardware claim counts only after the algorithm and protocol have been squeezed as far as they go.*
+English, for teammates and reviewers: *Use hardware compute to build a community that is operator-free, server-blind, anonymous, and forgetful like real-life conversation, without giving up search, feeds, and the rest of normal usability. An operator's power and a community's usability come from metadata (who talks to whom, who reads what, whom to trust), not only from content, so the compute goes into producing that usability without seeing it. Our course contribution is hardware for the part of that work that existing hardware is measured to handle poorly, aimed at an always-on home node box (ML and crypto both in scope). Invariants: servers never see plaintext; no privileged operator; usability features are replaced, not dropped; spam must not exhaust ingest; search queries and reading history never leave the user's own box. Goal: reveal less about joined sub-communities and contacts. Scale: designed for 10⁶ members, stressed at 10⁷. The main workload is chosen by measurement; every design is compared at equal quality and equal resources, and user-facing thresholds are kept apart from comparison rules. A hardware claim counts only after the algorithm and protocol have been squeezed, and only after a measured duel against the protocol alternative.*
