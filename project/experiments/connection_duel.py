@@ -7,7 +7,7 @@ handshake at c_rej host seconds each); an admitted unknown connection may send o
 checks, and an invalid proof closes it, so the attacker gets one invalid proof per admitted connection.
 W-chip may instead keep CP19's N-b inside the cap (10 invalid proofs per admitted connection); the better is used.
 
-  .venv/Scripts/python.exe -W ignore experiments/connection_duel.py <cp30 worktree>/project   -> results/chip/cp35_connection_duel.json
+  .venv/Scripts/python.exe -W ignore experiments/connection_duel.py   -> results/chip/cp35_connection_duel.json
 
 The box model is CP19/CP20 at tag cp30 (as chip/model/chip_w16.py), text times from the CP34 16-bit mapping.
 Every number is an estimate (model); c_rej, the attacker's attempt rate and the join model are assumptions (CP35.md).
@@ -156,7 +156,8 @@ def same_frame(_x=None) -> dict:
 # ------------------------------------------------------------------ main
 
 def main() -> None:
-    wt = str(Path(sys.argv[1]).resolve())
+    from at_tag import tag_tree
+    wt = str(tag_tree("cp30"))
     res = {"what": "CP35 connection policy vs chip (journal/cp/CP35.md)", "label": "estimate (model)",
            "assumptions": {"c_rej_s": C_REJ, "lambdas": LAMBDAS, "phis": PHIS, "A_grid": A_GRID,
                            "link_syn_per_s": LINK_SYN_PER_S, "K_cand": K_CAND, "D_join": D_JOIN, "try_s": TRY_S,
