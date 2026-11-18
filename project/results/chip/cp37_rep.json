@@ -1,0 +1,71 @@
+{
+  "bench": "cp37 REP-N (arkworks 0.5, BN254 Groth16, single thread)",
+  "chain_2_16_prove_ms": 3497.8123000000005,
+  "cp6_laptop_chain_2_16_prove_ms": 3436.3,
+  "label": "measured (this PC); Pi 5 by ratio is an estimate",
+  "machine": "second PC (Core Ultra 9 185H, IT13 Max), Windows best-performance overlay",
+  "merkle_depth": 20,
+  "poseidon": {
+    "alpha": 5,
+    "constants": "seeded stand-ins (constraint count only)",
+    "full_rounds": 8,
+    "partial_rounds": 57,
+    "t": 3
+  },
+  "rows": [
+    {
+      "constraints": 5388,
+      "n": 1,
+      "pk_bytes": 1128368,
+      "proof_bytes": 128,
+      "prove_us": 315276.80000000005,
+      "public_inputs": 3,
+      "publics_bytes": 96,
+      "setup_s": 0.3447051,
+      "split_s": {
+        "fft_seven": 0.0101787,
+        "g1_msm_one": 0.0408897,
+        "g1_msms_four": 0.1635588,
+        "g2_msm": 0.131097
+      },
+      "verify_us": 1138.6000000000001,
+      "witnesses": 5408
+    },
+    {
+      "constraints": 51873,
+      "n": 10,
+      "pk_bytes": 10428336,
+      "proof_bytes": 128,
+      "prove_us": 2322169.9,
+      "public_inputs": 3,
+      "publics_bytes": 96,
+      "setup_s": 2.7243887,
+      "split_s": {
+        "fft_seven": 0.1030379,
+        "g1_msm_one": 0.294432,
+        "g1_msms_four": 1.177728,
+        "g2_msm": 0.9763269
+      },
+      "verify_us": 1123.2,
+      "witnesses": 52064
+    },
+    {
+      "constraints": 516723,
+      "n": 100,
+      "pk_bytes": 99758000,
+      "proof_bytes": 128,
+      "prove_us": 19341606.1,
+      "public_inputs": 3,
+      "publics_bytes": 96,
+      "setup_s": 26.5069007,
+      "split_s": {
+        "fft_seven": 1.1113032,
+        "g1_msm_one": 2.6806359,
+        "g1_msms_four": 10.7225436,
+        "g2_msm": 7.897607100000001
+      },
+      "verify_us": 1118.5,
+      "witnesses": 518624
+    }
+  ]
+}

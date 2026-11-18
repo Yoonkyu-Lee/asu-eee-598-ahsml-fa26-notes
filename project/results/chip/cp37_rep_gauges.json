@@ -1,0 +1,236 @@
+{
+ "what": "CP39/CP37 (1) gauges (journal/cp/CP37.md)",
+ "label": "estimate from measured bench",
+ "this_pc_over_laptop": 1.0179007362570207,
+ "pi5_slowdown_vs_laptop": 2.93,
+ "k1_s": 5.0,
+ "chip_mul_per_s": 450000000.0,
+ "rows": [
+  {
+   "n": 1,
+   "constraints": 5388,
+   "prove_s_this_pc": 0.3152768,
+   "split_this_pc_s": {
+    "fft_seven": 0.0101787,
+    "g1_msm_one": 0.0408897,
+    "g1_msms_four": 0.1635588,
+    "g2_msm": 0.131097
+   },
+   "g1_msm_share_of_prove": 0.5187784194713978,
+   "pi5_with_chip_1core_s": 0.45803993851128094,
+   "pi5_with_chip_4core_ideal_s": 0.13050278962782025,
+   "after_results_chip_g2_msm_s": 0.014459733333333334,
+   "after_results_pi5_with_chip_g1_g2_4core_ideal_s": 0.043108252149602296,
+   "after_results_pi5_with_chip_g1_g2_1core_s": 0.06508258859840917,
+   "pi5_1core_s": 0.9075158226103786,
+   "pi5_4core_ideal_s": 0.22687895565259464,
+   "x_k1_1core": 0.1815031645220757,
+   "x_k1_4core": 0.04537579113051893,
+   "verify_ms_this_pc": 1.1386,
+   "verify_ms_pi5": 3.277429597179929,
+   "proof_plus_publics_bytes": 224,
+   "pk_MB": 1.128368,
+   "g1_msm_sizes": [
+    5412,
+    5412,
+    5408,
+    8192
+   ],
+   "g1_msm_fq_mults": 9595683,
+   "chip_g1_msm_s": 0.02132374,
+   "note": "G2 MSM (B) and the Fr NTTs are not on the chip (G2: Fq2; NTT: Fr, CP37 table)"
+  },
+  {
+   "n": 10,
+   "constraints": 51873,
+   "prove_s_this_pc": 2.3221699,
+   "split_this_pc_s": {
+    "fft_seven": 0.1030379,
+    "g1_msm_one": 0.294432,
+    "g1_msms_four": 1.177728,
+    "g2_msm": 0.9763269
+   },
+   "g1_msm_share_of_prove": 0.5071670251173267,
+   "pi5_with_chip_1core_s": 3.438036638715722,
+   "pi5_with_chip_4core_ideal_s": 0.9673526263455972,
+   "after_results_chip_g2_msm_s": 0.10213776,
+   "after_results_pi5_with_chip_g1_g2_4core_ideal_s": 0.32007700758625096,
+   "after_results_pi5_with_chip_g1_g2_1core_s": 0.5425208836783371,
+   "pi5_1core_s": 6.6843038467770555,
+   "pi5_4core_ideal_s": 1.6710759616942639,
+   "x_k1_1core": 1.336860769355411,
+   "x_k1_4core": 0.3342151923388528,
+   "verify_ms_this_pc": 1.1232,
+   "verify_ms_pi5": 3.2331011097422233,
+   "proof_plus_publics_bytes": 224,
+   "pk_MB": 10.428336,
+   "g1_msm_sizes": [
+    52068,
+    52068,
+    52064,
+    65536
+   ],
+   "g1_msm_fq_mults": 64706080,
+   "chip_g1_msm_s": 0.1437912888888889,
+   "note": "G2 MSM (B) and the Fr NTTs are not on the chip (G2: Fq2; NTT: Fr, CP37 table)"
+  },
+  {
+   "n": 100,
+   "constraints": 516723,
+   "prove_s_this_pc": 19.3416061,
+   "split_this_pc_s": {
+    "fft_seven": 1.1113032,
+    "g1_msm_one": 2.6806359,
+    "g1_msms_four": 10.7225436,
+    "g2_msm": 7.897607100000001
+   },
+   "g1_msm_share_of_prove": 0.5543771052187854,
+   "pi5_with_chip_1core_s": 25.83263322363923,
+   "pi5_with_chip_4core_ideal_s": 7.225327845909807,
+   "after_results_chip_g2_msm_s": 0.7654067533333333,
+   "after_results_pi5_with_chip_g1_g2_4core_ideal_s": 2.5880135957469914,
+   "after_results_pi5_with_chip_g1_g2_1core_s": 4.987155962987966,
+   "pi5_1core_s": 55.67429500187586,
+   "pi5_4core_ideal_s": 13.918573750468965,
+   "x_k1_1core": 11.134859000375172,
+   "x_k1_4core": 2.783714750093793,
+   "verify_ms_this_pc": 1.1185,
+   "verify_ms_pi5": 3.219572285654093,
+   "proof_plus_publics_bytes": 224,
+   "pk_MB": 99.758,
+   "g1_msm_sizes": [
+    518628,
+    518628,
+    518624,
+    524288
+   ],
+   "g1_msm_fq_mults": 460301724,
+   "chip_g1_msm_s": 1.02289272,
+   "note": "G2 MSM (B) and the Fr NTTs are not on the chip (G2: Fq2; NTT: Fr, CP37 table)"
+  }
+ ],
+ "g2": {
+  "base_1000000": {
+   "texts_per_s_peak": 0.47942751883117385,
+   "pi5_core_share_by_n": {
+    "1": 0.001571289939919827,
+    "10": 0.001550037643174029,
+    "100": 0.0015435515526087532
+   },
+   "chip_share": 3.570090988392091e-05
+  },
+  "base_10000000": {
+   "texts_per_s_peak": 4.794275188311739,
+   "pi5_core_share_by_n": {
+    "1": 0.015712899399198274,
+    "10": 0.015500376431740293,
+    "100": 0.015435515526087535
+   },
+   "chip_share": 0.00035700909883920915
+  },
+  "high_1000000": {
+   "texts_per_s_peak": 2.3971375941558577,
+   "pi5_core_share_by_n": {
+    "1": 0.007856449699599097,
+    "10": 0.007750188215870107,
+    "100": 0.0077177577630437285
+   },
+   "chip_share": 0.00017850454941960368
+  },
+  "high_10000000": {
+   "texts_per_s_peak": 23.971375941558577,
+   "pi5_core_share_by_n": {
+    "1": 0.07856449699599098,
+    "10": 0.07750188215870107,
+    "100": 0.07717757763043728
+   },
+   "chip_share": 0.0017850454941960368
+  }
+ },
+ "g2_spam": [
+  {
+   "users": 1000000,
+   "K": 100,
+   "identities": "old",
+   "msgs_per_s": 1.0,
+   "pi5_core_share_rep_verify": 0.0032331011097422235
+  },
+  {
+   "users": 1000000,
+   "K": 100,
+   "identities": "new",
+   "msgs_per_s": 0.1388888888888889,
+   "pi5_core_share_rep_verify": 0.0004490418207975311
+  },
+  {
+   "users": 1000000,
+   "K": 1000,
+   "identities": "old",
+   "msgs_per_s": 10.0,
+   "pi5_core_share_rep_verify": 0.03233101109742224
+  },
+  {
+   "users": 1000000,
+   "K": 1000,
+   "identities": "new",
+   "msgs_per_s": 1.3888888888888888,
+   "pi5_core_share_rep_verify": 0.00449041820797531
+  },
+  {
+   "users": 1000000,
+   "K": 10000,
+   "identities": "old",
+   "msgs_per_s": 100.0,
+   "pi5_core_share_rep_verify": 0.32331011097422235
+  },
+  {
+   "users": 1000000,
+   "K": 10000,
+   "identities": "new",
+   "msgs_per_s": 13.88888888888889,
+   "pi5_core_share_rep_verify": 0.04490418207975311
+  },
+  {
+   "users": 10000000,
+   "K": 100,
+   "identities": "old",
+   "msgs_per_s": 1.0,
+   "pi5_core_share_rep_verify": 0.0032331011097422235
+  },
+  {
+   "users": 10000000,
+   "K": 100,
+   "identities": "new",
+   "msgs_per_s": 0.1388888888888889,
+   "pi5_core_share_rep_verify": 0.0004490418207975311
+  },
+  {
+   "users": 10000000,
+   "K": 1000,
+   "identities": "old",
+   "msgs_per_s": 10.0,
+   "pi5_core_share_rep_verify": 0.03233101109742224
+  },
+  {
+   "users": 10000000,
+   "K": 1000,
+   "identities": "new",
+   "msgs_per_s": 1.3888888888888888,
+   "pi5_core_share_rep_verify": 0.00449041820797531
+  },
+  {
+   "users": 10000000,
+   "K": 10000,
+   "identities": "old",
+   "msgs_per_s": 100.0,
+   "pi5_core_share_rep_verify": 0.32331011097422235
+  },
+  {
+   "users": 10000000,
+   "K": 10000,
+   "identities": "new",
+   "msgs_per_s": 13.88888888888889,
+   "pi5_core_share_rep_verify": 0.04490418207975311
+  }
+ ]
+}
