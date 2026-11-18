@@ -1,0 +1,92 @@
+{
+ "what": "CP39 R1 determinism (journal/cp/CP39.md)",
+ "label": "estimate (model) on measured embeddings (CP3 cache)",
+ "params": {
+  "K": 50,
+  "boxes": 200,
+  "hops": 3,
+  "seed": 39,
+  "attack_posts": 2000,
+  "q_honest": 0.001,
+  "variants": [
+   "fp32",
+   "fp16",
+   "int8_dyn_hf",
+   "int8_pc"
+  ],
+  "posts": 20000
+ },
+ "pairs": {
+  "fp32|fp16": {
+   "cos_min": 0.9999962825851056,
+   "cos_q001": 0.9999985365317788,
+   "cos_median": 0.9999993956758761,
+   "next_hop_overlap_mean": 0.98115,
+   "next_hop_all_same": 0.9442,
+   "neighbourhood_same": 0.9999,
+   "attack_move_share": 0.005
+  },
+  "fp32|int8_dyn_hf": {
+   "cos_min": 0.9669116721618461,
+   "cos_q001": 0.9784077768320674,
+   "cos_median": 0.9926865488712001,
+   "next_hop_overlap_mean": 0.9277666666666667,
+   "next_hop_all_same": 0.8046,
+   "neighbourhood_same": 0.9671,
+   "attack_move_share": 0.6905
+  },
+  "fp32|int8_pc": {
+   "cos_min": 0.975458350560956,
+   "cos_q001": 0.9844198617390086,
+   "cos_median": 0.9944517502305088,
+   "next_hop_overlap_mean": 0.9355833333333333,
+   "next_hop_all_same": 0.8228,
+   "neighbourhood_same": 0.97445,
+   "attack_move_share": 0.6475
+  },
+  "fp16|int8_dyn_hf": {
+   "cos_min": 0.9667161644927853,
+   "cos_q001": 0.9783891751887691,
+   "cos_median": 0.9926848951825302,
+   "next_hop_overlap_mean": 0.9270833333333334,
+   "next_hop_all_same": 0.80245,
+   "neighbourhood_same": 0.9671,
+   "attack_move_share": 0.708
+  },
+  "fp16|int8_pc": {
+   "cos_min": 0.9756707053247544,
+   "cos_q001": 0.9844473608920028,
+   "cos_median": 0.9944533963267359,
+   "next_hop_overlap_mean": 0.9354666666666667,
+   "next_hop_all_same": 0.8221,
+   "neighbourhood_same": 0.97445,
+   "attack_move_share": 0.615
+  },
+  "int8_dyn_hf|int8_pc": {
+   "cos_min": 0.961715253835993,
+   "cos_q001": 0.9746897552125013,
+   "cos_median": 0.9910103583733572,
+   "next_hop_overlap_mean": 0.9230499999999999,
+   "next_hop_all_same": 0.79315,
+   "neighbourhood_same": 0.96365,
+   "attack_move_share": 0.7345
+  }
+ },
+ "mixed_devices": {
+  "tau": 0.9785530257009735,
+  "theta_deg": 11.88775669623828,
+  "attack_move_share": 0.697
+ },
+ "deterministic": {
+  "tau": 1.0,
+  "attack_move_share": 0.0
+ },
+ "centre_spacing_deg": {
+  "nearest_median": 54.60745702500041
+ },
+ "verdict": {
+  "needed": true,
+  "worst_next_hop_all_same": 0.79315,
+  "worst_attack_move_share": 0.7345
+ }
+}
