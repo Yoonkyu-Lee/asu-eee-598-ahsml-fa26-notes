@@ -8,6 +8,9 @@ advertised u) + D_RAND random ones, refreshed every refresh_s by asking one neig
 A post reaches a box, the box verifies and encodes it (its own embedding, the routing value); the owner reads it if it
 is of one of the owner's interests (a person's judgement, so the label) and may vote. The box forwards it to neighbours whose advertised u matches the post
 (cos >= fwd_cos); a post with v votes also crosses up to floor(log2(1 + v)) non-matching hops (the rumour).
+CP39 A variants: pull (every refresh_s a box asks one on semantic neighbour for the last day's posts that match what the
+box advertises, optionally plus the posts that neighbour's owner voted for) and buckets (a box advertises only the ids of
+its bucket_n nearest cells of a public codebook, world["codebook"]; a post routes by its nearest cell).
 Baselines on the same posts: "members" (CP33: exactly the boxes whose owner holds the label) and "flood" (everyone).
 
 Attack hooks (R5): spam posts whose claimed embedding is rotated toward a target subreddit by tol_deg (the honest
@@ -27,6 +30,7 @@ from sim.engine import Engine
 DAY = 86400.0
 HOP_S = 0.05                     # per transfer (CP16)
 D_SEM, D_RAND = 6, 2
+PULLED = 1 << 30                 # off-hop count given to a pulled post: it is forwarded only where it matches
 
 
 @dataclass
@@ -50,6 +54,10 @@ class HoodScene:
     spam_per_day: float = 0.0            # R5: spam posts per attacker box per day
     spam_target: int = -1                # R5: subreddit the spam is steered toward
     bought_votes: int = 0                # R5: votes the attacker adds to each spam post
+    pull: bool = False                   # A (a): fill from a semantic neighbour every refresh_s
+    pull_votes: bool = False             # A (a+): the fill also takes the posts that neighbour's owner voted for
+    buckets: bool = False                # A (b): advertise codebook cell ids instead of u (world["codebook"])
+    bucket_n: int = 2                    # A (b): cells a box advertises
     seed: int = 39
 
 
@@ -90,17 +98,34 @@ class Hood:
         self.always = self.rng.random(n) < sc.always
         self.on_off = self.rng.uniform(0, DAY, n)                        # laptops: on from this time of day for 8 h
         self.spam = set(range(n - sc.spam_boxes, n)) if sc.spam_boxes else set()
+        self.cb = world.get("codebook") if sc.buckets else None
         self.nb = [self._fresh(b) for b in range(n)]
         self.has: list[dict] = [dict() for _ in range(n)]             # post -> arrival time
+        cap = int(n * sc.posts_per_box_day * sc.days * 3 + sc.spam_boxes * sc.spam_per_day * sc.days * 3 + 200)
+        self.HAS = np.zeros((n, cap), bool)                               # pull: who has what, as a matrix
+        self.VOTED = np.zeros((n, cap), bool)
+        self.PE = np.zeros((cap, E.shape[1]))
+        self.PT = np.zeros(cap)
+        self.PK = np.zeros(cap, int)
         self.posts: list[dict] = []
         self.votes: list[int] = []
-        self.c = {"receipts": 0, "encodes": 0, "forwards": 0, "reads": 0, "votes": 0}
+        self.c = {"receipts": 0, "encodes": 0, "forwards": 0, "reads": 0, "votes": 0, "pulls": 0, "pulled": 0}
 
     # ---- helpers
     def on(self, b, t):
         if self.always[b]:
             return True
         return ((t - self.on_off[b]) % DAY) < 8 * 3600.0
+
+    def cells(self, b):
+        """Buckets: the codebook cells box b advertises."""
+        return set(np.argsort(-(self.cb @ self.u[b]))[:self.sc.bucket_n].tolist())
+
+    def match(self, pid, q):
+        """Does post pid route to box q, judged from what q advertises?"""
+        if self.cb is not None:
+            return int(self.PK[pid]) in self.cells(q)
+        return float(self.PE[pid] @ self.adv(q)) >= self.sc.fwd_cos
 
     def adv(self, b):
         """The interest vector box b advertises to its neighbours (R4: with noise)."""
@@ -113,8 +138,12 @@ class Hood:
         pool = np.array(sorted(set(range(n)) - {b} if cands is None else set(cands) - {b}))
         if cands is None:
             pool = self.rng.choice(pool, min(60, len(pool)), replace=False)
-        adv = np.stack([self.adv(x) for x in pool])
-        sem = pool[np.argsort(-(adv @ self.u[b]))[:D_SEM]].tolist()
+        if self.cb is not None:
+            mine = self.cells(b)
+            score = np.array([len(mine & self.cells(x)) for x in pool]) + 0.1 * self.rng.random(len(pool))
+        else:
+            score = np.stack([self.adv(x) for x in pool]) @ self.u[b]
+        sem = pool[np.argsort(-score)[:D_SEM]].tolist()
         rest = [x for x in range(n) if x != b and x not in sem]
         return sem + self.rng.choice(rest, D_RAND, replace=False).tolist()
 
@@ -124,7 +153,26 @@ class Hood:
             q = self.nb[b][int(self.rng.integers(len(self.nb[b])))]
             if self.on(q, t):
                 self.nb[b] = self._fresh(b, set(self.nb[b]) | set(self.nb[q]))
+            if self.sc.pull:
+                self._pull(b, self.nb[b][int(self.rng.integers(D_SEM))])
         self.eng.after(self.sc.refresh_s, self.refresh, b)
+
+    def _pull(self, b, q):
+        t, N = self.eng.t, len(self.posts)
+        if not self.on(q, t):
+            return
+        self.c["pulls"] += 1
+        new = self.HAS[q, :N] & ~self.HAS[b, :N] & (self.PT[:N] >= t - DAY)
+        idx = np.flatnonzero(new)
+        if self.cb is not None:
+            ok = np.isin(self.PK[idx], sorted(self.cells(b)))
+        else:
+            ok = self.PE[idx] @ self.adv(b) >= self.sc.fwd_cos
+        if self.sc.pull_votes:
+            ok |= self.VOTED[q, idx]
+        for pid in idx[ok]:
+            self.c["pulled"] += 1
+            self.eng.after(HOP_S, self._receive, b, int(pid), q, PULLED)
 
     # ---- posts
     def write(self, b):
@@ -143,35 +191,48 @@ class Hood:
 
     def _publish(self, b, ix, label, claimed=None, votes=0):
         pid = len(self.posts)
-        e = self.w["emb"][ix]
-        self.posts.append({"ix": ix, "label": label, "t": self.eng.t, "author": b,
-                           "e": e if claimed is None else claimed})
+        e = self.w["emb"][ix] if claimed is None else claimed
+        if pid >= len(self.PT):
+            self._grow()
+        self.posts.append({"ix": ix, "label": label, "t": self.eng.t, "author": b, "e": e})
+        self.PE[pid], self.PT[pid] = e, self.eng.t
+        if self.cb is not None:
+            self.PK[pid] = int(np.argmax(self.cb @ e))
         self.votes.append(votes)
         self.has[b][pid] = self.eng.t
+        self.HAS[b, pid] = True
         self._forward(b, pid, 0)
+
+    def _grow(self):
+        k = len(self.PT)
+        self.HAS = np.pad(self.HAS, ((0, 0), (0, k)))
+        self.VOTED = np.pad(self.VOTED, ((0, 0), (0, k)))
+        self.PE = np.pad(self.PE, ((0, k), (0, 0)))
+        self.PT = np.pad(self.PT, (0, k))
+        self.PK = np.pad(self.PK, (0, k))
 
     def _receive(self, b, pid, frm, off_hops):
         t = self.eng.t
         if pid in self.has[b] or not self.on(b, t):
             return
         self.has[b][pid] = t
+        self.HAS[b, pid] = True
         self.c["receipts"] += 1
         self.c["encodes"] += 1
         p = self.posts[pid]
-        e = p["e"]                                       # the routing value (claimed within tolerance, R5)
         if p["label"] in self.true[b] and b not in self.spam:
             self.c["reads"] += 1
             self.u[b] = unit(self.u[b] + self.sc.alpha * self.w["emb"][p["ix"]])
             if self.rng.random() < self.sc.vote_p:
                 self.votes[pid] += 1
+                self.VOTED[b, pid] = True
                 self.c["votes"] += 1
         self._forward(b, pid, off_hops)
 
     def _forward(self, b, pid, off_hops):
-        e = self.posts[pid]["e"]
         reach = int(math.log2(1 + self.votes[pid])) if self.sc.rumour else 0
         for q in self.nb[b]:
-            match = float(e @ self.adv(q)) >= self.sc.fwd_cos
+            match = self.match(pid, q)
             if match or off_hops < reach:
                 self.c["forwards"] += 1
                 self.eng.after(HOP_S, self._receive, q, pid, b, off_hops + (0 if match else 1))
@@ -229,7 +290,21 @@ class Hood:
             sp = [pid for pid, p in enumerate(self.posts) if p["label"] < 0]
             out["spam_reach_target"] = float(np.mean([sum(pid in self.has[b] for b in tgt) / max(len(tgt), 1) for pid in sp])) if sp else None
             out["spam_reach_all"] = float(np.mean([sum(pid in self.has[b] for b in honest) / len(honest) for pid in sp])) if sp else None
-        # R4: a neighbour guesses the owner's main interest from the advertised vector (nearest subreddit centre)
-        guess = np.argmax(np.stack([self.adv(b) for b in honest]) @ self.cent.T, axis=1)
+        # R4: a neighbour guesses the owner's main interest from what the box advertises. Vector: the nearest subreddit
+        # centre. Cells: the most common true interest among boxes advertising the same cells (an attacker who knows
+        # the population). Prior: the most common interest for everyone (the floor).
+        if self.cb is not None:
+            sig = {b: tuple(sorted(self.cells(b))) for b in honest}
+            cnt: dict = {}
+            for b in honest:
+                for x in self.true[b]:
+                    cnt.setdefault(sig[b], {}).setdefault(x, 0)
+                    cnt[sig[b]][x] += 1
+            guess = [max(cnt[sig[b]].items(), key=lambda kv: kv[1])[0] for b in honest]
+            out["cell_sets"] = len(set(sig.values()))
+        else:
+            guess = np.argmax(np.stack([self.adv(b) for b in honest]) @ self.cent.T, axis=1)
         out["exposure_top1"] = float(np.mean([g in self.true[b] for g, b in zip(guess, honest)]))
+        pop = np.bincount([x for b in honest for x in self.true[b]], minlength=self.n_sub).argmax()
+        out["exposure_prior"] = float(np.mean([pop in self.true[b] for b in honest]))
         return out

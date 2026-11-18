@@ -1,6 +1,7 @@
 """CP39 R2-R5 (journal/cp/CP39.md, rules written before the runs): the semantic-neighbourhood model on Reddit posts.
 
   .venv/Scripts/python.exe -W ignore experiments/hood.py all     -> results/neighborhoods/r2_r5.json
+  .venv/Scripts/python.exe -W ignore experiments/hood.py a       -> results/neighborhoods/a_rescue.json (CP39 A)
 Needs data/neighborhoods/posts.npz (experiments/hood_data.py). Every number is an estimate (model).
 """
 from __future__ import annotations
@@ -16,10 +17,13 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from experiments.hood_determinism import kmeans  # noqa: E402
 from sim.hood import DAY, Hood, HoodScene, unit  # noqa: E402
 
 DATA = ROOT / "data" / "neighborhoods" / "posts.npz"
 OUT = ROOT / "results" / "neighborhoods" / "r2_r5.json"
+OUT_A = ROOT / "results" / "neighborhoods" / "a_rescue.json"
+CALIB_Q = 0.30                   # forward threshold = this quantile of cos(post, first u) over in-interest pairs (CP39)
 SEEDS = (1, 2, 3)
 T0 = time.time()
 
@@ -31,26 +35,47 @@ def world(variant="fp32"):
     return {"emb": unit(z[variant].astype(np.float64)), "label": z["label"], "names": names, "small_ids": sorted(small)}
 
 
-W = {}
+W: dict = {}
 
 
-def _w():
-    if not W:
-        W.update(world())
-    return W
+def _w(variant="fp32", k=0):
+    """World per encoder; k > 0 adds the public codebook (k-means of all post embeddings, fixed seed)."""
+    if (variant, k) not in W:
+        w = dict(world(variant))
+        if k:
+            w["codebook"] = kmeans(w["emb"], k, np.random.default_rng(39))
+        W[(variant, k)] = w
+    return W[(variant, k)]
 
 
-def _run(sc: HoodScene):
+def calib(variant):
+    """CP39 rule: the CALIB_Q quantile of cos(post, first u) over (post, box) pairs where the post is of the box's
+    interest; the out-of-interest pairs are reported next to it."""
+    h = Hood(HoodScene(), _w(variant))
+    E = h.w["emb"]
+    inn, out = [], []
+    for b in range(h.sc.n):
+        c = E @ h.u[b]
+        m = np.isin(h.w["label"], sorted(h.true[b]))
+        inn.append(c[m])
+        out.append(c[~m][::20])
+    inn, out = np.concatenate(inn), np.concatenate(out)
+    return {"fwd_cos": float(np.quantile(inn, CALIB_Q)), "in_median": float(np.median(inn)),
+            "out_median": float(np.median(out)), "out_q95": float(np.quantile(out, 0.95)),
+            "out_pass": float(np.mean(out >= np.quantile(inn, CALIB_Q)))}
+
+
+def _run(sc: HoodScene, variant="fp32", k=0):
     t = time.time()
-    r = Hood(sc, _w()).run()
+    r = Hood(sc, _w(variant, k)).run()
     r["secs"] = round(time.time() - t, 1)
     r["scene"] = {k: v for k, v in sc.__dict__.items()}
     return r
 
 
-def _travel(sc: HoodScene):
-    """R3: one box per seed picks up a new interest at day 1 after its owner reads 5 posts of it (a friend's links)."""
-    w = _w()
+def _travel(sc: HoodScene, variant="fp32", k=0):
+    """R3: 20 boxes per seed pick up a new interest at day 1 after their owners read 5 posts of it (a friend's links)."""
+    w = _w(variant, k)
     h = Hood(sc, w)
     rng = np.random.default_rng(sc.seed + 100)
     out = []
@@ -141,5 +166,60 @@ def run_all():
     OUT.write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
 
 
+METRICS = ("recall_60s", "recall_1h", "recall_small_60s", "recall_small_1h", "waste_share", "receipts_per_box_day",
+           "members_receipts_per_box_day", "flood_receipts_per_box_day", "exposure_top1", "exposure_prior", "cell_sets")
+
+
+def run_a():
+    """CP39 A (journal/cp/CP39.md, rules written before the run): pull, coarse cells, the larger encoder, all of them."""
+    cal = {v: calib(v) for v in ("fp32", "mpnet")}
+    print("calibration", cal, flush=True)
+    base = HoodScene()
+    mp = replace(base, fwd_cos=cal["mpnet"]["fwd_cos"])
+    K = 16
+    variants = {"A0": (base, "fp32", 0), "Aa": (replace(base, pull=True), "fp32", 0),
+                "Aa+": (replace(base, pull=True, pull_votes=True), "fp32", 0),
+                "Ab": (replace(base, buckets=True), "fp32", K), "Ac": (mp, "mpnet", 0),
+                "A-all": (replace(mp, pull=True, pull_votes=True, buckets=True), "mpnet", K)}
+    aux = {"Ab_k8": (replace(base, buckets=True), "fp32", 8), "Ab_k32": (replace(base, buckets=True), "fp32", 32),
+           "Ab_n1": (replace(base, buckets=True, bucket_n=1), "fp32", K),
+           "Ab_n3": (replace(base, buckets=True, bucket_n=3), "fp32", K),
+           "Ac+pull": (replace(mp, pull=True, pull_votes=True), "mpnet", 0)}
+    for v, k in {(v, k) for _, v, k in list(variants.values()) + list(aux.values())}:
+        _w(v, k)                                         # codebooks once, before forking
+    res = {"what": "CP39 A (journal/cp/CP39.md)", "label": "estimate (model) on measured embeddings", "calibration": cal}
+    with ProcessPoolExecutor(14) as ex:
+        futs, trav = {}, {}
+        for name, (sc, v, k) in {**variants, **aux}.items():
+            futs[name] = [ex.submit(_run, replace(sc, seed=s), v, k) for s in SEEDS]
+            futs[name + "/laptops"] = [ex.submit(_run, replace(sc, always=0.3, seed=s), v, k) for s in SEEDS]
+            if name in variants:
+                trav[name] = [ex.submit(_travel, replace(sc, seed=s), v, k) for s in SEEDS]
+        for name, fs in futs.items():
+            rs = [f.result() for f in fs]
+            res[name] = {m: float(np.mean([r[m] for r in rs])) for m in METRICS if all(m in r for r in rs)}
+            res[name]["pulls_per_box_day"] = float(np.mean([r["counts"]["pulls"] for r in rs])) / base.n / base.days
+            res[name]["pulled_per_box_day"] = float(np.mean([r["counts"]["pulled"] for r in rs])) / base.n / base.days
+            res[name]["secs"] = [r["secs"] for r in rs]
+            print(f"[{time.time() - T0:6.0f}s]", name, {m: round(x, 3) for m, x in res[name].items() if m != "secs"},
+                  flush=True)
+        for name, fs in trav.items():
+            h = [x["hours_to_half"] for f in fs for x in f.result()]
+            got = [x for x in h if x is not None]
+            res[name]["r3_travel"] = {"boxes": len(h), "never": len(h) - len(got),
+                                      "median_hours": float(np.median(got)) if got else None}
+            print("travel", name, res[name]["r3_travel"], flush=True)
+    for name in variants:
+        r = res[name]
+        r["verdict"] = {"r2": r["recall_1h"] >= 0.90 and r["recall_small_1h"] >= 0.80 and r["waste_share"] <= 0.50
+                        and r["receipts_per_box_day"] <= 0.5 * r["flood_receipts_per_box_day"],
+                        "r3": r["r3_travel"]["median_hours"] is not None and r["r3_travel"]["median_hours"] <= 1.0,
+                        "r4": r["exposure_top1"] <= 0.5}
+    res["rescued_by"] = [n for n in variants if all(res[n]["verdict"].values())]
+    print("verdicts", {n: res[n]["verdict"] for n in variants}, "rescued_by", res["rescued_by"])
+    OUT_A.parent.mkdir(parents=True, exist_ok=True)
+    OUT_A.write_text(json.dumps(res, indent=1, default=str), encoding="utf-8")
+
+
 if __name__ == "__main__":
-    run_all()
+    run_a() if sys.argv[1:] == ["a"] else run_all()
