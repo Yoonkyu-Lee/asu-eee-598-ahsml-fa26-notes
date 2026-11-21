@@ -338,7 +338,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 .nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
 .nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
 .nota>summary::-webkit-details-marker{display:none}
-.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
 .nota:not([open])>summary::before{transform:rotate(-90deg)}
 .nota>summary:hover{color:var(--ink2)}
 .nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
@@ -472,6 +472,30 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">adder tree</div>
+  <div class="f">reduction tree</div>
+  <div class="d" lang="ko">값 <span class="m"><i>V</i></span>개를 <strong>두 개씩 짝지어 더하기를 반복</strong>해 하나로 줄이는 덧셈기 묶음. 덧셈기 <span class="m"><i>V</i> − 1</span>개, 깊이 <span class="m">log<sub>2</sub> <i>V</i></span>단. 내적의 축소 차원을 곱셈기 여러 개로 펼쳤을 때(<code>spatial_for c</code>) 그 곱들을 다시 합치는 부품이다. 단을 지날 때마다 비트가 하나씩 는다. psum을 한 칸씩 넘기는 systolic array와 반대 전략이다.</div>
+  <div class="d" lang="en">A bundle of adders that <strong>repeatedly sums pairs</strong> to reduce <span class="m"><i>V</i></span> values to one: <span class="m"><i>V</i> − 1</span> adders, <span class="m">log<sub>2</sub> <i>V</i></span> levels. It's the part that merges the products when a dot product's reduction dimension is spread over several multipliers (<code>spatial_for c</code>), and it adds one bit per level. The opposite strategy to a systolic array, which passes the psum one hop at a time.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s3">Lecture 11-12 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">AMC</div>
+  <div class="f">AutoML for Model Compression</div>
+  <div class="d" lang="ko">강화학습 agent가 층을 하나씩 보며 <strong>그 층의 pruning 비율</strong>을 고르고, 정확도와 latency를 보상으로 배우는 방법 (He et al., ECCV 2018). <strong>"얼마나 자를지"(ratio)를 정하지 "무엇을 자를지"(criterion)를 정하지 않는다.</strong> 같은 정확도에서 균일하게 줄인 모델보다 약 1.8배 빨랐다(L19 36쪽 그래프 대략값).</div>
+  <div class="d" lang="en">A reinforcement-learning agent walks the layers choosing <strong>each layer's pruning ratio</strong>, rewarded on accuracy and latency (He et al., ECCV 2018). <strong>It decides how much to cut (the ratio), not what to cut (the criterion).</strong> At equal accuracy it ran about 1.8x faster than uniform shrinking (rough reading of lecture 19-20's page 36).</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s7">Lecture 19-20 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">APoZ</div>
+  <div class="f">Average Percentage of Zeros</div>
+  <div class="d" lang="ko">한 채널(뉴런)의 ReLU 뒤 출력이 데이터 전체에서 <strong>0인 비율</strong>. 높을수록 덜 중요하다고 보고 그 채널을 지운다. <strong>방향이 magnitude와 반대</strong>(작을수록 중요)이고, 흘려 넣은 데이터에 따라 값이 바뀐다.</div>
+  <div class="d" lang="en">The share of a channel's (neuron's) post-ReLU outputs that are <strong>zero</strong> across a dataset; the higher it is, the less important the channel, which gets removed. <strong>Its direction is the opposite of magnitude's</strong> (smaller means important), and it depends on the data streamed in.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s11">Lecture 19-20 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">APR</div>
   <div class="f">Automatic Place and Route</div>
   <div class="d" lang="ko">합성이 만든 netlist의 게이트를 칩 위 어디에 놓고 어떻게 배선할지 도구가 정하는 단계. 이 수업 Project에서는 Cadence Innovus를 쓴다. <strong>합성 직후의 면적·지연 숫자는 배선을 모르는 추정치</strong>이므로, 논문에 넣는 값은 post-APR이어야 한다.</div>
@@ -513,6 +537,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">bank &middot; crossbar &middot; bank conflict</div>
+  <div class="d" lang="ko">bank는 <strong>독립적으로 접근할 수 있는 메모리 조각</strong>, crossbar는 요청 여러 개를 아무 bank에나 이어 주는 스위치 격자, bank conflict는 한 사이클에 둘 이상의 요청이 <strong>같은 bank</strong>로 가서 하나가 밀리는 것. 포트를 늘리는 것보다 싸지만 <strong>bank는 포트가 아니다</strong>. 동시 접근이 서로 다른 bank로 흩어질 때만 포트 여럿처럼 동작한다. 가속기는 접근 패턴을 알아서 bank를 드러내 놓고 데이터 배치로 충돌을 피하는 경우가 많다. ECE 408의 shared memory 32 bank가 같은 물건이다.</div>
+  <div class="d" lang="en">A bank is <strong>an independently accessible slice of memory</strong>; a crossbar is a switch grid connecting many requests to any bank; a bank conflict is two or more requests in one cycle hitting <strong>the same bank</strong>, so one waits. Cheaper than adding ports, but <strong>a bank is not a port</strong>: it acts like several ports only when simultaneous accesses land in different banks. Accelerators know their access patterns, so they often expose banks and avoid conflicts through data layout. GPU shared memory's 32 banks are the same thing.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s10">Lecture 11-12 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">batch &middot; minibatch</div>
   <div class="d" lang="ko">한 번의 가중치 갱신에 쓰는 학습 예제의 <strong>부분집합</strong>. 전체 데이터셋의 gradient를 매번 계산하는 것이 불가능해서 생긴 타협이다. <strong>크기를 키우면 하드웨어 효율은 오르지만 수렴이 나빠진다.</strong> L01 31쪽 표에서 minibatch 32,768이 정확도가 가장 낮은 것이 그 사례다.</div>
   <div class="d" lang="en">The <strong>subset</strong> of training examples used for one weight update, a concession forced by the impossibility of computing the full-dataset gradient every step. <strong>Larger batches use the hardware better and converge worse</strong>: the 32,768 minibatch in the table on page 31 of lecture 1 has the lowest accuracy for exactly that reason.</div>
@@ -524,7 +555,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Batch Normalization</div>
   <div class="d" lang="ko">activation을 채널마다 평균 0, 분산 1로 맞춘 뒤 학습되는 γ, β로 scale·shift하는 층. <strong>추론 때는 통계가 고정돼 곱셈 하나 + 덧셈 하나</strong>로 접히고 앞 conv에 흡수(BN folding)할 수도 있다. <strong>학습 때는 batch 전체에 대한 reduction이라 동기화 지점이 생기고 memory-bound</strong>다.</div>
   <div class="d" lang="en">A layer that normalises activations per channel to zero mean and unit variance, then scales and shifts them by learned γ and β. <strong>At inference the statistics are frozen, so it folds to one multiply and one add</strong> and can be absorbed into the preceding conv (BN folding). <strong>In training it is a reduction over the whole batch: a synchronisation point, and memory-bound.</strong></div>
-  <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s9">Lecture 19-20 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -533,6 +564,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">부호 1 + 지수 8 + 가수 7 비트의 16비트 부동소수점. <strong>FP32와 지수 폭이 같아서 표현 범위가 같고, 정밀도만 잃는다.</strong> 그래서 FP32 코드를 거의 그대로 옮길 수 있다. TPU v2가 학습에 쓴 형식이다.</div>
   <div class="d" lang="en">A 16-bit float laid out as 1 sign + 8 exponent + 7 mantissa bits. <strong>It keeps FP32's exponent width, so the dynamic range is the same and only precision is lost</strong>, which is why FP32 code ports across almost unchanged. This is the format TPU v2 trains in.</div>
   <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">bitmask</div>
+  <div class="d" lang="ko">희소 텐서를 <strong>칸마다 1비트</strong>(0인가 아닌가) + 0 아닌 값 배열로 적는 형식. NVDLA가 쓴다. <strong>밀도와 무관한 고정 비용</strong>(8-bit 값이면 1/8)이 있지만 규칙적이라 하드웨어가 좋아한다. 중간 밀도의 작은 행렬에서는 CSR보다 작다.</div>
+  <div class="d" lang="en">A sparse format storing <strong>one bit per cell</strong> (zero or not) plus an array of the non-zeros. Used by NVDLA. It has <strong>a fixed cost independent of density</strong> (1/8 for 8-bit values) but is regular, which hardware likes. At middling density on small matrices it beats CSR.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s14">Lecture 19-20 &middot; 14</a></div>
 </div>
 
 <div class="gterm">
@@ -553,6 +591,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gC">C</h2>
 
 <div class="gterm">
+  <div class="t">CACTI</div>
+  <div class="d" lang="ko">SRAM, 캐시, DRAM의 <strong>크기, bank 수, 단어 폭, 공정</strong>을 넣으면 <strong>접근 에너지, leakage, 면적, 지연</strong>을 추정해 주는 모델 도구. HP Labs가 관리해 왔고, 이름은 머리글자가 아니라 선인장에서 왔다. <strong>회로를 만드는 합성 도구가 아니라</strong> 해석 모델이다. 아키텍처 논문의 SRAM 에너지 숫자는 대부분 여기서 나온다.</div>
+  <div class="d" lang="en">A model that takes an SRAM, cache or DRAM's <strong>size, bank count, word width and process</strong> and estimates <strong>access energy, leakage, area and delay.</strong> Long maintained by HP Labs; named after the cactus, not an acronym. <strong>Not a synthesis tool that builds circuits</strong> but an analytical model. Most SRAM energy numbers in architecture papers come from it.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s9">Lecture 17-18 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">capacity</div>
   <div class="d" lang="ko">모델이 <strong>표현할 수 있는 함수의 범위</strong>. 파라미터 수, 층 깊이, 다항식 차수로 늘린다. <strong>메모리 용량과 다른 말이지만 연결되어 있다.</strong> capacity를 늘리려고 파라미터를 늘리면 그만큼 바이트가 필요하다. quantization과 pruning은 이 값을 일부러 깎는 기법이다.</div>
   <div class="d" lang="en">The <strong>range of functions a model can represent</strong>, raised by adding parameters, depth or polynomial degree. <strong>A different word from memory capacity, though the two are linked</strong>: raising it by adding parameters costs exactly that many bytes. Quantization and pruning deliberately cut it back.</div>
@@ -565,6 +610,36 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">재구성 가능한 배열인데 단위가 <strong>1비트 LUT가 아니라 연산기(ALU)</strong>인 구조. ASIC의 효율과 FPGA의 유연성 사이를 노린다. SambaNova의 RDU가 이 계열에 가깝다.</div>
   <div class="d" lang="en">A reconfigurable array whose unit is <strong>an ALU rather than a one-bit LUT</strong>, aiming between ASIC efficiency and FPGA flexibility. SambaNova's RDU is close to this family.</div>
   <div class="src"><a href="lectures/L01-introduction.html#s2">Lecture 1 · 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">channel pruning</div>
+  <div class="f">filter pruning</div>
+  <div class="d" lang="ko">conv 층의 채널을 <strong>통째로</strong> 지워 <span class="m"><i>K</i></span>(또는 <span class="m"><i>C</i></span>)가 작은 <strong>dense 층</strong>을 만드는 가장 굵은 granularity. 결과에 0이 없어 index도 희소 하드웨어도 필요 없고 <strong>어디서나 바로 빨라진다.</strong> 한 층의 출력 채널을 지우면 다음 층의 입력 채널도 같이 사라진다. 대가는 작은 압축률이다.</div>
+  <div class="d" lang="en">The coarsest granularity: delete whole channels of a conv layer to get a <strong>dense layer</strong> with smaller <span class="m"><i>K</i></span> (or <span class="m"><i>C</i></span>). The result has no zeros, so no indices or sparse hardware are needed and <strong>it speeds up anywhere.</strong> Removing a layer's output channel removes the next layer's input channel too. The price is a smaller compression ratio.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s7">Lecture 19-20 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Cnvlutin</div>
+  <div class="d" lang="ko">activation을 (값, offset) 쌍으로 압축해 <strong>0인 activation의 MAC을 건너뛰는</strong> 가속기 (Albericio et al., ISCA 2016). weight는 dense로 두고 offset을 weight 버퍼의 주소로 쓴다(<strong>indirection</strong>). 작은 activation까지 문턱값으로 0으로 쳐서 평균 1.37×를 1.52×로 올렸다.</div>
+  <div class="d" lang="en">An accelerator that stores activations as (value, offset) pairs and <strong>skips the MACs of zero activations</strong> (Albericio et al., ISCA 2016). Weights stay dense and the offset addresses the weight buffer (<strong>indirection</strong>). Thresholding small activations to zero lifted its mean speedup from 1.37x to 1.52x.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s15">Lecture 19-20 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">CompAct</div>
+  <div class="f">On-chip <u>Comp</u>ression of <u>Act</u>ivations</div>
+  <div class="d" lang="ko">이 수업 강사의 설계. WS systolic array의 <strong>on-chip activation 버퍼 안에서</strong> activation을 RLC로 압축한다. <strong>row-major schedule</strong>로 접근을 순차로 만들어 디코더가 매 사이클 값 하나를 내게 하고, <strong>Lossy-RLC</strong>로 더 압축하고, 빈 bank는 deep sleep, 긴 run 동안은 <strong>snooze</strong>시킨다. activation 버퍼 에너지 45-62%, 시스템 에너지 최대 33% 절감.</div>
+  <div class="d" lang="en">The course instructor's design. It RLC-compresses activations <strong>inside a WS systolic array's on-chip activation buffer</strong>, uses a <strong>row-major schedule</strong> so accesses are sequential and the decoder emits one value per cycle, squeezes further with <strong>Lossy-RLC</strong>, deep-sleeps empty banks and <strong>snoozes</strong> the active bank during long runs. Saves 45-62% of activation-buffer energy and up to 33% of system energy.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s0">Lecture 17-18 &middot; 00</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">compression ratio</div>
+  <div class="d" lang="ko">보통은 <strong>원본 / 압축본</strong>이라 1보다 크다("3:1"). 그런데 CompAct 덱의 Feature Map Compression Ratio는 <strong>0에서 1 사이, 클수록 많이 줄인 것</strong>, 즉 1 − 압축본/원본(절약 비율)으로 쓰인다. 같은 "0.7"이 정의에 따라 정반대 뜻이니 논문마다 정의부터 확인한다.</div>
+  <div class="d" lang="en">Usually <strong>original / compressed</strong>, above 1 ("3:1"). The CompAct deck's Feature Map Compression Ratio instead runs <strong>from 0 to 1, larger meaning more removed</strong>: 1 − compressed/original, the fraction saved. The same "0.7" means opposite things under the two definitions, so check which one each paper uses.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s7">Lecture 17-18 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -582,6 +657,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="lectures/L04-dnns.html#s4">Lecture 4-5 &middot; 04</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">CSR &middot; CSC</div>
+  <div class="f">Compressed Sparse Row / Compressed Sparse Column</div>
+  <div class="d" lang="ko">희소 행렬을 <strong>값, 열(행) index, 행(열)마다의 bounds</strong> 세 배열로 적는 형식. bounds는 <strong>행(열) 수 + 1</strong>개다. CSR은 행을, CSC는 열을 빨리 꺼낸다. 어느 쪽을 쓸지는 dataflow가 정한다. 입력을 broadcast하는 EIE는 CSC를 쓴다. "compressed"는 0을 뺀다는 뜻이지 엔트로피 압축이 아니다.</div>
+  <div class="d" lang="en">A sparse matrix as three arrays: <strong>values, column (row) indices, and per-row (per-column) bounds</strong>, the bounds having <strong>rows (columns) + 1</strong> entries. CSR fetches rows fast, CSC columns; the dataflow picks which. EIE, which broadcasts inputs, uses CSC. "Compressed" means zeros are dropped, not entropy coding.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s14">Lecture 19-20 &middot; 14</a></div>
+</div>
+
 <h2 class="gletter" id="gD">D</h2>
 
 <div class="gterm">
@@ -596,6 +679,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">모든 worker가 <strong>모델 전체 사본</strong>을 들고 <strong>데이터만 나눠서</strong> gradient를 계산하는 분산학습. worker가 매 iteration 모델 크기만큼의 gradient를 주고받아서 <strong>통신이 병목</strong>이 된다. 반대는 모델을 쪼개는 model parallelism.</div>
   <div class="d" lang="en">Distributed training where every worker holds <strong>a full copy of the model</strong> and only <strong>the data is split</strong>. Each iteration every worker exchanges a model-sized gradient, which makes <strong>communication the bottleneck</strong>. The opposite is model parallelism, which splits the model.</div>
   <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s2">Paper Reading 2 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">data retention voltage</div>
+  <div class="f">V<sub>DRV</sub> · DRV</div>
+  <div class="d" lang="ko">SRAM 셀이 <strong>저장한 비트를 잃지 않는 최소 전원 전압</strong>. 이 전압에서는 읽고 쓸 수 없지만 <strong>leakage가 크게 준다.</strong> bank를 V<sub>DRV</sub>로 내린 상태를 CompAct은 <strong>snooze</strong>라고 부른다. 전원을 아예 끊는 <a href="#gP">power gating</a>(deep sleep)과 달리 데이터가 남는다. 다시 읽으려면 깨우는 시간과 에너지가 든다.</div>
+  <div class="d" lang="en">The <strong>lowest supply at which an SRAM cell keeps its bit.</strong> No reads or writes at this voltage, but <strong>leakage drops sharply.</strong> CompAct calls a bank lowered to V<sub>DRV</sub> <strong>snoozing.</strong> Unlike <a href="#gP">power gating</a> (deep sleep), the data survives; reading again costs wake-up time and energy.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s8">Lecture 17-18 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -624,14 +715,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">ping-pong buffering</div>
   <div class="d" lang="ko">같은 용도의 버퍼를 <strong>두 벌</strong> 두고, 한 벌을 연산기가 읽는 동안 다른 한 벌을 채운 뒤 <strong>역할을 맞바꾸는</strong> 기법. 데이터를 가져오는 일과 계산하는 일을 <strong>정말로 동시에</strong> 시킬 수 있게 한다. <strong>공짜가 아니다.</strong> on-chip SRAM이 두 배로 들고, <strong>느린 쪽을 빠르게 만들지는 못한다.</strong> 메모리가 압도적으로 느리면 stall은 그대로 남는다.</div>
   <div class="d" lang="en">Keeping <strong>two</strong> buffers for one purpose, filling one while the arithmetic reads the other and then <strong>swapping their roles</strong>, so fetching and computing can genuinely proceed at once. <strong>Not free</strong>: it doubles the on-chip SRAM, and <strong>it does not make the slow side faster.</strong> When memory dominates, the stall survives.</div>
-  <div class="src"><a href="lectures/L04-dnns.html#s9">Lecture 4-5 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L04-dnns.html#s9">Lecture 4-5 &middot; 09</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s11">Lecture 11-12 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DropConnect</div>
+  <div class="d" lang="ko">학습 중에 <strong>weight(연결) 하나하나를 무작위로 0으로</strong> 만드는 정규화(Wan, Zeiler, Zhang, LeCun, Fergus, ICML 2013). 뉴런 출력을 통째로 끄는 dropout과 달리 <strong>연결 단위</strong>다. ThUnderVolt에서 timing error가 난 MAC의 곱을 버리는 것이 추론 때 이와 같은 모양의 잡음이라고 해서 나온다.</div>
+  <div class="d" lang="en">A regulariser that zeroes <strong>individual weights (connections) at random</strong> during training (Wan, Zeiler, Zhang, LeCun, Fergus, ICML 2013). Unlike dropout, which switches off a whole neuron output, it works <strong>per connection.</strong> It comes up because ThUnderVolt's dropping of an erroneous MAC's product is noise of the same shape at inference.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s3">Lecture 15-16 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">dropout</div>
   <div class="d" lang="ko">학습 중 매 스텝마다 <strong>노드 일부를 무작위로 꺼서</strong> 특정 노드 의존을 막는 regularization. <strong>학습에만 있고 추론에는 없다</strong>는 것이 결정적이다. 추론 전용 칩은 이걸 구현할 필요가 없다. 그리고 <strong>꺼지는 노드가 매 스텝 바뀌므로 <a href="#gS">sparsity</a>를 만들지 않는다.</strong></div>
   <div class="d" lang="en">Regularization that <strong>randomly switches off a fraction of the nodes</strong> at each training step so the network cannot depend on any one of them. The decisive property is that it <strong>exists in training and not in inference</strong>, so inference-only silicon never implements it. And because the set changes every step, it <strong>creates no <a href="#gS">sparsity</a></strong>.</div>
-  <div class="src"><a href="lectures/L02-ml-basics.html#s9">Lecture 2-3 &middot; 09</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s9">Lecture 2-3 &middot; 09</a> &nbsp; <a href="lectures/L15-energy-efficient-systolic-array.html#s3">Lecture 15-16 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -650,7 +748,45 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s6">Paper Reading 1 &middot; 06</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">DVS &middot; DVFS</div>
+  <div class="f">Dynamic Voltage Scaling &middot; Dynamic Voltage and Frequency Scaling</div>
+  <div class="d" lang="ko">실행 중에 공급 전압(과 클럭)을 바꾸는 것. 보통의 DVFS는 부하가 낮을 때 <strong>둘을 같이</strong> 내린다. ThUnderVolt는 <strong>클럭은 두고 전압만</strong> 층마다 바꾸며, 이를 위해 마이크로초 단위로 전환하는 온칩 조정기를 쓴다.</div>
+  <div class="d" lang="en">Changing the supply voltage (and clock) at run time. Ordinary DVFS lowers <strong>both together</strong> when load is light. ThUnderVolt <strong>keeps the clock and changes only the voltage</strong> per layer, relying on on-chip regulators that switch in microseconds.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s4">Lecture 15-16 &middot; 04</a></div>
+</div>
+
 <h2 class="gletter" id="gE">E</h2>
+
+<div class="gterm">
+  <div class="t">effectual &middot; ineffectual computation</div>
+  <div class="d" lang="ko">MAC 중 <strong>W와 IA가 둘 다 0이 아닌 것</strong>만 결과를 바꾸는 effectual 연산이고, 나머지는 ineffectual이다. 두 밀도가 독립이면 effectual 비율은 두 밀도의 곱이다(AlexNet 약 0.54 × 0.43 ≈ 23%). <strong>"efficient"가 아니라 "effectual"</strong>이다. 에너지와 무관하게 결과에 영향이 있는지만 묻는다.</div>
+  <div class="d" lang="en">Of all MACs, only those where <strong>W and IA are both non-zero</strong> change the result (effectual); the rest are ineffectual. With independent densities, the effectual share is their product (AlexNet about 0.54 × 0.43 ≈ 23%). <strong>Effectual, not efficient</strong>: it only asks whether the result changes, regardless of energy.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s13">Lecture 19-20 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">EIE</div>
+  <div class="f">Efficient Inference Engine</div>
+  <div class="d" lang="ko">Deep Compression으로 잘리고 공유된 FC 가중치를 <strong>압축된 채로</strong> 읽어 희소 행렬 × 희소 벡터를 하는 ASIC (Han et al., ISCA 2016). 4-bit <strong>virtual weight</strong>(코드북 번호)와 4-bit <strong>relative index</strong>(직전 0 아닌 값과의 거리) 두 필드가 있고, ALU 직전에서만 16-bit로 펼친다. sparse 가속기의 원조 비교 대상.</div>
+  <div class="d" lang="en">An ASIC that reads FC weights pruned and shared by Deep Compression <strong>while still compressed</strong>, computing sparse matrix × sparse vector (Han et al., ISCA 2016). It carries a 4-bit <strong>virtual weight</strong> (a codebook index) and a 4-bit <strong>relative index</strong> (distance from the previous non-zero), expanding to 16 bits only before the ALU. The baseline sparse accelerators compare against.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s3">Lecture 19-20 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">embarrassingly parallel</div>
+  <div class="d" lang="ko">조각끼리 주고받을 것이 없어서 나눠 돌리기가 너무 쉬운 문제. FATE에서는 weight stationary systolic array의 <strong>열이 서로 독립</strong>(부분합이 열 안에서만 흐른다)이라 열 일부만 샘플해도 되는 근거로 쓰인다. 이 성질은 dataflow에 달려 있다.</div>
+  <div class="d" lang="en">A problem whose pieces exchange nothing, so splitting it up is trivially easy. In FATE it justifies sampling only some columns: in a weight-stationary systolic array <strong>the columns are independent</strong> (partial sums stay inside a column). The property depends on the dataflow.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s7">Lecture 15-16 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">entropy coding</div>
+  <div class="f">Huffman coding, arithmetic coding</div>
+  <div class="d" lang="ko">값이 나올 확률에 맞춰 <strong>자주 나오는 값에 짧은 비트열</strong>을 주는 무손실 압축. Deep Compression의 세 번째 단계(Huffman)가 이것이다. 부호 길이가 값마다 달라서 <strong>다음 값이 어디서 시작하는지 앞 값을 풀어야 안다.</strong> 그래서 매 사이클 값 하나를 받아야 하는 systolic array에는 맞추기 어렵다. 반복을 접는 <a href="#gR">RLC</a>와 다르다.</div>
+  <div class="d" lang="en">Lossless compression giving <strong>short bit strings to frequent values</strong> according to their probability; Deep Compression's third stage (Huffman) is one. Code lengths vary, so <strong>where the next value starts is known only after decoding the previous one</strong>, which makes it hard to fit to a systolic array that needs one value per cycle. Not the same as <a href="#gR">RLC</a>, which folds repeats.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s3">Lecture 17-18 &middot; 03</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">epoch</div>
@@ -660,6 +796,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gF">F</h2>
+
+<div class="gterm">
+  <div class="t">FAP &middot; FAP+T</div>
+  <div class="f">Fault-Aware Pruning &middot; Fault-Aware Pruning + reTraining</div>
+  <div class="d" lang="ko">systolic array에서 <strong>고장 난 MAC에 실리는 weight를 0으로 보고</strong>, 그 MAC을 mux 하나로 건너뛰는 기법(Zhang et al., VTS 2018). WS에서는 weight 하나가 MAC 하나에 정적으로 묶이므로, bypass가 곧 그 weight를 0으로 놓는 것과 같다. <strong>FAP+T</strong>는 그 뒤 칩마다 한 번 재학습한다. 실행 시간 추가 0, 면적 약 9%. 보통 pruning과 달리 <strong>무엇을 자를지 칩의 고장 위치가 정하고, 아무것도 빨라지지 않는다.</strong></div>
+  <div class="d" lang="en">A technique that <strong>treats every weight landing on a faulty MAC as zero</strong> and skips that MAC with one mux (Zhang et al., VTS 2018). Under WS each weight is statically tied to one MAC, so the bypass equals zeroing that weight. <strong>FAP+T</strong> then retrains once per chip. Zero added run time, about 9% area. Unlike ordinary pruning, <strong>the chip's fault locations decide what gets cut, and nothing gets faster.</strong></div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s6">Lecture 13-14 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FATE</div>
+  <div class="d" lang="ko">systolic array의 data-dependent timing error를 빠르게 추정하는 시뮬레이션 틀(Zhang &amp; Garg, ICCAD 2018). <strong>DelayNet</strong>(MAC의 현재·이전 입력 72비트로 지연을 맞히는 72-30-1 MLP), <strong>열 샘플링</strong>, <strong>확률적 오류 주입</strong>의 조합. Full gate-level 시뮬레이션 대비 FATE-Samp 7.92x(오차 4.3%), FATE-DNN 58.6x(오차 6.2%).</div>
+  <div class="d" lang="en">A simulation framework for quickly estimating a systolic array's data-dependent timing errors (Zhang &amp; Garg, ICCAD 2018). It combines <strong>DelayNet</strong> (a 72-30-1 MLP predicting delay from a MAC's current and previous inputs, 72 bits), <strong>column sampling</strong> and <strong>probabilistic error injection.</strong> Versus full gate-level simulation: FATE-Samp 7.92x (4.3% error), FATE-DNN 58.6x (6.2% error).</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s5">Lecture 15-16 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">fault &middot; error &middot; failure</div>
+  <div class="d" lang="ko">신뢰성 분야에서 엄격히 가르는 세 단계. <strong>fault</strong>는 물리적 원인(게이트 출력이 GND에 붙었다), <strong>error</strong>는 그 때문에 틀린 내부 상태(psum의 20번 비트가 틀렸다), <strong>failure</strong>는 바깥에서 보이는 서비스 실패(분류가 틀렸다). fault-tolerant 설계는 fault를 없애는 게 아니라 <strong>fault가 failure까지 가지 않게</strong> 막는 것이다.</div>
+  <div class="d" lang="en">Three stages the reliability field keeps strictly apart. A <strong>fault</strong> is the physical cause (a gate output shorted to ground), an <strong>error</strong> the resulting wrong internal state (bit 20 of a psum is wrong), a <strong>failure</strong> the service failure visible outside (a wrong classification). Fault-tolerant design doesn't remove faults; it <strong>stops faults from reaching failure.</strong></div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s3">Lecture 13-14 &middot; 03</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">FC layer</div>
@@ -719,6 +877,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gG">G</h2>
 
 <div class="gterm">
+  <div class="t">gate-level timing simulation &middot; SDF</div>
+  <div class="f">SDF = Standard Delay Format</div>
+  <div class="d" lang="ko">합성한 게이트 netlist에 셀 라이브러리에서 뽑은 게이트·배선 지연(SDF 파일)을 붙여 <strong>실제 입력마다</strong> 신호 도착 시각을 시뮬레이션하는 것. RTL 시뮬레이션은 지연이 0이고 STA는 최악 경로만 알려 주므로, data-dependent timing error를 세려면 이게 필요하다. 대신 매우 느리다(AlexNet 256장에 10일 이상).</div>
+  <div class="d" lang="en">Annotating a synthesised gate netlist with per-gate and per-wire delays from the cell library (an SDF file) and simulating signal arrival times <strong>for each real input.</strong> RTL simulation has zero delay and STA reports only the worst path, so counting data-dependent timing errors needs this. It is very slow (over 10 days for 256 AlexNet images).</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s5">Lecture 15-16 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">GEMM</div>
   <div class="f">GEneral Matrix-Matrix multiplication</div>
   <div class="d" lang="ko">BLAS 표준의 행렬 곱셈 루틴 <span class="m"><i>C</i> ← α<i>AB</i> + β<i>C</i></span>. FC 층은 원래 GEMM(batch 1이면 행렬 × 벡터)이고, conv는 <a href="#gI">im2col</a>로 GEMM이 된다. <strong>GPU의 Tensor Core와 TPU의 systolic array가 둘 다 GEMM 기계</strong>라 DNN 연산을 GEMM 모양으로 만드는 것이 곧 가속이다.</div>
@@ -734,10 +900,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">golden netlist</div>
+  <div class="d" lang="ko">RTL에서 합성한 게이트 netlist 중 <strong>정답 기준으로 삼는 고장 없는 판본</strong>. 고장 주입 실험에서 golden 출력과 faulty 출력을 비교한다. "golden"은 품질이 아니라 <strong>"기준"</strong>이라는 뜻이다.</div>
+  <div class="d" lang="en">The <strong>fault-free gate-level netlist used as the reference</strong> for correct outputs. Fault-injection experiments compare golden output with faulty output. "Golden" means <strong>"reference,"</strong> not a quality grade.</div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s9">Lecture 13-14 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">gradient descent</div>
   <div class="d" lang="ko">gradient의 <strong>음의 방향</strong>으로 반복해서 파라미터를 옮겨 cost function을 줄이는 방법. 닫힌 형태의 해 대신 이걸 쓰는 이유는 수학이 아니라 <strong>메모리와 연산량</strong>이다. 파라미터가 <span class="m"><i>n</i></span>개일 때 역행렬은 <span class="m"><i>n</i><sup>3</sup></span>이 들지만 한 스텝은 <span class="m"><i>n</i></span>에 비례한다. <strong>딥러닝 하드웨어가 <a href="#gM">MAC</a> 기계로 만들어진 근본 이유다.</strong></div>
   <div class="d" lang="en">Reducing the cost function by repeatedly stepping the parameters in the <strong>negative gradient direction</strong>. It is preferred over a closed-form solution for reasons of <strong>memory and arithmetic, not mathematics</strong>: inverting an <span class="m"><i>n</i>&times;<i>n</i></span> matrix costs <span class="m"><i>n</i><sup>3</sup></span> while one step costs <span class="m"><i>n</i></span>. <strong>This is the root reason deep learning hardware is built as a <a href="#gM">MAC</a> machine.</strong></div>
   <div class="src"><a href="lectures/L02-ml-basics.html#s10">Lecture 2-3 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">group Lasso</div>
+  <div class="d" lang="ko">가중치를 그룹(filter, 채널, 위치 등)으로 나누고 <strong>그룹마다의 L2 norm을 더한 값</strong>을 벌점으로 거는 regularization. 그룹 norm들의 L1이라 일부 그룹이 <strong>통째로 정확히 0</strong>이 된다. SSL(Wen et al., NeurIPS 2016)이 이걸로 structured sparsity를 학습시켰다.</div>
+  <div class="d" lang="en">Regularization that splits weights into groups (filters, channels, positions and so on) and penalises <strong>the sum of each group's L2 norm.</strong> Being an L1 over group norms, it drives some groups <strong>exactly to zero as a whole.</strong> SSL (Wen et al., NeurIPS 2016) used it to learn structured sparsity.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s13">Lecture 19-20 &middot; 13</a></div>
 </div>
 
 <h2 class="gletter" id="gH">H</h2>
@@ -775,6 +955,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gI">I</h2>
 
 <div class="gterm">
+  <div class="t">II</div>
+  <div class="f">Initiation Interval</div>
+  <div class="d" lang="ko">loop의 <strong>연속된 두 반복이 시작되는 사이클 간격</strong>. II = 1이면 매 사이클 새 일이 들어간다. <strong>throughput = 1 / II</strong>이고 latency는 이 식에 없다. pipelining은 latency를 늘리면서 II = 1을 지킨다(latency 5, II 1). 되먹임 고리(누적기)가 있으면 II는 그 고리의 latency보다 작아질 수 없다. HLS의 <code>#pragma HLS PIPELINE II=1</code>의 그 II다.</div>
+  <div class="d" lang="en">The <strong>number of cycles between the starts of two consecutive loop iterations.</strong> II = 1 means new work enters every cycle. <strong>Throughput = 1 / II</strong>; latency doesn't appear. Pipelining raises latency while keeping II = 1 (latency 5, II 1). With a feedback loop (an accumulator), II can't drop below that loop's latency. The II in HLS's <code>#pragma HLS PIPELINE II=1</code>.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s5">Lecture 11-12 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ILP</div>
   <div class="f">Instruction Level Parallelism</div>
   <div class="d" lang="ko">한 명령어 스트림 안에서 동시에 실행할 수 있는 명령어를 찾아 쓰는 것. 1986년부터 2002년경까지 성능을 얻는 주된 방법이었고 <strong>연 50%의 성능 증가</strong>를 냈다. 대가는 <strong>투기 실행(speculation)의 낭비</strong>다. Intel Core i7에서 SPEC 정수 벤치마크를 돌리면 <strong>평균 19%의 명령어가 버려진다.</strong></div>
@@ -796,6 +984,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">conv 입력의 <strong>창 하나를 행렬의 열 하나</strong>로 펼쳐서 conv를 GEMM 한 번으로 바꾸는 재배열. <strong>MAC은 그대로</strong>이고 겹치는 창 때문에 입력 메모리가 약 <span class="m"><i>R</i>·<i>S</i></span>배(3×3이면 약 9배)로 부푼다. 1×1 conv에서는 공짜다. 연산이 아니라 규칙성을 사는 기법이다.</div>
   <div class="d" lang="en">A rearrangement that unrolls <strong>each conv input window into one matrix column</strong>, turning conv into a single GEMM. <strong>MACs are unchanged</strong>; overlapping windows inflate input memory by about <span class="m"><i>R</i>·<i>S</i></span> (roughly 9x for 3×3). Free for a 1×1 conv. It buys regularity, not arithmetic.</div>
   <div class="src"><a href="lectures/L06-kernel-computation.html#s7">Lecture 6 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">indirection &middot; intersection &middot; arbitration</div>
+  <div class="d" lang="ko">희소 연산에서 피연산자를 맞추는 세 방식. <strong>indirection</strong>: 한쪽만 희소할 때 그 index를 dense 쪽의 주소로 쓴다(Cnvlutin). <strong>intersection</strong>: 양쪽 다 희소할 때 두 index 목록의 교집합을 찾는다(SNAP, 비교기 <span class="m"><i>N</i><sup>2</sup></span>). <strong>arbitration</strong>: 짝을 찾지 않고 모든 쌍을 곱한 뒤, 흩어진 곱을 crossbar로 누산 뱅크에 보내며 충돌을 중재한다(SCNN).</div>
+  <div class="d" lang="en">Three ways to line up operands in sparse compute. <strong>Indirection</strong>: with one sparse side, use its index as an address into the dense side (Cnvlutin). <strong>Intersection</strong>: with both sparse, find the common indices of two lists (SNAP, <span class="m"><i>N</i><sup>2</sup></span> comparators). <strong>Arbitration</strong>: skip pairing, multiply all pairs, and arbitrate conflicts as a crossbar scatters products to accumulator banks (SCNN).</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s15">Lecture 19-20 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">interleaving</div>
+  <div class="d" lang="ko">서로 독립인 작업 <span class="m"><i>k</i></span>개를 <strong>한 사이클씩 번갈아</strong> 같은 pipeline에 넣어, 한 작업이 결과를 기다리는 틈을 다른 작업으로 메우는 것. 누적기 덧셈의 latency가 <span class="m"><i>L</i></span>이면 <span class="m"><i>k</i> ≥ <i>L</i></span>줄을 번갈아 넣고 누적 레지스터를 <span class="m"><i>k</i></span>개로 복제해 II = 1을 얻는다. 부동소수점이면 덧셈 순서가 바뀌어 마지막 비트가 달라질 수 있다. 메모리의 address interleaving(주소를 bank에 번갈아 담기)과는 다른 말이다.</div>
+  <div class="d" lang="en">Feeding <span class="m"><i>k</i></span> independent jobs into one pipeline <strong>alternately, cycle by cycle</strong>, so the gap while one waits for its result is filled by another. With an accumulator add of latency <span class="m"><i>L</i></span>, alternate <span class="m"><i>k</i> ≥ <i>L</i></span> streams and duplicate the accumulator register <span class="m"><i>k</i></span> times to reach II = 1. In floating point it changes the order of additions, so the last bits may differ. Not the same as memory address interleaving (spreading addresses across banks).</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s7">Lecture 11-12 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -821,7 +1023,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">weight decay</div>
   <div class="d" lang="ko">cost function에 가중치의 크기를 벌점으로 더하는 것. <strong>L2는 <span class="m">&Sigma;<i>w</i><sup>2</sup></span>, L1은 <span class="m">&Sigma;|<i>w</i>|</span>다.</strong> 슬라이드는 둘을 한 묶음으로 적지만 <strong>결과가 다르다.</strong> L2는 가중치를 작게 만들 뿐이고 <strong>L1만 정확히 0으로 만든다.</strong> 0인 가중치는 곱셈도 저장도 건너뛸 수 있으므로 <strong>L1만 하드웨어 이득이 있다.</strong> 이게 pruning으로 이어진다.</div>
   <div class="d" lang="en">Adding a penalty on weight magnitude to the cost function: <strong>L2 uses <span class="m">&Sigma;<i>w</i><sup>2</sup></span> and L1 uses <span class="m">&Sigma;|<i>w</i>|</span></strong>. The slide groups them together but <strong>they behave differently</strong>. L2 only makes weights small; <strong>L1 drives them to exactly zero</strong>. A zero weight lets you skip both the multiply and the storage, so <strong>only L1 pays off in hardware</strong>, and that is the road to pruning.</div>
-  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s13">Lecture 19-20 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -835,7 +1037,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">latency &middot; throughput</div>
   <div class="d" lang="ko">latency는 요청 하나가 들어가서 나오기까지의 시간(초), throughput은 단위 시간에 끝나는 요청 수(inference/s). <strong>역수 관계가 아니다.</strong> batch를 키우면 throughput과 latency가 <strong>같이</strong> 오른다(0.25 s·4 inf/s → 0.33 s·6 inf/s). serving은 보통 "latency 상한 아래에서 throughput 최대"로 문제를 세운다.</div>
   <div class="d" lang="en">Latency is the time for one request to go in and come out (seconds); throughput is requests completed per unit time (inferences/s). <strong>Not reciprocals</strong>: batching raises throughput and latency <strong>together</strong> (0.25 s at 4 inf/s → 0.33 s at 6 inf/s). Serving is usually framed as maximising throughput under a latency ceiling.</div>
-  <div class="src"><a href="lectures/L07-hardware-metrics.html#s7">Lecture 7-8-9 &middot; 07</a></div>
+  <div class="src"><a href="lectures/L07-hardware-metrics.html#s7">Lecture 7-8-9 &middot; 07</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s5">Lecture 11-12 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">leakage &middot; dynamic energy</div>
+  <div class="f">static energy · switching energy</div>
+  <div class="d" lang="ko"><strong>dynamic</strong>은 읽고 쓸 때 비트선과 게이트를 충방전하는 에너지(접근 한 번당 pJ). <strong>leakage</strong>는 꺼진 트랜지스터로도 새는 전류 때문에 <strong>전원이 붙어 있는 내내</strong> 쓰는 에너지. 큰 SRAM일수록 leakage 비중이 크다. 압축은 dynamic을 <strong>접근 횟수</strong>로, leakage를 <strong>켜진 bank 수와 시간</strong>으로 줄인다. clock gating은 dynamic만 막고, <a href="#gP">power gating</a>과 <a href="#gD">V<sub>DRV</sub></a>가 leakage를 노린다.</div>
+  <div class="d" lang="en"><strong>Dynamic</strong> is energy for charging and discharging bitlines and gates on each read or write (pJ per access). <strong>Leakage</strong> is energy lost to current through "off" transistors <strong>for as long as power is applied.</strong> The bigger the SRAM, the larger leakage's share. Compression cuts dynamic via <strong>access count</strong> and leakage via <strong>how many banks are on, for how long.</strong> Clock gating blocks only dynamic; <a href="#gP">power gating</a> and <a href="#gD">V<sub>DRV</sub></a> go after leakage.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s8">Lecture 17-18 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -846,10 +1056,32 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">look-ahead snoozing</div>
+  <div class="d" lang="ko">CompAct의 SRAM 절전 기법. RLC 디코더는 반복 칸을 읽는 순간 <strong>앞으로 몇 사이클 동안 SRAM을 읽을 일이 없는지 미리 안다.</strong> 그동안 active bank를 <a href="#gD">V<sub>DRV</sub></a>로 내렸다가(snooze) run이 끝나기 전에 깨운다. 깨우는 비용이 있어서 <strong>긴 run에서만</strong> 이득이다.</div>
+  <div class="d" lang="en">CompAct's SRAM power-saving trick. The moment the RLC decoder reads a repeat slot, it <strong>knows in advance how many cycles will need no SRAM read.</strong> It lowers the active bank to <a href="#gD">V<sub>DRV</sub></a> for that stretch (snooze) and wakes it before the run ends. Waking costs something, so it pays <strong>only on long runs.</strong></div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s8">Lecture 17-18 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">loop nest</div>
   <div class="d" lang="ko">conv를 정의대로 쓴 일곱 겹 loop (N, K, P, Q, R, S, C)와 가장 안쪽의 MAC 한 줄. <strong>순서를 바꿔도 답은 같고, 어느 텐서가 안쪽 loop 동안 가만히 있는지가 바뀐다.</strong> 그 선택이 dataflow(weight/output stationary 등)다.</div>
   <div class="d" lang="en">Conv written by definition as seven nested loops (N, K, P, Q, R, S, C) around a single MAC. <strong>Reordering keeps the answer and changes which tensor sits still in the inner loops.</strong> That choice is the dataflow (weight stationary, output stationary and so on).</div>
   <div class="src"><a href="lectures/L06-kernel-computation.html#s5">Lecture 6 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">loop-carried dependency</div>
+  <div class="f">recurrence</div>
+  <div class="d" lang="ko">loop의 한 반복이 <strong>앞 반복의 결과를 쓰는</strong> 의존성. <code>acc = acc + v[i]</code>가 대표다. 이게 있으면 II ≥ ⌈고리 latency / 의존 거리⌉라서, 덧셈기 latency가 2인 누적기는 II = 2가 된다. ECE 411의 RAW hazard와 같은 뿌리지만 값 자체가 아직 계산 중이라 forwarding으로 못 푼다. interleaving이 의존 거리를 늘려서 푼다.</div>
+  <div class="d" lang="en">A dependency where one loop iteration <strong>uses an earlier iteration's result</strong>, <code>acc = acc + v[i]</code> being the classic case. It forces II ≥ ⌈loop latency / dependency distance⌉, so an accumulator with a 2-cycle adder runs at II = 2. The same root as a RAW hazard, but forwarding can't help because the value is still being computed; interleaving fixes it by lengthening the dependency distance.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s6">Lecture 11-12 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Lossy-RLC</div>
+  <div class="d" lang="ko">새 값이 <strong>지금 run의 값과 θ 이하로 차이 나면</strong> 같은 run으로 묶는 <a href="#gR">RLC</a>. 복원하면 run 전체가 첫 값으로 나오고 오차는 값마다 최대 θ다. θ는 층마다 training set으로 미리 정한다(VGG-16에서는 L<sub>2</sub>-L<sub>6</sub>에만). <strong>양자화와 다르다.</strong> 이웃 값끼리 묶으므로 같은 값도 앞 값에 따라 다르게 바뀐다. run이 가로 방향이라 feature map에 가로 줄무늬가 생긴다.</div>
+  <div class="d" lang="en"><a href="#gR">RLC</a> that merges a new value into the current run when it's <strong>within θ of the run's value.</strong> Decoding emits the run's first value throughout, so the error per value is at most θ. θ is chosen per layer ahead of time from the training set (only L<sub>2</sub>-L<sub>6</sub> on VGG-16). <strong>Not quantization</strong>: it merges neighbours, so the same value changes differently depending on what precedes it. Runs go horizontally, leaving horizontal streaks in feature maps.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s7">Lecture 17-18 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -868,6 +1100,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">곱해서 누적하는 연산 한 번, 그리고 그 연산을 하는 회로. DNN 연산의 기본 단위다. Tesla FSD 칩이 <strong>96×96 MAC</strong>을 갖고 있다는 식으로 배열 크기를 세는 데 쓴다. <strong>MAC 1회 = FLOP 2회.</strong></div>
   <div class="d" lang="en">One multiply-and-accumulate operation, and the circuit that performs it. The basic unit of DNN arithmetic, also used to size arrays, as in the Tesla FSD chip's <strong>96×96 MACs</strong>. <strong>One MAC is two FLOPs.</strong></div>
   <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">magnitude-based pruning</div>
+  <div class="d" lang="ko">절댓값이 작은 가중치(또는 L1/L2 norm이 작은 행, filter)를 덜 중요하다고 보고 자르는 기준. 슬라이드 스스로 <strong>heuristic</strong>이라 부른다. OBD에서 모든 Hessian 대각 원소 <span class="m"><i>h</i><sub>ii</sub></span>가 같다고 두면 이 기준이 된다. 입력 크기를 안 보기 때문에 LLM에서는 <span class="m">|<i>w</i>| × ‖<i>x</i>‖</span> 쪽으로 갔다.</div>
+  <div class="d" lang="en">Pruning the weights with small absolute value (or rows and filters with small L1/L2 norm) as least important. The slides themselves call it a <strong>heuristic.</strong> It's what OBD becomes if all Hessian diagonal entries <span class="m"><i>h</i><sub>ii</sub></span> are assumed equal. Because it ignores input scale, LLM pruning moved to <span class="m">|<i>w</i>| × ‖<i>x</i>‖</span>.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s8">Lecture 19-20 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -891,6 +1130,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">ISCA와 쌍벽을 이루는 아키텍처 학회. 이름대로 마이크로아키텍처 쪽에 더 가깝다.</div>
   <div class="d" lang="en">Architecture's other flagship venue alongside ISCA, leaning, as the name says, more microarchitectural.</div>
   <div class="src"><a href="lectures/L01-introduction.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">microarchitecture</div>
+  <div class="f">µarch</div>
+  <div class="d" lang="ko"><a href="#gI">ISA</a>를 <strong>실제로 어떤 연산기, 레지스터, 메모리, 배선으로 구현하는가</strong>. L11-12 2쪽은 DNN 하드웨어를 architecture(ISA, dataflow, FLOPs·대역폭, precision, sparsity), microarchitecture(연산기 설계, 메모리 구성), circuits 세 층으로 나누고, 그 강의부터 microarchitecture로 내려간다. TPU처럼 명령어가 굵은 가속기에서는 둘의 경계가 CPU보다 얇다.</div>
+  <div class="d" lang="en">How an <a href="#gI">ISA</a> is <strong>actually built out of arithmetic units, registers, memories and wires.</strong> Lecture 11-12's page 2 splits DNN hardware into architecture (ISA, dataflow, FLOPs and bandwidth, precision, sparsity), microarchitecture (arithmetic-unit design, memory organisation) and circuits, and from that lecture on the course works at the microarchitecture level. In accelerators with coarse instructions like the TPU, the line between the two is thinner than in a CPU.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s1">Lecture 11-12 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
@@ -935,7 +1182,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Mean Squared Error</div>
   <div class="d" lang="ko">예측값과 정답의 차이를 제곱해서 평균한 cost function. <span class="m"><i>MSE</i> = <sup>1</sup>&frasl;<sub><i>m</i></sub> &Sigma; (<i>ŷ<sub>i</sub></i> &minus; <i>y<sub>i</sub></i>)<sup>2</sup></span> 형태다. 계산 자체는 싸지만 <strong>모든 예제를 하나로 줄이는 축약</strong>이라 여러 장치에 나눠도 마지막에는 모아야 한다.</div>
   <div class="d" lang="en">A cost function averaging the squared difference between prediction and truth. Cheap to compute, but <strong>a reduction of every example down to one value</strong>, so splitting it across devices still requires a gather at the end.</div>
-  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a> &nbsp; <a href="lectures/L15-energy-efficient-systolic-array.html#s6">Lecture 15-16 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -945,7 +1192,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s15">Paper Reading 2 &middot; 15</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">MXU</div>
+  <div class="f">Matrix Multiply Unit</div>
+  <div class="d" lang="ko">TPU core 안의 <a href="#gS">systolic array</a> 하나. TPUv2 계열은 128×128(MAC 16,384개), TPUv1은 같은 물건을 Matrix Multiply Unit "64K per cycle", 즉 256×256으로 그렸다. NVIDIA Tensor Core와 역할은 같지만, Tensor Core는 작고 수백 개, MXU는 크고 몇 개다.</div>
+  <div class="d" lang="en">One <a href="#gS">systolic array</a> inside a TPU core: 128×128 (16,384 MACs) in the TPUv2 line, while TPUv1 drew the same thing as a Matrix Multiply Unit at "64K per cycle," i.e. 256×256. Same role as an NVIDIA Tensor Core, but Tensor Cores are small and number in the hundreds, while MXUs are large and few.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s1">Lecture 11-12 &middot; 01</a></div>
+</div>
+
 <h2 class="gletter" id="gN">N</h2>
+
+<div class="gterm">
+  <div class="t">N:M sparsity</div>
+  <div class="f">2:4 structured sparsity</div>
+  <div class="d" lang="ko">연속한 M개 묶음마다 0이 아닌 값의 수를 <strong>N개 이하로 고정</strong>하는 pruning 무늬. NVIDIA Ampere(A100)의 Sparse Tensor Core가 2:4를 지원한다. 값 절반 + 값마다 2-bit index로 저장하고 peak 2×(BERT 실측 1.5×). 정확도는 거의 그대로다. <strong>N의 뜻(남김 / 자름)이 문헌마다 다르니</strong> 1:4 같은 경우는 확인해야 한다.</div>
+  <div class="d" lang="en">A pruning pattern that <strong>caps the non-zeros at N</strong> in every group of M consecutive elements. NVIDIA Ampere's (A100) Sparse Tensor Core supports 2:4: half the values plus a 2-bit index per value, 2x peak (1.5x measured on BERT), with accuracy essentially unchanged. <strong>Sources disagree on whether N counts kept or pruned elements</strong>, so check for cases like 1:4.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s6">Lecture 19-20 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">network slimming</div>
+  <div class="f">scaling-based pruning</div>
+  <div class="d" lang="ko">BN의 <span class="m">γ</span>를 채널의 scaling factor로 보고, 학습 중 <span class="m">γ</span>에 <strong>L1 벌점</strong>을 걸어 쓸모없는 채널의 <span class="m">γ</span>를 0 쪽으로 민 다음 작은 채널을 지우는 channel pruning (Liu et al., ICCV 2017). <span class="m">γ</span> ≈ 0이어도 출력은 0이 아니라 <span class="m">β</span>라는 점에 주의.</div>
+  <div class="d" lang="en">Channel pruning that treats BN's <span class="m">γ</span> as each channel's scaling factor, puts an <strong>L1 penalty</strong> on it during training to push useless channels' <span class="m">γ</span> toward zero, then deletes the small ones (Liu et al., ICCV 2017). Note that with <span class="m">γ</span> ≈ 0 the output is <span class="m">β</span>, not zero.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s9">Lecture 19-20 &middot; 09</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">NNA</div>
@@ -953,6 +1224,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Tesla FSD 칩의 다이 사진에서 신경망 전용 블록에 붙은 이름. 회사마다 부르는 이름이 다르다: Apple은 <strong>Neural Engine</strong>, Google은 <strong>TPU</strong>, NVIDIA는 <strong>Tensor Core</strong>(GPU 안의 유닛). 같은 일을 하는 것이 아니라 <strong>비슷한 자리에 있는 것</strong>이므로 스펙을 직접 비교하면 안 된다.</div>
   <div class="d" lang="en">The label on the neural-network block in the Tesla FSD die shot. Every company names it differently: Apple's <strong>Neural Engine</strong>, Google's <strong>TPU</strong>, NVIDIA's <strong>Tensor Core</strong> (a unit inside the GPU). These are not the same thing so much as <strong>things in a similar position</strong>, so their specs should not be compared head to head.</div>
   <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">nnz</div>
+  <div class="f">number of non-zeros</div>
+  <div class="d" lang="ko">텐서에서 0이 아닌 원소의 <strong>개수</strong>(비율이 아니다. density = nnz / 전체). 희소 저장 형식의 크기를 적는 기본 단위로, CSR의 값·index 배열 길이가 nnz다. <span class="m">‖<b>W</b>‖<sub>0</sub></span>과 같은 값.</div>
+  <div class="d" lang="en">The <strong>count</strong> of non-zero entries in a tensor (not a ratio: density = nnz / total). The basic unit for sizing sparse formats; CSR's value and index arrays are nnz long. Equal to <span class="m">‖<b>W</b>‖<sub>0</sub></span>.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s14">Lecture 19-20 &middot; 14</a></div>
 </div>
 
 <div class="gterm">
@@ -968,10 +1247,18 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">NVIDIA Deep Learning Accelerator</div>
   <div class="d" lang="ko">NVIDIA가 RTL까지 공개한 추론 가속기. conv 코어가 <strong>입력·출력 채널을 PE 격자에 펼친 weight stationary</strong>이고, 이 수업 L10 31~32쪽의 loop nest가 그 dataflow다. GPU의 Tensor Core와 다른, CPU가 설정해서 돌리는 별도의 고정 기능 가속기다.</div>
   <div class="d" lang="en">An inference accelerator NVIDIA open-sourced down to the RTL. Its conv core is <strong>weight stationary with input and output channels spread across a PE grid</strong>; the loop nest on lecture 10 pages 31-32 is its dataflow. A separate fixed-function accelerator configured by a CPU, not the GPU's Tensor Core.</div>
-  <div class="src"><a href="lectures/L10-dataflow.html#s11">Lecture 10 &middot; 11</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s11">Lecture 10 &middot; 11</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s11">Lecture 11-12 &middot; 11</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s14">Lecture 19-20 &middot; 14</a></div>
 </div>
 
 <h2 class="gletter" id="gO">O</h2>
+
+<div class="gterm">
+  <div class="t">OBD</div>
+  <div class="f">Optimal Brain Damage</div>
+  <div class="d" lang="ko">손실을 Taylor 전개해 1차 항(수렴), 교차 항(독립), 3차 이상(2차 근사)을 버리고 남은 <span class="m">½<i>h</i><sub>ii</sub><i>w</i><sub>i</sub><sup>2</sup></span>을 중요도로 쓰는 pruning 기준 (LeCun, Denker, Solla, NeurIPS 1989). 같은 |<i>w</i>|라도 곡률 <span class="m"><i>h</i><sub>ii</sub></span>가 크면 더 중요하다. 전체 Hessian은 AlexNet이면 약 15 PB라 대각만 쓴다. 교차 항을 살린 것이 OBS, 그 LLM판이 SparseGPT.</div>
+  <div class="d" lang="en">A pruning criterion that Taylor-expands the loss, drops the first-order term (converged), cross terms (independence) and cubic terms (quadratic approximation), and keeps <span class="m">½<i>h</i><sub>ii</sub><i>w</i><sub>i</sub><sup>2</sup></span> as importance (LeCun, Denker, Solla, NeurIPS 1989). At equal |<i>w</i>|, larger curvature <span class="m"><i>h</i><sub>ii</sub></span> means more important. A full Hessian for AlexNet would be about 15 PB, so only the diagonal is used. Keeping cross terms gives OBS; its LLM descendant is SparseGPT.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s10">Lecture 19-20 &middot; 10</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">output &middot; weight &middot; input stationary</div>
@@ -1010,7 +1297,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">psum</div>
   <div class="d" lang="ko">출력 원소 하나를 만드는 <span class="m"><i>RSC</i></span>개 곱 중 <strong>일부만 더한 중간값</strong>. MAC마다 읽고 다시 써야 해서 <strong>접근이 두 번</strong>이고, 그래서 PE 안에 붙잡으면(OS) 아끼는 양이 크다. activation 함수는 누적이 끝난 뒤에만 걸고, 보통 입력보다 비트가 넓다.</div>
   <div class="d" lang="en">A <strong>running total of some</strong> of the <span class="m"><i>RSC</i></span> products that make one output element. It is read and written back on every MAC, <strong>two accesses</strong>, so pinning it in the PE (OS) saves a lot. The activation function applies only after accumulation ends, and a psum is usually wider than the inputs.</div>
-  <div class="src"><a href="lectures/L10-dataflow.html#s2">Lecture 10 &middot; 02</a></div>
+  <div class="src"><a href="lectures/L10-dataflow.html#s2">Lecture 10 &middot; 02</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s4">Lecture 11-12 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1018,7 +1305,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Process Design Kit</div>
   <div class="d" lang="ko">특정 공정에서 설계할 때 EDA 도구가 읽는 자료 묶음. 표준 셀 라이브러리, 타이밍 모델, 설계 규칙, 기생 모델. 이 수업은 <strong>ASU와 ARM의 7nm 교육용 PDK</strong>를 권한다. <strong>교육용 PDK의 숫자는 실제 파운드리 7nm와 같지 않다.</strong> 논문에 쓸 때 반드시 밝힌다.</div>
   <div class="d" lang="en">The bundle an EDA tool reads to design in a given process: standard cell library, timing models, design rules, parasitics. This course suggests the <strong>ASU/ARM 7nm educational PDK</strong>. <strong>An educational PDK's numbers are not a real foundry 7nm</strong>, and a paper has to say so.</div>
-  <div class="src"><a href="lectures/L01-introduction.html#s6">Lecture 1 · 06</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s6">Lecture 1 · 06</a> &nbsp; <a href="lectures/L13-fault-tolerant-systolic-array.html#s10">Lecture 13-14 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -1026,7 +1313,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Processing Element</div>
   <div class="d" lang="ko">가속기 배열의 한 칸. 보통 <a href="#gM">MAC</a> 하나와 작은 레지스터를 갖는다. "PE 배열이 96×96"처럼 가속기의 규모를 말하는 단위다.</div>
   <div class="d" lang="en">One cell of an accelerator array, usually a <a href="#gM">MAC</a> plus a little local storage. The unit in which accelerator size gets quoted, as in a 96×96 PE array.</div>
-  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s2">Lecture 11-12 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">permanent &middot; transient fault</div>
+  <div class="f">hard fault &middot; soft error</div>
+  <div class="d" lang="ko">구별 기준은 <strong>다음 번에도 같은 자리에서 틀리는가</strong>. 영구(hard) 고장은 제조 결함이나 노화로 생기고 계속 남는다. 일시(transient, soft error) 고장은 입자 충돌 등으로 한 번 비트가 뒤집히고 사라진다. 그 사이에 간헐(intermittent) 고장이 있다. 고장 지도를 한 번 만들어 두고 쓰는 FAP는 <strong>영구 고장에만</strong> 통한다.</div>
+  <div class="d" lang="en">The test is <strong>whether it's wrong in the same place next time.</strong> A permanent (hard) fault comes from a defect or aging and stays; a transient fault (soft error) flips a bit once, from a particle strike say, and is gone. Intermittent faults sit in between. FAP, which builds a fault map once and reuses it, works <strong>only for permanent faults.</strong></div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s3">Lecture 13-14 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1044,6 +1339,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">power gating</div>
+  <div class="d" lang="ko">스위치 트랜지스터로 회로 블록의 전원을 <strong>아예 끊어</strong> leakage를 거의 0으로 만드는 것. SRAM에서는 <strong>저장된 데이터가 사라진다</strong>(CompAct의 deep sleep). 데이터를 지켜야 하면 대신 <a href="#gD">V<sub>DRV</sub></a>로 내린다. Sparse TPU는 sparsity가 비워 준 작은 SRAM과 bank를 하나씩 끄는 <strong>fine-grained power gating</strong>을 쓴다.</div>
+  <div class="d" lang="en"><strong>Cutting a block's supply entirely</strong> with a switch transistor so leakage drops to near zero. For SRAM, <strong>the stored data is lost</strong> (CompAct's deep sleep); to keep data, lower to <a href="#gD">V<sub>DRV</sub></a> instead. Sparse TPU uses <strong>fine-grained power gating</strong>, switching off small SRAMs and banks one by one as sparsity empties them.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s14">Lecture 17-18 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">PPA</div>
+  <div class="f">Power, Performance, Area</div>
+  <div class="d" lang="ko">칩 설계를 평가하는 세 축. 합성과 배치배선 결과에서 잰다. 새 기능을 넣을 때 "PPA 오버헤드가 얼마냐"가 첫 질문이다. L13의 bypass mux는 면적 약 9%, 성능(실행 시간) 0이다.</div>
+  <div class="d" lang="en">The three axes chip designs are judged on, measured from synthesis and place-and-route. "What's the PPA overhead?" is the first question about any added feature. Lecture 13-14's bypass mux costs about 9% area and zero performance (run time).</div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s9">Lecture 13-14 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">PReLU</div>
   <div class="f">Parametric ReLU</div>
   <div class="d" lang="ko">음수 쪽 기울기 <span class="m"><i>a</i></span>를 채널마다 <strong>학습</strong>하는 ReLU 변형. 원소별 연산인데도 <strong>읽어 올 파라미터가 생겨서</strong> 고정 함수로 하드와이어한 activation 유닛으로는 못 돌린다.</div>
@@ -1051,14 +1361,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="lectures/L06-kernel-computation.html#s9">Lecture 6 &middot; 09</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">pruning</div>
+  <div class="d" lang="ko">학습된 모델에서 덜 중요한 가중치(또는 뉴런, 채널)를 <strong>영구히 0으로 만들어</strong> 작게 하는 것. 보통 prune과 fine-tune을 반복해 정확도 손실 없이 90% 안팎까지 자른다. 결정할 것은 넷이다: <strong>granularity</strong>(어떤 모양으로), <strong>criterion</strong>(무엇을), <strong>ratio</strong>(층마다 얼마나), fine-tuning. dropout(학습 중 임시로 끔)과 다르고, <strong>파라미터가 줄어도 시간이 준다는 보장은 없다.</strong></div>
+  <div class="d" lang="en"><strong>Permanently zeroing</strong> the less important weights (or neurons, channels) of a trained model to shrink it, usually alternating prune and fine-tune to reach around 90% with no accuracy loss. Four decisions: <strong>granularity</strong> (what shape), <strong>criterion</strong> (what), <strong>ratio</strong> (how much per layer), and fine-tuning. Not dropout (temporary, during training), and <strong>fewer parameters don't guarantee less time.</strong></div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s2">Lecture 19-20 &middot; 02</a></div>
+</div>
+
 <h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">Razor flip-flop</div>
+  <div class="d" lang="ko">보통 플립플롭 옆에 <strong>조금 늦게 샘플하는 그림자 래치</strong>를 붙여, 둘이 다르면 신호가 늦게 왔다(timing error)고 판정하는 회로(Ernst et al., MICRO 2003). 감지 뒤 옳은 값으로 다시 돌리는 방식 전체를 TED+R라 한다. 그림자 래치의 창보다 더 늦으면 감지하지 못한다.</div>
+  <div class="d" lang="en">A regular flip-flop plus <strong>a shadow latch that samples slightly later</strong>; if they disagree, the signal arrived late, a timing error (Ernst et al., MICRO 2003). The full scheme of detecting and then replaying with the correct value is TED+R. Arrivals later than the shadow latch's window go undetected.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s2">Lecture 15-16 &middot; 02</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">ReLU</div>
   <div class="f">Rectified Linear Unit</div>
   <div class="d" lang="ko"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>. AlexNet이 <strong>가장 중요한 기법으로 첫 번째에 놓은</strong> 것이다. tanh 같은 <strong>포화 비선형성보다 학습이 훨씬 빠르다.</strong> CIFAR-10에서 25% 학습 오류에 도달하는 데 <strong>6배 적은 반복</strong>이 든다. 논문은 <em>"전통적인 포화 뉴런을 썼다면 이렇게 큰 신경망으로 실험할 수 없었을 것"</em>이라고 적었다. <strong>하드웨어에서는 비교 하나</strong>라 지수 함수가 필요한 tanh나 sigmoid와 달리 거의 공짜다.</div>
   <div class="d" lang="en"><span class="m"><i>f</i>(<i>x</i>) = max(0, <i>x</i>)</span>, the technique AlexNet <strong>placed first as the most important.</strong> It <strong>trains much faster than saturating nonlinearities</strong> like tanh: <strong>six times fewer iterations</strong> to reach 25% training error on CIFAR-10. The paper writes that <em>they would not have been able to experiment with such large networks using traditional saturating neurons.</em> <strong>In hardware it is one comparison</strong>, nearly free, unlike tanh or sigmoid which need an exponential.</div>
-  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a></div>
+  <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s10">Paper Reading 1 &middot; 10</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s13">Lecture 19-20 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1085,6 +1409,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">RLC</div>
+  <div class="f">Run-Length Coding (RLE, run-length encoding)</div>
+  <div class="d" lang="ko">같은 값이 이어지는 구간(run)을 <strong>"값, 몇 번"</strong>으로 줄여 적는 압축. 디코더가 카운터 하나라 하드웨어로 싸다. 대신 <strong>앞에서부터 차례로 풀어야</strong> 해서 접근 순서가 순차여야 하고(CompAct의 row-major schedule), <strong>반복이 없는 데이터는 오히려 커진다.</strong> 0의 run만 적는 변형이 <a href="#gS">Sparse-RLC</a>, 비슷한 값도 묶는 변형이 <a href="#gL">Lossy-RLC</a>다.</div>
+  <div class="d" lang="en">Compression that writes a stretch of repeated values (a run) as <strong>"value, how many."</strong> The decoder is one counter, so it's cheap in hardware. But it <strong>must be decoded front to back</strong>, so access must be sequential (CompAct's row-major schedule), and <strong>data without repeats gets bigger.</strong> The variant that records only zero runs is <a href="#gS">Sparse-RLC</a>; the one that also merges near-equal values is <a href="#gL">Lossy-RLC</a>.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s3">Lecture 17-18 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">RLE</div>
+  <div class="f">run-length encoding</div>
+  <div class="d" lang="ko">0이 아닌 값마다 <strong>그 앞에 0이 몇 개(run) 있었는지</strong>를 함께 적는 형식. Eyeriss가 activation 압축에 썼다(run 5비트, level 16비트). 크기가 nnz에 비례하지만, run 필드의 최댓값을 넘는 긴 0의 줄은 가짜 항목을 끼워 넣어야 한다.</div>
+  <div class="d" lang="en">A format storing, with each non-zero, <strong>how many zeros preceded it (the run).</strong> Eyeriss used it to compress activations (5-bit run, 16-bit level). Its size scales with nnz, but zero stretches longer than the run field's maximum need dummy entries.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s14">Lecture 19-20 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">roofline</div>
   <div class="d" lang="ko">가로축 arithmetic intensity, 세로축 달성 가능 성능인 로그-로그 그림. <strong>attainable = min(peak, AI × BW)</strong>. latency ≈ max(연산 시간, 메모리 시간)을 "초당"으로 뒤집은 것이라 완벽한 겹치기를 가정한다. 측정한 점은 정의상 지붕 아래에 있다.</div>
   <div class="d" lang="en">A log-log chart of attainable performance against arithmetic intensity: <strong>attainable = min(peak, AI × BW).</strong> It is latency ≈ max(compute time, memory time) flipped to "per second", so it assumes perfect overlap. Measured points sit below the roof by definition.</div>
@@ -1092,6 +1432,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gS">S</h2>
+
+<div class="gterm">
+  <div class="t">scan chain</div>
+  <div class="d" lang="ko">테스트 모드에서 칩의 플립플롭들을 <strong>하나의 긴 shift register로 이어</strong> 바깥에서 내부 상태를 써넣고 읽어내게 만든 DFT(Design for Test) 구조. 제조 테스트에서 고장 위치를 찾는 데 쓴다. 대부분의 디지털 ASIC에 이미 있다. systolic array의 정상 동작 데이터 shift와는 다른, 테스트 전용 경로다.</div>
+  <div class="d" lang="en">A DFT (design-for-test) structure that, in test mode, <strong>strings the chip's flip-flops into one long shift register</strong> so internal state can be written and read from outside. Used in manufacturing test to locate faults; most digital ASICs already have it. A test-only path, distinct from a systolic array's normal-mode data shifting.</div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s6">Lecture 13-14 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SCNN</div>
+  <div class="d" lang="ko">weight와 activation이 둘 다 희소한 conv를 위한 가속기 (Parashar et al., ISCA 2017). dataflow는 PT-IS-CP-sparse: 입력 평면을 PE에 나눠 붙잡고(input stationary), 0 아닌 weight 4개 × activation 4개를 <strong>모두 곱한 뒤</strong>(Cartesian product) 16×32 crossbar로 누산 뱅크에 흩어 보낸다. PE 면적 중 곱셈기는 6.5%, crossbar와 누산 버퍼가 50%다.</div>
+  <div class="d" lang="en">An accelerator for convs where both weights and activations are sparse (Parashar et al., ISCA 2017). Its dataflow is PT-IS-CP-sparse: input planes are split across PEs and held (input stationary), 4 non-zero weights × 4 activations are <strong>all multiplied</strong> (Cartesian product), and a 16×32 crossbar scatters the products to accumulator banks. Multipliers are 6.5% of PE area; the crossbar and accumulators, 50%.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s17">Lecture 19-20 &middot; 17</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">self-attention</div>
@@ -1110,10 +1464,56 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">sign-magnitude (SMR)</div>
+  <div class="f">Signed Magnitude Representation</div>
+  <div class="d" lang="ko">맨 위 비트가 부호, 나머지가 절댓값인 정수 표현. 2의 보수(2C)에서는 작은 음수가 거의 모든 비트가 1이라 곱셈기가 느린데, SMR로 곱하면 +w와 −w가 곱셈기 안에서 같게 생겨 <strong>평균 지연</strong>이 준다(최대 지연은 그대로). 전압을 낮춰 timing error를 감수하는 설계에서만 이득이다. 0이 둘(+0, −0)이다.</div>
+  <div class="d" lang="en">An integer format with a sign bit on top and the absolute value below. In two's complement (2C) a small negative number is nearly all ones, which slows the multiplier; multiplying in SMR makes +w and −w look identical inside it, cutting <strong>mean delay</strong> (max delay unchanged). It only pays off in designs that undervolt and accept timing errors. It has two zeros (+0 and −0).</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s9">Lecture 15-16 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SIMD</div>
+  <div class="f">Single Instruction, Multiple Data</div>
+  <div class="d" lang="ko">명령어 하나로 여러 레인이 <strong>각자 다른 데이터에 같은 연산</strong>을 하는 구조. 값은 공용 버스나 트리로 <strong>모두에게 뿌린다.</strong> GPU warp(SIMT)와 CPU AVX가 이 계열이다. systolic array는 값을 <strong>이웃 PE로 넘겨</strong> 재사용한다는 점이 다르다. 행렬×행렬에서는 systolic이 밀도와 대역폭에서 이기고, 행렬×벡터와 sparsity(RLE) 지원은 SIMD가 쉽다.</div>
+  <div class="d" lang="en">One instruction drives many lanes doing <strong>the same operation on different data</strong>; values are <strong>sprayed to everyone</strong> over a shared bus or tree. GPU warps (SIMT) and CPU AVX belong here. A systolic array differs by <strong>passing values to neighbouring PEs</strong> for reuse. On matrix × matrix the systolic array wins on density and bandwidth; matrix × vector and sparsity (RLE) support come easier to SIMD.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s12">Lecture 17-18 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">simple dual-port &middot; true dual-port</div>
+  <div class="d" lang="ko">SRAM 포트 구성. <strong>simple dual-port</strong>는 포트 둘 중 하나는 쓰기 전용, 하나는 읽기 전용(1R1W)이라 사이클당 읽기가 하나다. <strong>true dual-port</strong>는 두 포트가 각자 읽기도 쓰기도 할 수 있어(2RW) 한 사이클에 두 번 읽을 수 있다. 벤더 문서의 "dual-port RAM"은 보통 simple 쪽이다. 곱셈기를 먹이는 것은 <strong>읽기 포트 수</strong>다. 포트를 늘리면 ASIC에서는 셀 면적, 전력, 지연이 늘고, FPGA에서는 BRAM을 복제해야 한다.</div>
+  <div class="d" lang="en">SRAM port arrangements. <strong>Simple dual-port</strong> has one write-only and one read-only port (1R1W), so one read per cycle. <strong>True dual-port</strong> lets each port read or write (2RW), so two reads per cycle are possible. A vendor's "dual-port RAM" usually means the simple kind. What feeds multipliers is <strong>the read-port count</strong>; more ports cost cell area, power and delay in an ASIC and BRAM duplication on an FPGA.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s8">Lecture 11-12 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">skew</div>
+  <div class="f">input skewing, alignment in time</div>
+  <div class="d" lang="ko">systolic array의 행(또는 열) <span class="m"><i>i</i></span>에 데이터를 <strong><span class="m"><i>i</i></span>사이클 늦게</strong> 넣어, 한 칸씩 이동하는 두 흐름이 맞는 PE에서 맞는 사이클에 만나게 하는 것. 그래서 입력이 평행사변형 모양으로 들어가고, 배열이 채워지고 비워지는 <span class="m">2<i>N</i> − 2</span>사이클(fill, drain)이 생긴다. <span class="m"><i>N</i>×<i>N</i></span> 배열에 길이 <span class="m"><i>T</i></span>를 흘리면 이용률이 <span class="m"><i>T</i> / (<i>T</i> + 2<i>N</i> − 2)</span>다.</div>
+  <div class="d" lang="en">Feeding row (or column) <span class="m"><i>i</i></span> of a systolic array <strong><span class="m"><i>i</i></span> cycles late</strong>, so two streams that each move one hop per cycle meet at the right PE in the right cycle. Inputs therefore enter as a parallelogram, and the array spends <span class="m">2<i>N</i> − 2</span> cycles filling and draining; streaming length <span class="m"><i>T</i></span> through an <span class="m"><i>N</i>×<i>N</i></span> array gives utilisation <span class="m"><i>T</i> / (<i>T</i> + 2<i>N</i> − 2)</span>.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s14">Lecture 11-12 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SNAP</div>
+  <div class="f">Sparse Neural Acceleration Processor</div>
+  <div class="d" lang="ko">weight와 activation의 0 아닌 index를 <strong>비교기 배열 + priority encoder</strong>로 한 사이클에 맞추는(intersection) 16nm 가속기 칩 (Zhang et al., VLSI 2019). 직렬 merge를 N×N 병렬 비교로 바꿨지만 비교기가 <span class="m"><i>N</i><sup>2</sup></span>으로 는다.</div>
+  <div class="d" lang="en">A 16nm accelerator chip that matches the non-zero indices of weights and activations in one cycle with <strong>a comparator array plus priority encoders</strong> (intersection) (Zhang et al., VLSI 2019). It turns a serial merge into N×N parallel comparisons, at the cost of <span class="m"><i>N</i><sup>2</sup></span> comparators.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s16">Lecture 19-20 &middot; 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Sparse-RLC</div>
+  <div class="d" lang="ko"><strong>0의 run 길이만</strong> 적는 <a href="#gR">RLC</a>. 0이 아닌 값은 그대로 한 칸씩, 0이 이어지면 "0이 몇 개" 한 칸. run 값이 0으로 정해져 있으니 보통 RLC(run 하나에 두 칸)보다 칸이 적다. 대신 <strong>0이 아닌 값의 반복은 못 접는다.</strong> Sparse TPU의 &lt;counter, data&gt; 칸(4-bit 카운터 + 8-bit 값)도 같은 생각이다.</div>
+  <div class="d" lang="en"><a href="#gR">RLC</a> that records <strong>only the lengths of zero runs.</strong> Nonzero values take one slot each; a stretch of zeros takes one "this many zeros" slot. The run value is known to be zero, so it needs fewer slots than plain RLC (two per run), but it <strong>can't fold repeats of nonzero values.</strong> Sparse TPU's &lt;counter, data&gt; slot (4-bit counter + 8-bit value) is the same idea.</div>
+  <div class="src"><a href="lectures/L17-on-chip-compression.html#s11">Lecture 17-18 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">sparsity</div>
   <div class="d" lang="ko">텐서에서 <strong>0인 원소의 비율</strong>. 0은 곱셈도 저장도 건너뛸 수 있으므로 하드웨어 이득이 된다. 다만 <strong>0이 흩어져 있으면 건너뛰는 제어 논리가 오히려 더 비싸질 수 있다.</strong> 그래서 뒤에서 structured sparsity가 나온다. <a href="#gL">L1</a>은 sparsity를 만들고 L2와 <a href="#gD">dropout</a>은 만들지 않는다.</div>
   <div class="d" lang="en">The <strong>fraction of zero elements</strong> in a tensor. Zeros let you skip both the multiply and the storage, which is the hardware payoff. But <strong>when the zeros are scattered, the control logic for skipping them can cost more than it saves</strong>, which is why structured sparsity appears later. <a href="#gL">L1</a> produces sparsity; L2 and <a href="#gD">dropout</a> do not.</div>
-  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a></div>
+  <div class="src"><a href="lectures/L02-ml-basics.html#s8">Lecture 2-3 &middot; 08</a> &nbsp; <a href="lectures/L15-energy-efficient-systolic-array.html#s4">Lecture 15-16 &middot; 04</a> &nbsp; <a href="lectures/L17-on-chip-compression.html#s3">Lecture 17-18 &middot; 03</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s5">Lecture 19-20 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1131,6 +1531,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">SRAM</div>
+  <div class="f">Static Random-Access Memory</div>
+  <div class="d" lang="ko">비트 하나를 <strong>트랜지스터 6개(6T)짜리 래치</strong>로 붙잡는 메모리. refresh가 필요 없고 연산기와 같은 다이에 만든다. on-chip buffer, global buffer, scratchpad, cache가 거의 다 SRAM이다. DRAM(트랜지스터 1개 + 커패시터 1개)보다 셀이 열 배 넘게 크지만 빠르고 가깝다. 한 사이클에 꺼낼 수 있는 값의 수는 <strong>읽기 포트 수</strong>로 정해진다. TPUv1의 Unified Buffer 24 MiB가 다이의 29%였다.</div>
+  <div class="d" lang="en">Memory holding each bit in <strong>a six-transistor (6T) latch</strong>: no refresh, built on the same die as the logic. Nearly every on-chip buffer, global buffer, scratchpad and cache is SRAM. Its cell is more than ten times larger than DRAM's (one transistor plus one capacitor) but fast and close. How many values it delivers per cycle is set by <strong>its read-port count.</strong> TPUv1's 24 MiB Unified Buffer took 29% of the die.</div>
+  <div class="src"><a href="lectures/L11-dnn-accelerator.html#s8">Lecture 11-12 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">stochastic rounding</div>
   <div class="d" lang="ko">값을 가까운 격자점으로 그냥 반올림하지 않고, <strong>거리에 비례한 확률로</strong> 위아래 격자점 중 하나를 고르는 것. 한 번 한 번은 틀려도 <strong>기댓값이 원래 값과 같다(unbiased).</strong> TernGrad와 QSGD가 쓴다.</div>
   <div class="d" lang="en">Rounding to one of the two neighbouring grid points <strong>with probability proportional to distance</strong> instead of always to the nearest. Each result is off, but <strong>the expectation equals the original value (unbiased)</strong>. Used by TernGrad and QSGD.</div>
@@ -1138,13 +1546,45 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">structured &middot; unstructured sparsity</div>
+  <div class="f">coarse-grained &middot; fine-grained pruning</div>
+  <div class="d" lang="ko">pruning의 최소 단위가 가중치 하나면 unstructured(fine-grained), 행·커널·채널 같은 덩어리면 structured(coarse-grained). <strong>0의 개수가 아니라 배치를 말한다.</strong> unstructured는 정확도에 가장 유리하지만 GPU에서는 67% 희소해도 5배 느려질 수 있고(L19 61쪽), structured는 남은 것이 작은 dense 행렬이라 어디서나 빨라진다. 그 사이 타협이 N:M이다.</div>
+  <div class="d" lang="en">Unstructured (fine-grained) when pruning's smallest unit is one weight; structured (coarse-grained) when it's a block such as a row, kernel or channel. <strong>It describes the arrangement of zeros, not their number.</strong> Unstructured is best for accuracy, but on a GPU 67% sparsity can run 5x slower (lecture 19-20 page 61); structured leaves a smaller dense matrix that speeds up anywhere. N:M is the compromise in between.</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s5">Lecture 19-20 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">stuck-at fault</div>
+  <div class="f">stuck-at-0 / stuck-at-1 (s-a-0, s-a-1)</div>
+  <div class="d" lang="ko">회로의 선 하나가 입력과 무관하게 <strong>항상 0 또는 항상 1</strong>인 것처럼 동작한다고 보는 <strong>고장 모델</strong>. 실제 결함(단락, 개방 등)을 근사한 것이고, 테스트 패턴 생성(ATPG)과 고장 주입 시뮬레이션의 기본 단위다. 테스트 벡터는 고장 지점을 반대값으로 <strong>활성화</strong>하고 그 차이를 출력까지 <strong>전파</strong>해야 한다.</div>
+  <div class="d" lang="en">A <strong>fault model</strong> treating one wire as <strong>always 0 or always 1</strong> regardless of its inputs. It approximates real defects (shorts, opens and so on) and is the basic unit of test-pattern generation (ATPG) and fault-injection simulation. A test vector must <strong>activate</strong> the site to the opposite value and <strong>propagate</strong> the difference to an output.</div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s3">Lecture 13-14 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">systolic array</div>
-  <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. <strong>이 수업에서 내부를 제대로 파는 것은 뒤쪽 강의다.</strong> L01에서는 이름만 나온다.</div>
-  <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. <strong>The internals get opened up in a later lecture</strong>; lecture 1 only names it.</div>
-  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="d" lang="ko"><a href="#gP">PE</a>를 격자로 놓고 <strong>데이터를 옆 PE로 흘려보내며</strong> 계산하는 구조. 한 번 읽은 값을 여러 PE가 이어서 쓰므로 메모리 접근이 줄어든다. Google TPU의 기본 구조다. L01에서는 이름만 나오고, <strong>내부는 Lecture 11-12가 cycle 단위로 연다</strong>(WS 2×2, OS 3×3). 이어서 고장 허용(13-14), 저전압 동작(15-16), on-chip 압축(17-18)이 같은 배열 위에서 진행된다.</div>
+  <div class="d" lang="en">A grid of <a href="#gP">PE</a>s that computes by <strong>passing data from one PE to the next</strong>, so a value read once gets used by many PEs and memory traffic drops. It is the basic structure of the Google TPU. Lecture 1 only names it; <strong>lecture 11-12 opens it up cycle by cycle</strong> (2×2 WS, 3×3 OS), and fault tolerance (13-14), undervolting (15-16) and on-chip compression (17-18) all build on the same array.</div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s14">Lecture 11-12 &middot; 14</a> &nbsp; <a href="lectures/L13-fault-tolerant-systolic-array.html#s2">Lecture 13-14 &middot; 02</a> &nbsp; <a href="lectures/L15-energy-efficient-systolic-array.html#s2">Lecture 15-16 &middot; 02</a> &nbsp; <a href="lectures/L17-on-chip-compression.html#s4">Lecture 17-18 &middot; 04</a></div>
 </div>
 
 <h2 class="gletter" id="gT">T</h2>
+
+<div class="gterm">
+  <div class="t">TACO</div>
+  <div class="f">The Tensor Algebra Compiler</div>
+  <div class="d" lang="ko">텐서 식과 <strong>차원마다의 저장 형식</strong>(Dense/Sparse)을 받아 그 조합에 맞는 loop 코드를 만드는 컴파일러 (Kjolstad et al., OOPSLA 2017). TACO에서 CSR은 형식 이름이 아니라 "1차원 Dense + 2차원 Sparse"라는 조합이다.</div>
+  <div class="d" lang="en">A compiler that takes a tensor expression and <strong>a storage format per dimension</strong> (Dense/Sparse) and generates matching loop code (Kjolstad et al., OOPSLA 2017). In TACO, CSR isn't a format name but the combination "dimension 1 Dense + dimension 2 Sparse."</div>
+  <div class="src"><a href="lectures/L19-dnn-pruning.html#s15">Lecture 19-20 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TED+R</div>
+  <div class="f">Timing Error Detection + Recovery</div>
+  <div class="d" lang="ko">Razor 같은 회로로 timing error를 감지하고 <strong>M 사이클을 들여 옳은 값으로 다시</strong> 하는 방식. CPU 파이프라인에서는 통했지만, systolic array에서는 MAC 하나의 오류가 <strong>배열 전체를 멈추게</strong> 해서(256×256에서 stall 60% 이상) 에너지 이득이 r ≈ 0.9 근처에서 끝난다.</div>
+  <div class="d" lang="en">Detect a timing error with a circuit like Razor, then <strong>spend M cycles redoing it with the correct value.</strong> It worked on CPU pipelines, but on a systolic array one MAC's error <strong>stalls the entire array</strong> (over 60% stall rate at 256×256), so the energy gain runs out around r ≈ 0.9.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s2">Lecture 15-16 &middot; 02</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">temporal &middot; spatial reuse</div>
@@ -1157,7 +1597,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Tensor Core</div>
   <div class="d" lang="ko">NVIDIA GPU 안에 들어 있는 행렬 곱셈 전용 유닛. <span class="m">D = A·B + C</span> 형태만 하고, 입력은 낮은 정밀도로 받아 FP32로 누산한다. V100의 <strong>15.7 TFLOP/s(FP32)와 125 Tensor TFLOP/s의 8배 차이</strong>가 이 유닛에서 나온다. <strong>범용 칩 안에 전용 가속기가 들어 있는 예다.</strong></div>
   <div class="d" lang="en">A matrix-multiply unit inside NVIDIA GPUs. It only does <span class="m">D = A·B + C</span>, taking reduced-precision inputs and accumulating in FP32. The <strong>eightfold gap between the V100's 15.7 FP32 TFLOP/s and its 125 Tensor TFLOP/s</strong> comes from this unit. <strong>An example of a dedicated accelerator living inside a general-purpose chip.</strong></div>
-  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a> &nbsp; <a href="lectures/L19-dnn-pruning.html#s6">Lecture 19-20 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TEP</div>
+  <div class="f">Timing Error Propagation</div>
+  <div class="d" lang="ko">timing error를 잡지도 고치지도 않고 틀린 값을 그대로 흘려보내는 기준선. 덧셈기에서 늦게 도착하는 것은 상위 비트라서 오차가 크고, MAC당 오류율이 몇 %만 돼도 정확도가 무너진다.</div>
+  <div class="d" lang="en">The baseline that neither catches nor fixes timing errors and simply passes wrong values on. The late bits in an adder are the high-order ones, so the errors are large, and accuracy collapses at per-MAC error rates of just a few percent.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s2">Lecture 15-16 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1166,6 +1614,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">분산학습에서 gradient를 원소마다 <strong>{−1, 0, +1} × scaler</strong>로 stochastic rounding 해서 보내는 기법 (Wen et al., NIPS 2017). 2 bit 기준 worker→server 통신 16배 감소. layer-wise scaler와 2.5σ gradient clipping을 같이 쓴다.</div>
   <div class="d" lang="en">Sending gradients in distributed training as <strong>{−1, 0, +1} times a scaler</strong> per element via stochastic rounding (Wen et al., NIPS 2017). Worker-to-server traffic drops 16× at 2 bits. Paired with layer-wise scalers and 2.5σ gradient clipping.</div>
   <div class="src"><a href="readings/PR2-terngrad-and-transformer.html#s4">Paper Reading 2 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ThUnderVolt</div>
+  <div class="d" lang="ko">DNN 가속기의 MAC 배열을 정격보다 낮은 전압으로 돌리고, Razor FF로 감지한 timing error는 <strong>다시 하지 않고 그 곱을 0으로 버리는</strong> 설계(Zhang, Rangineni, Ghodsi, Garg, DAC 2018). 배열이 멈추지 않아 성능은 그대로이고, 층별 전압(ThVolt-OPT/Dyn)으로 ImageNet에서 에너지 45%, zero-skipping과 합쳐 77.03%를 1% 안팎의 정확도 손실로 아낀다.</div>
+  <div class="d" lang="en">A design that runs a DNN accelerator's MAC array below nominal voltage and, for timing errors caught by Razor FFs, <strong>drops the product (makes it 0) instead of replaying</strong> (Zhang, Rangineni, Ghodsi, Garg, DAC 2018). The array never stalls, so performance is untouched; with per-layer voltages (ThVolt-OPT/Dyn) it saves 45% energy on ImageNet, 77.03% with zero-skipping, at around 1% accuracy loss.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s3">Lecture 15-16 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">timing speculation &middot; guardband</div>
+  <div class="f">better-than-worst-case design &middot; timing margin</div>
+  <div class="d" lang="ko">클럭이나 전압을 최악 경로가 아니라 <strong>흔한 경로</strong>에 맞추고, 가끔 늦는 경우를 감지하거나 견디는 설계. guardband는 원래 최악 경로 위에 공정·전압·온도 변동을 대비해 얹는 여유다. overclocking과 undervolting은 같은 guardband를 깎아 먹는 두 방향이다. CPU의 branch speculation과는 이름만 같다.</div>
+  <div class="d" lang="en">Setting the clock or voltage for <strong>the common path</strong> rather than the worst one, and detecting or tolerating the occasional late arrival. A guardband is the slack normally stacked on the worst path for process, voltage and temperature variation; overclocking and undervolting are two ways of eating it. Shares only a name with CPU branch speculation.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s1">Lecture 15-16 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1195,7 +1658,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Tensor Processing Unit</div>
   <div class="d" lang="ko">Google의 ML 가속기. <a href="#gS">systolic array</a> 기반이다. V1은 추론 전용, V2는 <a href="#gB">bfloat</a>으로 학습까지, V3는 V2의 2배. <strong>Edge TPU</strong>는 별개 제품으로 Coral 보드에 들어가고 4 TOPS / 2 TOPS/W다.</div>
   <div class="d" lang="en">Google's ML accelerator, built on a <a href="#gS">systolic array</a>. V1 is inference only, V2 trains using <a href="#gB">bfloat</a>, V3 is twice V2. The <strong>Edge TPU</strong> is a separate product on the Coral board at 4 TOPS and 2 TOPS/W.</div>
-  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
+  <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a> &nbsp; <a href="lectures/L11-dnn-accelerator.html#s12">Lecture 11-12 &middot; 12</a> &nbsp; <a href="lectures/L13-fault-tolerant-systolic-array.html#s3">Lecture 13-14 &middot; 03</a> &nbsp; <a href="lectures/L15-energy-efficient-systolic-array.html#s1">Lecture 15-16 &middot; 01</a> &nbsp; <a href="lectures/L17-on-chip-compression.html#s2">Lecture 17-18 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1213,6 +1676,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">독립적인 연산 여러 개를 <strong>한 명령어에 묶어</strong> 하드웨어를 단순하게 만드는 접근. RISC처럼 <strong>일을 하드웨어에서 컴파일러로 옮긴다.</strong> Intel과 HP의 <strong>Itanium</strong>이 이 방식이었고 정수 프로그램에서 실패했다. 그런데 Golden Age는 <strong>DSA가 투기적 out-of-order 대신 VLIW를 쓸 수 있다</strong>고 적는다. <strong>실패한 아이디어가 아니라 범위를 잘못 잡은 아이디어였다.</strong></div>
   <div class="d" lang="en">Bundling several independent operations into <strong>one wide instruction</strong> so the hardware can be simpler, shifting work <strong>from hardware to the compiler</strong> as RISC did. Intel and HP's <strong>Itanium</strong> took this route and failed on integer programs. Yet Golden Age notes that <strong>DSAs can use VLIW instead of speculative out-of-order mechanisms</strong>: <strong>not a failed idea but an idea scoped wrongly.</strong></div>
   <div class="src"><a href="readings/PR1-golden-age-and-alexnet.html#s2">Paper Reading 1 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">voltage underscaling</div>
+  <div class="d" lang="ko">클럭은 그대로 두고 공급 전압만 정격 아래로 내리는 것. 연산당 에너지는 <strong>(V/V<sub>nominal</sub>)<sup>2</sup></strong>로 줄지만 회로가 느려져 data-dependent timing error가 생긴다. Lecture 15-16 그래프의 가로축 "Voltage Underscaling Ratio"가 이 비율이고, "Normalized Energy" 축은 사실상 그 제곱이다.</div>
+  <div class="d" lang="en">Lowering only the supply voltage below nominal while keeping the clock. Energy per operation falls as <strong>(V/V<sub>nominal</sub>)<sup>2</sup></strong>, but the circuit slows and data-dependent timing errors appear. The "Voltage Underscaling Ratio" axis in Lecture 15-16's plots is this ratio; the "Normalized Energy" axis is effectively its square.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s1">Lecture 15-16 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1245,6 +1715,26 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="en">Cerebras's chip: 46,225 mm² (215 mm on a side), 1.2 trillion transistors, 400,000 cores and <strong>18 GB of on-chip memory</strong>. It sits right against what a single 300 mm wafer can yield. Its strategy is <strong>to hold the entire model on chip and delete off-chip traffic</strong>.</div>
   <div class="src"><a href="lectures/L01-introduction.html#s15">Lecture 1 · 15</a></div>
 </div>
+
+<h2 class="gletter" id="gY">Y</h2>
+
+<div class="gterm">
+  <div class="t">yield</div>
+  <div class="d" lang="ko">웨이퍼에서 나온 다이 중 <strong>쓸 수 있는 것의 비율</strong>. 가장 단순한 Poisson 모델은 <span class="m"><i>Y</i> = <i>e</i><sup>−<i>AD</i></sup></span>(면적 <i>A</i>, 결함 밀도 <i>D</i>)로, 면적에 <strong>지수적으로</strong> 나빠진다. 결함 있는 다이를 버리는 대신 FAP처럼 <strong>고장을 안고 쓰면</strong> yield의 정의가 "결함 0개"에서 "정확도 손실이 허용 범위 안"으로 바뀐다.</div>
+  <div class="d" lang="en">The <strong>fraction of dies from a wafer that are usable.</strong> The simplest Poisson model is <span class="m"><i>Y</i> = <i>e</i><sup>−<i>AD</i></sup></span> (area <i>A</i>, defect density <i>D</i>), worsening <strong>exponentially</strong> with area. Instead of scrapping defective dies, <strong>running them with their faults</strong> as FAP does shifts yield's definition from "zero defects" to "accuracy loss within budget."</div>
+  <div class="src"><a href="lectures/L13-fault-tolerant-systolic-array.html#s3">Lecture 13-14 &middot; 03</a></div>
+</div>
+
+<h2 class="gletter" id="gZ">Z</h2>
+
+<div class="gterm">
+  <div class="t">zero-skipping</div>
+  <div class="f">zero-gating</div>
+  <div class="d" lang="ko">피연산자가 0인 MAC을 돌리지 않는 것. ReLU 뒤 activation에 0이 많아 효과가 크다. systolic array에서는 박자를 깰 수 없어 보통 사이클을 건너뛰기보다 그 MAC이 토글하지 않게 막는다(에너지만 절약). 0인 MAC은 timing error도 안 내므로 ThUnderVolt와 곱으로 겹친다.</div>
+  <div class="d" lang="en">Not running MACs with a zero operand; it pays off because activations after ReLU are full of zeros. On a systolic array, which can't break its lockstep, this usually means stopping that MAC from toggling rather than skipping cycles (energy only). A zero MAC can't make a timing error either, so it stacks multiplicatively with ThUnderVolt.</div>
+  <div class="src"><a href="lectures/L15-energy-efficient-systolic-array.html#s4">Lecture 15-16 &middot; 04</a></div>
+</div>
+
 
 </div>
 <div id="none" style="display:none"></div>

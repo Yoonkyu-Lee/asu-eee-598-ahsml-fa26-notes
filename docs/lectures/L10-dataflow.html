@@ -338,7 +338,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 .nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
 .nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
 .nota>summary::-webkit-details-marker{display:none}
-.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
 .nota:not([open])>summary::before{transform:rotate(-90deg)}
 .nota>summary:hover{color:var(--ink2)}
 .nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
@@ -1515,6 +1515,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <h3><span lang="ko">다음 강의</span><span lang="en">Next lecture</span></h3>
   <p lang="ko">덱이 OS, WS, IS 세 그림으로 끝났다. Sze 교재 5장은 이 셋 다음에 <strong>row stationary</strong>(Eyeriss)와 <strong>no local reuse</strong>를 이어서 다룬다(보충). 30쪽 격자가 systolic array의 출발점이기도 하다. 다음 덱이 그쪽으로 가는지는 <strong>Canvas의 Schedule과 실제 슬라이드가 정한다.</strong> 슬라이드가 올라오기 전에는 노트를 쓰지 않는다.</p>
   <p lang="en">The deck ended on the three OS, WS and IS pictures. Chapter 5 of the Sze text continues from these three to <strong>row stationary</strong> (Eyeriss) and <strong>no local reuse</strong> (supplementary), and page 30's grid is also where systolic arrays begin. Whether the next deck goes there is <strong>decided by the Canvas schedule and the actual slides.</strong> No note gets written before they're posted.</p>
+  <p lang="ko">실제로 올라온 다음 덱은 <a href="L11-dnn-accelerator.html">Lecture 11-12 · DNN Accelerator</a>다. 오늘의 OS·WS loop nest가 PE 회로, pipeline, SRAM 포트, 그리고 TPU의 weight-stationary systolic array로 내려간다.</p>
+  <p lang="en">The deck that actually came next is <a href="L11-dnn-accelerator.html">Lecture 11-12 · DNN Accelerator</a>. Today's OS and WS loop nests go down to PE circuits, pipelines, SRAM ports and the TPU's weight-stationary systolic array.</p>
 </section>
 
 <footer>

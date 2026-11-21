@@ -338,7 +338,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 .nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
 .nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
 .nota>summary::-webkit-details-marker{display:none}
-.nota>summary::before{content:"be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
 .nota:not([open])>summary::before{transform:rotate(-90deg)}
 .nota>summary:hover{color:var(--ink2)}
 .nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
@@ -469,8 +469,8 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt from the lecture deck <strong>without skipping a single slide</strong>. Whichever half you arrive with, ML or hardware, the other half is missing. Filling that half is the point here, down to telling you whether a number is big or small.</p>
 
   <div class="facts">
-    <span class="chip" lang="ko">6 / 6 강 정리</span>
-    <span class="chip" lang="en">6 of 6 lectures written</span>
+    <span class="chip" lang="ko">11 / 11 강 정리</span>
+    <span class="chip" lang="en">11 of 11 lectures written</span>
     <span class="chip">Tue/Thu 10:30-11:45 · LSEB04</span>
     <span class="chip hot" lang="ko">Project 50%</span>
     <span class="chip hot" lang="en">Project is 50%</span>
@@ -610,6 +610,106 @@ a.mod:hover .num{color:var(--blue)}
   <span class="status done" lang="en">Read</span>
 </a>
 
+<a class="mod" href="lectures/L11-dnn-accelerator.html">
+  <span class="num">11</span>
+  <div>
+    <h3 lang="ko">DNN Accelerator</h3>
+    <h3 lang="en">DNN Accelerator</h3>
+    <div class="when">75 slides &middot; Lecture 11-12 &middot; Jeff Zhang</div>
+    <p lang="ko">L10의 loop nest를 회로로 짓는다. 곱셈기 하나에서 출발해 곱셈기 넷과 adder tree로 넓히고(8항에 8사이클 → 2사이클), pipelining으로 latency 5에서도 1 op/cycle(II = 1)을 지키고, 되먹임 때문에 II = 2가 되는 누적기는 interleaving으로 푼다. 곱셈기 넷이 원하는 사이클당 피연산자 8개는 SRAM 포트, bank, weight broadcast(8 → 5), 전용 버퍼, double buffering으로 대 준다. 끝에서 TPUv1(MMU 64K MAC/cycle, Unified Buffer 167 GiB/s, Weight FIFO 30 GiB/s)의 weight stationary systolic array와 3×3 output stationary systolic array를 사이클마다 따라간다(T + 2N − 2 사이클).</p>
+    <p lang="en">Lecture 10's loop nests, built as circuits. Starting from one multiplier, widen to four plus an adder tree (8 terms in 2 cycles instead of 8), pipeline to keep 1 op/cycle (II = 1) even at latency 5, and fix the accumulator, whose feedback forces II = 2, with interleaving. The eight operands per cycle those multipliers want come from SRAM ports, banks, a weight broadcast (8 reads → 5), dedicated buffers and double buffering. It ends by following TPUv1's weight-stationary systolic array (MMU 64K MACs/cycle, Unified Buffer 167 GiB/s, Weight FIFO 30 GiB/s) and a 3×3 output-stationary array cycle by cycle (T + 2N − 2 cycles).</p>
+    <div class="tags">
+      <span class="tag v">systolic array &middot; TPU</span>
+      <span class="tag t">pipelining &middot; II</span>
+      <span class="tag p">SRAM port &middot; bank</span>
+      <span class="tag d">weight &middot; output stationary</span>
+      <span class="tag">double buffering</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="lectures/L13-fault-tolerant-systolic-array.html">
+  <span class="num">13</span>
+  <div>
+    <h3 lang="ko">Fault-tolerant Systolic Array Design</h3>
+    <h3 lang="en">Fault-tolerant Systolic Array Design</h3>
+    <div class="when">13 slides &middot; Lecture 13-14 &middot; Jeff Zhang</div>
+    <p lang="ko">256×256 systolic array에서 MAC 8개(0.012%)만 stuck-at 고장이 나도 TIMIT 정확도가 약 74%에서 50% 아래로 떨어진다. psum이 열을 따라 MAC을 차례로 지나서 고장 하나가 열 전체를 오염시키기 때문이다. 고장 MAC을 mux 하나로 건너뛰면 그 weight를 0으로 놓은 것과 같고(FAP), mapping으로 잘림을 채널마다 흩은 뒤 칩마다 한 번 재학습(FAP+T, 약 15분)하면 MAC 50%가 고장 나도 AlexNet은 1.7%p만 잃는다. 실행 시간 추가는 0.</p>
+    <p lang="en">On a 256×256 systolic array, stuck-at faults in just 8 MACs (0.012%) drop TIMIT accuracy from about 74% to below 50%, because psums walk down a column through every MAC and one fault spoils the whole column. Skipping a faulty MAC with one mux equals zeroing its weights (FAP); spread those cuts across channels with the mapping and retrain once per chip (FAP+T, about 15 minutes), and AlexNet loses only 1.7 points with 50% of MACs broken, at zero run-time cost.</p>
+    <div class="tags">
+      <span class="tag d">fault-aware pruning</span>
+      <span class="tag">stuck-at fault</span>
+      <span class="tag t">systolic array</span>
+      <span class="tag v">fault-aware mapping</span>
+      <span class="tag">0.012% &middot; ↓1.7%p @ 50%</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="lectures/L15-energy-efficient-systolic-array.html">
+  <span class="num">15</span>
+  <div>
+    <h3 lang="ko">Energy-Efficient Systolic Array Design</h3>
+    <h3 lang="en">Energy-Efficient Systolic Array Design</h3>
+    <div class="when">25 slides &middot; Lecture 15-16 &middot; Jeff Zhang</div>
+    <p lang="ko">에너지가 V²에 비례하니 클럭은 두고 전압만 내린다. 그러면 data-dependent timing error가 생기는데, Razor로 잡아 다시 하면(TED+R) 256×256 배열에서는 MAC 하나의 오류가 배열 전체를 멈춰 stall이 60%를 넘는다. ThUnderVolt는 틀린 곱을 그냥 0으로 버려(DropConnect와 같은 모양) 층별 전압으로 ImageNet 에너지 45%, zero-skipping과 합쳐 77.03%를 아낀다. 평가에 수십 일 걸리던 gate-level 시뮬레이션은 FATE(72-30-1 DelayNet + 열 샘플링)로 최대 58.6배 빨라졌고, 그 덕에 곱셈을 sign-magnitude로 바꾸면 같은 에너지에서 AlexNet 정확도가 15%p 오른다는 걸 찾았다.</p>
+    <p lang="en">Energy goes as V², so keep the clock and lower only the voltage. That creates data-dependent timing errors, and catching and replaying them with Razor (TED+R) fails on a 256×256 array, where one MAC's error stalls everything (over 60% stall rate). ThUnderVolt just drops the bad product (DropConnect-shaped noise) and, with per-layer voltages, saves 45% energy on ImageNet, 77.03% with zero-skipping. FATE (a 72-30-1 DelayNet plus column sampling) makes the weeks-long gate-level simulation up to 58.6x faster, which revealed that multiplying in sign-magnitude lifts AlexNet accuracy by 15 points at the same energy.</p>
+    <div class="tags">
+      <span class="tag t">voltage underscaling &middot; Razor</span>
+      <span class="tag d">ThUnderVolt &middot; DropConnect</span>
+      <span class="tag v">FATE</span>
+      <span class="tag t">2C vs sign-magnitude</span>
+      <span class="tag">45% &middot; 77.03% energy</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="lectures/L17-on-chip-compression.html">
+  <span class="num">17</span>
+  <div>
+    <h3 lang="ko">On-chip Compression for Systolic Array</h3>
+    <h3 lang="en">On-chip Compression for Systolic Array</h3>
+    <div class="when">31 slides &middot; Lecture 17-18 &middot; Jeff Zhang</div>
+    <p lang="ko">TPU는 activation 버퍼 24 MiB가 칩의 29%로 MAC 배열(24%)보다 넓다. 강사의 논문 CompAct은 ReLU가 만든 0과 반복을 RLC로 접어 on-chip 버퍼 안에 담고, systolic array가 매 사이클 값 하나를 받도록 schedule을 row-major로 바꾸고, Lossy-RLC(θ)로 더 줄이고, 빈 bank는 deep sleep, 긴 run 동안은 snooze시킨다. activation 버퍼 에너지 45-62%, 시스템 에너지 최대 33% 절감. 뒤쪽은 bank별 power gating을 쓰는 Sparse TPU.</p>
+    <p lang="en">TPU v1's 24 MiB activation buffer takes 29% of the die, more than its MAC array (24%). The instructor's CompAct folds ReLU's zeros and repeats with RLC inside the on-chip buffer, switches to a row-major schedule so the systolic array still gets one value per cycle, squeezes further with Lossy-RLC (θ), and puts empty banks in deep sleep and the active bank in snooze during long runs: 45-62% less activation-buffer energy, up to 33% less system energy. The back half is Sparse TPU with per-bank power gating.</p>
+    <div class="tags">
+      <span class="tag t">systolic array</span>
+      <span class="tag d">RLC &middot; Lossy-RLC</span>
+      <span class="tag p">SRAM leakage &middot; snooze</span>
+      <span class="tag v">CompAct &middot; Sparse TPU</span>
+      <span class="tag">buffer −45~62%</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
+<a class="mod" href="lectures/L19-dnn-pruning.html">
+  <span class="num">19</span>
+  <div>
+    <h3 lang="ko">DNN Pruning and Sparsity-aware Accelerator</h3>
+    <h3 lang="en">DNN Pruning and Sparsity-aware Accelerator</h3>
+    <div class="when">79 slides &middot; Lecture 19-20 &middot; Jeff Zhang</div>
+    <p lang="ko">가중치의 90%를 0으로 만드는 건 쉽다. 그 0으로 실제로 빨라지려면 모양이 맞아야 한다. fine-grained ↔ 2:4 ↔ channel의 granularity, magnitude·OBD(½h<sub>ii</sub>w<sub>i</sub><sup>2</sup>)·APoZ·regression 기준, A100 2:4(peak 2×, BERT 1.5×), 그리고 bitmask·RLE·CSR 저장과 indirection·intersection·Cartesian product 정렬. SCNN PE에서 곱셈기는 면적의 6.5%, 흩어진 곱을 받는 쪽이 50%다.</p>
+    <p lang="en">Zeroing 90% of the weights is easy; turning those zeros into speed takes the right shape. Granularity from fine-grained through 2:4 to channel, criteria from magnitude and OBD (½h<sub>ii</sub>w<sub>i</sub><sup>2</sup>) to APoZ and regression, the A100's 2:4 (2x peak, 1.5x on BERT), then bitmask, RLE and CSR storage and indirection, intersection and Cartesian-product alignment. In an SCNN PE the multipliers are 6.5% of the area; catching the scattered products takes 50%.</p>
+    <div class="tags">
+      <span class="tag d">pruning</span>
+      <span class="tag p">structured &middot; 2:4 sparsity</span>
+      <span class="tag t">CSR &middot; RLE &middot; bitmask</span>
+      <span class="tag v">SCNN &middot; SNAP &middot; Cnvlutin</span>
+      <span class="tag">effectual work ~23%</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span>
+  <span class="status done" lang="en">Read</span>
+</a>
+
 <h2 class="grp" lang="ko">Paper Reading</h2>
 <h2 class="grp" lang="en">Paper reading</h2>
 
@@ -660,9 +760,9 @@ a.mod:hover .num{color:var(--blue)}
   <p lang="ko">Canvas의 Schedule이 아직 전부 나오지 않았다. 실라버스와 L01 s7이 예고한 것은 이렇다. 슬라이드가 올라오는 대로 위 목록에 추가된다.</p>
   <p lang="en">The full Canvas schedule is not out yet. What the syllabus and slide 7 of lecture 1 promise is below; entries move up to the list above as decks appear.</p>
   <ul lang="ko">
-    <li>모델 최적화: quantization, pruning</li>
+    <li>모델 최적화: quantization</li>
     <li>아키텍처 최적화: performance, energy efficiency, roofline</li>
-    <li>Custom hardware: systolic array, CGRA, near data processing, reliability와 fault tolerance</li>
+    <li>Custom hardware: CGRA, near data processing</li>
     <li>Compilation: tiling, dataflow, mapping, scheduling</li>
     <li>AutoML: neural architecture와 hardware co-design</li>
     <li>TinyML: 자원 제약 환경의 DNN 최적화, TFLite</li>
@@ -670,9 +770,9 @@ a.mod:hover .num{color:var(--blue)}
     <li>최신 주제: recommendation model, LLM</li>
   </ul>
   <ul lang="en">
-    <li>Model optimization: quantization, pruning</li>
+    <li>Model optimization: quantization</li>
     <li>Architectural optimization: performance, energy efficiency, roofline</li>
-    <li>Custom hardware: systolic arrays, CGRAs, near-data processing, reliability and fault tolerance</li>
+    <li>Custom hardware: CGRAs, near-data processing</li>
     <li>Compilation: tiling, dataflow, mapping, scheduling</li>
     <li>AutoML: neural architecture and hardware co-design</li>
     <li>TinyML: resource-constrained DNN optimization, TFLite</li>

@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEE 598 AHSML · Lecture 13-14 — Fault-tolerant Systolic Array Design</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   EEE 598 추가분. CEN 598 스타일 블록 + EEE 554의 수식 장치 + .scale
+   ───────────────────────────────────────────────────────────── */
+
+/* 수식 표기 (EEE 554에서) */
+.m{font-family:var(--serif);font-style:normal;font-size:1.07em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:22px 0;line-height:1.9}
+.eq i{font-style:italic}
+.eq .note{font-family:var(--sans);font-size:13px;color:var(--ink3);display:block;margin-top:4px}
+
+/* 기호 뜯어보기. .jargon 과 시각이 같으므로 규칙을 그대로 물려받는다. */
+.nota{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.nota>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none}
+.nota>summary::-webkit-details-marker{display:none}
+.nota>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.nota:not([open])>summary::before{transform:rotate(-90deg)}
+.nota>summary:hover{color:var(--ink2)}
+.nota .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7}
+.nota .body>*:first-child{margin-top:0}
+.nota .body>*:last-child{margin-bottom:0}
+.nota .parts{width:100%;border-collapse:collapse;margin:12px 0}
+.nota .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.nota .parts tr:last-child td{border-bottom:0}
+.nota .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink);padding-right:18px}
+.nota .eq{margin:12px 0}
+
+/* 숫자 감각. 이 저장소에서 새로 만든 장치.
+   숫자 혼자는 정보가 아니라서, 항상 기준점을 옆에 붙인다. */
+.scale{margin:20px 0;background:var(--chip);border:1px solid var(--rule);border-radius:8px;padding:12px 16px 14px}
+.scale>.cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.scale table{width:100%;border-collapse:collapse}
+.scale td{padding:7px 10px 7px 0;vertical-align:baseline;border-bottom:1px solid var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.55}
+.scale tr:last-child td{border-bottom:0}
+.scale td.what{color:var(--ink);width:1%;white-space:nowrap;padding-right:16px}
+.scale td.num{font-family:var(--mono);font-size:13px;color:var(--ink);text-align:right;width:1%;white-space:nowrap;padding-right:16px}
+.scale tr.base td.what,.scale tr.base td.num{color:var(--ink3)}
+.scale .foot{margin-top:10px;font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* 도해에서 수식을 쓰는 경우에만 세리프. 기본 .svgtxt 는 산세리프 그대로 둔다. */
+.svgtxt.ser{font-family:var(--serif)}
+.svgtxt.ser.it{font-style:italic}
+
+@media(max-width:900px){
+  /* .nota 도 .jargon 과 같이 첫 칸 줄바꿈을 허용한다 */
+  .nota .parts td:first-child{white-space:normal}
+  /* .scale 3열이 390px 에 안 들어간다. 행을 쌓는다. */
+  .scale table,.scale tbody,.scale tr,.scale td{display:block;width:auto}
+  .scale tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .scale tr:last-child{border-bottom:0}
+  .scale td{border-bottom:0;padding:1px 0}
+  .scale td.what,.scale td.num{white-space:normal;text-align:left;padding-right:0}
+  .scale td.num{color:var(--ink2)}
+}
+
+/* 의미 고정 색상 인라인 헬퍼. CEN 598 의 .cD/.cP/.cT/.cV 자리를
+   이 과목의 의미(연산이냐 데이터냐)로 다시 정의한 것이다. */
+.cAlg{color:var(--blue);font-weight:600}    /* 모델과 알고리즘 */
+.cHw{color:var(--violet);font-weight:600}   /* 연산 하드웨어 */
+.cMem{color:var(--brown);font-weight:600}   /* 메모리와 데이터 이동 */
+.cSw{color:var(--pink);font-weight:600}     /* 소프트웨어 스택 */
+.cGain{color:var(--green);font-weight:600}  /* 이득 */
+.cCost{color:var(--amber);font-weight:600}  /* 비용과 손실 */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">EEE / CEN 598 · Hardware and Systems for Machine Learning · Jeff (Jun) Zhang</div>
+  <h1 class="title">Lecture 13-14<br>Fault-tolerant Systolic Array Design</h1>
+  <p class="subtitle" lang="ko">256×256 systolic array에서 <strong>MAC 8개</strong>(0.012%)만 고장 나도 TIMIT 정확도가 반 토막 난다. 이 강의는 그 고장을 <strong>칩을 버리지도, 예비 회로를 깔지도 않고</strong> 푸는 법을 보여준다. 고장 난 MAC에 걸리는 weight를 <strong>일부러 0으로 만들고(Fault-Aware Pruning)</strong>, 칩마다 <strong>한 번 재학습(FAP+T)</strong>하면, MAC 절반이 고장 나도 AlexNet이 몇 %p만 떨어진다.</p>
+  <p class="subtitle" lang="en">On a 256×256 systolic array, <strong>eight broken MACs</strong> (0.012%) are enough to halve TIMIT accuracy. This lecture shows how to live with those faults <strong>without discarding the chip or adding spare hardware</strong>: <strong>deliberately zero the weights that land on broken MACs (fault-aware pruning)</strong>, then <strong>retrain once per chip (FAP+T)</strong>, and AlexNet loses only a few points even with half the MACs broken.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">슬라이드 13쪽</span>
+    <span class="chip">Lecture 13-14 · 날짜 표기 없음</span>
+    <span class="chip hot">reliability / fault tolerance: ECE 479에서 안 본 주제</span>
+    <span class="chip dim">근거 논문: Zhang et al., VTS 2018</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">13 slides</span>
+    <span class="chip">Lecture 13-14 · undated</span>
+    <span class="chip hot">reliability / fault tolerance: not covered in ECE 479</span>
+    <span class="chip dim">source paper: Zhang et al., VTS 2018</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">← All lectures</a>
+    <div class="mod">Lecture 13-14</div>
+    <div class="name">Fault-tolerant Systolic Array Design</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 강의가 하는 일</span><span lang="en">What this lecture does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">systolic array는 어디에나 있다</span><span lang="en">Systolic arrays are everywhere</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">WS 동작과 정확한 스케줄</span><span lang="en">WS operation and its precise schedule</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">영구 고장과 stuck-at 모델</span><span lang="en">Permanent faults and the stuck-at model</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">고장이 activation을 어떻게 망가뜨리나</span><span lang="en">How a fault wrecks activations</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">cross-layer co-design</span><span lang="en">Cross-layer co-design</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">Fault-Aware Pruning과 bypass</span><span lang="en">Fault-aware pruning and the bypass</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">mapping이 pruning의 모양을 정한다</span><span lang="en">Mapping sets the shape of the pruning</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">FAP+T: 칩마다 재학습</span><span lang="en">FAP+T: retraining per chip</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">세 층을 잇는 흐름</span><span lang="en">The flow across three layers</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">실험 설정</span><span lang="en">Experimental setup</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">AlexNet 결과</span><span lang="en">AlexNet results</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">정리 &amp; 다음 강의</span><span lang="en">Recap &amp; next lecture</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head" data-slide="1"><span class="sec-num">00</span><h2 lang="ko">이 강의가 하는 일</h2><h2 lang="en">What this lecture does</h2></div>
+  <p class="sec-sub" lang="ko">표지에 <code>Lecture 13-14: Fault-tolerant Systolic Array Design</code>. 날짜도 학기 footer도 없다. <strong>인쇄된 쪽 번호가 2쪽에서 "5"로 시작해서 끝까지 PDF 쪽수보다 3 크다</strong>(PDF 13쪽 = 인쇄 16). 더 긴 덱에서 앞 몇 장을 덜어낸 흔적이다. 이 노트의 쪽수는 전부 PDF 쪽수다.</p>
+  <p class="sec-sub" lang="en">The title page reads <code>Lecture 13-14: Fault-tolerant Systolic Array Design</code>, with no date and no semester footer. <strong>Printed page numbers start at "5" on PDF page 2 and stay 3 ahead of the PDF all the way</strong> (PDF page 13 is printed 16): a longer deck with its first few pages cut. Every page number in this note is the PDF page.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">한 줄로</span><span class="tag" lang="en">In one line</span>
+    <p lang="ko">지금까지의 강의는 <span class="cHw">systolic array</span>가 <strong>완벽하게 동작한다</strong>고 가정했다. 실제 칩은 <span class="cCost">제조 결함</span>으로 일부 MAC이 영구히 틀린 값을 낸다. 그런데 systolic array는 <strong>partial sum이 한 열을 따라 MAC을 차례로 통과하는 구조</strong>라서, MAC 하나가 틀리면 그 열이 내는 출력 전부가 틀린다. 이 강의의 답은 하드웨어만으로도, 소프트웨어만으로도 아니다. <strong>고장 위치를 테스트로 알아내고(회로), 그 MAC을 건너뛰는 선을 하나 깔고(아키텍처), 거기 걸리는 weight를 0으로 놓고 재학습한다(ML).</strong> 세 층을 같이 움직이는 <strong>cross-layer co-design</strong>이다.</p>
+    <p lang="en">Every lecture so far assumed the <span class="cHw">systolic array</span> <strong>works perfectly.</strong> Real chips have <span class="cCost">manufacturing defects</span> that make some MACs permanently wrong. And because in a systolic array <strong>the partial sum walks down a column through one MAC after another</strong>, one bad MAC spoils every output that column produces. The lecture's answer is neither hardware alone nor software alone: <strong>find the faults by testing (circuits), add one wire to skip a faulty MAC (architecture), zero the weights that land there and retrain (ML).</strong> Moving all three layers together is <strong>cross-layer co-design.</strong></p>
+  </div>
+
+  <h4 lang="ko">덱의 네 덩어리</h4>
+  <h4 lang="en">The deck in four parts</h4>
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">덩어리</th><th lang="ko">핵심 질문</th>
+      <th lang="en">Pages</th><th lang="en">Part</th><th lang="en">Core question</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>2-3</td><td lang="ko">무대: systolic array</td><td lang="ko">어디에 쓰이고, weight stationary로 어떻게 도는가</td>
+          <td lang="en">The stage: systolic arrays</td><td lang="en">Where are they used, and how does weight stationary run?</td></tr>
+      <tr><td>4-5</td><td lang="ko">문제: 영구 고장</td><td lang="ko">MAC 몇 개가 고장 나면 정확도가 얼마나 떨어지고, 왜 그렇게 많이 떨어지는가</td>
+          <td lang="en">The problem: permanent faults</td><td lang="en">How far does accuracy fall with a few broken MACs, and why so far?</td></tr>
+      <tr><td>6-10</td><td lang="ko">해법: FAP, mapping, FAP+T</td><td lang="ko">고장 난 MAC을 pruning으로 바꾸는 법, 그 pruning을 덜 아프게 만드는 법</td>
+          <td lang="en">The fix: FAP, mapping, FAP+T</td><td lang="en">How to turn a broken MAC into pruning, and how to make that pruning hurt less</td></tr>
+      <tr><td>11-13</td><td lang="ko">흐름과 결과</td><td lang="ko">PyTorch, RTL, netlist를 어떻게 이었고, AlexNet에서 얼마나 버텼나</td>
+          <td lang="en">Flow and results</td><td lang="en">How PyTorch, RTL and the netlist were joined, and how well AlexNet held up</td></tr>
+    </tbody>
+  </table>
+
+  <h4 lang="ko">이미 아는 것과 새로 나오는 것</h4>
+  <h4 lang="en">What you already know, and what is new</h4>
+  <table>
+    <thead><tr>
+      <th lang="ko">슬라이드</th><th lang="ko">상태</th><th lang="ko">이 노트가 하는 일</th>
+      <th lang="en">Slides</th><th lang="en">Status</th><th lang="en">What the note does</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">systolic array, TPU (2)</td><td lang="ko">안다 (ECE 479 Lec11, L01, L07-8-9)</td><td lang="ko">개념은 확인만. <strong>MAC 단위의 비트 폭(8, 16, 24)</strong>만 새로 짚는다. 뒤에서 고장 크기를 재는 데 쓴다</td>
+          <td lang="en">Systolic arrays, TPU (2)</td><td lang="en">known (ECE 479 lec 11, lecture 1, lecture 7-8-9)</td><td lang="en">concept confirmed only; the new bit is <strong>the MAC's bit widths (8, 16, 24)</strong>, used later to size a fault</td></tr>
+      <tr><td lang="ko">WS 동작 (3)</td><td lang="ko">반쯤 안다 (L10)</td><td lang="ko">L10 12번 절로 보낸다. <strong>"psum이 열 전체를 통과한다"</strong>는 사실 하나만 고장의 관점에서 다시 본다</td>
+          <td lang="en">WS operation (3)</td><td lang="en">half known (lecture 10)</td><td lang="en">points to lecture 10 section 12 and re-reads just one fact through a fault lens: <strong>the psum crosses the whole column</strong></td></tr>
+      <tr><td lang="ko">stuck-at, scan chain, 제조 결함 (4)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">테스트 분야의 기본 용어를 처음부터 푼다. fault / error / failure, 영구 / 일시 고장, yield</td>
+          <td lang="en">Stuck-at, scan chain, defects (4)</td><td lang="en"><strong>new</strong></td><td lang="en">the testing field's basic vocabulary from scratch: fault / error / failure, permanent / transient, yield</td></tr>
+      <tr><td lang="ko">activation 산포도 (5)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">왜 고장 난 값이 <strong>크게</strong> 틀리는지를 비트 자리로 설명한다</td>
+          <td lang="en">Activation scatter (5)</td><td lang="en"><strong>new</strong></td><td lang="en">explains with bit positions why faulty values are <strong>hugely</strong> wrong</td></tr>
+      <tr><td lang="ko">FAP, FAP+T (7, 9-10)</td><td lang="ko"><strong>새것</strong>. 단, pruning과 재학습은 안다 (ECE 479 Lec12)</td><td lang="ko">pruning은 한 줄 확인. <strong>"무엇을 자를지를 고장이 정한다"</strong>는 뒤집힘에 지면을 쓴다</td>
+          <td lang="en">FAP, FAP+T (7, 9-10)</td><td lang="en"><strong>new</strong>, though pruning and retraining are known (ECE 479 lec 12)</td><td lang="en">pruning gets one line; the space goes to the twist that <strong>the faults decide what gets cut</strong></td></tr>
+      <tr><td lang="ko">mapping 전략 (8)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">BaseMap과 CUMap을 손으로 만져볼 수 있게 했다 (7번 절 도구)</td>
+          <td lang="en">Mapping strategies (8)</td><td lang="en"><strong>new</strong></td><td lang="en">BaseMap and CUMap made hands-on (the tool in section 7)</td></tr>
+      <tr><td lang="ko">흐름, 실험, 결과 (11-13)</td><td lang="ko"><strong>새것</strong></td><td lang="ko">원 논문(VTS 2018)의 설정과 숫자를 대조한다. 슬라이드와 논문 숫자가 다른 곳을 밝힌다</td>
+          <td lang="en">Flow, setup, results (11-13)</td><td lang="en"><strong>new</strong></td><td lang="en">checked against the original paper (VTS 2018), flagging where slide and paper numbers differ</td></tr>
+    </tbody>
+  </table>
+
+  <h4 lang="ko">오늘 나오는 약어</h4>
+  <h4 lang="en">Acronyms in today's lecture</h4>
+  <p lang="ko"><strong>SA(systolic array), MAC, TPU, WS, FAP(Fault-Aware Pruning), FAP+T(FAP + reTraining), PPA(Power, Performance, Area), RTL, EDA, DSSoC, s-a-0 / s-a-1(stuck-at-0/1), TIMIT, CUMap.</strong> 하나만 고르라면 <strong>FAP</strong>다. "고장 난 MAC = 그 MAC에 매핑된 weight가 0인 것"이라는 등식 하나가 강의 전체다. 가장 헷갈리는 짝은 <strong>FAP와 보통의 pruning</strong>이다. 둘 다 weight를 0으로 만들지만 <strong>무엇을 자를지 누가 정하는가</strong>가 정반대다. 6번 절에서 짚는다. CUMap의 CU는 슬라이드가 풀어 쓰지 않는다.</p>
+  <p lang="en"><strong>SA (systolic array), MAC, TPU, WS, FAP (fault-aware pruning), FAP+T (FAP plus retraining), PPA (power, performance, area), RTL, EDA, DSSoC, s-a-0 / s-a-1 (stuck-at-0/1), TIMIT, CUMap.</strong> If you keep one, keep <strong>FAP</strong>: the single equation "a broken MAC = the weights mapped onto it are zero" is the whole lecture. The most confusable pair is <strong>FAP versus ordinary pruning</strong>. Both zero weights, but <strong>who decides what gets cut</strong> is opposite; section 6 separates them. The slide never expands the "CU" in CUMap.</p>
+
+  <h4 lang="ko">오늘 나오는 기호</h4>
+  <h4 lang="en">Notation in today's lecture</h4>
+  <p lang="ko">3쪽의 <span class="m"><i>Y</i><sub><i>B</i>,3</sub> = <i>A</i><sub><i>B</i>,3</sub> × <i>W</i><sub>3,3</sub></span>가 유일한 식이다. <span class="m"><i>B</i></span>는 batch(입력 행의 수), 3은 특성 수다. 원소는 <span class="m"><i>a</i><sub><i>bk</i></sub></span>(샘플 <i>b</i>의 <i>k</i>번째 입력), <span class="m"><i>w</i><sub><i>kj</i></sub></span>(입력 <i>k</i> → 출력 <i>j</i>), <span class="m"><i>y</i><sub><i>bj</i></sub></span>. <strong>제일 중요한 식</strong>은 3쪽 아래의 <span class="m"><i>y</i><sub>11</sub> = <i>w</i><sub>31</sub><i>a</i><sub>13</sub> + <i>w</i><sub>21</sub><i>a</i><sub>12</sub> + <i>w</i><sub>11</sub><i>a</i><sub>11</sub></span>다. 출력 하나가 <strong>한 열의 MAC 셋을 전부 지나서</strong> 만들어진다는 것을 그대로 적은 식이고, 고장이 왜 증폭되는지가 여기서 나온다. 2쪽 그림과 3쪽 그림은 <strong>weight 첨자 순서가 서로 다르다</strong>(2번 절 함정).</p>
+  <p lang="en">Page 3's <span class="m"><i>Y</i><sub><i>B</i>,3</sub> = <i>A</i><sub><i>B</i>,3</sub> × <i>W</i><sub>3,3</sub></span> is the only equation. <span class="m"><i>B</i></span> is the batch (number of input rows) and 3 the feature count. Elements are <span class="m"><i>a</i><sub><i>bk</i></sub></span> (sample <i>b</i>'s <i>k</i>-th input), <span class="m"><i>w</i><sub><i>kj</i></sub></span> (input <i>k</i> → output <i>j</i>) and <span class="m"><i>y</i><sub><i>bj</i></sub></span>. <strong>The key equation</strong> is the one at the bottom of page 3, <span class="m"><i>y</i><sub>11</sub> = <i>w</i><sub>31</sub><i>a</i><sub>13</sub> + <i>w</i><sub>21</sub><i>a</i><sub>12</sub> + <i>w</i><sub>11</sub><i>a</i><sub>11</sub></span>: it says one output is built by <strong>passing through all three MACs of a column</strong>, which is where fault amplification comes from. Pages 2 and 3 <strong>order the weight subscripts differently</strong> (trap in section 2).</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 강의는 어느 층이고 어느 지표를 움직이나.</strong> L01 42쪽 지도의 <strong>세 층을 동시에</strong> 건드리는 드문 강의다. 회로(테스트, netlist), 하드웨어(bypass), 알고리즘(pruning, 재학습). 움직이는 지표는 셋 다다. <strong>Accuracy</strong>를 지키는 게 목표이고, <strong>Performance</strong>는 건드리지 않는 게 조건이며(실행 시간 추가 0), <strong>Efficiency</strong>는 간접적으로 움직인다. 고장 난 칩을 버리지 않으면 <strong>yield가 오르고, 같은 웨이퍼에서 쓸 수 있는 칩이 늘어난다.</strong> 6쪽 삼각형이 이 셋을 그대로 그렸다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Which layer is this, and which metric does it move.</strong> A rare lecture that touches <strong>all three layers</strong> of lecture 1's page-42 map at once: circuits (testing, netlists), hardware (the bypass), algorithms (pruning, retraining). It moves all three metrics too. Protecting <strong>accuracy</strong> is the goal, leaving <strong>performance</strong> untouched is the constraint (zero added run time), and <strong>efficiency</strong> moves indirectly: keep faulty chips instead of binning them and <strong>yield rises, so one wafer gives more usable chips.</strong> Page 6's triangle draws exactly these three.
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>이 노트가 기댄 원 논문.</strong> 4-13쪽 그림의 대부분은 강사 본인의 논문에서 왔다. <em>Analyzing and Mitigating the Impact of Permanent Faults on a Systolic Array Based Neural Network Accelerator</em>, Jeff (Jun) Zhang, Tianyu Gu, Kanad Basu, Siddharth Garg, <strong>IEEE VLSI Test Symposium (VTS) 2018</strong> (arXiv 1802.04657). 슬라이드 오른쪽 위의 <em>[VTS'18, Best Paper Award Nom.]</em>이 그것이다. 이 논문은 "더 나은 scheduling은 범위 밖"이라고 적고 끝나는데, 8쪽 mapping 전략과 13쪽의 <em>FAP*+Mapping</em> 곡선은 그 다음 단계다. 같은 저자들의 저널판 <em>Fault-Tolerant Systolic Array Based Accelerators for Deep Neural Network Execution</em>(Zhang, Basu, Garg, <strong>IEEE Design &amp; Test 2019</strong>)이 그 확장으로 보인다(보충. 저널판 본문은 대조하지 못했다). 슬라이드 밖에서 가져온 숫자는 전부 <strong>보충</strong>이라고 밝혀 둔다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>The paper this note leans on.</strong> Most figures on pages 4-13 come from the instructor's own paper: <em>Analyzing and Mitigating the Impact of Permanent Faults on a Systolic Array Based Neural Network Accelerator</em>, Jeff (Jun) Zhang, Tianyu Gu, Kanad Basu and Siddharth Garg, <strong>IEEE VLSI Test Symposium (VTS) 2018</strong> (arXiv 1802.04657). That's the <em>[VTS'18, Best Paper Award Nom.]</em> tag at the top right of the slides. The paper ends by calling better scheduling out of scope; page 8's mapping strategies and page 13's <em>FAP*+Mapping</em> curves are the next step. The same authors' journal version, <em>Fault-Tolerant Systolic Array Based Accelerators for Deep Neural Network Execution</em> (Zhang, Basu and Garg, <strong>IEEE Design &amp; Test 2019</strong>), appears to be that extension (supplementary; I could not check the journal text itself). Every number taken from outside the slides is marked <strong>supplementary</strong>.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head" data-slide="2"><span class="sec-num">01</span><h2 lang="ko">systolic array는 어디에나 있다</h2><h2 lang="en">Systolic arrays are everywhere</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Systolic Arrays: Scalable Deep Learning Accelerators</em>. 왼쪽은 데이터센터(TPU), 오른쪽은 연구용 SoC(EPOCHS-1)다. <strong>크기가 100배 다른 두 칩이 같은 구조를 쓴다</strong>는 것이 이 장의 말이고, 그래서 그 구조의 고장을 다루는 게 의미가 있다.</p>
+  <p class="sec-sub" lang="en">Titled <em>Systolic Arrays: Scalable Deep Learning Accelerators.</em> Datacenter on the left (TPU), research SoC on the right (EPOCHS-1). <strong>Two chips of very different scale share one structure</strong>, and that is why the structure's faults are worth studying.</p>
+
+  <h3><span lang="ko">왼쪽: TPU 스타일 배열과 MAC 하나</span><span lang="en">Left: a TPU-style array and one MAC</span></h3>
+  <p lang="ko">위에 <span class="cMem">Weight Memory</span>, 왼쪽에 세로로 <span class="cMem">Activation Memory</span>가 있다. 가운데 격자는 <span class="cHw">MAC</span> 상자로, 맨 윗줄이 <em>w<sub>11</sub>, w<sub>21</sub>, …, w<sub>N1</sub></em>, 둘째 줄이 <em>w<sub>12</sub>, w<sub>22</sub>, …, w<sub>N2</sub></em>, 맨 아랫줄이 <em>w<sub>1N</sub> … w<sub>NN</sub></em>이다. 왼쪽에서 <em>a<sub>12</sub> a<sub>11</sub></em>, <em>a<sub>21</sub></em>이 초록 띠를 따라 <strong>비스듬히(한 줄씩 한 사이클 늦게)</strong> 들어온다. 빨간 글씨 화살표 둘이 방향을 적었다. <strong><em>Activations</em>는 오른쪽으로, <em>Partial Sums</em>는 아래로.</strong> 각 열 밑에 ⊕와 되돌이 선이 있는 <em>Accumulators</em>가 있고, 그 안에 <em>y<sub>11</sub>, y<sub>12</sub>, …, y<sub>1B</sub></em>처럼 열마다 B개의 출력이 쌓인다.</p>
+  <p lang="en"><span class="cMem">Weight Memory</span> sits on top, <span class="cMem">Activation Memory</span> runs down the left. The grid is <span class="cHw">MAC</span> boxes: the top row holds <em>w<sub>11</sub>, w<sub>21</sub>, …, w<sub>N1</sub></em>, the second <em>w<sub>12</sub>, w<sub>22</sub>, …, w<sub>N2</sub></em>, the bottom <em>w<sub>1N</sub> … w<sub>NN</sub></em>. From the left, <em>a<sub>12</sub> a<sub>11</sub></em> and <em>a<sub>21</sub></em> enter along a green band, <strong>skewed (each row one cycle later)</strong>. Two red labelled arrows give the directions: <strong><em>Activations</em> flow right, <em>Partial Sums</em> flow down.</strong> Under each column, an <em>Accumulators</em> block with ⊕ and a feedback line stacks B outputs per column, <em>y<sub>11</sub>, y<sub>12</sub>, …, y<sub>1B</sub></em>.</p>
+  <p lang="ko">점선으로 확대한 <em>MAC Unit</em> 그림이 이 덱에서 가장 쓸모 있는 그림이다. 왼쪽에서 <strong><span class="m"><i>a</i></span> 8비트</strong>가 레지스터를 지나 오른쪽으로 계속 나가고, <strong><span class="m"><i>w</i></span> 8비트</strong> 레지스터가 그 아래 있다. 둘이 곱셈기(×)로 들어가 <strong>16비트 곱</strong>이 되고, 위에서 내려온 <strong>24비트 partial sum</strong>과 덧셈기(+)에서 더해져 <strong>24비트</strong>로 아래 레지스터를 거쳐 내려간다. 아래에 Google과 ARM 로고가 있다. 둘 다 systolic array 기반 가속기를 만든 회사라는 표시다.</p>
+  <p lang="en">The dotted zoom labelled <em>MAC Unit</em> is the most useful figure in the deck. From the left, <strong><span class="m"><i>a</i></span> (8 bits)</strong> passes through a register and keeps going right; a <strong><span class="m"><i>w</i></span> (8 bits)</strong> register sits below it. Both feed a multiplier (×) giving a <strong>16-bit product</strong>, which an adder (+) sums with the <strong>24-bit partial sum</strong> arriving from above, sending <strong>24 bits</strong> down through an output register. Google and ARM logos sit below: both companies have built systolic-array accelerators.</p>
+  <p lang="ko">아래 글. <em>Google TPUv1 (2017): 256 x 256 MAC units</em>, <em>2-D grid of Multiply-Accumulate (MAC) units</em>, <em>Nearest neighbor commutation</em>. 마지막 단어는 <strong>communication의 오타로 보인다.</strong> 그리고 <em>Google Cloud TPUv5e (2023)</em>, <em>Accelerates large-scale AI inference</em>. TPUv1에서 v5e까지 <strong>6년이 지나도 같은 구조를 쓴다</strong>는 게 요점이다.</p>
+  <p lang="en">Below: <em>Google TPUv1 (2017): 256 x 256 MAC units</em>, <em>2-D grid of Multiply-Accumulate (MAC) units</em>, <em>Nearest neighbor commutation</em>, where the last word <strong>looks like a typo for communication.</strong> Then <em>Google Cloud TPUv5e (2023)</em>, <em>Accelerates large-scale AI inference.</em> The point: <strong>six years from TPUv1 to v5e, same structure.</strong></p>
+
+  <div class="callout" lang="ko">
+    <strong>systolic array 자체는 이미 안다.</strong> ECE 479 Lec11에서 Edge TPU를 systolic array로 소개받았고, L01에서 <a href="L01-introduction.html#s15">이름이 나왔고</a>, L07-8-9에서 <a href="L07-hardware-metrics.html#s10">TPUv1의 roofline</a>을 봤고, L10에서 <a href="L10-dataflow.html#s12">WS 배열이 psum을 이웃에게 넘기는 그림</a>까지 봤다. 내부 구조와 dataflow 분류는 Lecture 11-12에서 다룬다. <strong>여기서 새로 챙길 것은 비트 폭 셋(8, 16, 24)뿐이다.</strong> 고장이 24비트 중 어느 자리에 걸리느냐가 4번 절의 핵심이 된다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>You already know systolic arrays.</strong> ECE 479 lecture 11 introduced the Edge TPU as one; lecture 1 <a href="L01-introduction.html#s15">named them</a>; lecture 7-8-9 showed <a href="L07-hardware-metrics.html#s10">TPUv1's roofline</a>; lecture 10 got as far as <a href="L10-dataflow.html#s12">a WS array passing psums to neighbours</a>. Internals and the dataflow taxonomy belong to Lecture 11-12. <strong>The only new things to pick up here are the three bit widths (8, 16, 24)</strong>: which of the 24 bits a fault hits becomes the crux of section 4.
+  </div>
+
+  <h3><span lang="ko">오른쪽: EPOCHS-1, 이종 SoC 속 타일 하나</span><span lang="en">Right: EPOCHS-1, one tile in a heterogeneous SoC</span></h3>
+  <p lang="ko">로고 다섯 개가 세로로: <strong>DARPA, IBM, Harvard, Columbia University, Illinois</strong>. 옆에 다이 배치도가 있다. 갈색 사각형 타일들이 격자로 놓였고 이름표가 <em>IO</em>, <em>NLP EdgeBERT</em>, <em>tile_acc</em>, <em>tile_cpu</em> 등이다. 큰 회색 빗금 영역 몇 개가 가려져 있고, 가운데 왼쪽의 타일 하나가 <strong>검은 굵은 테두리</strong>로 강조되어 빨간 글씨 <em>Systolic Arrays</em>가 적혀 있다. 아래 글: <em>DARPA DSSoC: 12 nm EPOCHS-1 (taped out in October 2021, 2022)</em>, <em>Systolic arrays</em>, <em>32 X 32 MAC units</em>.</p>
+  <p lang="en">Five logos stacked: <strong>DARPA, IBM, Harvard, Columbia University, Illinois.</strong> Beside them a die floorplan: brown rectangular tiles in a grid, labelled <em>IO</em>, <em>NLP EdgeBERT</em>, <em>tile_acc</em>, <em>tile_cpu</em> and so on. Several large grey hatched regions are blanked out, and one tile at the centre-left gets <strong>a thick black outline</strong> with <em>Systolic Arrays</em> in red. Below: <em>DARPA DSSoC: 12 nm EPOCHS-1 (taped out in October 2021, 2022)</em>, <em>Systolic arrays</em>, <em>32 X 32 MAC units.</em></p>
+  <p lang="ko">렌더된 그림에서는 안 읽히지만 PDF 텍스트 층에 타일 이름이 더 남아 있다. <em>Ariane w/ inline FPGA, FFT w/ PM, Viterbi w/ PM, NVDLA w/ PM, Night Vision, Crypto, NCA (Audio), LPDDR Mem, SP Mem</em> 등이다. <strong>RISC-V 코어(Ariane), FFT, Viterbi 복호기, NVDLA, 암호 블록이 한 칩에 같이 있고, systolic array는 그 중 타일 하나다.</strong> DSSoC는 DARPA의 Domain-Specific System on Chip 프로그램 이름이다(보충). 강사가 이 칩을 보여준 이유는, 데이터센터의 거대한 TPU만이 아니라 <strong>작은 연구 SoC 안의 32×32 타일</strong>도 같은 구조라는 것이다.</p>
+  <p lang="en">The render doesn't show them, but the PDF's text layer keeps more tile names: <em>Ariane w/ inline FPGA, FFT w/ PM, Viterbi w/ PM, NVDLA w/ PM, Night Vision, Crypto, NCA (Audio), LPDDR Mem, SP Mem.</em> <strong>RISC-V cores (Ariane), an FFT, a Viterbi decoder, NVDLA and a crypto block share one die, and the systolic array is just one tile.</strong> DSSoC is the name of DARPA's Domain-Specific System on Chip programme (supplementary). The instructor's point: not only the giant datacenter TPU but also <strong>a 32×32 tile inside a small research SoC</strong> uses this structure.</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · MAC 개수</div>
+    <div class="cap" lang="en">Sense of scale · MAC counts</div>
+    <table>
+      <tr><td class="what">TPUv1</td><td class="num">256 × 256 = 65,536</td>
+          <td><span lang="ko">이 강의의 고장 실험 대상과 같은 크기. 0.012%가 MAC 8개다</span><span lang="en">the same size as this lecture's fault experiments; 0.012% is 8 MACs</span></td></tr>
+      <tr><td class="what">EPOCHS-1</td><td class="num">32 × 32 = 1,024</td>
+          <td><span lang="ko">TPUv1의 1/64. 같은 0.012%라면 고장 MAC이 평균 0.12개, 대부분의 칩은 고장이 하나도 없다</span><span lang="en">1/64 of TPUv1. At the same 0.012%, the average is 0.12 faulty MACs: most chips have none</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">3쪽 예제</span><span lang="en">page 3's example</span></td><td class="num">3 × 3 = 9</td>
+          <td><span lang="ko">기준점. 손으로 스케줄을 따라갈 수 있는 크기</span><span lang="en">reference: small enough to trace the schedule by hand</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">고장 개수는 MAC 개수(면적)에 비례해서 는다. <strong>배열이 클수록 "고장 없는 칩"이 드물어진다.</strong> 큰 배열일수록 이 강의의 문제가 절실해지는 이유다.</div>
+    <div class="foot" lang="en">The fault count grows with the MAC count (the area). <strong>The bigger the array, the rarer a fault-free chip</strong>, which is why this lecture's problem bites hardest on big arrays.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head" data-slide="3"><span class="sec-num">02</span><h2 lang="ko">WS 동작과 정확한 스케줄</h2><h2 lang="en">WS operation and its precise schedule</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Systolic Array Operation (Weight Stationary)</em>. 3×3 배열 하나로 행렬 곱 한 번을 사이클 단위로 따라간다. 아래 띠에 <strong><em>Systolic Array Requires a Precise Schedule</em></strong>(Precise에 밑줄과 기울임).</p>
+  <p class="sec-sub" lang="en">Titled <em>Systolic Array Operation (Weight Stationary).</em> One matrix multiply traced cycle by cycle on a 3×3 array. The banner at the bottom: <strong><em>Systolic Array Requires a Precise Schedule</em></strong> (Precise underlined and italic).</p>
+
+  <p lang="ko">맨 위 식 <span class="m"><i>Y</i><sub><i>B</i>,3</sub> = <i>A</i><sub><i>B</i>,3</sub> × <i>W</i><sub>3,3</sub></span>에서 <i>A</i>만 주황이다. 오른쪽 범례: 회색 상자 = <em>Multiply-Accumulate Unit (MAC)</em>, 노란 테두리 = <em>Clock Cycle</em>. 격자는 <em>W11 W12 W13 / W21 W22 W23 / W31 W32 W33</em>이고, 첫 열의 W11, W21, W31 셋이 노란 테두리다. 왼쪽에서 주황 activation이 줄마다 한 칸씩 밀려 들어온다.</p>
+  <p lang="en">In the equation at the top, <span class="m"><i>Y</i><sub><i>B</i>,3</sub> = <i>A</i><sub><i>B</i>,3</sub> × <i>W</i><sub>3,3</sub></span>, only <i>A</i> is orange. The legend at right: grey box = <em>Multiply-Accumulate Unit (MAC)</em>, yellow outline = <em>Clock Cycle.</em> The grid reads <em>W11 W12 W13 / W21 W22 W23 / W31 W32 W33</em>, and the first column's W11, W21, W31 wear yellow outlines. Orange activations enter from the left, each row shifted one slot further back:</p>
+  <ul lang="ko">
+    <li>1행: <em>a31 a21 a11</em> (a11이 맨 앞)</li>
+    <li>2행: <em>a32 a22 a12</em> (한 칸 뒤)</li>
+    <li>3행: <em>a33 a23 a13</em> (두 칸 뒤)</li>
+  </ul>
+  <ul lang="en">
+    <li>row 1: <em>a31 a21 a11</em> (a11 at the front)</li>
+    <li>row 2: <em>a32 a22 a12</em> (one slot back)</li>
+    <li>row 3: <em>a33 a23 a13</em> (two slots back)</li>
+  </ul>
+  <p lang="ko">첫 열을 따라 빨간 partial sum이 자란다. W11 밑에 <em>w11 a11</em>, W21 밑에 <em>w21a12+w11a11</em>, 맨 아래로 <em>y<sub>11</sub> = w31a13 + w21a12 + w11a11</em>이 나온다. 사이클 1에 a11이 W11에 닿고, 사이클 2에 그 곱이 W21에 내려오는 <strong>바로 그 순간</strong> a12가 W21에 닿고, 사이클 3에 a13이 W31에 닿는다. 셋 중 하나라도 한 사이클 어긋나면 엉뚱한 곱이 더해진다. 그게 "precise schedule"이다.</p>
+  <p lang="en">A red partial sum grows down the first column: <em>w11 a11</em> under W11, <em>w21a12+w11a11</em> under W21, and out the bottom <em>y<sub>11</sub> = w31a13 + w21a12 + w11a11.</em> In cycle 1 a11 reaches W11; in cycle 2 a12 reaches W21 <strong>at exactly the moment</strong> that product arrives from above; in cycle 3 a13 reaches W31. Slip any one by a cycle and the wrong product gets added. That's the "precise schedule."</p>
+
+  <figure>
+    <svg viewBox="0 0 680 330" role="img" aria-label="3×3 weight stationary systolic array에서 W21 MAC 하나가 고장 나면 첫 열을 지나는 모든 partial sum이 오염되는 모습">
+      <defs>
+        <marker id="l13ArB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--brown)"/></marker>
+        <marker id="l13ArA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/></marker>
+      </defs>
+      <!-- activation streams -->
+      <text class="svglab" x="186" y="69" text-anchor="end" style="font-size:11px" fill="var(--brown)">a31 a21 a11</text>
+      <text class="svglab" x="150" y="149" text-anchor="end" style="font-size:11px" fill="var(--brown)">a32 a22 a12</text>
+      <text class="svglab" x="114" y="229" text-anchor="end" style="font-size:11px" fill="var(--brown)">a33 a23 a13</text>
+      <line x1="192" y1="65" x2="226" y2="65" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="156" y1="145" x2="226" y2="145" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="120" y1="225" x2="226" y2="225" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <!-- horizontal links -->
+      <line x1="300" y1="65" x2="336" y2="65" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <line x1="410" y1="65" x2="446" y2="65" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <line x1="300" y1="145" x2="336" y2="145" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <line x1="410" y1="145" x2="446" y2="145" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <line x1="300" y1="225" x2="336" y2="225" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <line x1="410" y1="225" x2="446" y2="225" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB)"/>
+      <!-- vertical psum links, column 1 (corrupted below W21) -->
+      <line x1="265" y1="90" x2="265" y2="116" stroke="var(--brown)" stroke-width="1.8" marker-end="url(#l13ArB)"/>
+      <line x1="265" y1="170" x2="265" y2="196" stroke="var(--amber)" stroke-width="2.4" marker-end="url(#l13ArA)"/>
+      <line x1="265" y1="250" x2="265" y2="278" stroke="var(--amber)" stroke-width="2.4" marker-end="url(#l13ArA)"/>
+      <line x1="375" y1="90" x2="375" y2="116" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="375" y1="170" x2="375" y2="196" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="375" y1="250" x2="375" y2="278" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="485" y1="90" x2="485" y2="116" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="485" y1="170" x2="485" y2="196" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <line x1="485" y1="250" x2="485" y2="278" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#l13ArB)"/>
+      <!-- MAC cells -->
+      <rect x="230" y="40" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="340" y="40" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="450" y="40" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="230" y="120" width="70" height="50" rx="5" fill="rgba(var(--amber-rgb),.22)" stroke="var(--amber)" stroke-width="2.4"/>
+      <rect x="340" y="120" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="450" y="120" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="230" y="200" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="340" y="200" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <rect x="450" y="200" width="70" height="50" rx="5" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgnum" x="265" y="70" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W11</text>
+      <text class="svgnum" x="375" y="70" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W12</text>
+      <text class="svgnum" x="485" y="70" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W13</text>
+      <text class="svgnum" x="265" y="150" text-anchor="middle" style="font-size:13px" fill="var(--amber)">W21 ✗</text>
+      <text class="svgnum" x="375" y="150" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W22</text>
+      <text class="svgnum" x="485" y="150" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W23</text>
+      <text class="svgnum" x="265" y="230" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W31</text>
+      <text class="svgnum" x="375" y="230" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W32</text>
+      <text class="svgnum" x="485" y="230" text-anchor="middle" style="font-size:13px" fill="var(--blue)">W33</text>
+      <!-- outputs -->
+      <text class="svglab" x="265" y="298" text-anchor="middle" style="font-size:11.5px;font-weight:700" fill="var(--amber)">y_b1 ✗</text>
+      <text class="svglab" x="375" y="298" text-anchor="middle" style="font-size:11.5px" fill="var(--ink2)">y_b2</text>
+      <text class="svglab" x="485" y="298" text-anchor="middle" style="font-size:11.5px" fill="var(--ink2)">y_b3</text>
+      <text class="svglab" x="265" y="318" text-anchor="middle" style="font-size:10px" fill="var(--amber)" lang="ko">b = 1…B 전부</text>
+      <text class="svglab" x="265" y="318" text-anchor="middle" style="font-size:10px" fill="var(--amber)" lang="en">every b = 1…B</text>
+      <!-- side notes -->
+      <text class="svglab" x="546" y="58" style="font-size:10.5px" fill="var(--brown)" lang="ko">activation →</text>
+      <text class="svglab" x="546" y="58" style="font-size:10.5px" fill="var(--brown)" lang="en">activation →</text>
+      <text class="svglab" x="546" y="76" style="font-size:10.5px" fill="var(--brown)" lang="ko">psum ↓ (24b)</text>
+      <text class="svglab" x="546" y="76" style="font-size:10.5px" fill="var(--brown)" lang="en">psum ↓ (24b)</text>
+      <text class="svglab" x="546" y="140" style="font-size:10.5px" fill="var(--amber)" lang="ko">stuck-at 한 개가</text>
+      <text class="svglab" x="546" y="140" style="font-size:10.5px" fill="var(--amber)" lang="en">one stuck-at</text>
+      <text class="svglab" x="546" y="156" style="font-size:10.5px" fill="var(--amber)" lang="ko">아래로 지나는</text>
+      <text class="svglab" x="546" y="156" style="font-size:10.5px" fill="var(--amber)" lang="en">corrupts every</text>
+      <text class="svglab" x="546" y="172" style="font-size:10.5px" fill="var(--amber)" lang="ko">psum 전부를 오염</text>
+      <text class="svglab" x="546" y="172" style="font-size:10.5px" fill="var(--amber)" lang="en">psum passing down</text>
+      <text class="svglab" x="20" y="300" style="font-size:10px" fill="var(--ink3)" lang="ko">행이 아래로 갈수록</text>
+      <text class="svglab" x="20" y="300" style="font-size:10px" fill="var(--ink3)" lang="en">each lower row</text>
+      <text class="svglab" x="20" y="315" style="font-size:10px" fill="var(--ink3)" lang="ko">한 사이클씩 늦게 시작</text>
+      <text class="svglab" x="20" y="315" style="font-size:10px" fill="var(--ink3)" lang="en">starts a cycle later</text>
+      <text class="svglab" x="20" y="24" style="font-size:10.5px;font-weight:600" fill="var(--ink2)">Y(B×3) = A(B×3) × W(3×3), weight stationary</text>
+    </svg>
+    <figcaption lang="ko">3쪽 배열에 고장 하나를 얹어 다시 그렸다. <span class="cHw">보라</span>는 MAC, <span class="cAlg">파랑</span>은 그 안에 붙박인 weight, <span class="cMem">갈색</span>은 움직이는 데이터(activation은 오른쪽, psum은 아래), <span class="cCost">주황</span>은 고장이다. WS에서 열 <i>j</i>는 출력 <span class="m"><i>y</i><sub><i>bj</i></sub></span> 하나를 맡는다. 그래서 W21이 고장 나면 <strong>첫 열을 지나는 psum 전부, 즉 batch의 모든 샘플에 대한 <span class="m"><i>y</i><sub><i>b</i>1</sub></span>이 틀린다.</strong> 고장 하나의 피해가 MAC 하나가 아니라 열 하나, 그리고 그 열이 맡은 모든 입력으로 번진다.</figcaption>
+    <figcaption lang="en">Page 3's array redrawn with one fault. <span class="cHw">Violet</span> is the MACs, <span class="cAlg">blue</span> the weights pinned inside them, <span class="cMem">brown</span> moving data (activations right, psums down), <span class="cCost">amber</span> the fault. Under WS, column <i>j</i> owns one output <span class="m"><i>y</i><sub><i>bj</i></sub></span>. So when W21 breaks, <strong>every psum crossing column 1, which is <span class="m"><i>y</i><sub><i>b</i>1</sub></span> for every sample in the batch, comes out wrong.</strong> One fault's damage spreads from one MAC to a whole column and every input that column serves.</figcaption>
+  </figure>
+
+  <div class="callout" lang="ko">
+    <strong>L10의 WS와 같은 이야기다.</strong> L10은 <a href="L10-dataflow.html#s12">WS 배열에서 weight를 PE에 심어 두고 psum을 이웃 PE로 흘린다</a>고 했다. 3쪽은 그걸 2차원으로 펼친 것뿐이다. 이 강의가 새로 보태는 관점은 하나다. <strong>"psum을 이웃으로 흘린다"는 장점이 고장에서는 단점이 된다.</strong> 데이터를 버퍼로 돌려보내지 않고 MAC에서 MAC으로 바로 넘기니까, 중간에 틀린 값이 섞여도 <strong>아무도 검사하지 않고 끝까지 간다.</strong>
+  </div>
+  <div class="callout" lang="en">
+    <strong>Same story as lecture 10's WS.</strong> Lecture 10 described <a href="L10-dataflow.html#s12">a WS array that plants weights in the PEs and streams psums to the neighbouring PE</a>; page 3 just spreads that over two dimensions. This lecture adds one angle: <strong>the virtue of "psums flow to neighbours" becomes a liability under faults.</strong> Because data goes straight from MAC to MAC without a trip back to a buffer, a wrong value mixed in midway <strong>rides all the way down unchecked.</strong>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">3쪽 배열에서 batch <span class="m"><i>B</i> = 4</span>로 <span class="m"><i>Y</i> = <i>AW</i></span>를 계산한다. (1) MAC W21이 고장이면 <span class="m"><i>Y</i></span>의 12개 원소 중 몇 개가 틀릴 수 있나? (2) 고장이 W23이면?</p>
+    <p lang="en">Page 3's array computes <span class="m"><i>Y</i> = <i>AW</i></span> with batch <span class="m"><i>B</i> = 4.</span> (1) If MAC W21 is faulty, how many of <span class="m"><i>Y</i></span>'s 12 elements can be wrong? (2) What if the fault is in W23?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <div class="body">
+        <p lang="ko">(1) <strong>4개</strong>, 첫 열의 <span class="m"><i>y</i><sub>11</sub>, <i>y</i><sub>21</sub>, <i>y</i><sub>31</sub>, <i>y</i><sub>41</sub></span> 전부다. 각 샘플의 psum이 차례로 W21을 지나간다. (2) 마찬가지로 <strong>셋째 열 4개</strong>. 행 위치는 상관없다. W21이든 W31이든 그 열의 출력 전부를 오염시킨다. <strong>12개 중 1/3, 즉 MAC 9개 중 1개(11%)의 고장이 출력의 33%를 망친다.</strong> 256×256이면 MAC 65,536개 중 하나의 고장이 출력 열 256개 중 하나 전체를 망친다.</p>
+        <p lang="en">(1) <strong>Four</strong>: all of column 1, <span class="m"><i>y</i><sub>11</sub>, <i>y</i><sub>21</sub>, <i>y</i><sub>31</sub>, <i>y</i><sub>41</sub>.</span> Each sample's psum passes through W21 in turn. (2) Likewise <strong>the four in column 3.</strong> The row doesn't matter: W21 or W31, it spoils every output of that column. <strong>One fault in 9 MACs (11%) ruins a third (33%) of the outputs.</strong> At 256×256, one fault among 65,536 MACs ruins one entire output column out of 256.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">2쪽과 3쪽은 weight 첨자 순서가 반대다</h4>
+    <h4 lang="en">Pages 2 and 3 order the weight subscripts oppositely</h4>
+    <p lang="ko">3쪽은 W11 W12 W13이 <strong>첫 행</strong>에 놓여 행렬 <span class="m"><i>W</i></span>를 그대로 깔았다(<span class="m"><i>w</i><sub><i>kj</i></sub></span>는 <i>k</i>행 <i>j</i>열 MAC). 2쪽은 맨 윗줄이 <span class="m"><i>w</i><sub>11</sub>, <i>w</i><sub>21</sub>, …, <i>w</i><sub>N1</sub></span>이라 <strong>첫 첨자가 열</strong>이다. 원 논문도 "<span class="m"><i>w</i><sub><i>i</i>,<i>j</i></sub></span>를 <i>j</i>행 <i>i</i>열 MAC에 싣는다"고 적는다(보충). 둘 다 맞다. weight 행렬을 어떻게 정의하느냐(<span class="m"><i>Y</i> = <i>AW</i></span>냐 <span class="m"><i>y</i> = <i>Wa</i></span>냐)의 차이일 뿐이다. <strong>"열 하나 = 출력 하나"라는 구조는 둘 다 같다.</strong> 논문을 읽을 때 첨자부터 믿지 말고 "어느 방향이 출력인가"를 먼저 확인하자.</p>
+    <p lang="en">Page 3 puts W11 W12 W13 in <strong>the first row</strong>, laying the matrix <span class="m"><i>W</i></span> out as is (<span class="m"><i>w</i><sub><i>kj</i></sub></span> sits at row <i>k</i>, column <i>j</i>). Page 2's top row is <span class="m"><i>w</i><sub>11</sub>, <i>w</i><sub>21</sub>, …, <i>w</i><sub>N1</sub></span>, so <strong>the first subscript is the column.</strong> The original paper says it loads "<span class="m"><i>w</i><sub><i>i</i>,<i>j</i></sub></span> into the MAC in row <i>j</i> and column <i>i</i>" (supplementary). Both are right; it's only whether the weight matrix is defined for <span class="m"><i>Y</i> = <i>AW</i></span> or <span class="m"><i>y</i> = <i>Wa</i></span>. <strong>"One column = one output" holds in both.</strong> When reading a paper, don't trust the subscripts first; check which direction is the output.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head" data-slide="4"><span class="sec-num">03</span><h2 lang="ko">영구 고장과 stuck-at 모델</h2><h2 lang="en">Permanent faults and the stuck-at model</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Permanent Faults on Systolic Arrays</em>. 한 장에 세 가지가 들어 있다. 왼쪽 큰 그래프(고장 MAC 수 대 정확도), 오른쪽 위 사진(<em>Manufacturing Defects</em>), 오른쪽 아래 회로(<em>Gate-level Stuck-at Faults</em>). <strong>이 장이 이 과목에서 reliability라는 주제가 처음 나오는 곳</strong>이므로 기본 용어부터 처음부터 깐다.</p>
+  <p class="sec-sub" lang="en">Titled <em>Permanent Faults on Systolic Arrays.</em> Three things on one page: a large plot on the left (faulty MACs versus accuracy), a photo top right (<em>Manufacturing Defects</em>), a circuit bottom right (<em>Gate-level Stuck-at Faults</em>). <strong>This is where reliability first appears in the course</strong>, so the basic vocabulary gets laid down from scratch.</p>
+
+  <h3><span lang="ko">먼저 말부터: fault, error, failure</span><span lang="en">Words first: fault, error, failure</span></h3>
+  <p lang="ko">슬라이드는 "fault"라는 단어를 정의 없이 쓴다. 신뢰성 분야에서는 이 셋을 엄격히 구분한다(보충. 표준 정리는 Avižienis, Laprie, Randell, Landwehr, <em>Basic Concepts and Taxonomy of Dependable and Secure Computing</em>, IEEE Transactions on Dependable and Secure Computing, 2004).</p>
+  <p lang="en">The slides use "fault" without defining it. The reliability field keeps three words strictly apart (supplementary; the standard reference is Avižienis, Laprie, Randell and Landwehr, <em>Basic Concepts and Taxonomy of Dependable and Secure Computing</em>, IEEE Transactions on Dependable and Secure Computing, 2004).</p>
+  <div class="def">
+    <span class="tag" lang="ko">보충 정의</span><span class="tag" lang="en">Supplementary definitions</span>
+    <p lang="ko"><strong>Fault</strong>: 물리적 원인. "이 게이트 출력이 GND에 붙어 버렸다."<br><strong>Error</strong>: 그 원인 때문에 <strong>내부 상태</strong>가 틀린 것. "이 MAC이 내보낸 psum의 20번 비트가 틀렸다."<br><strong>Failure</strong>: 그 틀림이 <strong>바깥에서 보이는</strong> 서비스 실패가 된 것. "이 음성 프레임을 엉뚱한 음소로 분류했다."</p>
+    <p lang="en"><strong>Fault</strong>: the physical cause. "This gate's output is shorted to ground."<br><strong>Error</strong>: the resulting <strong>wrong internal state.</strong> "Bit 20 of the psum this MAC emitted is wrong."<br><strong>Failure</strong>: that wrongness <strong>visible from outside</strong> as a service failure. "This speech frame got the wrong phoneme."</p>
+  </div>
+  <p lang="ko">이 구분이 이 강의 전체의 뼈대다. <strong>fault는 막을 수 없고</strong>(제조 결함은 생긴다), <strong>error는 DNN 안에서 흔히 생기며</strong>(4-5쪽), 이 강의가 막으려는 것은 <strong>failure, 즉 분류 정확도의 하락</strong>이다. FAP는 fault를 고치지 않는다. fault가 error로 번지는 길(그 MAC의 기여)을 끊고, 남은 error가 failure가 되지 않게 재학습한다.</p>
+  <p lang="en">That split is this lecture's skeleton. <strong>Faults can't be prevented</strong> (defects happen), <strong>errors are common inside a DNN</strong> (pages 4-5), and what the lecture defends against is <strong>failure: a drop in classification accuracy.</strong> FAP doesn't repair the fault. It cuts the path from fault to error (that MAC's contribution) and retrains so the remaining error doesn't become failure.</p>
+
+  <h3><span lang="ko">오른쪽 위: 제조 결함</span><span lang="en">Top right: manufacturing defects</span></h3>
+  <p lang="ko">컨베이어 위에 보라빛 웨이퍼 몇 장이 놓였고, 오른쪽 위에 노란 카메라(광학 검사 장비)가 있다. 노란 말풍선 돋보기가 웨이퍼 하나를 확대했고, 다이 격자 한가운데 <strong>빨간 X</strong>가 있다. 웨이퍼 위 다이 하나에 결함이 났다는 그림이다. 아래 글 <em>Manufacturing Defects</em>.</p>
+  <p lang="en">Purple wafers on a conveyor, a yellow camera (optical inspection) at the top right, and a yellow speech-bubble magnifier zooming into one wafer with a <strong>red X</strong> in the middle of its die grid: a defect on one die. Caption: <em>Manufacturing Defects.</em></p>
+  <p lang="ko">결함의 원인은 먼지 입자, 리소그래피 불량, 도핑 편차 같은 것이다(보충). 어디에 떨어질지는 우연이다. 그래서 칩이 클수록 결함을 하나라도 맞을 확률이 커진다. 업계에서 흔히 쓰는 가장 단순한 모형은 <strong>Poisson yield 모델</strong>이다.</p>
+  <p lang="en">Defects come from dust particles, lithography flaws, doping variation and the like (supplementary). Where one lands is chance, so the bigger the die, the likelier it catches at least one. The simplest model in common use is the <strong>Poisson yield model:</strong></p>
+  <div class="eq"><span class="m"><i>Y</i> = <i>e</i><sup>−<i>A</i>·<i>D</i></sup></span><span class="note" lang="ko">보충. 결함이 다이 위에 고르게 무작위로 떨어진다는 가정</span><span class="note" lang="en">supplementary; assumes defects land uniformly at random</span></div>
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · Poisson yield</span><span lang="en">Unpacking the notation · Poisson yield</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>Y</i></td><td><span lang="ko">yield. 결함이 <strong>하나도 없는</strong> 다이의 비율 (스칼라, 0~1)</span><span lang="en">yield: the fraction of dies with <strong>zero</strong> defects (a scalar, 0 to 1)</span></td></tr>
+        <tr><td class="m"><i>A</i></td><td><span lang="ko">다이 면적 (cm²). 이 강의에서는 MAC 수와 비례한다고 보면 된다</span><span lang="en">die area (cm²); for this lecture, think of it as proportional to the MAC count</span></td></tr>
+        <tr><td class="m"><i>D</i></td><td><span lang="ko">결함 밀도 (개/cm²). 공정이 성숙할수록 작아진다</span><span lang="en">defect density (defects per cm²); falls as a process matures</span></td></tr>
+        <tr><td class="m"><i>A</i>·<i>D</i></td><td><span lang="ko">다이 하나에 떨어지는 결함의 <strong>평균 개수</strong>. 이게 1이면 yield는 <span class="m"><i>e</i><sup>−1</sup></span> ≈ 37%</span><span lang="en">the <strong>mean number of defects</strong> per die. At 1, yield is <span class="m"><i>e</i><sup>−1</sup></span> ≈ 37%</span></td></tr>
+      </table>
+    </div>
+  </details>
+  <p lang="ko">핵심은 <strong>지수</strong>라는 것이다. 면적을 두 배로 하면 yield가 반이 되는 게 아니라 <strong>제곱</strong>이 된다(<span class="m"><i>e</i><sup>−2<i>AD</i></sup> = <i>Y</i><sup>2</sup></span>). 기존 방식은 결함 있는 다이를 <strong>버린다.</strong> 이 강의의 제안은 <strong>결함이 있어도 쓴다</strong>는 것이고, 그게 되면 yield의 정의 자체가 "결함 0개"에서 "정확도 손실이 허용 범위 안"으로 바뀐다. 원 논문의 서론도 정확히 이렇게 적는다. "제조 결함은 출하 테스트에서 찾을 수 있지만, 영구 고장이 있는 칩을 전부 버리면 yield가 떨어진다"(보충).</p>
+  <p lang="en">The key is that it's <strong>exponential.</strong> Double the area and yield isn't halved, it's <strong>squared</strong> (<span class="m"><i>e</i><sup>−2<i>AD</i></sup> = <i>Y</i><sup>2</sup></span>). The usual practice is to <strong>discard</strong> defective dies. This lecture proposes <strong>using them anyway</strong>, and once that works, yield's very definition shifts from "zero defects" to "accuracy loss within budget." The paper's introduction says exactly this: manufacturing defects can be found in post-fabrication test, but discarding every chip with a permanent fault reduces yield (supplementary).</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · yield (보충, 설명용 어림수)</div>
+    <div class="cap" lang="en">Sense of scale · yield (supplementary, illustrative round numbers)</div>
+    <table>
+      <tr class="base"><td class="what"><span lang="ko"><i>A</i>·<i>D</i> = 0.1</span><span lang="en"><i>A</i>·<i>D</i> = 0.1</span></td><td class="num">Y ≈ 90%</td>
+          <td><span lang="ko">작은 다이. 열 개 중 하나를 버린다</span><span lang="en">a small die: one in ten gets binned</span></td></tr>
+      <tr><td class="what"><span lang="ko"><i>A</i>·<i>D</i> = 0.5</span><span lang="en"><i>A</i>·<i>D</i> = 0.5</span></td><td class="num">Y ≈ 61%</td>
+          <td><span lang="ko">면적 5배. yield는 90%의 다섯 제곱</span><span lang="en">5x the area: yield is 90% to the fifth power</span></td></tr>
+      <tr><td class="what"><span lang="ko"><i>A</i>·<i>D</i> = 2</span><span lang="en"><i>A</i>·<i>D</i> = 2</span></td><td class="num">Y ≈ 14%</td>
+          <td><span lang="ko">레티클 한계급 거대 다이에 미성숙 공정. 일곱 개 중 여섯을 버린다</span><span lang="en">a reticle-limit die on an immature process: six in seven binned</span></td></tr>
+      <tr><td class="what"><span lang="ko">웨이퍼 한 장 통째</span><span lang="en">a whole wafer</span></td><td class="num">Y → 0</td>
+          <td><span lang="ko">결함 0개는 불가능. <a href="L01-introduction.html#s15">L01의 Cerebras WSE</a> 같은 wafer-scale 칩은 처음부터 <strong>고장을 안고 쓰는 설계</strong>(여분 코어와 우회 배선)여야만 성립한다</span><span lang="en">zero defects is impossible. A wafer-scale chip like <a href="L01-introduction.html#s15">lecture 1's Cerebras WSE</a> only works if designed <strong>to run with faults</strong> from day one (spare cores and rerouting)</span></td></tr>
+    </table>
+    <div class="foot" lang="ko"><i>A</i>·<i>D</i> 값은 감을 잡기 위한 예시이고 특정 공정의 실측이 아니다.</div>
+    <div class="foot" lang="en">The <i>A</i>·<i>D</i> values are illustrative, not measurements of any particular process.</div>
+  </div>
+
+  <h3><span lang="ko">오른쪽 아래: 게이트 수준 stuck-at fault</span><span lang="en">Bottom right: gate-level stuck-at faults</span></h3>
+  <p lang="ko">보라 바탕에 노란 선으로 그린 NAND 다섯 개짜리 회로. 왼쪽 회색 상자에 입력 <strong>1, 0</strong>이 있고 화살표가 <em>Test vector for h s-a-0 fault</em>라고 적었다. 신호 이름은 a~k와 출력 z. 내부 선 <strong>h</strong>에 빨간 점과 <em>s-a-0</em>. NAND 출력 j 옆에 <strong>0(1)</strong>, 최종 출력 z 옆에 <strong>1(0)</strong>, 그리고 화살표 두 개가 <em>Good value</em>(노랑)와 <em>Faulty value</em>(빨강)를 가리킨다. 즉 <strong>"정상값(고장값)"</strong> 표기다.</p>
+  <p lang="en">A five-NAND circuit drawn in yellow on purple. A grey box at the left holds inputs <strong>1, 0</strong>, with an arrow labelled <em>Test vector for h s-a-0 fault.</em> Signals are named a to k, output z. Internal wire <strong>h</strong> has a red dot and <em>s-a-0.</em> Next to NAND output j: <strong>0(1)</strong>; next to output z: <strong>1(0)</strong>, with arrows pointing at <em>Good value</em> (yellow) and <em>Faulty value</em> (red). So the notation is <strong>"good (faulty)."</strong></p>
+  <p lang="ko">따라가 보자. a = 1, b = 0. a는 c, d로, b는 e, f로 갈라진다. 첫 NAND(d, e) = NAND(1, 0) = 1 = g이고, g가 h와 i로 갈라진다. 위 NAND(c, h): 정상이면 NAND(1, 1) = <strong>0</strong>, h가 0에 붙어 있으면 NAND(1, 0) = <strong>1</strong>. 그래서 j = 0(1). 아래 NAND(i, f) = NAND(1, 0) = 1 = k. 마지막 NAND(j, k): 정상 NAND(0, 1) = <strong>1</strong>, 고장 NAND(1, 1) = <strong>0</strong>. 그래서 z = 1(0). <strong>출력이 다르므로 이 입력 벡터로 h s-a-0을 잡아낼 수 있다.</strong></p>
+  <p lang="en">Trace it. a = 1, b = 0; a fans out to c and d, b to e and f. The first NAND(d, e) = NAND(1, 0) = 1 = g, which fans out to h and i. The upper NAND(c, h): healthy, NAND(1, 1) = <strong>0</strong>; with h stuck at 0, NAND(1, 0) = <strong>1</strong>. Hence j = 0(1). The lower NAND(i, f) = NAND(1, 0) = 1 = k. The final NAND(j, k): healthy NAND(0, 1) = <strong>1</strong>, faulty NAND(1, 1) = <strong>0</strong>. Hence z = 1(0). <strong>The outputs differ, so this input vector detects h s-a-0.</strong></p>
+  <p lang="ko">이 예제에 테스트 생성의 두 단계가 다 들어 있다(보충). <strong>활성화(activation)</strong>: 고장 지점을 고장값의 반대로 몰아야 한다. h s-a-0을 보려면 정상일 때 h = 1이어야 하므로 g = 1이 되게 a, b를 고른다. <strong>전파(propagation)</strong>: 그 차이가 출력까지 가려면 가는 길의 게이트가 막지 않아야 한다. NAND는 다른 입력이 0이면 출력이 1로 고정되므로, c = 1, k = 1이 필요하다. 이 두 조건을 자동으로 푸는 것이 ATPG(Automatic Test Pattern Generation)다.</p>
+  <p lang="en">The example holds both steps of test generation (supplementary). <strong>Activation</strong>: drive the fault site to the opposite of the stuck value. To see h s-a-0, h must be 1 when healthy, so pick a, b making g = 1. <strong>Propagation</strong>: the difference must reach an output without being masked. A NAND with any other input at 0 is stuck at 1, so c = 1 and k = 1 are needed. Solving both automatically is ATPG (Automatic Test Pattern Generation).</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · stuck-at fault (s-a-0 / s-a-1)</span><span lang="en">Unpacking the jargon · stuck-at fault (s-a-0 / s-a-1)</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>stuck-at-0 / stuck-at-1 fault <span lang="ko">(s-a-0, s-a-1로 줄여 쓴다)</span><span lang="en">(abbreviated s-a-0, s-a-1)</span></td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">회로의 선(net) 하나가 입력과 상관없이 <strong>항상 0 또는 항상 1</strong>인 것처럼 동작한다고 보는 <strong>고장 모델</strong></span><span lang="en">a <strong>fault model</strong> that treats one wire (net) as <strong>always 0 or always 1</strong> regardless of its inputs</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">제조 테스트 패턴을 만들고, 그 패턴이 고장을 몇 % 잡는지(fault coverage)를 잴 때. 그리고 이 강의처럼 <strong>netlist에 고장을 일부러 심어(fault injection)</strong> 영향을 시뮬레이션할 때</span><span lang="en">when generating manufacturing test patterns and measuring what share of faults they catch (fault coverage), and, as in this lecture, when <strong>planting faults in a netlist (fault injection)</strong> to simulate their effect</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">DFT(Design for Test)와 테스트 엔지니어. VTS, ITC 같은 테스트 학회의 기본 언어다</span><span lang="en">DFT (design-for-test) and test engineers; the basic language of test venues like VTS and ITC</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko"><strong>모델이지 실제 물리가 아니다.</strong> 실제 결함은 단락, 개방, 지연 증가 등 다양하지만, "선 하나가 0이나 1에 붙었다"로 근사하면 대부분의 결함을 잡는 테스트가 나온다는 경험칙 위에 서 있다(보충). 그리고 <strong>"stuck-at-0"은 출력이 0이라는 뜻이지 값이 0인 MAC이라는 뜻이 아니다.</strong> 24비트 psum의 한 비트가 0에 붙는 것이다</span><span lang="en"><strong>It's a model, not the physics.</strong> Real defects are shorts, opens, extra delay and more, but approximating them as "a wire stuck at 0 or 1" yields tests that catch most of them, by long experience (supplementary). Also, <strong>"stuck-at-0" means one wire reads 0, not that the MAC outputs zero</strong>: one bit of a 24-bit psum is pinned</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3><span lang="ko">왼쪽: 고장 MAC 몇 개면 무너지나</span><span lang="en">Left: how many faulty MACs it takes</span></h3>
+  <p lang="ko">그래프 제목 <em>Gate-level fault injection on a 256 X 256 SA</em>. 가로축 <em>Number of Faulty MACs</em> 0~64(눈금 8 간격), 세로축 <em>Classification Accuracy (%)</em> −20~100. 빨강 <strong>MNIST</strong>, 파랑 <strong>TIMIT</strong>, 둘 다 오차 막대가 있다. 그래프 위에 5×5 MAC 격자 만화가 반투명으로 겹쳐 있고, 몇 칸에 빨간 번개(<em>Stuck-at-faults</em>)가 있으며, 번개 셋이 몰린 맨 왼쪽 열 아래쪽을 검은 타원이 감쌌다. 그 위에 굵게 <em>Fault Rate: 0.012%</em>.</p>
+  <p lang="en">Plot title: <em>Gate-level fault injection on a 256 X 256 SA.</em> X axis <em>Number of Faulty MACs</em>, 0 to 64 (ticks every 8); Y axis <em>Classification Accuracy (%)</em>, −20 to 100. Red is <strong>MNIST</strong>, blue <strong>TIMIT</strong>, both with error bars. A translucent cartoon 5×5 MAC grid is overlaid, with red lightning bolts (<em>Stuck-at-faults</em>) in some cells and a black ellipse wrapping the lower part of the leftmost column where three bolts cluster. Above it, in bold: <em>Fault Rate: 0.012%.</em></p>
+  <p lang="ko">눈으로 읽은 곡선은 이렇다(오차 막대가 커서 대략값이다). <strong>MNIST</strong>는 0개에서 약 98%, 4개에서 약 83%, 8개에서 약 63%, 32개에서 약 20%, 64개에서 약 11%. <strong>TIMIT</strong>은 0개에서 약 74%, 4개에서 약 40%, 8개에서 약 47%(오차 막대 35~58), 16개에서 <strong>약 4%로 바닥</strong>, 그 뒤로는 3% 근처에 붙어 있다. 원 논문 본문의 숫자는 TIMIT이 <strong>MAC 4개(약 0.005%)만 고장 나도 74.13%에서 39.69%로</strong> 떨어진다는 것이다(보충).</p>
+  <p lang="en">Reading the curves by eye (the error bars are wide, so these are approximate): <strong>MNIST</strong> is about 98% at zero, ~83% at 4, ~63% at 8, ~20% at 32, ~11% at 64. <strong>TIMIT</strong> is about 74% at zero, ~40% at 4, ~47% at 8 (error bar 35-58), <strong>~4% at 16, the floor</strong>, then clings near 3%. The paper's text gives the number: with <strong>just 4 faulty MACs (about 0.005%), TIMIT drops from 74.13% to 39.69%</strong> (supplementary).</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 0.012%는 몇 개인가</div>
+    <div class="cap" lang="en">Sense of scale · how many is 0.012%</div>
+    <table>
+      <tr class="base"><td class="what"><span lang="ko">256×256 배열</span><span lang="en">256×256 array</span></td><td class="num">65,536 MAC</td>
+          <td><span lang="ko">기준점</span><span lang="en">reference</span></td></tr>
+      <tr><td class="what"><span lang="ko">슬라이드의 0.012%</span><span lang="en">the slide's 0.012%</span></td><td class="num">8 / 65,536 = 0.0122%</td>
+          <td><span lang="ko"><strong>MAC 8개.</strong> 5쪽 산포도도 원 논문에서 "고장 MAC 8개"로 표기된 그림이다(보충)</span><span lang="en"><strong>8 MACs.</strong> The page-5 scatter is labelled "8 faulty MACs" in the paper (supplementary)</span></td></tr>
+      <tr><td class="what"><span lang="ko">논문 초록의 0.006%</span><span lang="en">the abstract's 0.006%</span></td><td class="num">4 / 65,536 = 0.0061%</td>
+          <td><span lang="ko"><strong>MAC 4개.</strong> 슬라이드와 숫자가 다른 이유가 이것이다. 둘 다 맞고 가리키는 점이 다르다</span><span lang="en"><strong>4 MACs.</strong> That's why the slide and the paper differ: both are right, they point at different dots</span></td></tr>
+      <tr><td class="what"><span lang="ko">4K 화면의 0.012%</span><span lang="en">0.012% of a 4K screen</span></td><td class="num">≈ 1,000 px / 8.3M</td>
+          <td><span lang="ko">죽은 픽셀 천 개짜리 모니터는 그래도 볼 만하다. <strong>systolic array는 같은 비율에서 못 쓰게 된다.</strong> 픽셀은 혼자 망가지지만 MAC은 열 전체를 끌고 간다</span><span lang="en">a monitor with a thousand dead pixels is still watchable; <strong>a systolic array at the same rate is not.</strong> A pixel fails alone; a MAC drags its whole column down</span></td></tr>
+    </table>
+  </div>
+
+  <p lang="ko">강사가 이 그래프에 만화 격자를 겹친 이유는 2번 절 그림과 같다. <strong>타원이 감싼 것이 열</strong>이다. 고장은 MAC 단위로 생기지만 피해는 열 단위로 난다. 그래서 0.012%라는 작은 숫자가 정확도를 반 토막 낸다.</p>
+  <p lang="en">The cartoon grid is overlaid for the same reason as section 2's figure: <strong>the ellipse wraps a column.</strong> Faults happen per MAC, but damage happens per column, which is how a number as small as 0.012% halves accuracy.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">영구 고장 vs 일시 고장(soft error)</h4>
+    <h4 lang="en">Permanent faults versus transient faults (soft errors)</h4>
+    <p lang="ko">구별 기준은 <strong>"다음 번에도 같은 자리에서 틀리는가"</strong>다. <strong>영구(permanent, hard)</strong> 고장은 제조 결함이나 노화로 생기고 칩이 살아 있는 한 그대로다. <strong>일시(transient, soft)</strong> 고장은 우주선 중성자나 알파 입자가 플립플롭 하나를 한 번 뒤집는 식이라 다음 사이클엔 사라진다. 그 사이에 <strong>간헐(intermittent)</strong> 고장도 있다(특정 전압·온도에서만). 원 논문은 "일시 고장은 분류 결과에 가끔 영향을 줄 뿐 전체 정확도 영향은 작다. <strong>영구 고장은 매 실행에 영향을 준다</strong>"며 영구 고장만 다룬다(보충). <strong>이 강의의 해법(fault map을 한 번 만들어 두고 쓰는 것)은 일시 고장에는 통하지 않는다.</strong> 고장 위치가 미리 안 정해져 있기 때문이다.</p>
+    <p lang="en">The test is <strong>"will it be wrong in the same place next time?"</strong> A <strong>permanent (hard)</strong> fault comes from a defect or aging and stays as long as the chip lives. A <strong>transient (soft)</strong> fault is a cosmic-ray neutron or alpha particle flipping one flip-flop once; it's gone next cycle. In between sit <strong>intermittent</strong> faults (only at certain voltages or temperatures). The paper argues that transient faults only occasionally change a classification and barely move overall accuracy, while <strong>permanent faults hit every execution</strong>, and it treats only the latter (supplementary). <strong>This lecture's fix, building a fault map once and reusing it, does nothing for transient faults</strong>: their location isn't known in advance.</p>
+    <h4 lang="ko">"fault rate"는 MAC의 비율이다</h4>
+    <h4 lang="en">"Fault rate" is a share of MACs</h4>
+    <p lang="ko">이 덱의 fault rate는 <strong>고장 난 MAC의 비율</strong>이다(13쪽 가로축이 <em>Percentage of Faulty MACs</em>). 게이트당 고장 확률도, 추론 한 번이 틀릴 확률도 아니다. MAC 하나에는 게이트가 수백 개 있으므로, 같은 "1%"라도 무엇의 1%인지에 따라 결함 밀도가 수백 배 다르다.</p>
+    <p lang="en">This deck's fault rate is <strong>the share of MACs that are faulty</strong> (page 13's x axis reads <em>Percentage of Faulty MACs</em>). It is not a per-gate fault probability, nor the probability an inference goes wrong. A MAC holds hundreds of gates, so "1%" of different things implies defect densities hundreds of times apart.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head" data-slide="5"><span class="sec-num">04</span><h2 lang="ko">고장이 activation을 어떻게 망가뜨리나</h2><h2 lang="en">How a fault wrecks activations</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Permanent Fault Impact on DNN Activations</em>. 산포도 하나와 질문 하나: <em>How to mitigate the fault impact?</em></p>
+  <p class="sec-sub" lang="en">Titled <em>Permanent Fault Impact on DNN Activations.</em> One scatter plot and one question: <em>How to mitigate the fault impact?</em></p>
+
+  <p lang="ko">가로축 <em>Layer 3 Golden Activation</em>(고장 없는 정답값), 세로축 <em>Layer 3 Faulty Activation</em>(고장 칩에서 나온 값), 둘 다 0~25. 원점에서 오른쪽 위로 <strong>검은 대각선</strong> <span class="m"><i>y</i> = <i>x</i></span>가 그어져 있다. 고장이 없으면 모든 점이 이 선 위에 있어야 한다. 위에 <em>TIMIT</em>, <em>Fault Rate: 0.012%</em>.</p>
+  <p lang="en">X axis <em>Layer 3 Golden Activation</em> (the fault-free value), Y axis <em>Layer 3 Faulty Activation</em> (the value from the faulty chip), both 0 to 25. A <strong>black diagonal</strong> <span class="m"><i>y</i> = <i>x</i></span> runs from the origin up and right; with no faults every dot would sit on it. Labels: <em>TIMIT</em>, <em>Fault Rate: 0.012%.</em></p>
+  <p lang="ko">파란 점들이 선 위에 거의 없다. 세 무리로 나뉜다.</p>
+  <p lang="en">Almost no blue dots are on the line. They fall into three groups:</p>
+  <ul lang="ko">
+    <li><strong>세로축 위(가로 0)</strong>: 정답은 0인데 고장 값은 0~26 전 구간. 점이 촘촘한 기둥을 이룬다. <strong>꺼져 있어야 할 뉴런이 켜졌다.</strong></li>
+    <li><strong>빨간 상자</strong>(가로 약 1~4, 세로 약 7~26, 노란 바탕): 정답은 작은데 고장 값이 대각선보다 <strong>훨씬 위</strong>. 강사가 상자로 강조한 무리다.</li>
+    <li><strong>가로축 위(세로 0)</strong>: 정답은 1~10인데 고장 값은 0. <strong>켜져 있어야 할 뉴런이 꺼졌다.</strong></li>
+  </ul>
+  <ul lang="en">
+    <li><strong>On the y axis (x = 0)</strong>: the true value is 0, but faulty values span 0 to 26 in a dense column. <strong>Neurons that should be off turned on.</strong></li>
+    <li><strong>The red box</strong> (x about 1-4, y about 7-26, yellow fill): small true values, faulty values <strong>far above</strong> the diagonal. The group the instructor boxed.</li>
+    <li><strong>On the x axis (y = 0)</strong>: true values 1 to 10, faulty value 0. <strong>Neurons that should be on turned off.</strong></li>
+  </ul>
+  <p lang="ko">대각선 아래쪽 오른편에는 점이 거의 없다. <strong>틀린 값이 정답보다 작게 틀리는 경우는 드물고, 크게 틀린다.</strong> 원 논문의 설명이 바로 이것이다. "stuck-at fault는 MAC 출력의 <strong>상위 비트</strong>에 자주 걸려서 행렬-벡터 곱에 큰 절대 오차를 만든다"(보충). 가로축 위의 점들(0으로 꺼진 뉴런)은 크게 음수로 틀린 값이 ReLU에서 0으로 잘린 것으로 읽을 수 있다(이건 이 노트의 해석이다. 슬라이드는 activation 함수를 밝히지 않는다).</p>
+  <p lang="en">The lower right of the diagonal is nearly empty. <strong>Wrong values are rarely smaller than the truth; they're much bigger.</strong> The paper says exactly this: stuck-at faults frequently hit the <strong>higher-order bits</strong> of the MAC output, causing large absolute errors in the matrix-vector product (supplementary). The dots on the x axis (neurons forced to 0) read naturally as values pushed hugely negative and then clipped to 0 by a ReLU (this note's interpretation; the slide doesn't name the activation function).</p>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 24비트 psum의 한 비트가 틀리면</div>
+    <div class="cap" lang="en">Sense of scale · one wrong bit in a 24-bit psum</div>
+    <table>
+      <tr class="base"><td class="what"><span lang="ko">8b × 8b 곱 하나의 최대 크기</span><span lang="en">largest 8b × 8b product</span></td><td class="num">127 × 127 = 16,129</td>
+          <td><span lang="ko">부호 있는 INT8 기준. 정상적인 psum 증분의 상한</span><span lang="en">for signed INT8: the ceiling on a healthy psum increment</span></td></tr>
+      <tr><td class="what"><span lang="ko">0번 비트 고장</span><span lang="en">bit 0 stuck</span></td><td class="num">± 1</td>
+          <td><span lang="ko">반올림 오차 수준. 거의 무해</span><span lang="en">rounding-noise level, nearly harmless</span></td></tr>
+      <tr><td class="what"><span lang="ko">8번 비트 고장</span><span lang="en">bit 8 stuck</span></td><td class="num">± 256</td>
+          <td><span lang="ko">곱 하나의 1.6%</span><span lang="en">1.6% of one product</span></td></tr>
+      <tr><td class="what"><span lang="ko">16번 비트 고장</span><span lang="en">bit 16 stuck</span></td><td class="num">± 65,536</td>
+          <td><span lang="ko">최대 곱 <strong>네 개</strong>를 합친 것보다 크다</span><span lang="en">more than <strong>four</strong> maximal products combined</span></td></tr>
+      <tr><td class="what"><span lang="ko">23번 비트(MSB) 고장</span><span lang="en">bit 23 (MSB) stuck</span></td><td class="num">± 8,388,608</td>
+          <td><span lang="ko">2의 보수라면 <strong>부호가 뒤집힌다.</strong> 최대 곱 520개어치. 사실상 아무 값이나 된다</span><span lang="en">in two's complement this <strong>flips the sign</strong>: worth 520 maximal products, effectively any value at all</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">비트 폭(8, 16, 24)은 2쪽 MAC 그림의 숫자다. 2의 보수와 부호 있는 INT8은 이 표를 위한 가정이다(슬라이드는 표현 방식을 밝히지 않는다). 24비트 중 위쪽 절반 아무 데나 걸리면 그 열의 출력은 쓸모가 없어진다.</div>
+    <div class="foot" lang="en">The bit widths (8, 16, 24) come from page 2's MAC figure. Two's complement and signed INT8 are assumptions made for this table (the slide doesn't say). A fault anywhere in the upper half of the 24 bits makes that column's outputs useless.</div>
+  </div>
+
+  <div class="callout" lang="ko">
+    <strong>"DNN은 오류에 강하다"는 말이 여기서 반만 맞는다.</strong> ECE 479 Lec12에서 본 quantization과 pruning은 DNN이 <strong>작은 오차를 넓게</strong> 흡수한다는 데 기댄다. INT8로 반올림하면 모든 값이 조금씩 틀린다. 그런데 stuck-at은 정반대 모양이다. <strong>소수의 값이 크게</strong> 틀린다. 원 논문도 "DNN이 본래 오류에 강하니 영구 고장을 그냥 무시하자"는 선행 연구의 가정을 이 실험으로 반박하며 시작한다(보충). <strong>오차의 크기가 아니라 분포의 모양이 문제다.</strong> 그래서 해법도 "틀린 값을 그대로 두고 견디기"가 아니라 <strong>"틀린 값을 0으로 바꾸기"</strong>가 된다. 0은 크게 틀린 값보다 훨씬 덜 틀린 값이다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>"DNNs are error-tolerant" is only half true here.</strong> The quantization and pruning of ECE 479 lecture 12 rely on a DNN absorbing <strong>small errors spread widely</strong>: rounding to INT8 makes every value a little wrong. A stuck-at fault is the opposite shape: <strong>a few values wildly wrong.</strong> The paper opens by refuting, with this very experiment, prior work's assumption that inherent resilience lets you simply ignore permanent faults (supplementary). <strong>The problem is the shape of the error distribution, not its size.</strong> So the fix isn't "leave the wrong values and cope" but <strong>"turn the wrong values into zero."</strong> Zero is far less wrong than a wildly wrong value.
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">psum 24비트 중 하나가 고장 날 자리가 균등하게 무작위라고 하자. 위 표의 기준(16번 비트 이상이면 "출력 폐기 수준")으로, 고장 MAC 하나가 그 열을 못 쓰게 만들 확률은? 그리고 TIMIT 곡선이 MAC 16개에서 바닥을 치는 것과 어떻게 이어지나?</p>
+    <p lang="en">Suppose the stuck bit is uniformly random among the psum's 24 bits. By the table's yardstick (bit 16 or higher means "output unusable"), what's the chance one faulty MAC ruins its column? How does that tie to TIMIT bottoming out at 16 faulty MACs?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <div class="body">
+        <p lang="ko">16~23번 비트 8개 / 24개 = <strong>1/3</strong>. 고장 MAC 16개면 기대값으로 <strong>열 5개 이상</strong>이 쓸모없는 값을 낸다. 한 층의 출력 뉴런 몇 개가 엉뚱하게 큰 값을 내면 다음 층에서 그 값이 모든 뉴런으로 퍼진다(FC는 모든 입력이 모든 출력에 연결된다). 층이 넷인 TIMIT 망에서 그게 겹치면 바닥까지 가는 데 많은 열이 필요 없다. 다만 실제 netlist에서 고장 자리는 비트에 균등하지 않다(곱셈기 내부, 덧셈기 carry 체인 등). 이건 모양을 잡기 위한 어림이다.</p>
+        <p lang="en">8 bits (16 to 23) out of 24 = <strong>1/3.</strong> With 16 faulty MACs you'd expect <strong>five or more columns</strong> emitting garbage. A few output neurons with absurdly large values in one layer spread to every neuron of the next (in an FC layer every input feeds every output). Stack that over the four-layer TIMIT network and it doesn't take many columns to hit the floor. In a real netlist, fault sites aren't uniform over bits (multiplier internals, the adder's carry chain), so this is a rough shape, not a prediction.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head" data-slide="6"><span class="sec-num">05</span><h2 lang="ko">cross-layer co-design</h2><h2 lang="en">Cross-layer co-design</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Fault-tolerant Systolic Array Design</em>. 띠 <strong><em>Cross-layer Hardware/Software Co-design for Fault-tolerance</em></strong>. 그림 셋: 왼쪽 DNN, 가운데 보라 상자 속 삼각형, 오른쪽 TPU 보드 사진.</p>
+  <p class="sec-sub" lang="en">Titled <em>Fault-tolerant Systolic Array Design.</em> Banner: <strong><em>Cross-layer Hardware/Software Co-design for Fault-tolerance.</em></strong> Three pictures: a DNN on the left, a triangle in a purple box in the middle, a TPU board photo on the right.</p>
+
+  <p lang="ko">왼쪽은 층 1부터 층 L까지의 완전 연결 망이다. 입력 <em>a<sup>0</sup><sub>11</sub>, a<sup>0</sup><sub>21</sub>, a<sup>0</sup><sub>31</sub></em>이 빨간 노드 셋(<em>N<sup>0</sup></em>)으로 들어가고, weight <em>w<sup>1</sup><sub>11</sub></em> 등을 거쳐 파란 노드 <em>y<sup>1</sup><sub>11</sub> … y<sup>1</sup><sub>N<sup>1</sup>1</sub></em>(<em>N<sup>1</sup></em>), 점점점 뒤에 <em>N<sup>L−1</sup></em>, 마지막 초록 노드 둘(<em>N<sup>L</sup></em>)이 있다. 원 논문 Figure 1a와 같은 그림이다(보충). 가운데 보라 상자에는 파란 삼각형의 세 꼭짓점에 <strong><em>Fault-tolerance</em>(위), <em>Classification Accuracy</em>(왼쪽 아래), <em>Performance/Area Overheads</em>(오른쪽 아래)</strong>가 있고, 밑에 노란 글씨 <em>Hardware/Software Co-design</em>. 오른쪽은 방열판을 얹은 초록 PCB 사진으로 TPU 보드로 보인다.</p>
+  <p lang="en">On the left, a fully connected network from layer 1 to layer L: inputs <em>a<sup>0</sup><sub>11</sub>, a<sup>0</sup><sub>21</sub>, a<sup>0</sup><sub>31</sub></em> into three red nodes (<em>N<sup>0</sup></em>), through weights like <em>w<sup>1</sup><sub>11</sub></em> to blue nodes <em>y<sup>1</sup><sub>11</sub> … y<sup>1</sup><sub>N<sup>1</sup>1</sub></em> (<em>N<sup>1</sup></em>), dots, <em>N<sup>L−1</sup></em>, and two green output nodes (<em>N<sup>L</sup></em>). It's Figure 1a of the paper (supplementary). The purple box holds a blue triangle with <strong><em>Fault-tolerance</em> at the top, <em>Classification Accuracy</em> bottom left, <em>Performance/Area Overheads</em> bottom right</strong>, and <em>Hardware/Software Co-design</em> in yellow underneath. On the right, a green PCB with a heatsink, apparently a TPU board.</p>
+  <p lang="ko">삼각형이 말하는 것은 <strong>셋을 동시에 만족시켜야 한다</strong>는 것이다. 고장을 견디되(위), 정확도를 잃지 않고(왼쪽), 성능과 면적을 크게 쓰지 않는다(오른쪽). 어느 한 꼭짓점만 보면 쉬운 답이 있다. 그게 아래 표다.</p>
+  <p lang="en">The triangle says <strong>all three must hold at once</strong>: tolerate faults (top) without losing accuracy (left) or spending much performance and area (right). Looking at one corner alone, each has an easy answer, as the table below shows.</p>
+
+  <h3><span lang="ko">고전적인 해법들과 그 대가 (보충)</span><span lang="en">The classic fixes and what they cost (supplementary)</span></h3>
+  <p lang="ko">슬라이드는 기존 방법을 나열하지 않는다. 원 논문 2절(Related Work)이 정리한 것을 바탕으로, 이 분야를 처음 보는 입장에서 지도를 그려 둔다.</p>
+  <p lang="en">The slides don't list the prior art. Based on the paper's section 2 (related work), here's a map for someone new to the field:</p>
+  <table>
+    <thead><tr>
+      <th lang="ko">방법</th><th lang="ko">하는 일</th><th lang="ko">삼각형에서 무엇을 잃나</th>
+      <th lang="en">Method</th><th lang="en">What it does</th><th lang="en">Which corner it gives up</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">버리기 (binning)</td><td lang="ko">테스트에서 고장이 하나라도 나오면 칩을 폐기</td><td lang="ko"><span class="cCost">yield</span>. 큰 배열일수록 지수적으로 나빠진다(3번 절)</td>
+          <td lang="en">Discard (binning)</td><td lang="en">scrap any chip that fails test</td><td lang="en"><span class="cCost">yield</span>, exponentially worse for big arrays (section 3)</td></tr>
+      <tr><td lang="ko">ECC</td><td lang="ko">메모리에 검사 비트를 붙여 비트 오류를 고친다</td><td lang="ko">메모리에는 잘 맞지만 <strong>연산 datapath에는 직접 안 맞는다.</strong> 원 논문도 메모리 고장은 ECC로 처리된다고 보고 datapath만 다룬다</td>
+          <td lang="en">ECC</td><td lang="en">add check bits to memory and correct bit errors</td><td lang="en">fits memory well but <strong>doesn't apply directly to a compute datapath</strong>; the paper assumes memory faults are ECC's job and studies only the datapath</td></tr>
+      <tr><td lang="ko">중복 (TMR 등)</td><td lang="ko">같은 회로를 여러 벌 두고 다수결</td><td lang="ko"><span class="cCost">면적·전력 2~3배</span>. 가속기의 존재 이유(효율)를 정면으로 깎는다</td>
+          <td lang="en">Redundancy (TMR etc.)</td><td lang="en">replicate the circuit and vote</td><td lang="en"><span class="cCost">2-3x area and power</span>, attacking the accelerator's whole reason to exist (efficiency)</td></tr>
+      <tr><td lang="ko">행/열 제거 (Kung 계열)</td><td lang="ko">고장 PE가 있는 행이나 열을 통째로 건너뛰어, 더 작은 정상 배열로 쓴다</td><td lang="ko"><span class="cCost">성능</span>. 고장 하나마다 열 하나(256 MAC)를 잃는다. PE 안에 우회 경로와 추가 레지스터도 필요하다</td>
+          <td lang="en">Row/column elimination (Kung line)</td><td lang="en">skip any row or column holding a faulty PE, running as a smaller healthy array</td><td lang="en"><span class="cCost">performance</span>: each fault costs a whole column (256 MACs), plus bypass paths and extra registers in every PE</td></tr>
+      <tr><td lang="ko">무시하기</td><td lang="ko">DNN이 알아서 견디길 기대</td><td lang="ko"><span class="cCost">정확도</span>. 4-5쪽이 이게 안 된다는 증거다</td>
+          <td lang="en">Ignore it</td><td lang="en">hope the DNN copes</td><td lang="en"><span class="cCost">accuracy</span>; pages 4-5 are the evidence it fails</td></tr>
+      <tr><td lang="ko"><strong>FAP / FAP+T</strong></td><td lang="ko">고장 MAC 하나만 건너뛰고, 그 자리의 weight를 0으로 보고 망을 맞춘다</td><td lang="ko"><span class="cGain">실행 시간 추가 0</span>, bypass 면적 약 9%(보충), 정확도 손실은 재학습으로 줄인다</td>
+          <td lang="en"><strong>FAP / FAP+T</strong></td><td lang="en">skip only the faulty MAC, treat its weights as zero and adapt the network</td><td lang="en"><span class="cGain">zero run-time overhead</span>, about 9% bypass area (supplementary), accuracy loss shrunk by retraining</td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">행/열 제거의 원조는 H. T. Kung과 M. Lam의 CMU 기술 보고서 <em>Fault-Tolerance and Two-Level Pipelining in VLSI Systolic Arrays</em>(1983)이고, J. H. Kim과 S. M. Reddy의 <em>On the Design of Fault-Tolerant Two-Dimensional Systolic Arrays for Yield Enhancement</em>(IEEE Transactions on Computers, 1989)가 이를 yield 향상 쪽으로 다듬었다(보충, 원 논문 참고문헌 [26], [27]). systolic array라는 이름을 만든 Kung이 <strong>처음부터 고장 문제를 같이 생각했다</strong>는 게 흥미로운 지점이다.</p>
+  <p lang="en">Row/column elimination goes back to H. T. Kung and M. Lam's CMU technical report <em>Fault-Tolerance and Two-Level Pipelining in VLSI Systolic Arrays</em> (1983), refined toward yield by J. H. Kim and S. M. Reddy, <em>On the Design of Fault-Tolerant Two-Dimensional Systolic Arrays for Yield Enhancement</em> (IEEE Transactions on Computers, 1989) (supplementary; the paper's references [26] and [27]). It's telling that Kung, who coined "systolic array," <strong>was thinking about faults from the start.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">application-agnostic vs application-aware</h4>
+    <h4 lang="en">Application-agnostic versus application-aware</h4>
+    <p lang="ko">원 논문이 기존 방법과 자기 방법을 가르는 기준이 이것이다(보충). <strong>기존 방법은 모두 "원래 계산을 정확히 해낸다"를 목표로 한다</strong>(application-agnostic). 어떤 프로그램이 돌든 같은 답이 나와야 한다. <strong>FAP는 원래 계산을 포기한다.</strong> 고장 칩은 원래 DNN이 아니라 <strong>weight 일부가 0인 다른 DNN</strong>을 돌린다(application-aware). 그게 허용되는 건 DNN의 목표가 "정확한 행렬 곱"이 아니라 "정확한 분류"이기 때문이다. <strong>"cross-layer"의 진짜 뜻은 하드웨어가 지켜야 할 약속을 위층의 목표(정확도)로 바꿔 잡는다는 것</strong>이다. 같은 칩에서 암호 연산을 돌린다면 이 해법은 쓸 수 없다.</p>
+    <p lang="en">This is the paper's dividing line between prior work and its own (supplementary). <strong>Every prior method aims to "compute the original thing exactly"</strong> (application-agnostic): whatever program runs, the answer must match. <strong>FAP gives up on the original computation.</strong> A faulty chip runs <strong>a different DNN with some weights zeroed</strong>, not the original (application-aware). That's allowed because a DNN's goal is a correct classification, not a correct matrix product. <strong>"Cross-layer" really means swapping the hardware's promise for the upper layer's goal (accuracy).</strong> Run cryptography on the same chip and this fix is off the table.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head" data-slide="7"><span class="sec-num">06</span><h2 lang="ko">Fault-Aware Pruning과 bypass</h2><h2 lang="en">Fault-aware pruning and the bypass</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Fault-Aware Pruning (FAP)</em>, 오른쪽 위 초록 <em>[VTS'18, Best Paper Award Nom.]</em>. 위 줄은 알고리즘(고장 MAC → 잘린 DNN), 아래 상자는 그걸 가능하게 하는 하드웨어다.</p>
+  <p class="sec-sub" lang="en">Titled <em>Fault-Aware Pruning (FAP)</em>, with a green <em>[VTS'18, Best Paper Award Nom.]</em> at the top right. The upper row is the algorithm (faulty MACs → pruned DNN); the box below is the hardware that makes it possible.</p>
+
+  <h3><span lang="ko">위 줄: 고장 지도 → 정적 mapping → pruning</span><span lang="en">Top row: fault map → static mapping → pruning</span></h3>
+  <p lang="ko">왼쪽 상자 <strong><em>Scan-chain tests identify fault locations</em></strong>. 그 옆 5×5 격자 <em>Faulty MACs</em>: M 상자 25개 중 빨간 것이 9개(1행 1·5열, 2행 2열, 3행 5열, 4행 4·5열, 5행 1·2·5열)다. 굵은 화살표 <strong><em>Static Mapping</em></strong>을 지나 <em>Baseline DNN</em>(파란 노드 5-5-5, 모든 연결이 있고 일부 연결이 <strong>빨간 선</strong>)이 있고, 빨간 글씨 화살표 <strong><em>Fault-Aware Pruning</em></strong>을 지나면 <em>Pruned DNN</em>에서 빨간 선이 전부 사라졌다.</p>
+  <p lang="en">A box at left: <strong><em>Scan-chain tests identify fault locations.</em></strong> Beside it a 5×5 grid, <em>Faulty MACs</em>: 9 of 25 M boxes are red (row 1 cols 1 and 5, row 2 col 2, row 3 col 5, row 4 cols 4 and 5, row 5 cols 1, 2 and 5). A bold arrow, <strong><em>Static Mapping</em></strong>, leads to the <em>Baseline DNN</em> (blue nodes 5-5-5, fully connected, some connections drawn <strong>in red</strong>), and a red-lettered arrow, <strong><em>Fault-Aware Pruning</em></strong>, leads to the <em>Pruned DNN</em> with every red connection gone.</p>
+  <p lang="ko">이 그림의 논리는 한 줄이다. <strong>WS에서는 weight 하나가 정확히 한 MAC에 실린다.</strong> 원 논문은 이걸 "DNN weight와 MAC 사이에 <strong>정적 mapping</strong>이 있다"고 부르고, 함수로 적는다(보충).</p>
+  <p lang="en">The logic is one line: <strong>under WS, each weight lands on exactly one MAC.</strong> The paper calls this a <strong>static mapping</strong> between DNN weights and MACs and writes it as a function (supplementary):</p>
+  <div class="eq"><span class="m"><i>r</i>(<i>i</i>, <i>j</i>) = <i>j</i> mod <i>N</i>,&nbsp;&nbsp; <i>c</i>(<i>i</i>, <i>j</i>) = <i>i</i> mod <i>N</i></span><span class="note" lang="ko">FC 층 weight <i>w</i><sub><i>i</i>,<i>j</i></sub>가 올라가는 MAC의 행과 열 (원 논문 5절, 보충)</span><span class="note" lang="en">row and column of the MAC that FC weight <i>w</i><sub><i>i</i>,<i>j</i></sub> lands on (paper section 5, supplementary)</span></div>
+  <details class="nota" open>
+    <summary><span lang="ko">기호 뜯어보기 · 정적 mapping</span><span lang="en">Unpacking the notation · static mapping</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td class="m"><i>w</i><sub><i>i</i>,<i>j</i></sub></td><td><span lang="ko">FC 층의 weight 하나. 원 논문 표기로 <i>i</i>가 출력 뉴런, <i>j</i>가 입력 뉴런 (스칼라)</span><span lang="en">one FC weight; in the paper's notation <i>i</i> is the output neuron, <i>j</i> the input neuron (a scalar)</span></td></tr>
+        <tr><td class="m"><i>N</i></td><td><span lang="ko">배열 한 변의 MAC 수. 여기서는 256</span><span lang="en">MACs per side of the array; 256 here</span></td></tr>
+        <tr><td class="m">mod <i>N</i></td><td><span lang="ko">weight 행렬이 <span class="m"><i>N</i>×<i>N</i></span>보다 크면 <span class="m"><i>N</i>×<i>N</i></span> 블록으로 잘라 차례로 싣는다는 뜻. 그래서 <strong>MAC 하나에 여러 weight가 실린다</strong>(블록마다 하나씩)</span><span lang="en">a weight matrix bigger than <span class="m"><i>N</i>×<i>N</i></span> is cut into <span class="m"><i>N</i>×<i>N</i></span> blocks loaded in turn, so <strong>one MAC carries several weights</strong> (one per block)</span></td></tr>
+        <tr><td class="m"><i>r</i>, <i>c</i></td><td><span lang="ko">MAC의 행과 열. 고장 지도에서 (<i>r</i>, <i>c</i>)가 고장이면, 이 식을 거꾸로 풀어 거기 실리는 weight 전부를 0으로 만든다</span><span lang="en">the MAC's row and column. If (<i>r</i>, <i>c</i>) is faulty in the fault map, invert the formula and zero every weight that lands there</span></td></tr>
+      </table>
+      <p lang="ko">conv 층은 <strong>입력 채널을 행 방향으로, 출력 채널을 열 방향으로</strong> 싣는다(<span class="m"><i>r</i> = <i>k</i> mod <i>N</i></span>, <span class="m"><i>c</i> = <i>l</i> mod <i>N</i></span>, <i>k</i> 입력 채널, <i>l</i> 출력 채널). 이 선택이 7번 절의 BaseMap이고, 거기서 문제가 생긴다.</p>
+      <p lang="en">Conv layers put <strong>input channels along rows and output channels along columns</strong> (<span class="m"><i>r</i> = <i>k</i> mod <i>N</i></span>, <span class="m"><i>c</i> = <i>l</i> mod <i>N</i></span>, <i>k</i> the input channel, <i>l</i> the output channel). That choice is section 7's BaseMap, and it's where the trouble starts.</p>
+    </div>
+  </details>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · scan chain</span><span lang="en">Unpacking the jargon · scan chain</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>scan chain <span lang="ko">(scan test, scan design)</span><span lang="en">(scan test, scan design)</span></td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">테스트 모드에서 칩의 플립플롭들을 <strong>하나의 긴 shift register로 이어</strong>, 바깥에서 내부 상태를 직접 써넣고 읽어내게 만든 구조</span><span lang="en">a structure that, in test mode, <strong>strings the chip's flip-flops into one long shift register</strong> so internal state can be written and read directly from outside</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">출하 전 제조 테스트. 3번 절의 테스트 벡터를 내부 노드에 넣고, 결과를 빼내서 정상값과 비교한다. <strong>어느 MAC이 틀렸는지 위치까지</strong> 알아내는 게 이 강의의 전제다</span><span lang="en">post-fabrication test: shift section 3's test vectors into internal nodes, shift results out and compare against good values. This lecture assumes it reveals <strong>which MAC failed, by location</strong></span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">DFT 엔지니어가 합성 단계에서 넣는다. 대부분의 디지털 ASIC이 이미 갖고 있으므로 <strong>FAP를 위해 새로 만들 필요는 없다</strong></span><span lang="en">inserted by DFT engineers during synthesis. Most digital ASICs already have it, so <strong>FAP needs nothing new here</strong></span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko">systolic array의 "activation이 옆으로 흘러가는 것"도 shift지만 그건 <strong>정상 동작의 데이터 경로</strong>이고, scan chain은 <strong>테스트 모드에서만 켜지는 별도 경로</strong>다. 그리고 BIST(Built-In Self-Test)와도 다르다. BIST는 칩이 스스로 패턴을 만들어 검사하는 것이고, scan은 바깥 테스터가 패턴을 넣는다(보충)</span><span lang="en">a systolic array's activations sliding sideways are also a shift, but that's <strong>the normal-mode datapath</strong>; the scan chain is <strong>a separate path live only in test mode.</strong> It also differs from BIST (built-in self-test), where the chip generates its own patterns; with scan, an external tester feeds them (supplementary)</span></td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3><span lang="ko">아래 상자: bypass 경로</span><span lang="en">Bottom box: the bypass path</span></h3>
+  <p lang="ko">검은 테두리 상자 속 5×5 격자(빨간 MAC 8개, 위와 배치가 다르다). 오른쪽에 주황 점선 확대 둘. 위 확대는 빨간 M(고장) 아래 주황 <strong>2:1 mux</strong>(입력 0과 1)이고 선택 신호가 빨간 <strong>1</strong>. 아래 확대는 흰 M(정상) 아래 같은 mux에 선택 신호 <strong>0</strong>. 오른쪽 글 <strong><em>Hardware Support: Bypass path enabled to skip faulty MACs</em></strong>.</p>
+  <p lang="en">A black-framed 5×5 grid (8 red MACs, arranged differently from above). On its right, two orange dashed zooms. The upper one shows a red M (faulty) above an orange <strong>2:1 mux</strong> (inputs 0 and 1) with select set to a red <strong>1</strong>; the lower shows a white M (healthy) above the same mux with select <strong>0</strong>. The text: <strong><em>Hardware Support: Bypass path enabled to skip faulty MACs.</em></strong></p>
+
+  <figure>
+    <svg viewBox="0 0 680 300" role="img" aria-label="MAC 하나에 bypass mux를 붙인 구조. fault bit가 1이면 위에서 온 partial sum을 MAC을 거치지 않고 그대로 아래로 보낸다">
+      <defs>
+        <marker id="l13ArB2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--brown)"/></marker>
+        <marker id="l13ArG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+      </defs>
+      <!-- psum in -->
+      <text class="svglab" x="200" y="22" text-anchor="middle" style="font-size:11px" fill="var(--brown)">psum_in (24b)</text>
+      <line x1="200" y1="30" x2="200" y2="62" stroke="var(--brown)" stroke-width="2" marker-end="url(#l13ArB2)"/>
+      <circle cx="200" cy="46" r="3.5" fill="var(--brown)"/>
+      <!-- bypass branch -->
+      <path d="M200,46 L340,46 L340,200" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-dasharray="6 4"/>
+      <line x1="340" y1="196" x2="340" y2="206" stroke="var(--green)" stroke-width="2.2" marker-end="url(#l13ArG)"/>
+      <text class="svglab" x="350" y="120" style="font-size:11px;font-weight:600" fill="var(--green)">bypass</text>
+      <!-- MAC box -->
+      <rect x="110" y="66" width="180" height="96" rx="7" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="2"/>
+      <text class="svglab" x="120" y="84" style="font-size:11px;font-weight:700" fill="var(--amber)" lang="ko">MAC (고장)</text>
+      <text class="svglab" x="120" y="84" style="font-size:11px;font-weight:700" fill="var(--amber)" lang="en">MAC (faulty)</text>
+      <circle cx="160" cy="118" r="16" fill="rgba(var(--violet-rgb),.14)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="160" y="123" text-anchor="middle" style="font-size:16px" fill="var(--violet)">×</text>
+      <circle cx="230" cy="118" r="16" fill="rgba(var(--violet-rgb),.14)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="230" y="123" text-anchor="middle" style="font-size:16px" fill="var(--violet)">+</text>
+      <line x1="176" y1="118" x2="212" y2="118" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgnum" x="194" y="112" text-anchor="middle" style="font-size:9px" fill="var(--ink2)">16b</text>
+      <text class="svglab" x="120" y="152" style="font-size:9.5px" fill="var(--blue)">w (8b)</text>
+      <text class="svglab" x="62" y="122" text-anchor="end" style="font-size:10px" fill="var(--brown)">a (8b)</text>
+      <line x1="66" y1="118" x2="142" y2="118" stroke="var(--brown)" stroke-width="1.4"/>
+      <line x1="230" y1="134" x2="230" y2="206" stroke="var(--amber)" stroke-width="2"/>
+      <text class="svgnum" x="238" y="184" style="font-size:9.5px" fill="var(--amber)">✗ 24b</text>
+      <!-- mux -->
+      <polygon points="200,210 370,210 345,242 225,242" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)" stroke-width="1.6"/>
+      <text class="svgnum" x="230" y="228" text-anchor="middle" style="font-size:12px" fill="var(--ink)">0</text>
+      <text class="svgnum" x="340" y="228" text-anchor="middle" style="font-size:12px" fill="var(--ink)">1</text>
+      <text class="svglab" x="285" y="231" text-anchor="middle" style="font-size:10px" fill="var(--violet)">mux</text>
+      <line x1="285" y1="242" x2="285" y2="276" stroke="var(--brown)" stroke-width="2" marker-end="url(#l13ArB2)"/>
+      <text class="svglab" x="295" y="270" style="font-size:11px" fill="var(--brown)">psum_out</text>
+      <!-- fault bit -->
+      <rect x="430" y="210" width="120" height="32" rx="5" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="490" y="231" text-anchor="middle" style="font-size:10.5px" fill="var(--brown)">fault bit = 1</text>
+      <line x1="430" y1="226" x2="362" y2="226" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#l13ArB2)"/>
+      <text class="svglab" x="490" y="258" text-anchor="middle" style="font-size:10px" fill="var(--ink3)" lang="ko">scan test가 채운다</text>
+      <text class="svglab" x="490" y="258" text-anchor="middle" style="font-size:10px" fill="var(--ink3)" lang="en">filled by scan test</text>
+      <!-- right notes -->
+      <text class="svglab" x="430" y="70" style="font-size:10.5px" fill="var(--ink2)" lang="ko">sel = 1: psum_out = psum_in</text>
+      <text class="svglab" x="430" y="70" style="font-size:10.5px" fill="var(--ink2)" lang="en">sel = 1: psum_out = psum_in</text>
+      <text class="svglab" x="430" y="88" style="font-size:10.5px" fill="var(--ink2)" lang="ko">= 이 MAC의 w를 0으로 둔 것</text>
+      <text class="svglab" x="430" y="88" style="font-size:10.5px" fill="var(--ink2)" lang="en">= this MAC's w set to 0</text>
+      <text class="svglab" x="430" y="118" style="font-size:10.5px" fill="var(--ink2)" lang="ko">sel = 0: 정상 MAC</text>
+      <text class="svglab" x="430" y="118" style="font-size:10.5px" fill="var(--ink2)" lang="en">sel = 0: normal MAC</text>
+      <text class="svglab" x="430" y="136" style="font-size:10.5px" fill="var(--ink2)" lang="ko">추가 사이클 0</text>
+      <text class="svglab" x="430" y="136" style="font-size:10.5px" fill="var(--ink2)" lang="en">zero extra cycles</text>
+    </svg>
+    <figcaption lang="ko">7쪽 아래 상자를 MAC 하나의 배선으로 풀었다(구조는 2쪽 MAC 그림과 원 논문 Figure 3을 따랐다). <span class="cMem">갈색</span>은 데이터, <span class="cHw">보라</span>는 연산기, <span class="cCost">주황</span>은 고장, <span class="cGain">초록</span>이 새로 깐 bypass 선이다. 고장 비트가 1이면 위에서 온 psum이 <strong>MAC을 거치지 않고</strong> 그대로 아래 MAC으로 간다. 그 열의 출력은 이 MAC의 곱 <span class="m"><i>w</i>·<i>a</i></span>만 빠진 합, 즉 <strong><span class="m"><i>w</i> = 0</span>일 때의 합</strong>과 정확히 같다. 스케줄은 그대로라 사이클이 하나도 늘지 않는다.</figcaption>
+    <figcaption lang="en">Page 7's bottom box unpacked into one MAC's wiring (structure follows page 2's MAC and the paper's Figure 3). <span class="cMem">Brown</span> is data, <span class="cHw">violet</span> compute, <span class="cCost">amber</span> the fault, <span class="cGain">green</span> the new bypass wire. With the fault bit at 1, the psum from above goes <strong>around the MAC</strong> straight down to the next. That column's output is the sum minus this MAC's product <span class="m"><i>w</i>·<i>a</i></span>, exactly <strong>the sum with <span class="m"><i>w</i> = 0</span></strong>. The schedule is unchanged, so not one cycle is added.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"그냥 weight 0을 실으면 되지 않나?" 안 된다</h4>
+    <h4 lang="en">"Why not just load a zero weight?" It doesn't work</h4>
+    <p lang="ko">원 논문이 한 줄로 못박은 것이다. "고장 MAC에 실제로 weight 0을 싣는 것은 그 weight를 0으로 놓는 것과 <strong>같지 않다</strong>"(보충). 고장이 곱셈기 안에 있으면 0을 실어도 곱이 0이 안 나올 수 있고, 고장이 <strong>덧셈기나 출력 레지스터</strong>에 있으면 곱이 0이어도 위에서 내려온 psum 자체가 망가진다. 2번 절 그림의 주황 화살표가 그 경우다. <strong>틀린 회로를 소프트웨어 값으로 달랠 수는 없고, 회로를 경로에서 빼야 한다.</strong> 그게 mux 하나의 일이다. 원 논문은 이 bypass의 면적 오버헤드를 <strong>약 9%</strong>로 보고한다(보충).</p>
+    <p lang="en">The paper nails this in one sentence: actually loading a zero weight into a faulty MAC is <strong>not equivalent</strong> to setting that weight to zero (supplementary). If the fault is in the multiplier, a zero weight may not yield a zero product; if it's in the <strong>adder or output register</strong>, even a zero product leaves the psum from above corrupted, which is the amber arrow in section 2's figure. <strong>You can't soothe a broken circuit with a software value; you have to take the circuit out of the path.</strong> That's the mux's job. The paper reports the bypass's area overhead as <strong>about 9%</strong> (supplementary).</p>
+    <h4 lang="ko">FAP는 보통 pruning과 정반대 방향이다</h4>
+    <h4 lang="en">FAP runs the opposite way from ordinary pruning</h4>
+    <p lang="ko">구별 기준은 <strong>"무엇을 자를지 누가 정하나"</strong>다. ECE 479 Lec12에서 본 magnitude pruning은 <strong>모델이 정한다.</strong> 크기가 작아서 잘라도 덜 아픈 weight를 고른다. 목적은 연산과 메모리를 <span class="cGain">줄이는 것</span>이다. FAP는 <strong>칩이 정한다.</strong> 고장 MAC에 걸린 weight라면 크기가 얼마든 자른다. 가장 중요한 weight일 수도 있다. 그리고 <strong>아무것도 줄지 않는다.</strong> bypass된 MAC도 그 사이클을 차지하고, 메모리에서 weight를 안 읽는 것도 아니다. FAP의 목적은 속도가 아니라 <strong>틀린 값을 덜 틀린 값(0)으로 바꾸는 것</strong>뿐이다. pruning이라는 단어를 같이 쓴다고 Deep Compression류 이득을 기대하면 안 된다.</p>
+    <p lang="en">The test is <strong>"who decides what gets cut."</strong> The magnitude pruning of ECE 479 lecture 12 lets <strong>the model decide</strong>: pick weights small enough to cut painlessly, in order to <span class="cGain">shrink</span> compute and memory. FAP lets <strong>the chip decide</strong>: any weight landing on a faulty MAC is cut whatever its magnitude, maybe the most important weight there is. And <strong>nothing shrinks.</strong> A bypassed MAC still occupies its cycle, and the weight isn't skipped in memory. FAP's only purpose is to <strong>turn a wrong value into a less wrong one (zero)</strong>, not speed. Sharing the word "pruning" doesn't mean you get Deep Compression-style savings.</p>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">TIMIT 망의 가운데 층은 2000 × 2000 FC다. 256×256 배열에 올리면 MAC 하나에 weight가 몇 개 실리나? MAC 8개가 고장이면 이 층 weight의 몇 %가 잘리나?</p>
+    <p lang="en">The TIMIT network's middle layer is a 2000 × 2000 FC. Mapped onto the 256×256 array, how many weights does one MAC carry? With 8 faulty MACs, what share of this layer's weights gets pruned?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <div class="body">
+        <p lang="ko">2000 = 7 × 256 + 208이므로 한 변이 <strong>블록 8개</strong>(마지막 블록은 208칸만 찬다). 행 인덱스 0~207의 MAC은 블록 8개, 208~255의 MAC은 7개를 받는다. 그래서 MAC 하나에 <strong>49~64개</strong>(7×7 ~ 8×8)의 weight가 실린다. 고장 8개면 최대 8 × 64 = 512개, 전체 4,000,000개 중 <strong>약 0.013%</strong>. <strong>잘리는 비율 ≈ 고장 MAC 비율</strong>이다. 블록이 배열을 고르게 덮는 한 이게 일반적으로 성립한다. 그러니 FAP가 잘라내는 양 자체는 아주 적다. 4-5쪽의 재앙은 잘린 양이 아니라 <strong>틀린 값의 크기</strong>에서 왔다는 게 다시 확인된다.</p>
+        <p lang="en">2000 = 7 × 256 + 208, so each side spans <strong>8 blocks</strong> (the last only 208 wide). MACs with index 0-207 get 8 blocks, 208-255 get 7. So one MAC carries <strong>49 to 64</strong> weights (7×7 to 8×8). Eight faults prune at most 8 × 64 = 512 of 4,000,000 weights, <strong>about 0.013%.</strong> <strong>Pruned share ≈ faulty-MAC share</strong>, which holds generally as long as the blocks tile the array evenly. So FAP cuts very little. It confirms that pages 4-5's disaster came from <strong>the size of the wrong values</strong>, not the amount of anything removed.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head" data-slide="8"><span class="sec-num">07</span><h2 lang="ko">mapping이 pruning의 모양을 정한다</h2><h2 lang="en">Mapping sets the shape of the pruning</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>FAP Mapping Strategies</em>. 그림 (a)는 9×9 배열과 activation 공급 방식, (b)는 conv 예제와 두 mapping의 결과다. <strong>슬라이드에 설명 글이 거의 없어서, 아래 해석은 그림을 읽고 이 노트가 재구성한 것이다.</strong> 재구성은 (b)의 결과와 정확히 맞는다.</p>
+  <p class="sec-sub" lang="en">Titled <em>FAP Mapping Strategies.</em> Panel (a) is a 9×9 array and how activations are fed; (b) is a conv example and the result of two mappings. <strong>The slide carries almost no prose, so the reading below is this note's reconstruction from the figure</strong>, and it matches (b) exactly.</p>
+
+  <h3><span lang="ko">(b) 위: 예제 설정</span><span lang="en">(b) top: the example</span></h3>
+  <p lang="ko">오른쪽 위 글: <em>Conv. Example: Feature Map: 6x6x9 (WxHxC), One weight filter: 3x3x9 (WxHxC), Stride: 1, TPU size: 9x9 (RowxColumn)</em>. 왼쪽 그림은 <em>Feature Map (A<sup>c</sup>)</em>이 채널 방향(<em>Channels (c)</em>)으로 겹쳐 있고, 맨 앞 장의 칸에 1~18 번호가 붙었다. 2, 3번 칸이 회색이고 빨간 상자가 1~4번 칸 근처를 감싸며, 빨간 점선이 뒤 채널들로 이어진다. 3칸짜리 창이 한 줄을 따라 미끄러지는 모습이다.</p>
+  <p lang="en">Text at top right: <em>Conv. Example: Feature Map: 6x6x9 (WxHxC), One weight filter: 3x3x9 (WxHxC), Stride: 1, TPU size: 9x9 (RowxColumn).</em> On the left, the <em>Feature Map (A<sup>c</sup>)</em> stacked along <em>Channels (c)</em>, its front sheet numbered 1 to 18. Cells 2 and 3 are grey, a red box wraps around cells 1-4, and red dotted lines run back through the channels: a three-wide window sliding along a row.</p>
+  <p lang="ko">filter 하나의 weight는 3 × 3 × 9 = <strong>81개</strong>인데 배열의 한 열은 MAC <strong>9개</strong>다. 그래서 filter 하나를 한 열에 <strong>9번(9 pass)에 나눠</strong> 싣는다. <strong>어떤 81개를 어떤 9개씩 묶어 어느 행에 실을지</strong>가 mapping이다. 결과 <span class="m"><i>y</i></span>는 어떻게 묶든 같다. 다른 것은 <strong>고장 하나가 어떤 weight들을 데려가느냐</strong>다.</p>
+  <p lang="en">One filter has 3 × 3 × 9 = <strong>81 weights</strong>, but a column has <strong>9 MACs</strong>, so a filter goes onto a column <strong>in 9 passes.</strong> <strong>Which 81 weights get grouped into which 9s, on which rows</strong> is the mapping. The output <span class="m"><i>y</i></span> is the same however you group them. What differs is <strong>which weights a single fault takes with it.</strong></p>
+
+  <h3><span lang="ko">(b) 아래: BaseMap과 CUMap</span><span lang="en">(b) bottom: BaseMap and CUMap</span></h3>
+  <p lang="ko">두 상자 모두 채널 1~9의 3×3 kernel을 3×3으로 늘어놓았다. 아래 글 <strong><em>weight filter 1 pruned on TPU column 1</em></strong>.</p>
+  <ul lang="ko">
+    <li><strong>BaseMap</strong>: 채널 2, 4, 9의 kernel 전체에 <strong>큰 X</strong>. 나머지 채널은 1~9가 다 살아 있다. (채널 6만 1, 3, 5, 7, 9만 적혀 있는데, 슬라이드가 이유를 밝히지 않는다. 고장과 무관한 그림상의 차이로 보인다.)</li>
+    <li><strong>CUMap</strong>: <strong>모든 채널</strong>에서 kernel의 <strong>세로 한 줄</strong>만 빗금 X. 채널 1·4·7은 가운데 줄(2, 5, 8), 채널 2·5·8은 왼쪽 줄(1, 4, 7), 채널 3·6·9는 오른쪽 줄(3, 6, 9).</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>BaseMap</strong>: <strong>a big X</strong> through the whole kernel of channels 2, 4 and 9; every other channel keeps 1-9. (Only channel 6 shows just 1, 3, 5, 7, 9; the slide doesn't say why, and it looks like a drawing difference unrelated to the faults.)</li>
+    <li><strong>CUMap</strong>: <strong>every channel</strong> loses <strong>one vertical column</strong> of its kernel, hatched. Channels 1, 4, 7 lose the middle column (2, 5, 8); channels 2, 5, 8 the left (1, 4, 7); channels 3, 6, 9 the right (3, 6, 9).</li>
+  </ul>
+
+  <h3><span lang="ko">(a): 고장 지도와 activation 공급</span><span lang="en">(a): the fault map and activation feed</span></h3>
+  <p lang="ko">9×9 격자의 빨간 MAC은 13개다. <strong>1열만 보면 2, 4, 9행</strong>이 빨갛다. 오른쪽 확대 mux 둘은 7쪽과 같다(고장은 선택 1, 정상은 0). 왼쪽 큰 상자 <em>Activation Memory</em>에서 세 갈래가 나와 빨간 점선 상자 <strong><em>Data Shuffling for CUMap</em></strong>으로 들어간다. 그 안에 행마다 칸이 하나씩 있다. <em>A<sup>1</sup><sub>1</sub>, A<sup>1</sup><sub>2</sub>, A<sup>1</sup><sub>3</sub></em>(1~3행), <em>A<sup>2</sup><sub>1</sub>…A<sup>2</sup><sub>3</sub></em>(4~6행), <em>A<sup>3</sup><sub>1</sub>…A<sup>3</sup><sub>3</sub></em>(7~9행). 각 그룹 맨 아래 칸으로 <em>A<sup>1</sup><sub>6</sub>, A<sup>1</sup><sub>5</sub>, A<sup>1</sup><sub>4</sub></em> 같은 다음 값들이 들어오고, 칸 사이 위쪽 화살표로 한 칸씩 <strong>위로 밀려 올라간다</strong>.</p>
+  <p lang="en">The 9×9 grid has 13 red MACs. <strong>In column 1, rows 2, 4 and 9</strong> are red. The two zoomed muxes on the right repeat page 7 (select 1 for faulty, 0 for healthy). The big <em>Activation Memory</em> box on the left sends three feeds into a red dashed box, <strong><em>Data Shuffling for CUMap</em></strong>, holding one cell per row: <em>A<sup>1</sup><sub>1</sub>, A<sup>1</sup><sub>2</sub>, A<sup>1</sup><sub>3</sub></em> (rows 1-3), <em>A<sup>2</sup><sub>1</sub>…A<sup>2</sup><sub>3</sub></em> (rows 4-6), <em>A<sup>3</sup><sub>1</sub>…A<sup>3</sup><sub>3</sub></em> (rows 7-9). Next values like <em>A<sup>1</sup><sub>6</sub>, A<sup>1</sup><sub>5</sub>, A<sup>1</sup><sub>4</sub></em> enter at the bottom cell of each group and <strong>shift up</strong> one cell at a time along upward arrows.</p>
+
+  <p lang="ko">이 그림에서 두 mapping의 규칙을 거꾸로 읽어내면 이렇다.</p>
+  <p lang="en">Reading the two mapping rules back out of the figure:</p>
+  <table>
+    <thead><tr>
+      <th lang="ko">mapping</th><th lang="ko">행 9개에 무엇을 싣나</th><th lang="ko">r행 MAC이 고장이면</th>
+      <th lang="en">Mapping</th><th lang="en">What the 9 rows carry</th><th lang="en">If the MAC in row r is faulty</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>BaseMap</td><td lang="ko"><strong>행 = 입력 채널.</strong> pass마다 kernel의 한 위치(1~9)를 정해 채널 9개의 그 위치 weight를 싣는다. 원 논문의 conv mapping(<span class="m"><i>r</i> = <i>k</i> mod <i>N</i></span>)과 같다</td><td lang="ko">채널 <i>r</i>의 9칸이 9번의 pass에서 전부 그 MAC을 지난다 → <strong>채널 <i>r</i> 통째로 잘림</strong></td>
+          <td lang="en"><strong>Row = input channel.</strong> Each pass fixes one kernel position (1-9) and loads that position's weight for all 9 channels; the paper's conv mapping (<span class="m"><i>r</i> = <i>k</i> mod <i>N</i></span>)</td><td lang="en">all 9 cells of channel <i>r</i> cross that MAC over the 9 passes → <strong>channel <i>r</i> cut entirely</strong></td></tr>
+      <tr><td>CUMap</td><td lang="ko"><strong>행 = (채널 그룹, kernel 가로 위치).</strong> 1~3행이 채널 하나의 가로 3칸, 4~6행이 다른 채널, 7~9행이 또 다른 채널. pass마다 채널 셋 × kernel 한 줄을 싣는다. 채널 1·4·7은 1~3행, 2·5·8은 4~6행, 3·6·9는 7~9행으로 간다</td><td lang="ko">그 행 그룹을 쓰는 채널 셋의 <strong>kernel 세로 한 줄씩만</strong> 잘림</td>
+          <td lang="en"><strong>Row = (channel group, kernel horizontal offset).</strong> Rows 1-3 hold one channel's three horizontal taps, rows 4-6 another channel's, rows 7-9 a third's; each pass loads three channels × one kernel row. Channels 1, 4, 7 use rows 1-3; 2, 5, 8 rows 4-6; 3, 6, 9 rows 7-9</td><td lang="en">the three channels using that row group each lose <strong>just one vertical column</strong> of their kernel</td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">맞춰 보자. 1열 고장이 2, 4, 9행이다. BaseMap이면 채널 2, 4, 9가 통째로 사라진다. 슬라이드와 같다. CUMap이면 2행 = 그룹 1의 가운데 → 채널 1·4·7의 가운데 줄, 4행 = 그룹 2의 왼쪽 → 채널 2·5·8의 왼쪽 줄, 9행 = 그룹 3의 오른쪽 → 채널 3·6·9의 오른쪽 줄. <strong>슬라이드와 칸 하나까지 같다.</strong></p>
+  <p lang="en">Check it. Column 1's faults sit in rows 2, 4, 9. Under BaseMap, channels 2, 4 and 9 vanish entirely, matching the slide. Under CUMap, row 2 = group 1's middle → the middle column of channels 1, 4, 7; row 4 = group 2's left → the left column of channels 2, 5, 8; row 9 = group 3's right → the right column of channels 3, 6, 9. <strong>It matches the slide cell for cell.</strong></p>
+  <p lang="ko"><strong>잘린 weight 수는 둘 다 27개(81개 중 3분의 1)로 같다.</strong> 고장 MAC 셋 × 9 pass. 달라진 것은 <strong>모양</strong>뿐이다. BaseMap은 채널 셋을 <strong>완전히</strong> 잃고, CUMap은 모든 채널이 <strong>조금씩</strong> 잃는다. 4번 절 callout과 같은 원리다. 정보가 완전히 사라진 채널은 다른 weight가 메울 방법이 없지만, kernel 한 줄이 빠진 채널은 남은 두 줄과 이웃 채널이 대신할 여지가 있다. 그리고 그 "여지"를 실제로 쓰게 만드는 것이 다음 절의 재학습이다. "Data Shuffling" 상자는 CUMap이 요구하는 activation 순서(채널 하나의 가로 3칸을 세 행에 나란히)를 맞춰 주는 장치이고, 위로 밀어 올리는 동작이 stride 1 창의 미끄러짐이다. 원 논문은 BaseMap 방식에서 "고장 MAC 하나가 filter 채널 하나를 통째로 잘라 AlexNet 정확도가 떨어진다"고 적고 더 나은 scheduling을 숙제로 남겼다(보충). CUMap이 그 숙제의 답이다.</p>
+  <p lang="en"><strong>Both prune 27 weights, a third of 81</strong>: three faulty MACs × 9 passes. Only <strong>the shape</strong> differs. BaseMap loses three channels <strong>completely</strong>; CUMap has every channel lose <strong>a little.</strong> Same principle as section 4's callout: a channel whose information is gone entirely can't be covered by other weights, but a channel missing one kernel column still has two columns and neighbouring channels to compensate, and the next section's retraining is what puts that slack to use. The "Data Shuffling" box arranges activations the way CUMap needs (one channel's three horizontal taps side by side on three rows), and the upward shift is the stride-1 window sliding. The paper notes that under its BaseMap-style policy "one faulty MAC prunes a whole channel of the filter," hurting AlexNet, and leaves better scheduling for later (supplementary). CUMap is that later.</p>
+
+  <div class="play">
+    <div class="plab" lang="ko">고장 지도 → pruning 마스크 · 8쪽 9×9 예제</div>
+    <div class="plab" lang="en">Fault map → pruning mask · page 8's 9×9 example</div>
+    <div class="hintline" lang="ko" style="border-top:0;padding-top:0;margin-top:0">왼쪽 9×9 격자는 8쪽 (a)의 TPU다. <strong>MAC을 눌러 고장을 켜고 끈다.</strong> 오른쪽은 고른 열에 실린 <strong>filter 하나(3×3×9)</strong>를 채널별로 펼친 것이고, 잘린 weight가 X로 표시된다. 처음 상태는 슬라이드의 고장 지도다. 규칙은 위 표의 재구성을 따른다.</div>
+    <div class="hintline" lang="en" style="border-top:0;padding-top:0;margin-top:0">The 9×9 grid on the left is page 8(a)'s TPU. <strong>Click a MAC to toggle a fault.</strong> On the right, the <strong>one filter (3×3×9)</strong> mapped to the chosen column, laid out by channel, with pruned weights crossed out. It starts with the slide's fault map, and the rules follow the reconstruction in the table above.</div>
+
+    <div class="plab" lang="ko">Mapping</div>
+    <div class="plab" lang="en">Mapping</div>
+    <div class="presets" id="fmMap"></div>
+    <div class="plab" lang="ko">보는 열 (= filter 번호)</div>
+    <div class="plab" lang="en">Column shown (= filter number)</div>
+    <div class="presets" id="fmCol"></div>
+    <div class="plab" lang="ko">고장 지도</div>
+    <div class="plab" lang="en">Fault map</div>
+    <div class="presets" id="fmPre"></div>
+
+    <div id="fmSvg" style="margin-top:18px"></div>
+    <div id="fmOut" style="margin-top:14px"></div>
+    <div class="verdict" id="fmV" style="margin-top:14px"></div>
+
+    <div class="hintline" lang="ko"><strong>찾아볼 것 셋.</strong> 하나, 처음 상태에서 BaseMap과 CUMap을 오가면 8쪽 (b)의 두 상자가 그대로 나온다. 잘린 수는 27로 같다. 둘, 1열에서 <strong>1, 2, 3행을 전부 고장</strong> 내 보자. CUMap도 채널 1·4·7을 통째로 잃는다. <strong>CUMap이 만능이 아니라 고장이 한 그룹에 몰리지 않을 때 이긴다</strong>는 뜻이다. 셋, 무작위 50%를 여러 번 눌러 보면 BaseMap은 열마다 채널을 <strong>평균 4.5개</strong>(9개의 절반) 통째로 잃고, CUMap은 <strong>평균 1개 남짓</strong>만 잃는다(한 그룹의 세 행이 모두 고장일 확률 1/8 × 채널 셋 × 그룹 셋 ≈ 1.1). 13쪽의 FAP와 FAP*+Mapping 곡선 사이 간격이 이것이다.</div>
+    <div class="hintline" lang="en"><strong>Three things to find.</strong> One, from the starting state, toggling BaseMap and CUMap reproduces page 8(b)'s two boxes, with 27 pruned either way. Two, fault <strong>rows 1, 2 and 3 of column 1</strong>: CUMap now loses channels 1, 4, 7 entirely too. <strong>CUMap isn't magic; it wins when faults don't pile into one row group.</strong> Three, hit random 50% a few times: BaseMap loses <strong>4.5 whole channels per column on average</strong> (half of 9), CUMap <strong>only about 1</strong> (the chance all three rows of a group fail is 1/8, × 3 channels × 3 groups ≈ 1.1). That gap is the distance between page 13's FAP and FAP*+Mapping curves.</div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">mapping은 결과를 바꾸지 않는데 정확도는 바꾼다?</h4>
+    <h4 lang="en">Mapping doesn't change the result, yet it changes accuracy?</h4>
+    <p lang="ko">정상 칩에서는 맞다. L10에서 본 대로 dataflow와 mapping은 <strong>덧셈 순서</strong>만 바꾸고 결과는 같다. 그런데 <strong>고장 칩에서는 mapping이 "어떤 weight가 0이 되느냐"를 정한다.</strong> 같은 고장 지도라도 mapping에 따라 서로 다른 DNN이 돌아간다. 이 강의에서 mapping은 에너지 문제(L10)가 아니라 <strong>정확도 문제</strong>로 바뀐다. 컴파일러가 칩마다 다른 고장 지도를 알고 mapping을 골라야 하는 이유다.</p>
+    <p lang="en">On a healthy chip, yes: as lecture 10 showed, dataflow and mapping only reorder additions and the result is identical. But <strong>on a faulty chip, the mapping decides which weights become zero.</strong> The same fault map runs different DNNs under different mappings. In this lecture, mapping turns from an energy question (lecture 10) into <strong>an accuracy question</strong>, which is why the compiler needs each chip's own fault map before choosing one.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head" data-slide="9-10"><span class="sec-num">08</span><h2 lang="ko">FAP+T: 칩마다 재학습</h2><h2 lang="en">FAP+T: retraining per chip</h2></div>
+  <p class="sec-sub" lang="ko">9쪽은 FAP 다음에 재학습을 붙이는 것, 10쪽은 그 재학습이 <strong>칩마다 따로</strong>여야 하는 이유다.</p>
+  <p class="sec-sub" lang="en">Page 9 adds retraining after FAP; page 10 shows why that retraining has to happen <strong>separately for every chip.</strong></p>
+
+  <h3 data-slide="9"><span lang="ko">FAP + Re-training (FAP+T)</span><span lang="en">FAP + Re-training (FAP+T)</span></h3>
+  <p lang="ko">7쪽 위 줄의 <em>Baseline DNN</em>(빨간 선 섞임) → <em>Fault-Aware Pruning</em> → <em>Pruned DNN</em>(빨간 선 사라짐) 그림이 다시 나온다. 아래 세 줄:</p>
+  <p lang="en">Page 7's <em>Baseline DNN</em> (red links mixed in) → <em>Fault-Aware Pruning</em> → <em>Pruned DNN</em> (red links gone) appears again. Three bullets below:</p>
+  <ul lang="ko">
+    <li><em>Adapt to fault pruning with new optimized weights</em>: 잘린 자리를 남은 weight가 메우도록 새 값을 찾는다</li>
+    <li><em>Improve classification accuracy</em></li>
+    <li><em>Extra one-time "test" cost per faulty chip</em>: 고장 칩마다 한 번씩 드는 "테스트" 비용</li>
+  </ul>
+  <ul lang="en">
+    <li><em>Adapt to fault pruning with new optimized weights</em>: find new values so the surviving weights cover for the cut ones</li>
+    <li><em>Improve classification accuracy</em></li>
+    <li><em>Extra one-time "test" cost per faulty chip</em></li>
+  </ul>
+  <p lang="ko">재학습 절차는 원 논문 Algorithm 1에 있다(보충). 학습된 weight와 칩의 고장 지도를 불러와 → 잘릴 weight의 위치를 정하고 → 그 weight를 0으로 놓은 뒤 → <strong>MAX_EPOCHS번 동안 backprop으로 weight를 갱신하고, 매번 잘린 weight를 다시 0으로 되돌린다.</strong> MAX_EPOCHS = 0이면 그냥 FAP다.</p>
+  <p lang="en">The procedure is the paper's Algorithm 1 (supplementary): load the trained weights and the chip's fault map → find the indices of pruned weights → set them to zero → <strong>for MAX_EPOCHS, update weights by backprop, then force the pruned ones back to zero each time.</strong> MAX_EPOCHS = 0 is plain FAP.</p>
+<pre class="code"><span class="c"># <span lang="ko">FAP+T (원 논문 Algorithm 1을 PyTorch 식으로 옮긴 스케치. 보충)</span><span lang="en">FAP+T (a PyTorch-style sketch of the paper's Algorithm 1; supplementary)</span></span>
+mask = build_mask(model, fault_map, mapping)   <span class="c"># <span lang="ko">고장 MAC에 실리는 weight = 0, 나머지 = 1</span><span lang="en">0 where a weight lands on a faulty MAC, else 1</span></span>
+apply(model, mask)                              <span class="c"># <span lang="ko">= FAP</span><span lang="en">= FAP</span></span>
+<span class="k">for</span> epoch <span class="k">in range</span>(MAX_EPOCHS):                <span class="c"># <span lang="ko">0이면 FAP와 같다</span><span lang="en">0 means FAP</span></span>
+    <span class="k">for</span> x, y <span class="k">in</span> train_loader:                  <span class="c"># <span lang="ko">원래 학습 데이터 (칩 제조사가 갖고 있어야 한다)</span><span lang="en">the original training data (the chip vendor must hold it)</span></span>
+        loss = criterion(model(x), y)
+        loss.backward(); opt.step(); opt.zero_grad()
+        apply(model, mask)                      <span class="c"># <span lang="ko">잘린 weight를 다시 0으로</span><span lang="en">force pruned weights back to 0</span></span></pre>
+
+  <div class="callout" lang="ko">
+    <strong>ECE 479 Lec12의 "pruning 뒤에는 retrain이 필수"와 같은 이야기다.</strong> magnitude pruning 뒤에 남은 weight를 다시 학습해 정확도를 되찾던 그 절차를, 마스크만 바꿔 그대로 쓴다. 차이는 마스크가 <strong>모델이 아니라 칩에서 온다</strong>는 것 하나다(6번 절 함정). pruning의 일반론과 하드웨어 지원은 Lecture 19에서 다룬다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Same as ECE 479 lecture 12's "pruning must be followed by retraining."</strong> The procedure that retrained surviving weights after magnitude pruning is reused verbatim with a different mask. The only difference: the mask comes <strong>from the chip, not the model</strong> (section 6's trap). Pruning in general and its hardware support come in Lecture 19.
+  </div>
+
+  <h3 data-slide="10"><span lang="ko">FAP+T Test-time Overhead: 칩마다 다른 DNN</span><span lang="en">FAP+T test-time overhead: a different DNN per chip</span></h3>
+  <p lang="ko">왼쪽 위 <strong><em>Process Variation</em></strong>. 왼쪽에 검은 선으로 완전 연결된 3-3 망 하나. 화살표 셋이 <em>Chip 1, Chip 2, Chip 3</em>의 3×3 MAC 격자로 갈라진다. 번개(고장) 위치가 칩마다 다르다. Chip 1은 1행 세 칸과 2행 1열, Chip 2는 1행 1열과 2행 2·3열과 3행 3열, Chip 3은 1행 3열과 2행 2·3열과 3행 3열. 각 칩 오른쪽 끝에 <strong>초록 선</strong>으로 그린 3-3 망이 있고, <strong>셋 다 남은 연결이 다르다.</strong></p>
+  <p lang="en"><strong><em>Process Variation</em></strong> at the top left. On the left, one fully connected 3-3 network in black. Three arrows fan out to the 3×3 MAC grids of <em>Chip 1, Chip 2, Chip 3</em>, each with lightning bolts (faults) in different places: Chip 1 the whole first row plus row 2 col 1; Chip 2 row 1 col 1, row 2 cols 2-3, row 3 col 3; Chip 3 row 1 col 3, row 2 cols 2-3, row 3 col 3. At the far right of each, a 3-3 network drawn <strong>in green</strong>, and <strong>each keeps a different set of links.</strong></p>
+  <p lang="ko">요점은 <strong>같은 설계, 같은 웨이퍼에서 나와도 고장 위치는 칩마다 우연</strong>이라는 것이다. 그래서 FAP+T의 결과물은 모델 하나가 아니라 <strong>칩 수만큼의 weight 세트</strong>다. 재학습은 <strong>출하 전 테스트 단계에서 칩마다 한 번</strong> 한다. 슬라이드가 "test" cost라고 따옴표를 친 이유가 이것이다. 원래 테스트는 "합격/불합격"만 정하는데, 이제 테스트 단계에 <strong>학습 작업</strong>이 끼어든다.</p>
+  <p lang="en">The point: <strong>same design, same wafer, yet fault locations are chance on every chip.</strong> So FAP+T's output isn't one model but <strong>one weight set per chip.</strong> Retraining happens <strong>once per chip during pre-shipment test</strong>, which is why the slide puts "test" cost in quotes. Testing used to decide pass/fail; now a <strong>training job</strong> sits inside it.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 270" role="img" aria-label="FAP+T의 비용이 설계 시점, 칩별 테스트 시점, 실행 시점 중 어디에서 드는지 보여주는 흐름도">
+      <defs>
+        <marker id="l13ArK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker>
+      </defs>
+      <text class="svglab" x="80" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--ink2)" lang="ko">설계 시점 · 한 번</text>
+      <text class="svglab" x="80" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--ink2)" lang="en">design time · once</text>
+      <text class="svglab" x="355" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--amber)" lang="ko">테스트 시점 · 칩마다 한 번</text>
+      <text class="svglab" x="355" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--amber)" lang="en">test time · once per chip</text>
+      <text class="svglab" x="610" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--green)" lang="ko">실행 시점 · 수명 내내</text>
+      <text class="svglab" x="610" y="20" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--green)" lang="en">run time · whole life</text>
+      <!-- design box -->
+      <rect x="20" y="95" width="120" height="70" rx="7" fill="rgba(var(--blue-rgb),.10)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="80" y="122" text-anchor="middle" style="font-size:11px;font-weight:700" fill="var(--blue)">baseline DNN</text>
+      <text class="svglab" x="80" y="140" text-anchor="middle" style="font-size:10px" fill="var(--ink2)" lang="ko">+ bypass RTL</text>
+      <text class="svglab" x="80" y="140" text-anchor="middle" style="font-size:10px" fill="var(--ink2)" lang="en">+ bypass RTL</text>
+      <text class="svglab" x="80" y="156" text-anchor="middle" style="font-size:10px" fill="var(--ink2)" lang="ko">(면적 ≈ 9%)</text>
+      <text class="svglab" x="80" y="156" text-anchor="middle" style="font-size:10px" fill="var(--ink2)" lang="en">(area ≈ 9%)</text>
+      <!-- chips -->
+      <g>
+        <rect x="190" y="40" width="70" height="40" rx="5" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)" stroke-width="1.3"/>
+        <text class="svglab" x="225" y="65" text-anchor="middle" style="font-size:10.5px" fill="var(--violet)">chip 1</text>
+        <rect x="190" y="110" width="70" height="40" rx="5" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)" stroke-width="1.3"/>
+        <text class="svglab" x="225" y="135" text-anchor="middle" style="font-size:10.5px" fill="var(--violet)">chip 2</text>
+        <rect x="190" y="180" width="70" height="40" rx="5" fill="rgba(var(--violet-rgb),.10)" stroke="var(--violet)" stroke-width="1.3"/>
+        <text class="svglab" x="225" y="205" text-anchor="middle" style="font-size:10.5px" fill="var(--violet)">chip 3</text>
+      </g>
+      <line x1="140" y1="120" x2="186" y2="62" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#l13ArK)"/>
+      <line x1="140" y1="130" x2="186" y2="130" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#l13ArK)"/>
+      <line x1="140" y1="140" x2="186" y2="198" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#l13ArK)"/>
+      <!-- test pipeline per chip -->
+      <g>
+        <rect x="285" y="40" width="70" height="40" rx="5" fill="rgba(var(--brown-rgb),.12)" stroke="var(--brown)" stroke-width="1.3"/>
+        <text class="svglab" x="320" y="58" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">scan test</text>
+        <text class="svglab" x="320" y="72" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">→ fault map</text>
+        <rect x="380" y="40" width="130" height="40" rx="5" fill="rgba(var(--amber-rgb),.14)" stroke="var(--amber)" stroke-width="1.3"/>
+        <text class="svglab" x="445" y="58" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)">mask → FAP+T</text>
+        <text class="svglab" x="445" y="72" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="ko">재학습 ~15분</text>
+        <text class="svglab" x="445" y="72" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="en">retrain ~15 min</text>
+        <line x1="260" y1="60" x2="281" y2="60" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="355" y1="60" x2="376" y2="60" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="510" y1="60" x2="551" y2="60" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+      </g>
+      <g>
+        <rect x="285" y="110" width="70" height="40" rx="5" fill="rgba(var(--brown-rgb),.12)" stroke="var(--brown)" stroke-width="1.3"/>
+        <text class="svglab" x="320" y="128" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">scan test</text>
+        <text class="svglab" x="320" y="142" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">→ fault map</text>
+        <rect x="380" y="110" width="130" height="40" rx="5" fill="rgba(var(--amber-rgb),.14)" stroke="var(--amber)" stroke-width="1.3"/>
+        <text class="svglab" x="445" y="128" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)">mask → FAP+T</text>
+        <text class="svglab" x="445" y="142" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="ko">재학습 ~15분</text>
+        <text class="svglab" x="445" y="142" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="en">retrain ~15 min</text>
+        <line x1="260" y1="130" x2="281" y2="130" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="355" y1="130" x2="376" y2="130" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="510" y1="130" x2="551" y2="130" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+      </g>
+      <g>
+        <rect x="285" y="180" width="70" height="40" rx="5" fill="rgba(var(--brown-rgb),.12)" stroke="var(--brown)" stroke-width="1.3"/>
+        <text class="svglab" x="320" y="198" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">scan test</text>
+        <text class="svglab" x="320" y="212" text-anchor="middle" style="font-size:9.5px" fill="var(--brown)">→ fault map</text>
+        <rect x="380" y="180" width="130" height="40" rx="5" fill="rgba(var(--amber-rgb),.14)" stroke="var(--amber)" stroke-width="1.3"/>
+        <text class="svglab" x="445" y="198" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)">mask → FAP+T</text>
+        <text class="svglab" x="445" y="212" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="ko">재학습 ~15분</text>
+        <text class="svglab" x="445" y="212" text-anchor="middle" style="font-size:9.5px" fill="var(--amber)" lang="en">retrain ~15 min</text>
+        <line x1="260" y1="200" x2="281" y2="200" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="355" y1="200" x2="376" y2="200" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+        <line x1="510" y1="200" x2="551" y2="200" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#l13ArK)"/>
+      </g>
+      <!-- deployed weights -->
+      <rect x="555" y="40" width="110" height="40" rx="5" fill="rgba(var(--green-rgb),.10)" stroke="var(--green)" stroke-width="1.3"/>
+      <text class="svglab" x="610" y="65" text-anchor="middle" style="font-size:10.5px" fill="var(--green)">weights · 1</text>
+      <rect x="555" y="110" width="110" height="40" rx="5" fill="rgba(var(--green-rgb),.10)" stroke="var(--green)" stroke-width="1.3"/>
+      <text class="svglab" x="610" y="135" text-anchor="middle" style="font-size:10.5px" fill="var(--green)">weights · 2</text>
+      <rect x="555" y="180" width="110" height="40" rx="5" fill="rgba(var(--green-rgb),.10)" stroke="var(--green)" stroke-width="1.3"/>
+      <text class="svglab" x="610" y="205" text-anchor="middle" style="font-size:10.5px" fill="var(--green)">weights · 3</text>
+      <text class="svglab" x="610" y="242" text-anchor="middle" style="font-size:10px" fill="var(--green)" lang="ko">추가 사이클 0</text>
+      <text class="svglab" x="610" y="242" text-anchor="middle" style="font-size:10px" fill="var(--green)" lang="en">zero extra cycles</text>
+      <text class="svglab" x="20" y="258" style="font-size:10px" fill="var(--ink3)" lang="ko">고장 위치는 칩마다 우연(10쪽 Process Variation) → weight 세트도 칩마다 다르다</text>
+      <text class="svglab" x="20" y="258" style="font-size:10px" fill="var(--ink3)" lang="en">fault locations are chance per chip (page 10, process variation) → one weight set per chip</text>
+    </svg>
+    <figcaption lang="ko">비용이 <strong>언제</strong> 드는지로 FAP+T를 다시 그렸다. 슬라이드 10쪽은 가운데 갈림길만 그렸고, 양 끝(설계 시점 bypass 면적, 실행 시점 추가 비용 0)은 원 논문의 숫자다(보충). 15분은 13쪽 오른쪽 그래프의 값이다. 비용은 <span class="cCost">주황</span>인 테스트 시점에 몰리고, 그건 칩 수명 전체로 나눠진다. <strong>실행 시점은 <span class="cGain">초록</span>, 즉 공짜다.</strong></figcaption>
+    <figcaption lang="en">FAP+T redrawn by <strong>when</strong> the costs fall. Page 10 draws only the middle fork; both ends (bypass area at design time, zero run-time overhead) are the paper's numbers (supplementary). The 15 minutes is from page 13's right-hand plot. Cost concentrates in the <span class="cCost">amber</span> test phase, amortised over the chip's life; <strong>run time is <span class="cGain">green</span>, free.</strong></figcaption>
+  </figure>
+
+  <div class="scale">
+    <div class="cap" lang="ko">숫자 감각 · 칩 한 개당 15분은 비싼가</div>
+    <div class="cap" lang="en">Sense of scale · is 15 minutes per chip expensive</div>
+    <table>
+      <tr><td class="what"><span lang="ko">FAP+T 재학습 (13쪽)</span><span lang="en">FAP+T retrain (page 13)</span></td><td class="num">≈ 15 min</td>
+          <td><span lang="ko">AlexNet, 칩 한 개, 한 번. 원 논문 본문은 같은 효과를 <strong>12분</strong>(25 epoch 대신 5 epoch, 1시간 → 12분)으로 적는다(보충)</span><span lang="en">AlexNet, one chip, once. The paper's text puts the same effect at <strong>12 minutes</strong> (5 epochs instead of 25, one hour → 12 minutes) (supplementary)</span></td></tr>
+      <tr><td class="what"><span lang="ko">서버 가속기 수명</span><span lang="en">a server accelerator's life</span></td><td class="num">~ 3-5 yr</td>
+          <td><span lang="ko">어림수. 1년 ≈ 525,600분이므로 15분은 수명의 <strong>약 10<sup>−5</sup></strong></span><span lang="en">a round figure. One year ≈ 525,600 minutes, so 15 minutes is <strong>about 10<sup>−5</sup></strong> of a life</span></td></tr>
+      <tr class="base"><td class="what"><span lang="ko">버리는 칩 한 개</span><span lang="en">one scrapped chip</span></td><td class="num">100%</td>
+          <td><span lang="ko">기준점. 다이 하나의 제조 비용 전체를 잃는다. 원 논문의 "수명 전체로 나눠진다(amortized)"는 논리가 이 비교다</span><span lang="en">reference: the die's entire manufacturing cost lost. The paper's "amortized over the lifetime" argument is this comparison</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">다만 칩이 백만 개면 15분 × 10<sup>6</sup> ≈ <strong>GPU 28.5년</strong>어치의 재학습이다(재학습 한 번에 GPU 하나를 쓴다고 가정). 칩당으로는 싸도 <strong>생산량 전체로는 데이터센터 규모의 작업</strong>이 된다. 슬라이드도 논문도 이 계산은 하지 않는다. 이 노트의 어림이다.</div>
+    <div class="foot" lang="en">At a million chips, though, 15 minutes × 10<sup>6</sup> ≈ <strong>28.5 GPU-years</strong> of retraining (assuming one GPU per retrain). Cheap per chip, but <strong>a datacenter-scale job across a production run.</strong> Neither slide nor paper does this sum; it's this note's estimate.</div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"test-time"은 추론 시간이 아니다</h4>
+    <h4 lang="en">"Test-time" does not mean inference time</h4>
+    <p lang="ko">ML 쪽에서 "test time"은 보통 <strong>학습이 끝난 모델을 평가하거나 쓰는 시점</strong>(= inference)이다. 10쪽 제목의 <em>Test-time Overhead</em>는 하드웨어 쪽 뜻이다. <strong>제조 후 출하 전, 칩을 테스터에 물려 검사하는 시점</strong>. 같은 단어가 ML과 하드웨어에서 다른 시점을 가리키는 이 과목의 단골 함정이다. 이 강의의 해법은 <strong>inference 시간에는 오버헤드가 0</strong>이고, 비용은 전부 <strong>제조 테스트 시간</strong>에 든다.</p>
+    <p lang="en">In ML, "test time" usually means <strong>when a trained model is evaluated or used</strong> (= inference). Page 10's <em>Test-time Overhead</em> uses the hardware meaning: <strong>after fabrication, before shipping, when the chip sits on a tester.</strong> One of this course's recurring traps, the same word naming different moments on the ML and hardware sides. This lecture's fix has <strong>zero overhead at inference time</strong>; every cost lands at <strong>manufacturing test time.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head" data-slide="11"><span class="sec-num">09</span><h2 lang="ko">세 층을 잇는 흐름</h2><h2 lang="en">The flow across three layers</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Cross-Layer Fault-tolerant Systolic Array Design</em>. 회색 가로 띠 셋에 구름 모양 단계들이 놓였고, 빨간 곡선 화살표가 순서를, 검은 직선 화살표가 분석이 어디로 들어가는지를 그린다. 6쪽 삼각형을 <strong>실제 도구 흐름</strong>으로 바꾼 그림이다.</p>
+  <p class="sec-sub" lang="en">Titled <em>Cross-Layer Fault-tolerant Systolic Array Design.</em> Three grey horizontal bands hold cloud-shaped steps; red curved arrows give the order, black straight arrows show where analyses feed in. Page 6's triangle turned into <strong>an actual tool flow.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">띠 (도구)</th><th lang="ko">그 띠의 구름과 상자</th>
+      <th lang="en">Band (tool)</th><th lang="en">Clouds and boxes in it</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko"><span class="cAlg">Machine Learning</span> (PyTorch)</td><td lang="ko"><em>Baseline Model Training</em> → 가운데 상자 <em>DNN Accuracy Analysis</em> → 오른쪽 빨간 글씨 구름 <strong><em>Fault-tolerant DNN Model</em></strong></td>
+          <td lang="en"><span class="cAlg">Machine Learning</span> (PyTorch)</td><td lang="en"><em>Baseline Model Training</em> → a central box <em>DNN Accuracy Analysis</em> → a red-lettered cloud at right, <strong><em>Fault-tolerant DNN Model</em></strong></td></tr>
+      <tr><td lang="ko"><span class="cHw">Architecture</span> (RTL)</td><td lang="ko"><em>Systolic Array RTL Model</em> → 굵은 글씨 구름 셋 <strong><em>Fault-aware Pruning</em> → <em>Fault-aware Mapping</em> → <em>Fault-aware Retraining</em></strong></td>
+          <td lang="en"><span class="cHw">Architecture</span> (RTL)</td><td lang="en"><em>Systolic Array RTL Model</em> → three bold clouds <strong><em>Fault-aware Pruning</em> → <em>Fault-aware Mapping</em> → <em>Fault-aware Retraining</em></strong></td></tr>
+      <tr><td lang="ko"><span class="cMem">Circuits</span> (EDA)</td><td lang="ko"><em>Systolic Array <strong>Golden</strong> Netlist</em> → (아래 타원 <em>Stuck-at Fault Injection</em>) → <em>Systolic Array <strong>Faulty</strong> Netlist</em>, 가운데 상자 <em>HW PPA Analysis</em>, 오른쪽 빨간 글씨 구름 <strong><em>Fault-tolerant Systolic Array Netlist</em></strong></td>
+          <td lang="en"><span class="cMem">Circuits</span> (EDA)</td><td lang="en"><em>Systolic Array <strong>Golden</strong> Netlist</em> → (oval below, <em>Stuck-at Fault Injection</em>) → <em>Systolic Array <strong>Faulty</strong> Netlist</em>; a central box <em>HW PPA Analysis</em>; a red-lettered cloud at right, <strong><em>Fault-tolerant Systolic Array Netlist</em></strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">빨간 화살표를 따라가면 길이 <strong>지그재그로 세 층을 오르내린다.</strong> 학습(ML) → RTL(아키텍처) → golden netlist(회로) → 고장 주입 → faulty netlist(회로) → <strong>다시 위로</strong> FAP(아키텍처) → mapping → retraining → 마지막에 <strong>둘로 갈라져</strong> 위로는 fault-tolerant DNN 모델, 아래로는 fault-tolerant netlist가 나온다. 결과물이 <strong>모델과 하드웨어 한 쌍</strong>이라는 게 이 그림의 결론이다. 가운데 두 분석 상자는 검은 화살표로 세 구름 모두에 들어간다. <strong>위에서는 정확도가, 아래에서는 PPA가 매 단계를 심판한다.</strong></p>
+  <p lang="en">Follow the red arrows and the path <strong>zigzags up and down all three layers</strong>: training (ML) → RTL (architecture) → golden netlist (circuits) → fault injection → faulty netlist (circuits) → <strong>back up</strong> to FAP (architecture) → mapping → retraining → finally <strong>splitting in two</strong>, a fault-tolerant DNN model upward and a fault-tolerant netlist downward. The conclusion: the output is <strong>a model and a piece of hardware, as a pair.</strong> The two central analysis boxes feed all three clouds via black arrows: <strong>accuracy from above and PPA from below judge every step.</strong></p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · golden netlist</span><span lang="en">Unpacking the jargon · golden netlist</span></summary>
+    <div class="body">
+      <table class="parts">
+        <tr><td><span lang="ko">풀네임</span><span lang="en">Full name</span></td><td>golden (reference) netlist</td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">One line</span></td><td><span lang="ko">합성이 RTL에서 만든 게이트 연결 목록 중, <strong>정답 기준으로 삼는 고장 없는 판본</strong></span><span lang="en">the <strong>fault-free version of the gate-level netlist</strong> synthesized from RTL, used as the reference for right answers</span></td></tr>
+        <tr><td><span lang="ko">언제</span><span lang="en">When</span></td><td><span lang="ko">고장 주입 실험에서 "golden 출력 vs faulty 출력"을 비교할 때. 5쪽 산포도의 가로축(<em>Golden Activation</em>)이 이 netlist의 출력이다</span><span lang="en">when fault-injection experiments compare golden versus faulty outputs; page 5's x axis (<em>Golden Activation</em>) is this netlist's output</span></td></tr>
+        <tr><td><span lang="ko">누가</span><span lang="en">Who</span></td><td><span lang="ko">검증과 테스트 엔지니어. 등가성 검사(equivalence checking)에서도 같은 말을 쓴다</span><span lang="en">verification and test engineers; equivalence checking uses the same word</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to confuse</span></td><td><span lang="ko">"golden"은 품질 등급이 아니라 <strong>"기준"</strong>이라는 뜻이다. ML 쪽의 ground truth label과 역할이 같지만, label은 사람이 붙인 정답이고 golden 출력은 <strong>고장 없는 회로가 낸 값</strong>이다. 고장 없는 회로도 INT8 반올림 때문에 FP32 PyTorch 결과와는 다를 수 있다</span><span lang="en">"golden" means <strong>"reference,"</strong> not a quality grade. It plays the role of an ML ground-truth label, but a label is a human's answer while golden output is <strong>what the fault-free circuit computes</strong>, which can still differ from FP32 PyTorch because of INT8 rounding</span></td></tr>
+      </table>
+    </div>
+  </details>
+  <p lang="ko"><strong>PPA</strong>는 Power, Performance, Area의 머리글자로, 칩 설계를 평가하는 세 축이다. 6쪽 삼각형의 오른쪽 꼭짓점(<em>Performance/Area Overheads</em>)을 재는 상자가 <em>HW PPA Analysis</em>다. 원 논문이 보고한 것은 bypass 면적 약 9%와 실행 시간 추가 0이다(보충).</p>
+  <p lang="en"><strong>PPA</strong> is power, performance and area, the three axes chip designs are judged on. The <em>HW PPA Analysis</em> box measures page 6's right-hand corner (<em>Performance/Area Overheads</em>). The paper reports about 9% bypass area and zero added run time (supplementary).</p>
+
+  <div class="callout" lang="ko">
+    <strong>이 그림은 L01이 말한 "다리"의 실물이다.</strong> 이 과목의 목표가 <em>a bridge between machine learning and hardware</em>라고 L01이 적었는데, 11쪽은 그 다리를 <strong>도구 단위로</strong> 그렸다. PyTorch 학습 루프와 게이트 수준 시뮬레이터가 한 실험 안에서 데이터를 주고받는다. 고장 주입은 netlist에서, 정확도 측정은 PyTorch에서 하므로, <strong>netlist 시뮬레이션이 낸 층 출력을 PyTorch로 다시 넘기는 연결부</strong>가 이 흐름의 실제 공학적 난관이다(보충. 원 논문은 netlist를 ModelSim으로 게이트 수준 시뮬레이션했다고 적는다).
+  </div>
+  <div class="callout" lang="en">
+    <strong>This figure is lecture 1's "bridge" made physical.</strong> Lecture 1 quoted the course goal as <em>a bridge between machine learning and hardware</em>; page 11 draws that bridge <strong>tool by tool.</strong> A PyTorch training loop and a gate-level simulator exchange data within one experiment. Faults are injected in the netlist but accuracy is measured in PyTorch, so <strong>the joint that hands netlist-simulated layer outputs back to PyTorch</strong> is the real engineering hurdle (supplementary; the paper says it ran gate-level simulation of the netlist in ModelSim).
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head" data-slide="12"><span class="sec-num">10</span><h2 lang="ko">실험 설정</h2><h2 lang="en">Experimental setup</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>Experiment Setup</em>. 한 줄: <em>Stuck-at fault injection on <strong>synthesized netlist</strong> of <u>256 x 256 systolic array.</u></em> 아래 벤치마크 둘.</p>
+  <p class="sec-sub" lang="en">Titled <em>Experiment Setup.</em> One line: <em>Stuck-at fault injection on <strong>synthesized netlist</strong> of <u>256 x 256 systolic array.</u></em> Two benchmarks below.</p>
+
+  <p lang="ko"><strong>TIMIT</strong>(파란 글씨): 사람 옆얼굴 실루엣의 입에서 파란 음파가 나오는 그림. 오른쪽에 회색 화살표가 들어가는 완전 연결 망: 입력 층 <strong>1895</strong>, 은닉 층 <strong>2000, 2000</strong>, 그리고 숫자가 안 적힌 은닉 층 하나 더, 출력 <strong>183</strong>. TIMIT은 영어 음성 인식 말뭉치이고, 183은 음소 상태(phone state) 분류 수로 보인다(보충).</p>
+  <p lang="en"><strong>TIMIT</strong> (blue): a profile silhouette with a blue sound wave leaving its mouth. To its right a grey arrow feeds a fully connected network: input layer <strong>1895</strong>, hidden layers <strong>2000, 2000</strong>, one more hidden layer with no number printed, output <strong>183</strong>. TIMIT is an English speech-recognition corpus; 183 appears to be the number of phone-state classes (supplementary).</p>
+  <p lang="ko"><strong>AlexNet</strong>(파란 글씨): 기차 사진(노란 상자로 검출 표시). 오른쪽에 주황 직육면체로 그린 AlexNet: C1(55×55×96, 5×5 창 표시는 다음 층 kernel), C2(27×27×256, 3×3), C3(13×13×384), C4(13×13×384), C5(13×13×256), 그리고 FC6 <strong>4096</strong>, FC7 <strong>4096</strong>, FC8 <strong>1000</strong>.</p>
+  <p lang="en"><strong>AlexNet</strong> (blue): a train photo (marked with a yellow detection box). To its right AlexNet in orange blocks: C1 (55×55×96, the 5×5 window drawn is the next layer's kernel), C2 (27×27×256, 3×3), C3 (13×13×384), C4 (13×13×384), C5 (13×13×256), then FC6 <strong>4096</strong>, FC7 <strong>4096</strong>, FC8 <strong>1000</strong>.</p>
+
+  <div class="callout" lang="ko">
+    <strong>AlexNet 구조는 이미 안다.</strong> <a href="L04-dnns.html#s3">L04-5 3번 절</a>에서 층별로 뜯었다. 여기서 볼 것은 <strong>conv 5개와 FC 3개가 섞였다</strong>는 것 하나다. FC는 6번 절 감각 문제처럼 고장이 weight에 고르게 퍼지지만, conv는 7번 절처럼 mapping에 따라 채널 통째로 잘릴 수 있다. TIMIT(FC만)보다 AlexNet이 FAP에 약한 이유가 이 차이에서 나온다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>You know AlexNet's structure.</strong> <a href="L04-dnns.html#s3">Lecture 4-5 section 3</a> took it apart layer by layer. The one thing to see here is that it <strong>mixes 5 conv and 3 FC layers.</strong> In FC layers, faults spread evenly over weights (section 6's exercise); in conv layers, depending on the mapping, they can cut whole channels (section 7). That's why AlexNet is more fragile under FAP than TIMIT (FC only).
+  </div>
+
+  <h3><span lang="ko">원 논문의 실험 조건 (보충)</span><span lang="en">The paper's experimental conditions (supplementary)</span></h3>
+  <div class="scale">
+    <div class="cap" lang="ko">원 논문 6.1절과 Table 1</div>
+    <div class="cap" lang="en">Paper section 6.1 and Table 1</div>
+    <table>
+      <tr><td class="what"><span lang="ko">배열</span><span lang="en">array</span></td><td class="num">256 × 256 MAC</td>
+          <td><span lang="ko">합성 가능한 Verilog, <strong>OSU FreePDK 45 nm</strong> 표준 셀, Cadence Genus로 합성</span><span lang="en">synthesizable Verilog, <strong>OSU FreePDK 45 nm</strong> standard cells, synthesized with Cadence Genus</span></td></tr>
+      <tr><td class="what"><span lang="ko">동작점</span><span lang="en">operating point</span></td><td class="num">658 MHz · 1.1 V</td>
+          <td><span lang="ko">동적 전력 <strong>19.7 W</strong>. TPUv1(700 MHz, 28 nm)과 비슷한 클록이다</span><span lang="en"><strong>19.7 W</strong> dynamic power; a clock close to TPUv1's (700 MHz, 28 nm)</span></td></tr>
+      <tr><td class="what"><span lang="ko">시뮬레이션</span><span lang="en">simulation</span></td><td class="num">ModelSim</td>
+          <td><span lang="ko">게이트 수준. 고장 위치를 균등 무작위로 바꿔 <strong>10번 반복</strong>. 4쪽의 오차 막대가 이 반복에서 나온다</span><span lang="en">gate level; fault locations drawn uniformly at random, <strong>10 repeats</strong>, which is where page 4's error bars come from</span></td></tr>
+      <tr><td class="what">TIMIT</td><td class="num">1845-2000-2000-2000-183</td>
+          <td><span lang="ko">논문 Table 1의 값. <strong>슬라이드 그림은 입력을 1895로 적는다.</strong> 숨은 셋째 은닉 층도 2000이다</span><span lang="en">from the paper's Table 1. <strong>The slide's figure prints the input as 1895.</strong> The unnumbered third hidden layer is also 2000</span></td></tr>
+      <tr><td class="what">MNIST</td><td class="num">784-256-256-256-10</td>
+          <td><span lang="ko">슬라이드 12쪽에는 없고 4쪽 그래프에만 나온다</span><span lang="en">absent from page 12, appears only in page 4's plot</span></td></tr>
+      <tr><td class="what">AlexNet</td><td class="num">PASCAL VOC2007</td>
+          <td><span lang="ko"><strong>ImageNet이 아니다.</strong> 13쪽의 기준 정확도 약 69.5%는 이 데이터셋 기준이다</span><span lang="en"><strong>Not ImageNet.</strong> Page 13's ~69.5% baseline is on this dataset</span></td></tr>
+    </table>
+    <div class="foot" lang="ko">원 논문은 TIMIT 모델의 출처로 Ba &amp; Caruana, <em>Do Deep Nets Really Need to Be Deep?</em>(NIPS 2014)를 인용한다. FreePDK45는 NCSU가 공개한 45 nm 교육용 PDK다. <a href="L01-introduction.html#s6">L01 6번 절</a>의 ASU 7nm 교육용 PDK와 같은 종류로, 실제 파운드리 공정이 아니라 연구·교육용 근사다.</div>
+    <div class="foot" lang="en">For TIMIT, the paper cites Ba and Caruana, <em>Do Deep Nets Really Need to Be Deep?</em> (NIPS 2014). FreePDK45 is NCSU's open 45 nm educational PDK, the same kind of thing as the ASU 7nm educational PDK in <a href="L01-introduction.html#s6">lecture 1 section 6</a>: a research and teaching approximation, not a real foundry process.</div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"synthesized netlist"에 주입했다는 말의 무게</h4>
+    <h4 lang="en">The weight of "injected into the synthesized netlist"</h4>
+    <p lang="ko">슬라이드가 <strong>synthesized netlist</strong>를 굵게 쓴 이유가 있다. 고장 주입은 여러 수준에서 할 수 있다. <strong>PyTorch에서</strong> weight나 activation의 비트를 뒤집는 것(빠르지만 실제 회로와 무관), <strong>RTL에서</strong> 레지스터 값을 바꾸는 것, <strong>게이트 netlist에서</strong> 내부 선을 0/1에 묶는 것. 마지막이 가장 느리지만 <strong>실제 결함이 어느 비트에 어떻게 나타나는지</strong>를 회로가 정해 준다. 4번 절의 "상위 비트에 자주 걸린다"는 관찰은 이 수준에서만 나올 수 있다. ML 논문에서 "fault injection"이라고만 쓰여 있으면 <strong>어느 수준인지부터 확인하자.</strong> 결론의 신뢰도가 자릿수로 다르다.</p>
+    <p lang="en">The slide bolds <strong>synthesized netlist</strong> for a reason. Faults can be injected at many levels: <strong>in PyTorch</strong>, flipping bits of weights or activations (fast, but unrelated to real circuitry); <strong>in RTL</strong>, altering register values; <strong>in the gate netlist</strong>, tying internal wires to 0 or 1. The last is slowest, but the circuit itself decides <strong>which bits a real defect shows up in, and how.</strong> Section 4's "often hits high-order bits" can only come from this level. When an ML paper just says "fault injection," <strong>check the level first</strong>: it changes how much the conclusion is worth by orders of magnitude.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head" data-slide="13"><span class="sec-num">11</span><h2 lang="ko">AlexNet 결과</h2><h2 lang="en">AlexNet results</h2></div>
+  <p class="sec-sub" lang="ko">제목 <em>FAP Results - AlexNet</em>. 그래프 둘: 왼쪽은 고장 비율별 네 방법의 정확도, 오른쪽은 재학습 시간에 따른 정확도(<em>FAP+T overhead</em>).</p>
+  <p class="sec-sub" lang="en">Titled <em>FAP Results - AlexNet.</em> Two plots: on the left, accuracy of four methods versus fault rate; on the right, accuracy versus retraining time (<em>FAP+T overhead</em>).</p>
+
+  <h3><span lang="ko">왼쪽: 네 곡선</span><span lang="en">Left: four curves</span></h3>
+  <p lang="ko">가로축 <em>Percentage of Faulty MACs in the TPU (%)</em> 0~50, 세로축 <em>Classification Accuracy (%)</em> 약 15~70. <strong>파랑 = 7쪽 mapping(BaseMap), 빨강 = 개선 mapping. 점선 = 재학습 없음, 실선 = 재학습(+T).</strong> 점은 0, 약 3, 6, 12.5, 25, 50%에 있다. 눈으로 읽은 값(오차 ±1%p쯤):</p>
+  <p lang="en">X axis <em>Percentage of Faulty MACs in the TPU (%)</em>, 0 to 50; Y axis <em>Classification Accuracy (%)</em>, about 15 to 70. <strong>Blue = page 7's mapping (BaseMap), red = the improved mapping; dotted = no retraining, solid = retrained (+T).</strong> Points sit at 0, about 3, 6, 12.5, 25 and 50%. Values read by eye (give or take a point):</p>
+  <table>
+    <thead><tr>
+      <th lang="ko">곡선</th><th lang="en">Curve</th><th>12.5%</th><th>25%</th><th>50%</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko"><span class="cCost">FAP</span> (파란 점선)</td><td lang="en"><span class="cCost">FAP</span> (blue dotted)</td><td>≈ 59.5</td><td>≈ 38.5</td><td><strong>≈ 16</strong></td></tr>
+      <tr><td lang="ko">FAP*+Mapping (빨간 점선)</td><td lang="en">FAP*+Mapping (red dotted)</td><td>≈ 67</td><td>≈ 61.5</td><td>≈ 55</td></tr>
+      <tr><td lang="ko">FAP+T (파란 실선)</td><td lang="en">FAP+T (blue solid)</td><td>≈ 68</td><td>≈ 66.5</td><td>≈ 62</td></tr>
+      <tr><td lang="ko"><span class="cGain">FAP*+Mapping+T</span> (빨간 실선)</td><td lang="en"><span class="cGain">FAP*+Mapping+T</span> (red solid)</td><td>≈ 69</td><td>≈ 69</td><td><strong>≈ 68</strong></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">기준(0%)은 약 69.5%다. 그래프 위에 <strong><em>FAP*+Mapping+T ↓ 1.7%</em></strong>(빨강), 50% 지점 아래에 초록 <em>Fault Rate 50%</em>, 초록 위쪽 화살표 둘이 FAP → FAP*+Mapping의 도약을 25%와 50%에서 가리킨다. PDF 텍스트 층에는 <em>FAP+T ↓ 8%</em>라는 글이 하나 더 있는데 렌더에서는 보이지 않는다. 읽은 값(약 69.5 → 62)과 맞고, <strong>원 논문 본문의 "50% 고장에서 8% 하락"</strong>과도 같다(보충). 이 강의의 주장 두 개가 이 표에 다 있다.</p>
+  <p lang="en">The baseline (0%) is about 69.5%. Above the plot, in red: <strong><em>FAP*+Mapping+T ↓ 1.7%</em></strong>; below the 50% point, in green, <em>Fault Rate 50%</em>, with two green upward arrows marking the FAP → FAP*+Mapping jump at 25% and 50%. The PDF text layer holds one more label, <em>FAP+T ↓ 8%</em>, that doesn't show in the render; it matches the readings (about 69.5 → 62) and <strong>the paper's text, "an 8% drop at a 50% fault rate"</strong> (supplementary). Both of the lecture's claims are in this table:</p>
+  <ul lang="ko">
+    <li><strong>재학습(+T)은 어느 mapping에서나 큰 폭으로 되살린다.</strong> 50%에서 FAP 16 → FAP+T 62.</li>
+    <li><strong>mapping은 재학습 없이도 대부분을 되살린다.</strong> 50%에서 FAP 16 → FAP*+Mapping 55. 7번 절의 "채널을 통째로 잃지 말자"가 숫자로 나온 것이다. 둘을 합치면 MAC 절반이 고장인데 <strong>1.7%p</strong>만 잃는다.</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Retraining (+T) recovers a lot under either mapping</strong>: at 50%, FAP 16 → FAP+T 62.</li>
+    <li><strong>Mapping recovers most of it even without retraining</strong>: at 50%, FAP 16 → FAP*+Mapping 55. Section 7's "don't lose whole channels," in numbers. Combine both and with half the MACs broken you lose only <strong>1.7 points.</strong></li>
+  </ul>
+  <p lang="ko"><em>FAP*</em>의 별표를 슬라이드는 설명하지 않는다. 개선 mapping과 함께 쓰는 FAP라는 표시로 읽힌다.</p>
+  <p lang="en">The slide doesn't explain the asterisk in <em>FAP*</em>; it reads as FAP used together with the improved mapping.</p>
+
+  <h3><span lang="ko">오른쪽: 재학습에 몇 분이 드나</span><span lang="en">Right: how many minutes retraining takes</span></h3>
+  <p lang="ko">가로축 <em>Retraining Time (mins)</em> 0~60(7.5 간격), 세로축 35~70. 범례: 파랑 <em>AlexNet 12% Faulty MACs</em>, 빨강 <em>25%</em>, 검정 <em>50%</em>, 검은 별 <em>Baseline Accuracy</em>. 세 곡선 모두 <strong>첫 점(2.5분쯤)에서 거의 다 올라오고</strong> 그 뒤로는 평평하다. 파랑은 약 67 → 68.5, 빨강은 약 61.5 → 67.5 → 68.3, 검정은 약 55 → 67 → 67.7(15분) → 약 67.8(55분). 15분 지점에 초록 원과 화살표, 초록 글씨 <strong><em>15 mins</em></strong>. 별(기준, 약 69.5)은 20분쯤에 찍혀 있다.</p>
+  <p lang="en">X axis <em>Retraining Time (mins)</em>, 0 to 60 in steps of 7.5; Y axis 35 to 70. Legend: blue <em>AlexNet 12% Faulty MACs</em>, red <em>25%</em>, black <em>50%</em>, black star <em>Baseline Accuracy.</em> All three curves <strong>recover nearly everything by the first point (about 2.5 minutes)</strong> and then go flat: blue about 67 → 68.5; red about 61.5 → 67.5 → 68.3; black about 55 → 67 → 67.7 at 15 minutes → about 67.8 at 55. A green circle and arrow at 15 minutes, labelled in green <strong><em>15 mins.</em></strong> The star (baseline, about 69.5) sits near 20 minutes.</p>
+  <p lang="ko">눈여겨볼 점 하나. <strong>세 곡선의 출발점(0분)이 왼쪽 그래프의 빨간 점선 값과 같다</strong>(12.5%에서 약 67, 25%에서 61.5, 50%에서 55). 오른쪽 그래프는 <strong>FAP*+Mapping 상태에서 재학습을 시작한 것</strong>, 즉 빨간 실선을 만드는 과정이다. 그리고 원 논문 Figure 5는 같은 실험을 <strong>분이 아니라 epoch</strong>으로 그렸다(0~24 epoch). 슬라이드는 이걸 시간으로 바꿔 "칩당 몇 분"이라는 공정 비용의 언어로 옮겼다.</p>
+  <p lang="en">One thing worth noticing: <strong>each curve's starting point (0 minutes) equals the red dotted values on the left</strong> (about 67 at 12.5%, 61.5 at 25%, 55 at 50%). The right plot is <strong>retraining starting from the FAP*+Mapping state</strong>, the process that produces the red solid line. The paper's Figure 5 drew the same experiment <strong>in epochs, not minutes</strong> (0-24 epochs); the slide converts it into time, the language of manufacturing cost: "minutes per chip."</p>
+
+  <div class="ex">
+    <span class="tag" lang="ko">감각 문제</span><span class="tag" lang="en">Get a feel</span>
+    <p lang="ko">어떤 칩이 테스트에서 MAC 30%가 고장으로 나왔다. 왼쪽 그래프만 보고 (1) 재학습 없이 출하한다면 어느 방법을 쓰겠나? (2) 테스트 라인에 칩당 3분밖에 못 쓴다면?</p>
+    <p lang="en">A chip tests at 30% faulty MACs. From the left plot alone: (1) shipping without retraining, which method? (2) If the test line can only spare 3 minutes per chip?</p>
+    <details>
+      <summary><span lang="ko">답</span><span lang="en">Answer</span></summary>
+      <div class="body">
+        <p lang="ko">(1) <strong>FAP*+Mapping.</strong> 재학습 없는 두 곡선 중 25%에서 61.5 대 38.5로 압도적이다. 30%면 그 사이 어딘가(약 60)다. mapping은 칩 고장 지도를 알면 컴파일 단계에서 공짜로 바꿀 수 있다. (2) <strong>FAP*+Mapping+T를 3분만.</strong> 오른쪽 그래프에서 25% 곡선이 첫 점(약 2.5분)에 이미 67.5까지 올라와 있다. 재학습의 이득은 <strong>처음 몇 분에 거의 다 온다.</strong> 15분은 마지막 1%p 남짓을 위한 시간이다. 원 논문이 25 epoch를 5 epoch로 줄여 5배 단축한 것도 같은 논리다.</p>
+        <p lang="en">(1) <strong>FAP*+Mapping.</strong> Of the two no-retraining curves it dominates, 61.5 versus 38.5 at 25%; at 30% it's somewhere around 60. Given the chip's fault map, the mapping can be changed for free at compile time. (2) <strong>FAP*+Mapping+T for just 3 minutes.</strong> On the right, the 25% curve is already at 67.5 by the first point (about 2.5 minutes). <strong>Retraining's gain arrives almost entirely in the first few minutes</strong>; the 15 minutes buys the last point or so. The paper's cut from 25 epochs to 5, a 5x speed-up, follows the same logic.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정</span><span class="tag" lang="en">Trap</span>
+    <h4 lang="ko">"↓1.7%"는 %p이고, 69.5%는 ImageNet top-1이 아니다</h4>
+    <h4 lang="en">"↓1.7%" is percentage points, and 69.5% is not ImageNet top-1</h4>
+    <p lang="ko">정확도에서 "1.7% 하락"은 <strong>69.5에서 67.8로</strong>라는 뜻이다(퍼센트포인트). 상대값이면 2.4%가 된다. 그리고 이 AlexNet은 원 논문 기준 <strong>PASCAL VOC2007</strong>로 학습·평가한 것이다(보충). L04-5에서 본 AlexNet의 ImageNet 숫자(top-1 오류 37.5% 등)와 나란히 놓으면 안 된다. 슬라이드는 데이터셋을 밝히지 않는다.</p>
+    <p lang="en">"Down 1.7%" in accuracy means <strong>69.5 to 67.8</strong>, percentage points; as a relative drop it would be 2.4%. And per the paper, this AlexNet was trained and evaluated on <strong>PASCAL VOC2007</strong> (supplementary). Don't set it beside the ImageNet numbers for AlexNet from lecture 4-5 (37.5% top-1 error and so on). The slide never names the dataset.</p>
+    <h4 lang="ko">슬라이드 숫자와 논문 숫자가 다른 곳 정리</h4>
+    <h4 lang="en">Where slide and paper numbers differ</h4>
+    <table>
+      <thead><tr><th lang="ko">항목</th><th lang="ko">슬라이드</th><th lang="ko">원 논문 (VTS 2018)</th><th lang="ko">이유</th>
+                 <th lang="en">Item</th><th lang="en">Slide</th><th lang="en">Paper (VTS 2018)</th><th lang="en">Why</th></tr></thead>
+      <tbody>
+        <tr><td lang="ko">대표 고장률</td><td>0.012%</td><td>0.006%</td><td lang="ko">MAC 8개 vs 4개. 가리키는 점이 다르다</td>
+            <td lang="en">headline fault rate</td><td lang="en">0.012%</td><td lang="en">0.006%</td><td lang="en">8 MACs vs 4: different data points</td></tr>
+        <tr><td lang="ko">재학습 시간</td><td lang="ko">15분</td><td lang="ko">12분 (5 epoch)</td><td lang="ko">mapping 유무와 측정 방식이 다르다. 슬라이드 곡선은 FAP*+Mapping에서 출발한다</td>
+            <td lang="en">retraining time</td><td lang="en">15 min</td><td lang="en">12 min (5 epochs)</td><td lang="en">different mapping and measurement; the slide's curves start from FAP*+Mapping</td></tr>
+        <tr><td lang="ko">TIMIT 입력</td><td>1895</td><td>1845</td><td lang="ko">밝혀지지 않음. 어느 한쪽의 오기로 보인다</td>
+            <td lang="en">TIMIT input</td><td lang="en">1895</td><td lang="en">1845</td><td lang="en">unexplained; likely a typo on one side</td></tr>
+        <tr><td lang="ko">mapping 개선</td><td lang="ko">8, 13쪽 (CUMap, FAP*+Mapping)</td><td lang="ko">없음 ("범위 밖")</td><td lang="ko">후속 연구(저널판으로 보임)의 내용</td>
+            <td lang="en">improved mapping</td><td lang="en">pages 8, 13 (CUMap, FAP*+Mapping)</td><td lang="en">none ("out of scope")</td><td lang="en">follow-up work (apparently the journal version)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head"><span class="sec-num">12</span><h2 lang="ko">정리 &amp; 다음 강의</h2><h2 lang="en">Recap &amp; next lecture</h2></div>
+
+  <h3><span lang="ko">한 장 요약</span><span lang="en">One-page recap</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">쪽</th><th lang="ko">무엇을 말했나</th><th lang="ko">기억할 숫자</th>
+      <th lang="en">Pages</th><th lang="en">What it said</th><th lang="en">Number to remember</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>2</td>
+          <td lang="ko">systolic array는 데이터센터(TPU)부터 연구 SoC(EPOCHS-1)까지 같은 구조. MAC 하나는 8b × 8b → 16b, psum 24b</td>
+          <td lang="ko">256×256 = 65,536 · 32×32</td>
+          <td lang="en">From datacenter (TPU) to research SoC (EPOCHS-1), the same structure. One MAC: 8b × 8b → 16b, 24b psum</td>
+          <td lang="en">256×256 = 65,536 · 32×32</td></tr>
+      <tr><td>3</td>
+          <td lang="ko">WS는 정확한 스케줄로 돈다. 출력 하나가 열 하나의 MAC 전부를 지난다</td>
+          <td lang="ko"><span class="m"><i>y</i><sub>11</sub> = Σ<sub><i>k</i></sub> <i>w</i><sub><i>k</i>1</sub><i>a</i><sub>1<i>k</i></sub></span></td>
+          <td lang="en">WS runs on a precise schedule; one output crosses every MAC of a column</td>
+          <td lang="en"><span class="m"><i>y</i><sub>11</sub> = Σ<sub><i>k</i></sub> <i>w</i><sub><i>k</i>1</sub><i>a</i><sub>1<i>k</i></sub></span></td></tr>
+      <tr><td>4-5</td>
+          <td lang="ko">제조 결함 → stuck-at → 상위 비트 오류 → 열 전체 오염. 오차가 작고 넓은 게 아니라 크고 드물다</td>
+          <td lang="ko">MAC 8개(0.012%)에 TIMIT 반 토막</td>
+          <td lang="en">Defect → stuck-at → high-order bit error → whole column corrupted. Errors are rare and huge, not small and spread</td>
+          <td lang="en">8 MACs (0.012%) halve TIMIT</td></tr>
+      <tr><td>6</td>
+          <td lang="ko">고장 내성 · 정확도 · 성능/면적 셋을 같이 맞추는 cross-layer co-design</td>
+          <td lang="ko">삼각형의 세 꼭짓점</td>
+          <td lang="en">Cross-layer co-design balancing fault tolerance, accuracy and performance/area</td>
+          <td lang="en">the triangle's three corners</td></tr>
+      <tr><td>7</td>
+          <td lang="ko">FAP: 고장 MAC = 거기 실린 weight가 0. mux 하나로 건너뛴다. 0을 싣는 것과는 다르다</td>
+          <td lang="ko">bypass 면적 ≈ 9% (보충) · 실행 시간 +0</td>
+          <td lang="en">FAP: faulty MAC = its weights are zero, skipped with one mux; not the same as loading a zero</td>
+          <td lang="en">bypass area ≈ 9% (supplementary) · run time +0</td></tr>
+      <tr><td>8</td>
+          <td lang="ko">mapping이 잘리는 weight의 수가 아니라 <strong>모양</strong>을 정한다. BaseMap은 채널 통째, CUMap은 kernel 한 줄씩</td>
+          <td lang="ko">둘 다 81개 중 27개</td>
+          <td lang="en">Mapping sets the <strong>shape</strong> of the pruning, not the count: BaseMap whole channels, CUMap one kernel column each</td>
+          <td lang="en">27 of 81 either way</td></tr>
+      <tr><td>9-10</td>
+          <td lang="ko">FAP+T: 칩마다 고장 지도가 다르므로 칩마다 한 번 재학습. 비용은 테스트 시점에만</td>
+          <td lang="ko">칩마다 weight 세트 하나</td>
+          <td lang="en">FAP+T: every chip has its own fault map, so retrain once per chip; cost only at test time</td>
+          <td lang="en">one weight set per chip</td></tr>
+      <tr><td>11-12</td>
+          <td lang="ko">PyTorch · RTL · netlist를 잇는 흐름. 결과물은 모델과 netlist 한 쌍. 256×256 netlist에 고장 주입</td>
+          <td lang="ko">TIMIT(FC) · AlexNet(conv+FC)</td>
+          <td lang="en">A flow joining PyTorch, RTL and netlist; the output is a model-netlist pair. Faults injected in a 256×256 netlist</td>
+          <td lang="en">TIMIT (FC) · AlexNet (conv+FC)</td></tr>
+      <tr><td>13</td>
+          <td lang="ko">50% 고장에서 FAP ≈ 16%, FAP+T ≈ 62%, FAP*+Mapping+T는 기준 대비 1.7%p 하락. 재학습 이득은 처음 몇 분에 온다</td>
+          <td lang="ko">↓1.7%p · 15분</td>
+          <td lang="en">At 50% faults: FAP ≈ 16%, FAP+T ≈ 62%, FAP*+Mapping+T just 1.7 points below baseline. Retraining's gain comes in the first minutes</td>
+          <td lang="en">↓1.7 points · 15 min</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span lang="ko">앞 강의들과의 대응</span><span lang="en">How earlier lectures map onto this one</span></h3>
+  <table>
+    <thead><tr>
+      <th lang="ko">앞에서</th><th lang="ko">여기서</th>
+      <th lang="en">Earlier</th><th lang="en">Here</th>
+    </tr></thead>
+    <tbody>
+      <tr><td lang="ko">L01 15번 절: 자동차 칩의 Safety 구획, Cerebras WSE</td><td lang="ko">reliability가 예고된 곳. wafer-scale은 고장을 안고 쓰는 설계여야 한다 (3번 절)</td>
+          <td lang="en">Lecture 1 section 15: the automotive chip's safety region, Cerebras WSE</td><td lang="en">where reliability was foreshadowed; wafer scale has to be designed to run with faults (section 3)</td></tr>
+      <tr><td lang="ko">L07-8-9 10번 절: TPUv1 roofline</td><td lang="ko">같은 256×256 배열이 이번엔 고장 실험 대상 (1, 10번 절)</td>
+          <td lang="en">Lecture 7-8-9 section 10: TPUv1 roofline</td><td lang="en">the same 256×256 array, now under fault injection (sections 1, 10)</td></tr>
+      <tr><td lang="ko">L10 12번 절: WS 배열은 psum을 이웃으로 넘긴다</td><td lang="ko">그 덕에 고장이 열 전체로 번진다 (2번 절). mapping은 에너지가 아니라 정확도 문제가 된다 (7번 절)</td>
+          <td lang="en">Lecture 10 section 12: a WS array passes psums to neighbours</td><td lang="en">which is exactly why a fault spreads down the whole column (section 2); mapping becomes an accuracy question, not an energy one (section 7)</td></tr>
+      <tr><td lang="ko">ECE 479 Lec12: magnitude pruning, retrain 필수</td><td lang="ko">같은 재학습 절차에 마스크만 칩이 준다 (6, 8번 절)</td>
+          <td lang="en">ECE 479 lecture 12: magnitude pruning, retraining required</td><td lang="en">the same retraining loop, with the mask supplied by the chip (sections 6, 8)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout" lang="ko">
+    <strong>이 강의를 한 문장으로 접으면 이렇다.</strong> WS systolic array에서는 <span class="cAlg">weight</span> 하나가 <span class="cHw">MAC</span> 하나에 정적으로 묶이므로, 고장 난 MAC을 <span class="cGain">mux 하나</span>로 건너뛰면 그건 그 weight를 0으로 놓은 것과 같고, <span class="cSw">mapping</span>으로 그 0들이 한 채널에 몰리지 않게 흩은 뒤 칩마다 한 번 <span class="cAlg">재학습</span>하면, <span class="cCost">MAC 절반이 고장 난 칩</span>도 실행 시간을 하나도 늘리지 않고 거의 원래 정확도로 쓸 수 있다.
+  </div>
+  <div class="callout" lang="en">
+    <strong>Folded into one sentence:</strong> in a WS systolic array each <span class="cAlg">weight</span> is statically tied to one <span class="cHw">MAC</span>, so skipping a faulty MAC with <span class="cGain">a single mux</span> is the same as zeroing that weight; spread those zeros with the <span class="cSw">mapping</span> so no channel takes them all, <span class="cAlg">retrain</span> once per chip, and even <span class="cCost">a chip with half its MACs broken</span> runs at nearly full accuracy without a single extra cycle.
+  </div>
+
+  <h3><span lang="ko">이 뒤로 이어지는 이야기 (보충)</span><span lang="en">Where the story goes next (supplementary)</span></h3>
+  <p lang="ko">원 논문은 결론에서 다음 숙제로 <strong>노화(aging)에 따른 고장</strong>과 <strong>더 큰 망</strong>을 꼽았다. 노화 고장은 출하 테스트 이후에 생기므로, 공장에서 한 번 만든 고장 지도로는 못 잡는다. 현장에서 칩이 스스로 검사하고 다시 맞추는 방향이 필요하다. 그리고 데이터센터 규모에서는 테스트를 통과한 칩이 나중에 조용히 틀린 값을 내는 <strong>silent data corruption</strong>이 실제 문제로 보고됐다. Google의 <em>Cores that don't count</em>(Hochschild et al., HotOS 2021)가 대표적이다. 이 강의의 고장 모델(출하 전에 위치를 다 아는 영구 고장)은 그 큰 그림의 가장 다루기 쉬운 한 조각이다.</p>
+  <p lang="en">The paper's conclusion names two next steps: <strong>aging-related faults</strong> and <strong>larger networks.</strong> Aging faults appear after shipping test, so a fault map built once at the factory misses them; the chip has to re-test and re-adapt in the field. And at datacenter scale, chips that passed test later emitting quietly wrong values, <strong>silent data corruption</strong>, has been reported as a real problem; Google's <em>Cores that don't count</em> (Hochschild et al., HotOS 2021) is the standard reference. This lecture's fault model, permanent faults whose locations are all known before shipping, is the most tractable slice of that larger picture.</p>
+
+  <h3><span lang="ko">다음 강의</span><span lang="en">Next lecture</span></h3>
+  <p lang="ko">이 덱은 예고 슬라이드 없이 13쪽 결과 그래프로 끝난다. 2쪽에서 "scalable deep learning accelerator"로 소개한 systolic array가 이 강의 내내 무대였고, 이 강의는 그 무대의 <strong>신뢰성</strong> 축을 다뤘다. 다음 덱이 같은 무대의 어느 축으로 가는지는 다음 슬라이드가 정한다.</p>
+  <p lang="en">This deck ends on page 13's result plots with no preview slide. The systolic array introduced on page 2 as a "scalable deep learning accelerator" was the stage throughout, and this lecture covered its <strong>reliability</strong> axis. Which axis of the same stage comes next is for the next deck to say.</p>
+  <p lang="ko">실제로 이어진 덱은 <a href="L15-energy-efficient-systolic-array.html">Lecture 15-16 · Energy-Efficient Systolic Array Design</a>이다. 같은 배열을 이번에는 <strong>에너지</strong> 축에서 본다. 전압을 낮추면 timing error가 생기고, 그 error를 오늘의 FAP처럼 weight를 끄는 것으로 흡수한다.</p>
+  <p lang="en">The deck that actually followed is <a href="L15-energy-efficient-systolic-array.html">Lecture 15-16 · Energy-Efficient Systolic Array Design</a>, the same array seen along the <strong>energy</strong> axis: lowering the voltage causes timing errors, which get absorbed by dropping weights, much like today's FAP.</p>
+</section>
+
+<footer>
+  <span lang="ko">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 13-14 개인 학습 노트<br>
+  강의: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  지정 교재: Sze, Chen, Yang, Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio, Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  보충 근거: Zhang, Gu, Basu, Garg, <em>Analyzing and Mitigating the Impact of Permanent Faults on a Systolic Array Based Neural Network Accelerator</em>, IEEE VTS 2018 (arXiv 1802.04657)<br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Jeff (Jun) Zhang 교수와 Arizona State University에 있습니다.</span><span lang="en">EEE / CEN 598 Hardware and Systems for Machine Learning · Lecture 13-14 personal study notes<br>
+  Course: Jeff (Jun) Zhang, Arizona State University · Fall 2026<br>
+  Assigned texts: Sze, Chen, Yang and Emer, <em>Efficient Processing of Deep Neural Networks</em> (2020) · Goodfellow, Bengio and Courville, <em>Deep Learning</em> (2016) · Nielsen, <em>Neural Networks and Deep Learning</em> (2015)<br>
+  Supplementary source: Zhang, Gu, Basu and Garg, <em>Analyzing and Mitigating the Impact of Permanent Faults on a Systolic Array Based Neural Network Accelerator</em>, IEEE VTS 2018 (arXiv 1802.04657)<br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Jeff (Jun) Zhang and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 고장 지도 → pruning 마스크. 8쪽 예제: 9×9 배열, filter 3×3×9 (81 weight), 열 하나 = filter 하나.
+// BaseMap: 행 r = 입력 채널 r. 고장 (r, c)면 filter c의 채널 r 전체(9칸)가 잘린다.
+// CUMap  : 행 r = 그룹 g = floor(r/3), 가로 위치 j = r mod 3. 채널 ch(0-based)는 그룹 ch mod 3을 쓴다.
+//          고장 (r, c)면 그룹 g를 쓰는 채널 셋의 kernel 세로 줄 j(3칸)가 잘린다.
+(function () {
+  var mHost = document.getElementById('fmMap');
+  if (!mHost) return;
+  var cHost = document.getElementById('fmCol');
+  var pHost = document.getElementById('fmPre');
+  var svgHost = document.getElementById('fmSvg');
+  var out = document.getElementById('fmOut');
+  var vd = document.getElementById('fmV');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  // 슬라이드 8쪽 (a)의 빨간 MAC (1-based 행: 열 목록)
+  var SLIDE = { 1: [4], 2: [1, 5], 3: [3, 9], 4: [1], 5: [4, 5, 7], 7: [5], 8: [7], 9: [1, 7] };
+  var F = [];
+  function clear() { F = []; for (var r = 0; r < 9; r++) { F.push([false, false, false, false, false, false, false, false, false]); } }
+  function loadSlide() {
+    clear();
+    Object.keys(SLIDE).forEach(function (k) { SLIDE[k].forEach(function (c) { F[+k - 1][c - 1] = true; }); });
+  }
+  function randomRate(p) {
+    clear();
+    for (var r = 0; r < 9; r++) for (var c = 0; c < 9; c++) F[r][c] = Math.random() < p;
+  }
+  loadSlide();
+
+  var MAPS = [{ key: 'base', ko: 'BaseMap', en: 'BaseMap' }, { key: 'cu', ko: 'CUMap', en: 'CUMap' }];
+  var map = MAPS[0], col = 0, preset = 'slide';
+  var PRE = [
+    { key: 'slide', ko: '슬라이드 8쪽', en: 'Slide page 8', run: loadSlide },
+    { key: 'clear', ko: '고장 없음', en: 'No faults', run: clear },
+    { key: 'r12', ko: '무작위 12%', en: 'Random 12%', run: function () { randomRate(0.12); } },
+    { key: 'r25', ko: '무작위 25%', en: 'Random 25%', run: function () { randomRate(0.25); } },
+    { key: 'r50', ko: '무작위 50%', en: 'Random 50%', run: function () { randomRate(0.5); } }
+  ];
+
+  // 잘린 weight 마스크: pruned[ch][pos], ch 0..8, pos 0..8 (kernel 행 우선 1..9)
+  function mask(key) {
+    var P = [], ch, pos, r;
+    for (ch = 0; ch < 9; ch++) P.push([false, false, false, false, false, false, false, false, false]);
+    for (r = 0; r < 9; r++) {
+      if (!F[r][col]) continue;
+      if (key === 'base') {
+        for (pos = 0; pos < 9; pos++) P[r][pos] = true;
+      } else {
+        var g = Math.floor(r / 3), j = r % 3;
+        for (ch = 0; ch < 9; ch++) if (ch % 3 === g) for (var kr = 0; kr < 3; kr++) P[ch][kr * 3 + j] = true;
+      }
+    }
+    return P;
+  }
+  function stats(P) {
+    var s = { pruned: 0, dead: 0, worst: 0, intact: 0 };
+    P.forEach(function (row) {
+      var n = row.filter(Boolean).length;
+      s.pruned += n;
+      if (n === 9) s.dead++;
+      if (n === 0) s.intact++;
+      if (n > s.worst) s.worst = n;
+    });
+    return s;
+  }
+
+  function draw() {
+    var P = mask(map.key);
+    var s = '<svg viewBox="0 0 680 380" role="img" aria-label="' +
+      L('9×9 MAC 격자의 고장 지도와, 고른 열에 실린 filter의 채널별 3×3 kernel 중 잘린 칸을 보여주는 그림',
+        'a 9×9 MAC fault map beside the chosen column\'s filter, showing pruned cells of each channel\'s 3×3 kernel') + '">';
+    // 왼쪽: 배열
+    var x0 = 34, y0 = 34, d = 34;
+    s += '<text class="svglab" x="' + x0 + '" y="20" style="font-size:11px;font-weight:700" fill="var(--ink2)">' + L('9×9 TPU · 누르면 고장 토글', '9×9 TPU · click to toggle') + '</text>';
+    for (var r = 0; r < 9; r++) {
+      s += '<text class="svgnum" x="' + (x0 - 8) + '" y="' + (y0 + r * d + 20) + '" text-anchor="end" style="font-size:11px" fill="var(--ink3)">' + (r + 1) + '</text>';
+      for (var c = 0; c < 9; c++) {
+        var f = F[r][c], sel = c === col;
+        s += '<rect data-r="' + r + '" data-c="' + c + '" x="' + (x0 + c * d) + '" y="' + (y0 + r * d) + '" width="' + (d - 4) + '" height="' + (d - 4) + '" rx="3" style="cursor:pointer" fill="' +
+          (f ? 'rgba(var(--amber-rgb),.55)' : (sel ? 'rgba(var(--violet-rgb),.16)' : 'var(--card)')) + '" stroke="' +
+          (f ? 'var(--amber)' : (sel ? 'var(--violet)' : 'var(--rule)')) + '" stroke-width="' + (sel ? 1.8 : 1.1) + '"/>';
+      }
+    }
+    for (c = 0; c < 9; c++) {
+      s += '<text class="svgnum" x="' + (x0 + c * d + 15) + '" y="' + (y0 + 9 * d + 12) + '" text-anchor="middle" style="font-size:11px" fill="' + (c === col ? 'var(--violet)' : 'var(--ink3)') + '">' + (c + 1) + '</text>';
+    }
+    if (map.key === 'cu') {
+      for (var g = 0; g < 3; g++) {
+        s += '<rect x="' + (x0 - 26) + '" y="' + (y0 + g * 3 * d) + '" width="4" height="' + (3 * d - 4) + '" fill="var(--pink)"/>';
+      }
+      s += '<text class="svglab" x="' + x0 + '" y="' + (y0 + 9 * d + 30) + '" style="font-size:10.5px" fill="var(--pink)">' + L('분홍 막대 = CUMap 행 그룹 (채널 1·4·7 / 2·5·8 / 3·6·9)', 'pink bars = CUMap row groups (ch 1·4·7 / 2·5·8 / 3·6·9)') + '</text>';
+    } else {
+      s += '<text class="svglab" x="' + x0 + '" y="' + (y0 + 9 * d + 30) + '" style="font-size:10.5px" fill="var(--pink)">' + L('BaseMap: 행 r = 입력 채널 r', 'BaseMap: row r = input channel r') + '</text>';
+    }
+    // 오른쪽: filter 채널 9개
+    var X0 = 386, Y0 = 34, cw = 20, bw = 3 * cw;
+    s += '<text class="svglab" x="' + X0 + '" y="20" style="font-size:11px;font-weight:700" fill="var(--ink2)">' + L('열 ' + (col + 1) + '의 filter · 채널별 3×3', 'filter on column ' + (col + 1) + ' · 3×3 per channel') + '</text>';
+    for (var ch = 0; ch < 9; ch++) {
+      var bx = X0 + (ch % 3) * (bw + 42), by = Y0 + Math.floor(ch / 3) * (bw + 40);
+      var n = P[ch].filter(Boolean).length;
+      s += '<text class="svglab" x="' + bx + '" y="' + (by + 11) + '" style="font-size:11px" fill="' + (n === 9 ? 'var(--amber)' : 'var(--ink2)') + '">ch ' + (ch + 1) + (n ? ' −' + n : '') + '</text>';
+      for (var pos = 0; pos < 9; pos++) {
+        var cx = bx + (pos % 3) * cw, cy = by + 16 + Math.floor(pos / 3) * cw, pr = P[ch][pos];
+        s += '<rect x="' + cx + '" y="' + cy + '" width="' + (cw - 2) + '" height="' + (cw - 2) + '" rx="2" fill="' +
+          (pr ? 'rgba(var(--amber-rgb),.18)' : 'rgba(var(--blue-rgb),.16)') + '" stroke="' + (pr ? 'var(--amber)' : 'var(--blue)') + '" stroke-width="1"/>';
+        if (pr) {
+          s += '<line x1="' + (cx + 2) + '" y1="' + (cy + 2) + '" x2="' + (cx + cw - 4) + '" y2="' + (cy + cw - 4) + '" stroke="var(--amber)" stroke-width="1.4"/>';
+          s += '<line x1="' + (cx + cw - 4) + '" y1="' + (cy + 2) + '" x2="' + (cx + 2) + '" y2="' + (cy + cw - 4) + '" stroke="var(--amber)" stroke-width="1.4"/>';
+        }
+      }
+    }
+    s += '<text class="svglab" x="' + X0 + '" y="' + (Y0 + 3 * (bw + 40) + 6) + '" style="font-size:10.5px" fill="var(--ink3)">' + L('파랑 = 살아 있는 weight · 주황 X = 잘림', 'blue = surviving weight · amber X = pruned') + '</text>';
+    s += '</svg>';
+    svgHost.innerHTML = s;
+  }
+
+  function row(label, value, strong) {
+    return '<div style="display:flex;justify-content:space-between;gap:14px;font-size:14px">' +
+      '<span>' + label + '</span>' +
+      (strong ? '<strong>' + value + '</strong>' : '<span class="svgnum">' + value + '</span>') + '</div>';
+  }
+
+  function paint() {
+    draw();
+    var nf = 0, total = 0;
+    for (var r = 0; r < 9; r++) for (var c = 0; c < 9; c++) { if (F[r][c]) { total++; if (c === col) nf++; } }
+    var a = stats(mask('base')), b = stats(mask('cu')), me = map.key === 'base' ? a : b;
+    out.innerHTML =
+      row(L('배열 전체 고장 MAC', 'faulty MACs, whole array'), total + ' / 81 (' + Math.round(total / 81 * 100) + '%)') +
+      row(L('이 열의 고장 MAC', 'faulty MACs in this column'), String(nf)) +
+      row(L('잘린 weight (81개 중)', 'pruned weights (of 81)'), String(me.pruned), true) +
+      row(L('통째로 잃은 채널', 'channels lost entirely'), String(me.dead), true) +
+      row(L('하나도 안 잘린 채널', 'channels untouched'), String(me.intact));
+    var good = b.dead < a.dead;
+    vd.className = 'verdict ' + (me.dead === 0 ? 'ok' : 'bad');
+    vd.innerHTML = '<div class="hd">' + map.en + ' · ' + L('열 ', 'column ') + (col + 1) + '</div>' +
+      (nf === 0
+        ? L('<strong>이 열에는 고장이 없다.</strong> filter ' + (col + 1) + '은 하나도 안 잘린다. 다른 열을 눌러 보자.',
+            '<strong>No faults in this column.</strong> Filter ' + (col + 1) + ' keeps every weight. Try another column.')
+        : L('잘린 수는 BaseMap ' + a.pruned + ', CUMap ' + b.pruned + '로 <strong>같다</strong>(고장 ' + nf + '개 × 9). 다른 것은 모양이다. 통째로 잃은 채널이 BaseMap <strong>' + a.dead + '개</strong>, CUMap <strong>' + b.dead + '개</strong>. ' +
+              (good ? 'CUMap이 잘림을 채널마다 나눠서, 재학습이 메울 여지를 남긴다.' : (b.dead > 0 ? 'CUMap도 한 행 그룹에 고장이 셋 다 몰리면 채널을 통째로 잃는다.' : '이 경우는 둘 다 통째로 잃은 채널이 없다.')),
+            'Pruned counts are <strong>equal</strong>: BaseMap ' + a.pruned + ', CUMap ' + b.pruned + ' (' + nf + ' faults × 9). The shape differs: channels lost entirely, BaseMap <strong>' + a.dead + '</strong>, CUMap <strong>' + b.dead + '</strong>. ' +
+              (good ? 'CUMap spreads the cuts across channels, leaving retraining room to compensate.' : (b.dead > 0 ? 'Even CUMap loses whole channels when all three rows of a group fail.' : 'Here neither mapping loses a whole channel.'))));
+  }
+
+  function build(host, items, label, isOn, onPick) {
+    host.textContent = '';
+    items.forEach(function (it) {
+      var bt = document.createElement('button');
+      bt.type = 'button';
+      bt.textContent = label(it);
+      if (isOn(it)) bt.className = 'act';
+      bt.addEventListener('click', function () { onPick(it); render(); });
+      host.appendChild(bt);
+    });
+  }
+
+  function render() {
+    build(mHost, MAPS, function (m) { return L(m.ko, m.en); }, function (m) { return m === map; }, function (m) { map = m; });
+    build(cHost, [0, 1, 2, 3, 4, 5, 6, 7, 8], function (v) { return String(v + 1); }, function (v) { return v === col; }, function (v) { col = v; });
+    build(pHost, PRE, function (p) { return L(p.ko, p.en); }, function (p) { return p.key === preset; }, function (p) { preset = p.key; p.run(); });
+    paint();
+  }
+
+  svgHost.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.getAttribute || t.getAttribute('data-r') === null) return;
+    var r = +t.getAttribute('data-r'), c = +t.getAttribute('data-c');
+    F[r][c] = !F[r][c];
+    col = c;
+    preset = '';
+    render();
+  });
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="../assets/reader.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
